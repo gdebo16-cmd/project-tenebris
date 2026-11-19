@@ -1,0 +1,7 @@
+{
+  "name": "tenebris",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
+  "engines": { "node": ">=22" }
+}
