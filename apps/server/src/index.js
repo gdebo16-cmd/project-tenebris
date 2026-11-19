@@ -17,7 +17,6 @@ const store = new PgStore({
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const publicDir = path.join(__dirname, "Public");
 const clientDist = path.join(__dirname, "..", "..", "web", "dist");
 
 app.set("trust proxy", 1);
@@ -36,7 +35,6 @@ app.use(sessionMiddleware);
 
 app.use(express.json()); //to accept JSON strings
 app.use(express.urlencoded({ extended: true }));  //to accept forms
-app.use(express.static(publicDir)); // images (/utils, /classes, /races, /subclasses) for the React client
 
 app.use('/api', apiRoutes);
 
