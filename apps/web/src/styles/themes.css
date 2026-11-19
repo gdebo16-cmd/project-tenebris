@@ -1,0 +1,1096 @@
+/* Shared theme + display variables and base element styles. Loaded once for every page from main.jsx (before components.css and the page stylesheet). */
+
+:root,
+/* #region Standard Display Section */
+[data-display='standard'] {
+    /* theme colours: every [data-theme] sets only the 8 core values; the rest derive from them */
+    --gold-gradient: linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent) 75%, black));
+    --healColor: color-mix(in srgb, #6fbf73 40%, transparent);
+    --damageColor: color-mix(in srgb, var(--bg) 70%, transparent);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #d8a15e 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #b27f50 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #8366a7 30%);
+    --sliderThumb: #d8a15e;
+    --navSlideFill: rgba(216, 161, 94, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(216, 161, 94, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+    --bgc-bubble-send: var(--bg);
+    --bgc-bubble-receive: var(--surface);
+    --bgc-orb: color-mix(in srgb, var(--surface) 60%, var(--muted));
+    --txt-orb: var(--text);
+    --bs-orb: 0 0 6px var(--accent);
+    --bbl-shadow: var(--muted);
+    --bg-color-statmod: color-mix(in srgb, var(--accent) 45%, transparent);
+    --bg-color-header: color-mix(in srgb, var(--bg) var(--glass), transparent);
+    --bgc-top: var(--bg);
+    --bgc-low: color-mix(in srgb, var(--surface) var(--glass), transparent);
+    --portrait-border: 3px ridge var(--accent);
+    --bordercolor: var(--border);
+    --txt-color-1: var(--text);
+    --site-title-bg: color-mix(in srgb, var(--bg) var(--glass), transparent);
+    --bg-color-nav: color-mix(in srgb, var(--bg) var(--glass), transparent);
+    --spellslot-border: var(--accent);
+    --spellslot-checked: var(--accent);
+    --spellslot-checked-shadow: var(--accent-2);
+    --panel-bg: color-mix(in srgb, var(--surface) 25%, transparent);
+    --damage-bg: color-mix(in srgb, var(--surface) var(--glass), var(--accent-2) 10%);
+    --bgc-spell-tab: color-mix(in srgb, var(--surface) var(--glass), transparent);
+    --txt-spell-tab: var(--text);
+    --txt-tab: var(--text);
+    --bgc-tab: color-mix(in srgb, var(--surface) var(--glass), transparent);
+    --tab-shadow: var(--accent);
+    --tab-border: 1px solid var(--border);
+    --bs-book: 0 0 6px var(--border);
+    --drop-down-bg: var(--surface);
+    --drop-down-txt: var(--text);
+    --rest-bgc: color-mix(in srgb, var(--bg) var(--glass), transparent);
+    --rest-txt: var(--text);
+    --rest-bg-choice-1: var(--accent);
+    --rest-txt-choice-1: var(--bg);
+    --rest-bg-choice-2: var(--surface);
+    --rest-txt-choice-2: var(--text);
+    --bgc-action-bar: color-mix(in srgb, var(--bg) 20%, transparent);
+    --bgc-action: var(--bgc-tab);
+    --txt-action: var(--text);
+    --bgc-char-name: color-mix(in srgb, var(--bg) var(--glass), transparent);
+    --bgc-char-stat: color-mix(in srgb, var(--surface) var(--glass), transparent);
+    --bgc-char-delete: var(--accent);
+    --delete-txt: var(--bg);
+    --bgc-theme: var(--bg);
+    --bgc-title: var(--bg);
+    --bg-color-5: var(--surface);
+    --bg-color-4: color-mix(in srgb, var(--surface) 50%, transparent);
+    --bg-color-3: color-mix(in srgb, var(--muted) 25%, transparent);
+    --bg-color-2: color-mix(in srgb, var(--surface) var(--glass), transparent);
+    --bg-color-1: color-mix(in srgb, var(--bg) 45%, transparent);
+    --title-color: var(--accent);
+    --title-text: var(--text);
+    --text-color-2: var(--muted);
+    --txt-gradient: linear-gradient(to bottom, var(--text), var(--muted));
+
+    /* retool phase 1: shared literals */
+    --radCornerBL: 0 0 0 10px;
+    --radCornerBR: 0 0 10px 0;
+    --tileBorder: 1px solid var(--bordercolor);
+    --bs3: none;
+    --bs1: 2px 2px 15px black;
+    --bs2: 2px 2px 10px black;
+    --fontfam: "Almendra", serif;
+    --fontweight: 400;
+    --fontstyle: normal;
+    --shadowInner: none;
+    --tile: 10px;
+    --section-gap: 0.75rem;
+    --fontS1: 100%;
+    --fontS2: 130%;
+    --fontS3: 160%;
+    --w1: 100%;
+    --w2: 100vw;
+    --h1: 100%;
+    --h2: 100vh;
+    --maxW: 100%;
+    --maxH1: 100%;
+    --maxH2: 100vh;
+    --ofX1: hidden;
+    --ofX2: hidden;
+    --ofY1: auto;
+    --ofY2: auto;
+    --border1: none;
+    --orb: 50%;
+    --bs-bubble: 0 0 6px var(--bbl-shadow);
+    --open-orb: 10px;
+    --tab: 0.5rem;
+    --bs-tab: 0 0 6px var(--tab-shadow);
+    --nav-tile: 0.5rem;
+}
+[data-display='compact'] {
+    --tileBorder: none;
+    --rad1: .5rem;
+    --rad2: .25rem;
+    --bs1: 2px 2px 5px black;
+    --bs2: 2px 2px 9px black;
+    --bs3: 2px 2px 5px black;
+    --pad1: 2.5%;
+    --pad2: 1.5%;
+    --pad3: 0;
+    --mar1: 0;
+    --mar2: 1%;
+    --shadowInner: none;
+    --toprad: .5rem .5rem 0 0;
+    --lowrad: 0 0 .5rem .5rem;
+    --padTop: 1.5rem;
+    --padLow: 1.5rem;
+    --tile: .5rem;
+    --marTop: 0;
+    --marLow: 0;
+    --section-gap: 0.75rem;
+    --fontfam: "Almendra", serif;
+    --fontweight: 400;
+    --fontstyle: normal;
+    --fontS1: 100%;
+    --fontS2: 130%;
+    --fontS3: 150%;
+    --w1: 100%;
+    --w2: 100vw;
+    --h1: 100%;
+    --h2: 100vh;
+    --maxW: 100%;
+    --maxH1: 100%;
+    --maxH2: 100vh;
+    --minW1: 0;
+    --minW2: 0;
+    --minH1: 0;
+    --minH2: 0;
+    --ofX1: hidden;
+    --ofX2: hidden;
+    --ofY1: auto;
+    --ofY2: auto;
+    --border1: none;
+}
+[data-display='neon'] {
+    --tileBorder: 3px double var(--border);
+    --rad1: .25rem;
+    --rad2: .125rem;
+    --bs1: 2px 2px 5px black;
+    --pad1: 2.5%;
+    --pad2: 1.5%;
+    --pad3: 0;
+    --mar1: 0;
+    --mar2: 1%;
+    --shadowInner: none;
+    --toprad: .5rem .5rem 0 0;
+    --lowrad: 0 0 .5rem .5rem;
+    --padTop: .5rem;
+    --padLow: .5rem;
+    --tile: .5rem;
+    --marTop: 0;
+    --marLow: 0;
+    --section-gap: 0.75rem;
+    --fontfam: "Almendra", serif;
+    --fontweight: 400;
+    --fontstyle: normal;
+    --fontS1: 100%;
+    --fontS2: 130%;
+    --fontS3: 150%;
+    --w1: 100%;
+    --w2: 100vw;
+    --h1: 100%;
+    --h2: 100vh;
+    --maxW: 100%;
+    --maxH1: 100%;
+    --maxH2: 100vh;
+    --minW1: 0;
+    --minW2: 0;
+    --minH1: 0;
+    --minH2: 0;
+    --ofX1: hidden;
+    --ofX2: hidden;
+    --ofY1: auto;
+    --ofY2: auto;
+    --border1: none;
+    --bs3: var(--glow);
+    --bs2: var(--glow);
+    --glow: 2px 2px 15px var(--border);
+    --backdrop: blur(6px) saturate(190%);
+}
+[data-display='glass'] {
+    --tileBorder: 1px solid rgba(255, 255, 255, 0.25);
+    --rad1: 1.25rem;
+    --rad2: .75rem;
+    --bs1: 0 8px 32px rgba(0, 0, 0, 0.35);
+    --bs2: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --bs3: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --toprad: 1.25rem 1.25rem 0 0;
+    --lowrad: 0 0 1.25rem 1.25rem;
+    --tile: .75rem;
+    --backdrop: blur(15px) saturate(180%);
+    --inputRad: .75rem;
+}
+[data-display='parchment'] {
+    --tileBorder: 2px solid var(--bordercolor);
+    --rad1: .2rem;
+    --rad2: .1rem;
+    --bs1: 3px 4px 0 rgba(0, 0, 0, 0.55);
+    --bs2: 2px 3px 0 rgba(0, 0, 0, 0.5);
+    --bs3: 1px 2px 0 rgba(0, 0, 0, 0.45);
+    --toprad: .2rem .2rem 0 0;
+    --lowrad: 0 0 .2rem .2rem;
+    --tile: .2rem;
+    --fontfam: "Almendra", serif;
+    --fontweight: 400;
+    --fontstyle: normal;
+    --btnRad: .15rem;
+    --inputRad: .1rem;
+    --letterSp: .03em;
+}
+[data-display='minimal'] {
+    --tileBorder: 1px solid var(--bordercolor);
+    --rad1: .4rem;
+    --rad2: .25rem;
+    --bs1: none;
+    --bs2: none;
+    --bs3: none;
+    --shadowInner: none;
+    --toprad: .4rem .4rem 0 0;
+    --lowrad: 0 0 .4rem .4rem;
+    --tile: .4rem;
+    --section-gap: 1rem;
+    --fontfam: "Almendra", serif;
+    --fontweight: 400;
+    --fontstyle: normal;
+    --fontS2: 120%;
+    --fontS3: 140%;
+    --btnRad: .3rem;
+    --inputRad: .25rem;
+}
+[data-display='bold'] {
+    --tileBorder: 3px solid var(--bordercolor);
+    --rad1: 1rem;
+    --rad2: .6rem;
+    --bs1: 4px 6px 18px rgba(0, 0, 0, 0.8);
+    --bs2: 3px 4px 12px rgba(0, 0, 0, 0.75);
+    --bs3: 2px 3px 8px rgba(0, 0, 0, 0.7);
+    --toprad: 1rem 1rem 0 0;
+    --lowrad: 0 0 1rem 1rem;
+    --tile: 1rem;
+    --section-gap: 1rem;
+    --fontW1: 900;
+    --fontW2: 700;
+    --fontS2: 140%;
+    --fontS3: 175%;
+    --btnRad: .6rem;
+    --inputRad: .5rem;
+    --letterSp: .02em;
+}
+[data-display='shadow-of-the-mountains'] {
+    --glass: 72%;
+    --shadowInner: inset 4px 4px 14px rgba(187, 86, 96, 0.45), inset 0 0 5px rgba(224, 160, 96, 0.35);
+    --check-shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    --gold-gradient: linear-gradient(to bottom, #e0a060, #8f6049);
+}
+[data-display='gestalt'] {
+    --glass: 88%;
+    --shadowInner: inset 4px 4px 14px rgba(150, 205, 255, 0.42), inset 0 0 5px rgba(205, 235, 255, 0.32);
+    --check-shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    --gold-gradient: linear-gradient(to bottom, #d9a05a, #a66f2e);
+}
+/* #endregion */
+
+:root,
+/* #region Theme Section */
+[data-theme="default"] {
+    --bg: #0d042c;
+    --surface: #240303;
+    --text: #facd8d;
+    --muted: #8366a7;
+    --accent: #b27f50;
+    --accent-2: #d8a15e;
+    --border: #b27f50;
+    --glass: 85%;
+    --gold-gradient: linear-gradient(to bottom, #ae7743, #8a5b31);
+    --check-shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #d8a15e 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #b27f50 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #8366a7 30%);
+    --sliderThumb: #d8a15e;
+    --navSlideFill: rgba(216, 161, 94, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(216, 161, 94, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="prestige"] {
+    --bg: #1a1030;
+    --surface: #2c1f4f;
+    --text: #f4ecdc;
+    --muted: #b6a6cf;
+    --accent: #d4af37;
+    --accent-2: #8e6bd8;
+    --border: #d4af37;
+    --glass: 90%;
+    --gold-gradient: linear-gradient(to bottom, #ae7743, #8a5b31);
+    --check-shape: polygon(0 15%, 25% 45%, 50% 5%, 75% 45%, 100% 15%, 90% 100%, 10% 100%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #d4af37 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #8e6bd8 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #b6a6cf 30%);
+    --sliderThumb: #d4af37;
+    --navSlideFill: rgba(212, 175, 55, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(212, 175, 55, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="purple"] {
+    --bg: #180223;
+    --surface: #220c2d;
+    --text: #eedcf7;
+    --muted: #9d78b1;
+    --accent: #160126;
+    --accent-2: #4c2849;
+    --border: #58386e;
+    --glass: 85%;
+    --gold-gradient: linear-gradient(to bottom, #ae7743, #8a5b31);
+    --check-shape: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #c9a0e8 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #9d78b1 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #4c2849 30%);
+    --sliderThumb: #c9a0e8;
+    --navSlideFill: rgba(201, 160, 232, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(201, 160, 232, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="green"] {
+    --bg: #0f2416;
+    --surface: #0d1a10;
+    --text: #e2f2df;
+    --muted: #9cbf9f;
+    --accent: #657d64;
+    --accent-2: #d6c790;
+    --border: #688b6c;
+    --glass: 85%;
+    --check-shape: polygon(50% 0, 100% 35%, 85% 85%, 50% 100%, 15% 85%, 0 35%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #6fcf6a 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #d6c790 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #3f7d47 30%);
+    --sliderThumb: #6fcf6a;
+    --navSlideFill: rgba(111, 207, 106, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(111, 207, 106, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="glass-green"] {
+    --bg: #0f2416;
+    --surface: #274f2e;
+    --text: #e2f2df;
+    --muted: #9cbf9f;
+    --accent: #6fcf6a;
+    --accent-2: #e0c35a;
+    --border: #3f7d47;
+    --glass: 32%;
+    --check-shape: polygon(50% 0, 100% 35%, 85% 85%, 50% 100%, 15% 85%, 0 35%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #6fcf6a 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #e0c35a 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #274f2e 30%);
+    --sliderThumb: #6fcf6a;
+    --navSlideFill: rgba(111, 207, 106, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(111, 207, 106, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="blue"] {
+    --bg: #0c1a33;
+    --surface: #132134;
+    --text: #dde9fb;
+    --muted: #93a9c9;
+    --accent: #4473a4;
+    --accent-2: #ffc857;
+    --border: #3b6aa6;
+    --glass: 85%;
+    --check-shape: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%);
+    --blur: blur(2px) saturate(100%) brightness(1);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #4ea3ff 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #ffc857 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #3b6aa6 30%);
+    --sliderThumb: #4ea3ff;
+    --navSlideFill: rgba(78, 163, 255, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(78, 163, 255, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="glass-blue"] {
+    --bg: #0c1a33;
+    --surface: #1e3e67;
+    --text: #dde9fb;
+    --muted: #93a9c9;
+    --accent: #4ea3ff;
+    --accent-2: #ffc857;
+    --border: #3b6aa6;
+    --glass: 32%;
+    --check-shape: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #4ea3ff 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #ffc857 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #1e3e67 30%);
+    --sliderThumb: #4ea3ff;
+    --navSlideFill: rgba(78, 163, 255, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(78, 163, 255, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="red"] {
+    --bg: #2a0b0e;
+    --surface: #33090e;
+    --text: #cbab7a;
+    --muted: #c49696;
+    --accent: #6c2227;
+    --accent-2: #855a15;
+    --border: #8a2a32;
+    --glass: 85%;
+    --check-shape: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #e0464f 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #f0b75a 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #6c2227 30%);
+    --sliderThumb: #bce046;
+    --navSlideFill: rgba(84, 34, 90, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(84, 34, 90, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="glass-red"] {
+    --bg: #2a0b0e;
+    --surface: #581a20;
+    --text: #f7dcdc;
+    --muted: #c49696;
+    --accent: #e0464f;
+    --accent-2: #f0b75a;
+    --border: #8a2a32;
+    --glass: 32%;
+    --check-shape: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #e0464f 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #f0b75a 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #581a20 30%);
+    --sliderThumb: #e0464f;
+    --navSlideFill: rgba(224, 70, 79, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(224, 70, 79, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="orange"] {
+    --bg: #2b1406;
+    --surface: #4a240c;
+    --text: #fbe6d2;
+    --muted: #caa284;
+    --accent: #ff8a2b;
+    --accent-2: #4e938d;
+    --border: #a8561e;
+    --glass: 85%;
+    --check-shape: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #ff8a2b 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #4e938d 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #a8561e 30%);
+    --sliderThumb: #ff8a2b;
+    --navSlideFill: rgba(255, 138, 43, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(255, 138, 43, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="glass-orange"] {
+    --bg: #2b1406;
+    --surface: #603010;
+    --text: #fbe6d2;
+    --muted: #caa284;
+    --accent: #ff8a2b;
+    --accent-2: #5ec8c0;
+    --border: #a8561e;
+    --glass: 32%;
+    --check-shape: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #ff8a2b 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #5ec8c0 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #603010 30%);
+    --sliderThumb: #ff8a2b;
+    --navSlideFill: rgba(255, 138, 43, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(255, 138, 43, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="yellow"] {
+    --bg: #2a2406;
+    --surface: #322802;
+    --text: #fbf3d0;
+    --muted: #c9bb87;
+    --accent: #f5d33b;
+    --accent-2: #6c8cff;
+    --border: #dbc77a;
+    --glass: 85%;
+    --check-shape: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #f5d33b 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #6c8cff 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #9c8420 30%);
+    --sliderThumb: #f5d33b;
+    --navSlideFill: rgba(245, 211, 59, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(245, 211, 59, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="glass-yellow"] {
+    --bg: #2a2406;
+    --surface: #5a4b13;
+    --text: #fbf3d0;
+    --muted: #c9bb87;
+    --accent: #f5d33b;
+    --accent-2: #6c8cff;
+    --border: #9c8420;
+    --glass: 32%;
+    --check-shape: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #f5d33b 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #6c8cff 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #5a4b13 30%);
+    --sliderThumb: #f5d33b;
+    --navSlideFill: rgba(245, 211, 59, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(245, 211, 59, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="dark"] {
+    --bg: #0a0a0a;
+    --surface: #181818;
+    --text: #ececec;
+    --muted: #8f8f8f;
+    --accent: #b27f50;
+    --accent-2: #6f8f6f;
+    --border: #3a3a3a;
+    --glass: 90%;
+    --gold-gradient: linear-gradient(to bottom, #ae7743, #8a5b31);
+    --check-shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    --shadowInner: inset 4px 4px 15px #ffeacea9, inset 0px 0px 5px #ffeacea9;
+    --fontfam: 'New Rocker', cursive;
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #b27f50 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #6f8f6f 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #3a3a3a 30%);
+    --sliderThumb: #d8a15e;
+    --navSlideFill: rgba(216, 161, 94, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(216, 161, 94, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+
+[data-theme="gothic"] {
+    --bg: #080707;
+    --surface: #0b0606;
+    --text: #b8873e;
+    --muted: #490606;
+    --accent: #af1616;
+    --accent-2: #000000;
+    --border: #2d0505;
+    --glass: 90%;
+    --gold-gradient: linear-gradient(to bottom, #ae7743, #8a5b31);
+    --check-shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    --shadowInner: inset 4px 4px 15px #2d0606d8, inset 0px 0px 5px #0d0401ef;
+    --fontfam: 'New Rocker', cursive;
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), rgb(255, 0, 0) 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), rgb(208, 184, 28) 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), rgb(21, 101, 162) 30%);
+    --sliderThumb: #5d090e;
+    --navSlideFill: rgba(0, 0, 0, 0.25);
+    --navSlideBorder: rgba(61, 12, 12, 0.35);
+    --navSlideGlow: rgba(79, 23, 26, 0.45);
+    --navSlideShine: rgba(146, 79, 79, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+
+[data-theme="pilgrim"] {
+    --bg: #6a2700;
+    --surface: #154903bc;
+    --text: #ffffff;
+    --muted: #8e7e13;
+    --accent: #a41414;
+    --accent-2: #cd7430;
+    --border: #2d2205;
+    --glass: 90%;
+    --gold-gradient: linear-gradient(to bottom, #ae7743, #8a5b31);
+    --check-shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    --shadowInner: inset 4px 4px 15px #85c2ae9d, inset 0px 0px 5px #000000ef;
+    --fontfam: "Almendra", serif;
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), rgb(140, 255, 0) 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), rgb(214, 198, 90) 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), rgb(157, 96, 49) 30%);
+    --sliderThumb: #c3bb29;
+    --navSlideFill: rgba(0, 0, 0, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(79, 60, 23, 0.45);
+    --navSlideShine: rgba(255, 196, 137, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+
+[data-theme="dark-glass"] {
+    --bg: #0a0a0a;
+    --surface: #2a241f;
+    --text: #ececec;
+    --muted: #8f8f8f;
+    --accent: #b27f50;
+    --accent-2: #6f8f6f;
+    --border: #3a3a3a;
+    --glass: 32%;
+    --gold-gradient: linear-gradient(to bottom, #ae7743, #8a5b31);
+    --check-shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    --shadowInner: inset 4px 4px 15px #ffeacea9, inset 0px 0px 5px #ffeacea9;
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #b27f50 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #6f8f6f 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #2a241f 30%);
+    --sliderThumb: #d8a15e;
+    --navSlideFill: rgba(216, 161, 94, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(216, 161, 94, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="light"] {
+    --bg: #a08c60;
+    --surface: #fff1cc;
+    --text: #2a2118;
+    --muted: #7a6a58;
+    --accent: #a37b58;
+    --accent-2: #3f7d8c;
+    --border: #f8d088;
+    --glass: 90%;
+    --gold-gradient: linear-gradient(to bottom, #926135, #5e3d1f);
+    --check-shape: circle(50%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #a37b58 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #3f7d8c 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #7a6a58 30%);
+    --sliderThumb: #a37b58;
+    --navSlideFill: rgba(163, 123, 88, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(163, 123, 88, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="light-glass"] {
+    --bg: #fef2d8;
+    --surface: #e9dbc3;
+    --text: #2a2118;
+    --muted: #7a6a58;
+    --accent: #926135;
+    --accent-2: #3f7d8c;
+    --border: #c4a47c;
+    --glass: 32%;
+    --gold-gradient: linear-gradient(to bottom, #926135, #5e3d1f);
+    --check-shape: circle(50%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #926135 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #3f7d8c 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #7a6a58 30%);
+    --sliderThumb: #926135;
+    --navSlideFill: rgba(146, 97, 53, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(146, 97, 53, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="hellfire"] {
+    --bg: #1c0606;
+    --surface: #310c0c;
+    --text: #ffd2a8;
+    --muted: #c08a6a;
+    --accent: #ff8120;
+    --accent-2: #996726;
+    --border: #a03c17;
+    --glass: 88%;
+    --check-shape: polygon(50% 0, 85% 45%, 100% 70%, 80% 95%, 50% 100%, 20% 95%, 0 70%, 15% 45%);
+    --blur1: blur(3px) saturate(150%);
+    --blur2: blur(3px) saturate(150%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #ff8120 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #996726 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #a03c17 30%);
+    --sliderThumb: #ff8120;
+    --navSlideFill: rgba(255, 129, 32, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(255, 129, 32, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="glass-fire"] {
+    --bg: #1c0606;
+    --surface: #5a2317;
+    --text: #ffd2a8;
+    --muted: #c08a6a;
+    --accent: #ff8120;
+    --accent-2: #ffe2bb;
+    --border: #6b1a10;
+    --glass: 32%;
+    --check-shape: polygon(50% 0, 85% 45%, 100% 70%, 80% 95%, 50% 100%, 20% 95%, 0 70%, 15% 45%);
+    --blur1: blur(3px) saturate(150%);
+    --blur2: blur(3px) saturate(150%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #ff8120 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #ffe2bb 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #6b1a10 30%);
+    --sliderThumb: #ff8120;
+    --navSlideFill: rgba(255, 129, 32, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(255, 129, 32, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="frozen"] {
+    --bg: #0b1e2c;
+    --surface: #16364a;
+    --text: #e6f6ff;
+    --muted: #9ec3d6;
+    --accent: #7fe3ff;
+    --accent-2: #c9b6ff;
+    --border: #4a8fb0;
+    --glass: 85%;
+    --check-shape: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #7fe3ff 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #c9b6ff 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #4a8fb0 30%);
+    --sliderThumb: #7fe3ff;
+    --navSlideFill: rgba(127, 227, 255, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(127, 227, 255, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="frozen-glass"] {
+    --bg: #0b1e2c;
+    --surface: #234b60;
+    --text: #e6f6ff;
+    --muted: #9ec3d6;
+    --accent: #7fe3ff;
+    --accent-2: #c9b6ff;
+    --border: #4a8fb0;
+    --glass: 32%;
+    --check-shape: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #7fe3ff 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #c9b6ff 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #234b60 30%);
+    --sliderThumb: #7fe3ff;
+    --navSlideFill: rgba(127, 227, 255, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(127, 227, 255, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="neon"] {
+    --bg: #0a031a;
+    --surface: #0e0620;
+    --text: #f0ebff;
+    --muted: #9c8fc8;
+    --accent: #86edf4;
+    --accent-2: #a435e4;
+    --border: #ff46d2;
+    --glass: 88%;
+    --check-shape: circle(50%);
+    --shadowInner: inset 4px 4px 12px rgba(255, 60, 200, 0.35), inset -1px -1px 6px rgba(0, 240, 255, 0.35);
+    --neonGlow: 0 0 4px rgba(255, 60, 200, 0.9), 0 0 12px rgba(255, 60, 200, 0.55);
+    --neonTextGlow: 0 0 3px rgba(0, 240, 255, 0.9), 0 0 10px rgba(0, 240, 255, 0.5);
+    --fontfam: 'Delicious Handrawn', cursive;
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #86edf4 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #a435e4 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #ff46d2 30%);
+    --sliderThumb: #86edf4;
+    --navSlideFill: rgba(134, 237, 244, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(134, 237, 244, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="neon-glass"] {
+    --bg: #0a031a;
+    --surface: #0c223b95;
+    --text: #f0ebff;
+    --muted: #5b3ac7aa;
+    --accent: #4800ff8e;
+    --accent-2: #a4c67277;
+    --border: #3c4cf8;
+    --glass: 32%;
+    --check-shape: circle(50%);
+    --shadowInner: inset 4px 4px 12px rgba(70, 255, 60, 0.35), inset -1px -1px 6px rgba(81, 0, 255, 0.725);
+    --neonGlow: 0 0 4px rgba(60, 99, 255, 0.936), 0 0 12px rgba(54, 59, 53, 0.55);
+    --neonTextGlow: 0 0 3px rgba(0, 240, 255, 0.9), 0 0 10px rgba(0, 240, 255, 0.5);
+    --fontfam: 'Geist Pixel', sans-serif;
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #86edf4 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #a435e4 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #3c4cf8 30%);
+    --sliderThumb: #86edf4;
+    --navSlideFill: rgba(134, 237, 244, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(134, 237, 244, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="gestalt"] {
+    --bg: #181c28;
+    --surface: #2c333e;
+    --text: #ece8e0;
+    --muted: #8a98a6;
+    --accent: #e0a048;
+    --accent-2: #8a98a6;
+    --border: #5a6878;
+    --glass: 88%;
+    --gold-gradient: linear-gradient(to bottom, #d9a05a, #a66f2e);
+    --check-shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    --shadowInner: inset 4px 4px 14px rgba(150, 205, 255, 0.42), inset 0 0 5px rgba(205, 235, 255, 0.32);
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #e0a048 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #8a98a6 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #5a6878 30%);
+    --sliderThumb: #e0a048;
+    --navSlideFill: rgba(224, 160, 72, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(224, 160, 72, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+[data-theme="shadow-of-the-mountains"] {
+    --bg: #343b4d;
+    --surface: #323e53;
+    --text: #efe5e5;
+    --muted: #a3a9b7;
+    --accent: #bb5660;
+    --accent-2: #e0a060;
+    --border: #713540;
+    --glass: 72%;
+    /* Health colors */
+    --hpBarFull: color-mix(in srgb, var(--healColor), #bb5660 30%);
+    --hpBarHurt: color-mix(in srgb, color-mix(in srgb, var(--healColor), var(--damageColor)), #e0a060 30%);
+    --hpBarVeryHurt: color-mix(in srgb, var(--damageColor), #713540 30%);
+    --sliderThumb: #bb5660;
+    --navSlideFill: rgba(187, 86, 96, 0.25);
+    --navSlideBorder: rgba(255, 255, 255, 0.35);
+    --navSlideGlow: rgba(187, 86, 96, 0.45);
+    --navSlideShine: rgba(255, 255, 255, 0.28);
+    --hpBoxFull: var(--bgc-tab);
+    --hpBoxHurt: color-mix(in srgb, var(--healColor), var(--damageColor));
+    --hpBoxVeryHurt: var(--damageColor);
+}
+/* #endregion */
+
+:root,
+/* #region Background Section */
+[data-background="default"] {
+    --background: url('/colorsketch-eldrid-3840.webp');
+    --background-desktop: url('/colorsketch-eldrid-3840.webp');
+}
+[data-background="green"] {
+    --background: url('/eldrid-bg-green-3840.webp');
+    --background-desktop: url('/eldrid-bg-green-3840.webp');
+}
+[data-background="purple"] {
+    --background: url('/eldrid-bg-purple-3840.webp');
+    --background-desktop: url('/eldrid-bg-purple-3840.webp');
+}
+[data-background="blue"] {
+    --background: url('/eldrid-bg-blue-3840.webp');
+    --background-desktop: url('/eldrid-bg-blue-3840.webp');
+}
+[data-background="red"] {
+    --background: url('/eldrid-bg-red-3840.webp');
+    --background-desktop: url('/eldrid-bg-red-3840.webp');
+}
+[data-background="orange"] {
+    --background: url('/eldrid-bg-orange-3840.webp');
+    --background-desktop: url('/eldrid-bg-orange-3840.webp');
+}
+[data-background="yellow"] {
+    --background: url('/eldrid-bg-yellow-3840.webp');
+    --background-desktop: url('/eldrid-bg-yellow-3840.webp');
+}
+[data-background="dark"] {
+    --background: url('/eldrid-bg-dark-3840.webp');
+    --background-desktop: url('/eldrid-bg-dark-3840.webp');
+}
+[data-background="dark-map"] {
+    --background: url('/utils/mapblack1.png');
+    --background-desktop: url('/utils/mapblack1.png');
+}
+[data-background="light-map"] {
+    --background: url('/utils/mapwhite1.png');
+    --background-desktop: url('/utils/mapwhite1.png');
+}
+[data-background="light"] {
+    --background: url('/eldrid-bg-light-3840.webp');
+    --background-desktop: url('/eldrid-bg-light-3840.webp');
+}
+[data-background="hellfire"] {
+    --background: url('/eldrid-bg-hellfire-3840.webp');
+    --background-desktop: url('/eldrid-bg-hellfire-3840.webp');
+}
+[data-background="hellfire-map"] {
+    --background: url('/utils/hellfiremap.png');
+    --background-desktop: url('/utils/hellfiremap.png');
+}
+[data-background="frozen"] {
+    --background: url('/eldrid-bg-frozen-3840.webp');
+    --background-desktop: url('/eldrid-bg-frozen-3840.webp');
+}
+[data-background="frozen-map"] {
+    --background: url('/utils/frozenmap1.png');
+    --background-desktop: url('/utils/frozenmap1.png');
+}
+[data-background="neon"] {
+    --background: url('/eldrid-bg-neon-3840.webp');
+    --background-desktop: url('/eldrid-bg-neon-3840.webp');
+}
+[data-background="gestalt"] {
+    --background: url('/campaigns/the-fall-of-gestalt.webp');
+    --background-desktop: url('/campaigns/the-fall-of-gestalt.webp');
+}
+[data-background="shadow-of-the-mountains"] {
+    --background: url('/campaigns/shadow-of-the-mountains.webp');
+    --background-desktop: url('/campaigns/shadow-of-the-mountains.webp');
+}
+[data-background="gothic"] {
+    --background: url('/images/themes/gothic-background.jpg');
+    --background-desktop: url('/images/themes/gothic-background.jpg');
+}
+[data-background="haunted-forest"] {
+    --background: url('/images/themes/haunted-forest.jpg');
+    --background-desktop: url('/images/themes/haunted-forest.jpg');
+}
+[data-background="frozen-fortress"] {
+    --background: url('/images/themes/frozen-fortress.jpg');
+    --background-desktop: url('/images/themes/frozen-fortress.jpg');
+}
+[data-background="volcanic-forge"] {
+    --background: url('/images/themes/volcanic-forge.jpg');
+    --background-desktop: url('/images/themes/volcanic-forge.jpg');
+}
+[data-background="sunken-ruins"] {
+    --background: url('/images/themes/sunken-ruins.jpg');
+    --background-desktop: url('/images/themes/sunken-ruins.jpg');
+}
+[data-background="elven-grove"] {
+    --background: url('/images/themes/elven-grove.jpg');
+    --background-desktop: url('/images/themes/elven-grove.jpg');
+}
+[data-background="desert-tomb"] {
+    --background: url('/images/themes/desert-tomb.jpg');
+    --background-desktop: url('/images/themes/desert-tomb.jpg');
+}
+[data-background="storm-lighthouse"] {
+    --background: url('/images/themes/storm-lighthouse.jpg');
+    --background-desktop: url('/images/themes/storm-lighthouse.jpg');
+}
+[data-background="throne-hall"] {
+    --background: url('/images/themes/throne-hall.jpg');
+    --background-desktop: url('/images/themes/throne-hall.jpg');
+}
+[data-background="arcane-observatory"] {
+    --background: url('/images/themes/arcane-observatory.jpg');
+    --background-desktop: url('/images/themes/arcane-observatory.jpg');
+}
+[data-background="autumn-village"] {
+    --background: url('/images/themes/autumn-village.jpg');
+    --background-desktop: url('/images/themes/autumn-village.jpg');
+}
+/* #endregion */
+
+/* #region Mobile Crop Section */
+@media (max-width: 768px) {
+    html[data-theme],
+    html {
+        --blur1: blur(0.75px) saturate(140%);
+        --blur2: blur(0.5px) saturate(140%);
+        --blur3: blur(0.75px) saturate(140%);
+    }
+    html[data-background="default"] { --background: url('/colorsketch-eldrid-mobile-1440x2560.webp'); }
+    html[data-background="green"] { --background: url('/eldrid-bg-green-mobile-1440x2560.webp'); }
+    html[data-background="purple"] { --background: url('/eldrid-bg-purple-mobile-1440x2560.webp'); }
+    html[data-background="blue"] { --background: url('/eldrid-bg-blue-mobile-1440x2560.webp'); }
+    html[data-background="red"] { --background: url('/eldrid-bg-red-mobile-1440x2560.webp'); }
+    html[data-background="orange"] { --background: url('/eldrid-bg-orange-mobile-1440x2560.webp'); }
+    html[data-background="yellow"] { --background: url('/eldrid-bg-yellow-mobile-1440x2560.webp'); }
+    html[data-background="dark"] { --background: url('/eldrid-bg-dark-mobile-1440x2560.webp'); }
+    html[data-background="neon"] { --background: url('/eldrid-bg-neon-mobile-1440x2560.webp'); }
+    html[data-background="light"] { --background: url('/eldrid-bg-light-mobile-1440x2560.webp'); }
+    html[data-background="hellfire"] { --background: url('/eldrid-bg-hellfire-mobile-1440x2560.webp'); }
+    html[data-background="frozen"] { --background: url('/eldrid-bg-frozen-mobile-1440x2560.webp'); }
+    html[data-background="gestalt"] { --background: url('/campaigns/the-fall-of-gestalt-mobile-1440x2560.webp'); }
+    html[data-background="shadow-of-the-mountains"] { --background: url('/campaigns/shadow-of-the-mountains-mobile-1440x2560.webp'); }
+    html[data-background="gothic"] { --background: url('/images/themes/gothic-background-mobile-1440x2560.jpg'); }
+    html[data-background="haunted-forest"] { --background: url('/images/themes/haunted-forest-mobile-1440x2560.jpg'); }
+    html[data-background="frozen-fortress"] { --background: url('/images/themes/frozen-fortress-mobile-1440x2560.jpg'); }
+    html[data-background="volcanic-forge"] { --background: url('/images/themes/volcanic-forge-mobile-1440x2560.jpg'); }
+    html[data-background="sunken-ruins"] { --background: url('/images/themes/sunken-ruins-mobile-1440x2560.jpg'); }
+    html[data-background="elven-grove"] { --background: url('/images/themes/elven-grove-mobile-1440x2560.jpg'); }
+    html[data-background="desert-tomb"] { --background: url('/images/themes/desert-tomb-mobile-1440x2560.jpg'); }
+    html[data-background="storm-lighthouse"] { --background: url('/images/themes/storm-lighthouse-mobile-1440x2560.jpg'); }
+    html[data-background="throne-hall"] { --background: url('/images/themes/throne-hall-mobile-1440x2560.jpg'); }
+    html[data-background="arcane-observatory"] { --background: url('/images/themes/arcane-observatory-mobile-1440x2560.jpg'); }
+    html[data-background="autumn-village"] { --background: url('/images/themes/autumn-village-mobile-1440x2560.jpg'); }
+}
+/* #endregion */
