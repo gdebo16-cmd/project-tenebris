@@ -9,15 +9,15 @@ Write your answer after each **→**. Leave a question blank until you've decide
 
 ## Wave 0 — needed first
 
-- Test account for smoke tests (username only; put the password in `.env`, not here) →
-- Test campaign name →
-- Where tests run: local only, or also against staging/Neon branch? →
-- Neon branch to use for risky migrations →
+- Test account for smoke tests (username only; put the password in `.env`, not here) → `smoketest` (password in `.env` as `TEST_PASSWORD`)
+- Test campaign name → `Smoke Test Campaign`
+- Where tests run: local only, or also against staging/Neon branch? → local + `tenebris-staging`, both on the Neon `rework` branch, never production
+- Neon branch to use for risky migrations → throwaway child branches of `rework`, deleted after testing
 
 ## Table (Phase 0)
 
-- Hex orientation: pointy-top or flat-top →
-- Distance per hex (e.g. 5 ft) →
+- Hex orientation: pointy-top or flat-top → **flat-top** (2026-11-19)
+- Distance per hex (e.g. 5 ft) → **5 ft** (spell ranges and speeds are all multiples of 5) (2026-11-19)
 - What can a player do on the table vs the DM? →
 - Who can move a token that isn't theirs? →
 - Map assets for v1: curated only, or uploads? →
