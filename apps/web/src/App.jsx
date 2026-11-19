@@ -30,12 +30,9 @@ function App() {
             <ContentProvider>
             <ThemeWatcher />
             <Routes>
-                {/* anyone can see these */}
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-
-                {/* these need you to be logged in */}
                 <Route element={<RequireLogin />}>
                     <Route path="/home" element={<HomePage />} />
                     <Route path='/profile' element={<ProfilePage />} />
@@ -52,8 +49,6 @@ function App() {
                     <Route path="/characters/:id/inventory" element={<InventoryPage />} />
                     <Route path="/characters/:id/edit" element={<EditCharacterPage />} />
                 </Route>
-
-                {/* "*" means anything that didn't match above */}
                 <Route path="*" element={<p>Page not found. <a href="/home">Go home</a></p>} />
             </Routes>
             </ContentProvider>
