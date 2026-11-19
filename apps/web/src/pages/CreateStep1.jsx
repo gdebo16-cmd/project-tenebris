@@ -83,7 +83,7 @@ function CreateStep1() {
             <div className="step-1-container-wrapper">
                 <section className="step-1-container">
                     <form className="step-1-form" onSubmit={submit}>
-                        <article id="name" className="name-tile">
+                        <article id="name-container" className="name-tile">
                             <label className="name-label" htmlFor="name">Character name</label>
                             <input className="name-value" type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="One with no name"  />
                         </article>

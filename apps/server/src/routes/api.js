@@ -22,7 +22,8 @@ import { rateLimit } from 'express-rate-limit';
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 5,
-    message: { error: 'Too many attempts. Please try again in 15 minutes.'}
+    message: { error: 'Too many attempts. Please try again in 15 minutes.'},
+    skip: () => process.env.NODE_ENV !== 'production', // off in local dev so smoke tests can log in freely
 });
 
 const router = Router();
