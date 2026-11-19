@@ -1,3 +1,4 @@
+import compression from 'compression';
 import express from "express";
 import connectPgSimple from 'connect-pg-simple';
 import pool from './db.js';
@@ -33,11 +34,11 @@ const sessionMiddleware = session({               //defines security and rule se
 
 app.use(sessionMiddleware);
 
+app.use(compression()); // gzip every response, including /api/content
 app.use(express.json()); //to accept JSON strings
 app.use(express.urlencoded({ extended: true }));  //to accept forms
 
 app.use('/api', apiRoutes);
-
 
 app.get('/health', (req, res) => {
   res.json({ ok: true });

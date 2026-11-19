@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function load(file) {
-  const text = fs.readFileSync(path.join(__dirname, '..', '..', '..', '..', 'packages', 'content', file), 'utf8');
+  const text = JSON.stringify(JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', '..', '..', 'packages', 'content', file), 'utf8')));
   const version = crypto.createHash('md5').update(text).digest('hex').slice(0, 8);
   return { text, version };
 }
