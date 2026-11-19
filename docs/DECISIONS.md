@@ -9,7 +9,7 @@ Write your answer after each **→**. Leave a question blank until you've decide
 
 ## Wave 0 — needed first
 
-- Test account for smoke tests (username only; put the password in `.env`, not here) → `smoketest` (password in `.env` as `TEST_PASSWORD`)
+- Test account for smoke tests (username only; put the password in `.env`, not here) → `smoketest` (DM) and `smoketest2` (joining player), same password, in `.env` as `TEST_PASSWORD`
 - Test campaign name → `Smoke Test Campaign`
 - Where tests run: local only, or also against staging/Neon branch? → local + `tenebris-staging`, both on the Neon `rework` branch, never production
 - Neon branch to use for risky migrations → throwaway child branches of `rework`, deleted after testing

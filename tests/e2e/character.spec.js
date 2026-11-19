@@ -4,6 +4,8 @@ import { login, fillRequiredSelects } from './helpers.js';
 test('creates a character, opens its sheet and rolls', async ({ page }) => {
   const name = `Smoke ${Date.now()}`; // unique, so reruns never collide
   await login(page);
+  // Start clean: throw away any half-finished draft an earlier (failed) run left behind
+  await page.request.delete('/api/create_char/draft');
 
   // Step 1: name + species
   await page.goto('/create_char');
@@ -42,7 +44,7 @@ test('creates a character, opens its sheet and rolls', async ({ page }) => {
 
   // Roll: every new character has a starting weapon, so click its to-hit button
   // and check the roll shows up in the roll panel.
+  // (Rolling opens the panel by itself; we only check the roll was recorded.)
   await page.locator('.btn-to-hit').first().click();
-  await page.getByLabel('Open Roll Panel').click();
-  await expect(page.locator('.roll-bubble.is-sent').first()).toBeVisible();
+  await expect(page.locator('.roll-bubble.is-sent').first()).toContainText('to hit');
 });

@@ -15,8 +15,10 @@ test('a DM creates a tale and a player joins it', async ({ browser }) => {
   await expect(dm).toHaveURL(/\/campaign\/\d+/);
   const tale = dm.url();
 
-  // DM reads the invite code from the Invite / Join tab
-  await dm.getByRole('button', { name: 'Invite / Join' }).click();
+  // DM reads the invite code. On narrow screens it sits behind an "Invite / Join" tab;
+  // on desktop width it is already showing.
+  const inviteTab = dm.getByRole('button', { name: 'Invite / Join' });
+  if (await inviteTab.isVisible()) await inviteTab.click();
   const code = (await dm.locator('.invite-code').textContent()).trim();
   expect(code).not.toBe('');
 

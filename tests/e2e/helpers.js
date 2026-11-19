@@ -13,6 +13,8 @@ export async function login(page, username = 'smoketest') {
 // For every required dropdown that is still empty, pick its first real option.
 // One at a time, because picking one (a class, say) can fill or filter the next.
 export async function fillRequiredSelects(page) {
+  await page.waitForLoadState('networkidle'); // let the page finish loading its lists first
+  let quietChecks = 0;
   for (let i = 0; i < 30; i++) {
     const value = await page.evaluate(() => {
       // clear the marker from the dropdown we picked last time
@@ -25,7 +27,13 @@ export async function fillRequiredSelects(page) {
       el.dataset.smoke = 'next';
       return [...el.options].find((o) => o.value && !o.disabled).value;
     });
-    if (value === null) return;
+    if (value === null) {
+      // Nothing empty. Look again shortly, in case a late fetch re-rendered a list.
+      if (++quietChecks >= 2) return;
+      await page.waitForTimeout(400);
+      continue;
+    }
+    quietChecks = 0;
     await page.locator('select[data-smoke="next"]').selectOption(value);
     await page.waitForLoadState('networkidle');
   }
