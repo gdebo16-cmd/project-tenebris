@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
+COPY packages/rules/package.json packages/rules/
 RUN npm ci
 COPY . .
 RUN npm run build -w apps/web
@@ -15,6 +16,7 @@ ENV NODE_ENV=production
 COPY package.json package-lock.json ./
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
+COPY packages/rules/package.json packages/rules/
 RUN npm ci --omit=dev -w apps/server
 COPY apps/server apps/server
 COPY packages packages

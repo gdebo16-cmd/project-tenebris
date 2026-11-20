@@ -24,8 +24,8 @@ Write your answer after each **→**. Leave a question blank until you've decide
 
 ## Structure
 
-- `packages/rules` in plain JS or TypeScript? →
-- Migration tool: `node-pg-migrate` or a small custom runner? →
+- `packages/rules` in plain JS or TypeScript? → **TypeScript, for the whole repo** (server, web, rules), adopted during the Stage 1 rebuild (2026-11-19)
+- Migration tool: `node-pg-migrate` or a small custom runner? → **node-pg-migrate**, JS migrations; baseline `1795000000000_baseline.sql` adopted on `rework` (2026-11-19)
 - Image sizes to generate (desktop width, mobile size) →
 - Keep both `main` and `dev`, or merge `ejs-shift` and tidy branches? →
 

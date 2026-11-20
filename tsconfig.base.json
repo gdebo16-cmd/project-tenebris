@@ -1,0 +1,24 @@
+{
+  // Shared TypeScript settings. Each workspace's tsconfig.json "extends" this file.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+
+    // Catch mistakes: every value has a known type, null/undefined are checked.
+    "strict": true,
+
+    // TypeScript only CHECKS the code; nothing is compiled to .js.
+    // Node runs .ts files directly (type stripping), and Vite handles the web app.
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    // Only syntax Node can strip (no enums or namespaces), so .ts runs as-is.
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

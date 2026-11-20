@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    // Old .js files are allowed but not checked yet; each becomes .ts as it is rebuilt.
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["src"]
+}
