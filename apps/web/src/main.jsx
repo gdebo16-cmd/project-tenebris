@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import './styles/themes.css'
 import './styles/components.css'
 import App from './App.jsx'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './queryClient.ts'
 
 // Put the saved color scheme back on the page (same as theme.js did)
 document.documentElement.setAttribute('data-theme', localStorage.getItem('siteTheme') || 'default');
@@ -11,6 +13,8 @@ document.documentElement.setAttribute('data-display', localStorage.getItem('site
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </StrictMode>,
 )

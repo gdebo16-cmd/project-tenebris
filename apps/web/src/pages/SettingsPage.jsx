@@ -2,29 +2,31 @@ import { useEffect, useState } from 'react';
 import usePageStyle from '../hooks/usePageStyle';
 import settingsCss from '../styles/settings.css?inline';
 import SiteNav from '../components/SiteNav';
-import { sendJson } from '../utils/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '../api.ts';
+import { keys, useSettings } from '../queries.ts';
 
 // Replaces views/settings.ejs
 function SettingsPage() {
     usePageStyle(settingsCss);
     const [form, setForm] = useState({ username: '', email: '', password: '' });
     const [message, setMessage] = useState('');
+    const queryClient = useQueryClient();
+    const settings = useSettings();
 
-    // load the current username and email once
+    // fill the form with the current username and email once they arrive
     useEffect(() => {
-        fetch('/api/settings')
-            .then((res) => res.json())
-            .then((data) => {
-                setForm({ username: data.username, email: data.email, password: '' });
-            });
-    }, []);
+        if (settings.data) setForm({ username: settings.data.username, email: settings.data.email, password: '' });
+    }, [settings.data]);
 
     const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
     const submit = async (e) => {
         e.preventDefault();
         try {
-            await sendJson('/api/settings', 'PUT', form);
+            await api('/api/settings', { method: 'PUT', body: form });
+            queryClient.invalidateQueries({ queryKey: keys.settings });
+            queryClient.invalidateQueries({ queryKey: keys.me }); // the username may have changed
             setForm({ ...form, password: '' }); // clear the password box, like the page reload did
             setMessage('Account updated');
         } catch (err) {
@@ -37,7 +39,8 @@ function SettingsPage() {
         const ok = window.confirm('Delete your profile? This permanently removes your account, characters and campaigns. This cannot be undone.');
         if (!ok) return;
         try {
-            await sendJson('/api/settings', 'DELETE');
+            await api('/api/settings', { method: 'DELETE' });
+            queryClient.clear();
             window.location.href = '/'; // full reload so the app forgets the old login
         } catch (err) {
             setMessage(err.message);

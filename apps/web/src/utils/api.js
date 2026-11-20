@@ -1,12 +1,7 @@
-// Send JSON to the server and get JSON back.
-// If the server says no (400, 401, 404, 500...), this throws an Error with the server's message.
-export async function sendJson(url, method = 'POST', body) {
-    const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: body ? JSON.stringify(body) : undefined,
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || `HTTP error! status: ${res.status}`);
-    return data;
+import { api } from '../api.ts';
+
+// Older helper, kept for the creator and sheet until they are rebuilt (R4, R5).
+// It now goes through the same door as everything else: api() in src/api.ts.
+export function sendJson(url, method = 'POST', body) {
+    return api(url, { method, body });
 }

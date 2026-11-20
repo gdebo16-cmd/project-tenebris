@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import usePageStyle from '../hooks/usePageStyle';
 import signinCss from '../styles/signin.css?inline';
-import { sendJson } from '../utils/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '../api.ts';
+import { keys } from '../queries.ts';
 
 // Replaces Public/signin.html
 function LoginPage() {
@@ -14,11 +16,14 @@ function LoginPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const queryClient = useQueryClient();
 
     const submit = async (e) => {
         e.preventDefault(); // stop the browser from reloading the page
         try {
-            await sendJson('/api/login', 'POST', { username, password });
+            const me = await api('/api/login', { method: 'POST', body: { username, password } });
+            queryClient.clear();                  // forget anything cached for a previous account
+            queryClient.setQueryData(keys.me, me); // we already know who is logged in now
             navigate(dest);
         } catch (err) {
             setError(err.message);

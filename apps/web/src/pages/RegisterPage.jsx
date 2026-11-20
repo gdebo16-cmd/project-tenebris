@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import usePageStyle from '../hooks/usePageStyle';
 import registerCss from '../styles/register.css?inline';
-import { sendJson } from '../utils/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '../api.ts';
+import { keys } from '../queries.ts';
 
 // Replaces Public/registration.html
 function RegisterPage() {
@@ -12,6 +14,7 @@ function RegisterPage() {
     const [form, setForm] = useState({ username: '', password: '', email: '', name: '' });
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false); // blocks a second submit while the first is still running
+    const queryClient = useQueryClient();
 
     const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -20,7 +23,9 @@ function RegisterPage() {
         if (busy) return;
         setBusy(true);
         try {
-            await sendJson('/api/register', 'POST', form);
+            const me = await api('/api/register', { method: 'POST', body: form });
+            queryClient.clear();
+            queryClient.setQueryData(keys.me, me);
             navigate('/home');
         } catch (err) {
             setError(err.message);

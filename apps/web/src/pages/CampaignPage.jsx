@@ -1,7 +1,8 @@
 import {Link, useParams} from 'react-router';
 import { useState } from 'react';
-import { sendJson } from '../utils/api';
-import useFetch from '../hooks/useFetch';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '../api.ts';
+import { keys, useCampaign, useCampaignMonsters, useHome, useMonsterCatalog } from '../queries.ts';
 import usePageStyle from '../hooks/usePageStyle';
 import campaignPageCss from '../styles/campaignPage.css?inline';
 import Loader from '../components/Loader';
@@ -12,8 +13,9 @@ import campaignImages from '../data/campaignImages';
 function CampaignPage() {
     usePageStyle(campaignPageCss);
     const {campId} = useParams();
-    const {data, setData, loading, error} = useFetch(`/api/campaigns/${campId}`);
-    const home = useFetch('/api/home');
+    const queryClient = useQueryClient();
+    const { data, isPending, error } = useCampaign(campId);
+    const home = useHome(); // your characters, for the "Your character" picker
     const [picked, setPicked] = useState(null);
     const [campTab, setCampTab] = useState('campaign'); // which section shows on mobile
     const [editing, setEditing] = useState(false); // DM edit-campaign form
@@ -22,12 +24,12 @@ function CampaignPage() {
     const [editError, setEditError] = useState('');
     const [copied, setCopied] = useState(false);
     const isDm = data?.campaign?.role === 'dm';
-    const monsters = useFetch(isDm ? `/api/campaigns/${campId}/monsters` : null);
-    const catalog = useFetch(isDm ? '/api/monsters' : null);
+    const monsters = useCampaignMonsters(campId, isDm); // DM only: nothing is requested for players
+    const catalog = useMonsterCatalog(isDm);
     const [pickMonster, setPickMonster] = useState('');
 
-    if (error) return <p>Failure is upon us: {error}</p>;
-    if (loading) return <Loader text='Summoning your stories...'/>;
+    if (error) return <p>Failure is upon us: {error.message}</p>;
+    if (isPending) return <Loader text='Summoning your stories...'/>;
 
     const {campaign, members} = data;
     
@@ -36,9 +38,8 @@ function CampaignPage() {
     const chooseCharacter = async (e) => {
         const id = Number(e.target.value);
         setPicked(id);
-        await sendJson(`/api/campaigns/${campId}/character`, 'PUT', { characterId: id }); // refresh the members list
-        const res = await fetch(`/api/campaigns/${campId}`, { credentials: 'include' });
-        if (res.ok) setData(await res.json());
+        await api(`/api/campaigns/${campId}/character`, { method: 'PUT', body: { characterId: id } });
+        queryClient.invalidateQueries({ queryKey: keys.campaign(campId) }); // refresh the members list
     };
 
     const startEdit = () => {
@@ -53,8 +54,10 @@ function CampaignPage() {
         setEditError('');
         try {
             const body = { name: form.name.trim(), description: form.description, campaign_img_url: form.campaign_img_url };
-            await sendJson(`/api/campaigns/${campId}`, 'PATCH', body);
-            setData((prev) => ({ ...prev, campaign: { ...prev.campaign, ...body } }));
+            await api(`/api/campaigns/${campId}`, { method: 'PATCH', body });
+            queryClient.invalidateQueries({ queryKey: keys.campaign(campId) });
+            queryClient.invalidateQueries({ queryKey: keys.campaigns });
+            queryClient.invalidateQueries({ queryKey: keys.home });
             setEditing(false);
         } catch (err) {
             setEditError(err.message || 'Could not save the campaign.');
@@ -80,15 +83,13 @@ function CampaignPage() {
 
       const addMonster = async () => {
         if (!pickMonster) return;
-        const res = await fetch(`/api/campaigns/${campId}/monsters`, {
-            method: 'POST', credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ monster_id: Number(pickMonster) }),
-        });
-        if (!res.ok) return alert('Could not add that monster.');
-        const added = await res.json();
-        monsters.setData([...(monsters.data || []), { ...added, name: catalog.data.find((m) => m.id === added.monster_id)?.name }]);
-        setPickMonster('');
+        try {
+            await api(`/api/campaigns/${campId}/monsters`, { method: 'POST', body: { monster_id: Number(pickMonster) } });
+            queryClient.invalidateQueries({ queryKey: keys.campaignMonsters(campId) });
+            setPickMonster('');
+        } catch (err) {
+            alert(`Could not add that monster: ${err.message}`);
+        }
     };
 
     return (

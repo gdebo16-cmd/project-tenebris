@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { sendJson } from '../utils/api';
-import useFetch from '../hooks/useFetch';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '../api.ts';
+import { keys, useCampaigns } from '../queries.ts';
 import usePageStyle from '../hooks/usePageStyle';
 import campaignListCss from '../styles/campaignList.css?inline';
 import SiteNav from '../components/SiteNav';
@@ -14,16 +15,19 @@ function CampaignList() {
     const navigate = useNavigate();
 
     usePageStyle(campaignListCss);
-    const { data, setData, loading, error } = useFetch('/api/campaigns');
+    const { data, isPending, error } = useCampaigns();
+    const queryClient = useQueryClient();
 
     const deleteCampaign = async (e, camp) => {
         e.preventDefault();
         e.stopPropagation();
         if (!window.confirm(`Do you want to delete ${camp.name}? This cannot be undone.`)) return;
-
-        const res = await fetch(`/api/campaigns/${camp.id}`, { method: 'DELETE' });
-        if (res.ok) {
-            setData((prev) => ({ ...prev, campaigns: prev.campaigns.filter((c) => c.id !== camp.id) }));
+        try {
+            await api(`/api/campaigns/${camp.id}`, { method: 'DELETE' });
+            queryClient.invalidateQueries({ queryKey: keys.campaigns });
+            queryClient.invalidateQueries({ queryKey: keys.home });
+        } catch (err) {
+            alert(`Couldn't delete ${camp.name}: ${err.message}`);
         }
     };
 
@@ -31,15 +35,17 @@ function CampaignList() {
         e.preventDefault();
         setJoinError('');
         try {
-            const { id } = await sendJson('/api/campaigns/join', 'POST', { code });
+            const { id } = await api('/api/campaigns/join', { method: 'POST', body: { code } });
+            queryClient.invalidateQueries({ queryKey: keys.campaigns });
+            queryClient.invalidateQueries({ queryKey: keys.home });
             navigate(`/campaign/${id}`);
         } catch (err) {
             setJoinError(err.message);
         }
     };
 
-    if (error) return <p>Failure is upon us: {error}</p>;
-    if (loading) return <Loader text='Summoning your stories...'/>;
+    if (error) return <p>Failure is upon us: {error.message}</p>;
+    if (isPending) return <Loader text='Summoning your stories...'/>;
 
     const { campaigns } = data;
 

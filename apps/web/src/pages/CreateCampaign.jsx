@@ -2,7 +2,9 @@ import { useState} from 'react';
 import { useNavigate } from 'react-router';
 import usePageStyle from '../hooks/usePageStyle';
 import campCreateCss from '../styles/campCreate.css?inline';
-import { sendJson } from '../utils/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '../api.ts';
+import { keys } from '../queries.ts';
 import SiteNav from '../components/SiteNav';
 
 
@@ -12,12 +14,15 @@ function CreateCampaign() {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [saveError, setSaveError] = useState('');
+    const queryClient = useQueryClient();
 
 
     const submit = async (e) => {
         e.preventDefault();
         try {
-            const { id } = await sendJson('/api/campaigns', 'POST', { name, description });
+            const { id } = await api('/api/campaigns', { method: 'POST', body: { name, description } });
+            queryClient.invalidateQueries({ queryKey: keys.campaigns });
+            queryClient.invalidateQueries({ queryKey: keys.home });
             navigate(`/campaign/${id}`);
         } catch (err) {
             setSaveError(err.message);

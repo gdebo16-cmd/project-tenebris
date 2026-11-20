@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import useFetch from '../hooks/useFetch';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '../api.ts';
+import { keys, useHome } from '../queries.ts';
 import usePageStyle from '../hooks/usePageStyle';
 import homeCss from '../styles/home.css?inline';
 import SiteNav from '../components/SiteNav';
@@ -8,49 +10,30 @@ import Loader from '../components/Loader';
 
 function HomePage() {
     usePageStyle(homeCss);
-    const { data, setData, loading, error } = useFetch('/api/home');
+    const { data, isPending, error } = useHome();
+    const queryClient = useQueryClient();
     const [homeTab, setHomeTab] = useState('current'); // which section shows on mobile
 
-    const deleteCharacter = async (e, ch) => {
-        e.preventDefault();   // the button sits inside the card's link, so don't follow the link
+    // Ask, delete on the server, then refresh every list that showed it.
+    // The delete buttons sit inside each card's link, so stop the click from following the link.
+    const remove = async (e, question, path, label) => {
+        e.preventDefault();
         e.stopPropagation();
-        if (!window.confirm(`Do you want to delete ${ch.name}? This cannot be undone.`)) return;
-
+        if (!window.confirm(question)) return;
         try {
-            const res = await fetch(`/api/characters/${ch.id}`, { method: 'DELETE' });
-            if (res.ok) {
-                // remove it from the list on screen
-                setData((prev) => ({ ...prev, characters: prev.characters.filter((c) => c.id !== ch.id) }));
-            } else {
-                // tell the player why it failed instead of doing nothing
-                const body = await res.json().catch(() => ({}));
-                alert(`Couldn't delete ${ch.name}: ${body.error ?? res.status}`);
-            }
+            await api(path, { method: 'DELETE' });
+            queryClient.invalidateQueries({ queryKey: keys.home });
+            queryClient.invalidateQueries({ queryKey: keys.campaigns });
         } catch (err) {
-            alert(`Couldn't reach the server to delete ${ch.name}. Try again.`);
+            alert(`Couldn't delete ${label}: ${err.message}`);
         }
     };
+    const deleteCharacter = (e, ch) => remove(e, `Do you want to delete ${ch.name}? This cannot be undone.`, `/api/characters/${ch.id}`, ch.name);
+    const deleteCampaign = (e, camp) => remove(e, `Do you want to delete ${camp.name}? This cannot be undone.`, `/api/campaigns/${camp.id}`, camp.name);
+    const deleteDraft = (e) => remove(e, 'Delete this unfinished character?', '/api/create_char/draft', 'the unfinished character');
 
-    const deleteCampaign = async (e, camp) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!window.confirm(`Do you want to delete ${camp.name}? This cannot be undone.`)) return;
-        const res = await fetch(`/api/campaigns/${camp.id}`, { method: 'DELETE' });
-        if (res.ok) {
-            setData((prev) => ({ ...prev, campaigns: prev.campaigns.filter((c) => c.id !== camp.id) }));
-        }
-    };
-
-    const deleteDraft = async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!window.confirm('Delete this unfinished character?')) return;
-        const res = await fetch('/api/create_char/draft', { method: 'DELETE' });
-        if (res.ok) setData((prev) => ({ ...prev, draft: null }));
-    };
-
-    if (error) return <p>Failure is upon us: {error}</p>;
-    if (loading) return <Loader text='Summoning your stories...'/>;
+    if (error) return <p>Failure is upon us: {error.message}</p>;
+    if (isPending) return <Loader text='Summoning your stories...'/>;
 
     const { username, characters, campaigns, draft } = data;
 

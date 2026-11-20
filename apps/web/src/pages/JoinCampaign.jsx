@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { sendJson } from '../utils/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '../api.ts';
+import { keys } from '../queries.ts';
 import usePageStyle from '../hooks/usePageStyle';
 import joinCampaignCss from '../styles/joinCampaign.css?inline';
 
@@ -11,6 +13,7 @@ export default function JoinCampaign() {
     const [error, setError] = useState('');
     const ran = useRef(false);
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
 
 
@@ -20,7 +23,9 @@ export default function JoinCampaign() {
 
         const join = async () => {
             try {
-               const {id} = await sendJson('/api/campaigns/join', 'POST', { code });
+                const { id } = await api('/api/campaigns/join', { method: 'POST', body: { code } });
+                queryClient.invalidateQueries({ queryKey: keys.campaigns });
+                queryClient.invalidateQueries({ queryKey: keys.home });
                 navigate(`/campaign/${id}`);
             } catch (err) {
                 setError(err.message);

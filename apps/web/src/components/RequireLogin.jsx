@@ -1,39 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router';
 import Loader from './Loader';
+import { useMe, useProfile } from '../queries.ts';
+
+// Saved look settings follow the account to any device: copy them onto the page.
+const LOOKS = [['site_theme', 'siteTheme', 'data-theme'], ['site_background', 'siteBackground', 'data-background'], ['site_display', 'siteDisplay', 'data-display']];
 
 // Wrap pages that need a logged-in user. Asks the server "who am I?" (/api/me).
 // Not logged in -> send them to /login. Logged in -> show the page (<Outlet />).
 function RequireLogin() {
-    const [status, setStatus] = useState('checking');
     const location = useLocation();
-    
-    useEffect(() => {
-        fetch('/api/me')
-            .then(async (res) => {
-                if (res.ok) {
-                    // pull the saved theme and background from the account so they follow you to any device
-                    const p = await fetch('/api/profile').then((r) => (r.ok ? r.json() : null)).catch(() => null);
-                    if (p?.site_theme) {
-                        localStorage.setItem('siteTheme', p.site_theme);
-                        document.documentElement.setAttribute('data-theme', p.site_theme);
-                    }
-                    if (p?.site_background) {
-                        localStorage.setItem('siteBackground', p.site_background);
-                        document.documentElement.setAttribute('data-background', p.site_background);
-                    }
-                    if (p?.site_display) {
-                        localStorage.setItem('siteDisplay', p.site_display);
-                        document.documentElement.setAttribute('data-display', p.site_display);
-                    }
-                }
-                setStatus(res.ok ? 'yes' : 'no');
-            })
-            .catch(() => setStatus('no'));
-    }, []);
+    const me = useMe();
+    const profile = useProfile(me.isSuccess); // only ask for the profile once we know who you are
 
-    if (status === 'checking') return <Loader />;
-    if (status === 'no') return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
+    useEffect(() => {
+        const p = profile.data;
+        if (!p) return;
+        for (const [field, storageKey, attr] of LOOKS) {
+            if (p[field]) {
+                localStorage.setItem(storageKey, p[field]);
+                document.documentElement.setAttribute(attr, p[field]);
+            }
+        }
+    }, [profile.data]);
+
+    if (me.isPending) return <Loader />;
+    if (me.isError) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
     return <Outlet />;
 }
 

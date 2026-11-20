@@ -1,7 +1,9 @@
 import usePageStyle from '../hooks/usePageStyle';
 import profileCss from '../styles/profile.css?inline';
 import SiteNav from '../components/SiteNav';
-import { sendJson } from '../utils/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '../api.ts';
+import { keys } from '../queries.ts';
 
 
 const THEMES = ['default', 'green', 'purple', 'blue', 'red', 'orange', 'yellow', 'dark', 'light', 'hellfire', 'frozen', 'neon', 'gestalt', 'shadow-of-the-mountains', 'prestige', 'glass-green', 'glass-blue', 'glass-red', 'glass-orange', 'glass-yellow', 'glass-fire', 'dark-glass', 'light-glass', 'neon-glass', 'frozen-glass', 'gothic', 'pilgrim'];
@@ -12,29 +14,19 @@ const BACKGROUNDS = ['default', 'green', 'purple', 'blue', 'red', 'orange', 'yel
 
 function ProfilePage() {
     usePageStyle(profileCss);
+    const queryClient = useQueryClient();
 
-
-
-const pickTheme = async(e) => {
-    const next = e.target.value;
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('siteTheme', next);
-    await sendJson('/api/profile', 'PUT', { site_theme: next });
-};
-
-const pickDisplay = async(e) => {
-    const next = e.target.value;
-    document.documentElement.setAttribute('data-display', next);
-    localStorage.setItem('siteDisplay', next);
-    await sendJson('/api/profile', 'PUT', { site_display: next });
-};
-
-const pickBackground = async(e) => {
-    const next = e.target.value;
-    document.documentElement.setAttribute('data-background', next);
-    localStorage.setItem('siteBackground', next);
-    await sendJson('/api/profile', 'PUT', { site_background: next });
-};
+    // Show the new look right away, remember it on this device, then save it to the account.
+    const pick = (field, storageKey, attr) => async (e) => {
+        const next = e.target.value;
+        document.documentElement.setAttribute(attr, next);
+        localStorage.setItem(storageKey, next);
+        await api('/api/profile', { method: 'PUT', body: { [field]: next } });
+        queryClient.invalidateQueries({ queryKey: keys.profile });
+    };
+    const pickTheme = pick('site_theme', 'siteTheme', 'data-theme');
+    const pickDisplay = pick('site_display', 'siteDisplay', 'data-display');
+    const pickBackground = pick('site_background', 'siteBackground', 'data-background');
 
     return (
         <>
