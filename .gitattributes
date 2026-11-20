@@ -1,0 +1,2 @@
+# Several AIs add log entries at the same time: keep both sides instead of a merge conflict.
+docs/PROGRESS.md merge=union
