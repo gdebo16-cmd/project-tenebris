@@ -1,9 +1,10 @@
-import { modOf, signed, d20, capitalize } from '../utils/math';
+import { modOf, signed, capitalize } from '@tenebris/rules/math';
+import { rollD20 } from '../dice';
 
 // Click a box to roll a d20 + that stat's modifier
 // "bottom" replaces the score shown at the bottom (Speed shows distance instead)
 function StatBox({ label, score, bottom, onRoll }) {
-    const roll = () => onRoll(`${capitalize(label)} roll: ${d20() + modOf(score)}`);
+    const roll = () => rollD20(modOf(score)).then((r) => onRoll(`${capitalize(label)} roll: ${r.total}`), (err) => onRoll(`Roll failed: ${err.message}`));
 
     return (
         <article className='stat-tile' onClick={roll}>

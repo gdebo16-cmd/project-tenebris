@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import useSave from './useSave';
 import { STATS } from '../../utils/stats';
-import { roll4d6DropLowest } from '../../utils/math';
+import { rollStat } from '../../dice';
 
 // Each stat button rerolls that stat (4d6, drop the lowest). Nothing saves until "Save Changes".
 function EditAbilitiesForm({ character, onSaved }) {
@@ -12,7 +12,8 @@ function EditAbilitiesForm({ character, onSaved }) {
     );
     const { save, message } = useSave(`/api/characters/${character.id}/edit/abilities`, onSaved);
 
-    const reroll = (key) => setScores({ ...scores, [key]: roll4d6DropLowest() });
+    // the server rolls 4d6 drop the lowest
+    const reroll = (key) => rollStat().then((n) => setScores((old) => ({ ...old, [key]: n })));
 
     const submit = (e) => {
         e.preventDefault();

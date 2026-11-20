@@ -1,10 +1,11 @@
-//import { rollDice } from '../../utils/math';
 import { useState } from 'react';
 import SpellBook from './SpellBook';
 import { sendJson } from '../../utils/api';
 import TabList from '../../components/TabList';
-import { getSpellSlots, beamsAt, beamRollText, beamDamageText } from '../../utils/spellSlots';
-import { modOf, signed, proficiencyBonus, rollDice, rollToHit } from '../../utils/math';
+import { getSpellSlots, beamsAt } from '@tenebris/rules/spellSlots';
+import { modOf, signed, proficiencyBonus } from '@tenebris/rules/math';
+import { critMark } from '@tenebris/rules/dice';
+import { rollD20, rollTotal, rollBeamsText, rollBeamDamage } from '../../dice';
 import { useCharacter } from '../CharacterContext';
 import { createPortal } from 'react-dom';
 import { statName, statKey } from '../../utils/stats';
@@ -68,38 +69,40 @@ function SpellsTab() {
         const isHeal = !!s.heal_dice && !s.damage_dice && !s.base_damage_dice;
         const healMod = isHeal && s.heal_add_mod ? modOf(spellScore) : 0;
 
-        // Uses one slot at this level, then shows the message. Stops if none are left.
-        const cast = (message) => {
+        // A roll asks the server, so it's async; a failed roll shows in the feed
+        const run = (fn) => fn().catch((err) => onRoll?.(`Roll failed: ${err.message}`));
+        // Uses one slot at this level, then makes the message (it may roll). Stops if none are left.
+        const cast = (makeMessage) => run(async () => {
             if (!spendSlot(lvl, s.id)) return onRoll?.(isBody ? `${s.name} is used until your next long rest.` : `No level ${lvl} slots left!`);
-            onRoll?.(message);
-        };
+            onRoll?.(await makeMessage());
+        });
         const key = `s${s.upcastKey ?? s.id}`;
-        const hitText = () => {
-            const r = rollToHit(toHit);
+        const hitText = async () => {
+            const r = await rollD20(toHit);
             setCritKey(r.crit ? key : null);
-            return `Chance to hit: ${r.total}${r.crit ? ' CRIT!' : r.fail ? ' (natural 1)' : ''}!`;
+            return `Chance to hit: ${r.total}${critMark(r)}!`;
         };
         // a natural 20 on this tile's to-hit doubles the damage dice once
-        const damageText = () => {
+        const damageText = async () => {
             const crit = critKey === key;
             setCritKey(null);
-            if (isHeal) return `Healed: ${Math.max(0, rollDice(dice) + healMod)}`;
-            return beamsAt(s, level) > 1 ? beamDamageText(beamsAt(s, level), dice, 0, crit) : `Damage dealt: ${rollDice(dice, crit)}${crit ? ' CRIT!' : ''}`;
+            if (isHeal) return `Healed: ${Math.max(0, (await rollTotal(dice)) + healMod)}`;
+            return beamsAt(s, level) > 1 ? rollBeamDamage(beamsAt(s, level), dice, 0, crit) : `Damage dealt: ${await rollTotal(dice, crit)}${crit ? ' CRIT!' : ''}`;
         };
 
         return (
             <>
                 {/* the first button you click spends the slot */}
                 {s.attack_type ? (
-                    <button type='button' className='action-button btn-to-hit hover-grow' onClick={() => cast(beamsAt(s, level) > 1 ? `${who} casts ${s.name}! ${beamRollText(beamsAt(s, level), toHit, dice)}` : `${who} casts ${s.name}! ${hitText()}`)}>{signed(toHit)}</button>
+                    <button type='button' className='action-button btn-to-hit hover-grow' onClick={() => cast(async () => beamsAt(s, level) > 1 ? `${who} casts ${s.name}! ${await rollBeamsText(beamsAt(s, level), toHit, dice)}` : `${who} casts ${s.name}! ${await hitText()}`)}>{signed(toHit)}</button>
                 ) : s.opponent_save_roll ? (
-                    <button type='button' className='action-button btn-to-hit hover-grow' onClick={() => cast(`${who} casts ${s.name}! Target must make a ${statName(s.opponent_save_roll)} roll and beat a ${spellSave}!`)}>{statName(s.opponent_save_roll)} {spellSave}</button>
+                    <button type='button' className='action-button btn-to-hit hover-grow' onClick={() => cast(() => `${who} casts ${s.name}! Target must make a ${statName(s.opponent_save_roll)} roll and beat a ${spellSave}!`)}>{statName(s.opponent_save_roll)} {spellSave}</button>
                 ) : null}
                 {dice ? (
                     // with a to-hit/save button the damage is just a roll; without one, this button is the cast
-                    <button type='button' className={`action-button damage-button ${critKey === key ? ' is-crit' : ''}`} onClick={() => hasFirst ? onRoll?.(damageText()) : cast(`${who} casts ${s.name}! ${damageText()}`)}>{dice}{healMod ? signed(healMod) : ''}</button>
+                    <button type='button' className={`action-button damage-button ${critKey === key ? ' is-crit' : ''}`} onClick={() => hasFirst ? run(async () => onRoll?.(await damageText())) : cast(async () => `${who} casts ${s.name}! ${await damageText()}`)}>{dice}{healMod ? signed(healMod) : ''}</button>
                 ) : (
-                    <button type='button' className='action-button damage-button' onClick={() => cast(`${who} casts ${s.name}!`)}>Cast</button>
+                    <button type='button' className='action-button damage-button' onClick={() => cast(() => `${who} casts ${s.name}!`)}>Cast</button>
                 )}
             </>
         );

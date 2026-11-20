@@ -1,4 +1,4 @@
-import { signed, proficiencyBonus } from '../utils/math';
+import { signed, proficiencyBonus } from '@tenebris/rules/math';
 
 // Proficiency Bonus from the character's level (same math as skills, spells and class DC)
 function ProficiencyBonus({ character }) {

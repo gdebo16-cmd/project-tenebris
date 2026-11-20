@@ -4,7 +4,7 @@ import * as Spells from '../models/spellModel.js';
 import { getSheetCharacter } from '../models/characterModel.js';
 import { getSpell } from '../models/spellPack.js';
 import { getSpellSlots } from '@tenebris/rules/spellSlots';
-import { getSpellCaps, bodyMaxLevel } from '../utils/spellLimits.js'; /*prep-done*/
+import { getSpellCaps, bodyMaxLevel } from '@tenebris/rules/spellLimits'; /*prep-done*/
 
 // Highest spell level a character can cast (number of slot tiers). Cantrips (0) are always allowed.
 // Body Magic has no slots: its highest level comes from the character level.

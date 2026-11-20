@@ -12,6 +12,7 @@ import { getRaces, getSubraces, step1Submit, getStep2, step2Submit, getStep3, st
 import { getSpellbook, learnSpell, unlearnSpell, prepareSpell, unprepareSpell, setAction, removeAction } from '../controllers/apiSpellController.js';
 import { createCampaign, deleteCampaign, getCampaign, updateCampaign, listCampaigns, joinCampaign, setCampaignCharacter } from '../controllers/apiCampaignController.js';
 import { getContent, getSpells } from '../controllers/contentController.js';
+import { roll } from '../controllers/apiRollController.js';
 import { getCatalog, listCampaignMonsters, addMonster, getMonsterSheet, updateMonster, deleteMonster } from '../controllers/apiMonsterController.js';
 
 
@@ -32,6 +33,7 @@ const router = Router();
 router.post('/login', loginLimiter, login);
 router.post('/register', loginLimiter, register);
 router.get('/me', me);
+router.post('/roll', roll);
 router.post('/logout', logout);
 router.get('/home', home);
 router.get('/settings', getSettings);

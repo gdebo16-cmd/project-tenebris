@@ -1,4 +1,5 @@
-import { modOf, signed, d20, proficiencyBonus } from '../utils/math';
+import { modOf, signed, proficiencyBonus } from '@tenebris/rules/math';
+import { rollD20 } from '../dice';
 import { SKILLS } from '../utils/stats';
 
 // Skill value = modifier of its first stat + modifier of its second stat.
@@ -22,7 +23,7 @@ function Skills({ character, onRoll }) {
                                 className={`skill-tile ${proficient ? ' is-proficient' : ''}`}
                                 title={proficient ? 'Proficient' : undefined}
                                 id={`${skill.id}-container`}
-                                onClick={() => onRoll(`${skill.name} check: ${d20() + value}`)}
+                                onClick={() => rollD20(value).then((r) => onRoll(`${skill.name} check: ${r.total}`), (err) => onRoll(`Roll failed: ${err.message}`))}
                             >
                                 <p className="skill-label" id={`${skill.id}-label`}>{skill.name}</p>
                                 <p className="skill-value" id={`${skill.id}-value`}>{signed(value)}</p>

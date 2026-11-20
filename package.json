@@ -19,6 +19,7 @@
     "test:e2e": "playwright test",
     "migrate": "node db/migrate.js",
     "migrate:create": "node-pg-migrate create --migrations-dir db/migrations --migration-file-language js",
-    "typecheck": "tsc -p packages/rules && tsc -p apps/server && tsc -p apps/web"
+    "test": "node --test \"packages/rules/test/**/*.test.ts\"",
+    "typecheck": "tsc -p packages/rules && tsc -p packages/rules/test && tsc -p apps/server && tsc -p apps/web"
   }
 }

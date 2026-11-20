@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { modOf, signed, healthInit, rollDice, rollToHit, proficiencyBonus } from '../../utils/math';
+import { modOf, signed, healthInit, proficiencyBonus } from '@tenebris/rules/math';
+import { critMark } from '@tenebris/rules/dice';
+import { roll, rollD20, rollTotal, rollBeamsText, rollBeamDamage } from '../../dice';
 import { useCharacter } from '../CharacterContext';
-import { getSpellSlots, beamsAt, beamRollText, beamDamageText, scaledAt } from '../../utils/spellSlots';
+import { getSpellSlots, beamsAt, scaledAt } from '@tenebris/rules/spellSlots';
 import { createPortal } from 'react-dom';
 import { sendJson } from '../../utils/api';
 import RuneControl from './RuneControl';
@@ -36,7 +38,8 @@ function Actions() {
     const bonusSpells = actionSpellsList.filter((s) => s.action_type === 'bonus');
     const reactionSpells = actionSpellsList.filter((s) => s.action_type === 'reaction');
     const [critKey, setCritKey] = useState(null);   // key of the action/spell whose last to-hit was a natural 20
-    const critMark = (r) => (r.crit ? ' CRIT!' : r.fail ? ' (natural 1)' : '');
+    // Every roll is asked of the server, so roll handlers are async. run() shows a failed roll in the feed.
+    const run = (fn) => fn().catch((err) => onRoll(`Roll failed: ${err.message}`));
     const critClass = (key) => (critKey === key ? ' is-crit' : '');
    
 
@@ -47,10 +50,16 @@ function Actions() {
     const isReaver = character.class_name === 'Reaver';
     const isRuneWeaver = character.subclass_name === 'Rune Weaver' && character.level >= 3;
     const isWraith = character.class_name === 'Wraith';
-    // rune damage riders on a weapon hit (crits double them too)
-    const riderRolls = (a, crit) => (a.riders ?? []).map((r) => ({ ...r, n: rollDice(r.dice, crit) }));
+    // rune damage riders on a weapon hit (crits double them too), asked for in the same server roll as the weapon
+    const riderSpecs = (a, crit) => Object.fromEntries((a.riders ?? []).map((r, i) => [`rider${i}`, { type: 'dice', dice: r.dice, crit }]));
+    const riderRolls = (a, results) => (a.riders ?? []).map((r, i) => ({ ...r, n: results[`rider${i}`].total }));
     const riderText = (rs) => rs.map((r) => ` + ${r.n} ${r.type}`).join('');
     const riderSum = (rs) => rs.reduce((s, r) => s + r.n, 0);
+    // One server roll for a weapon hit: the weapon dice, its rune riders, and an optional extra (Soul Strike, Runic Strike, Sigil Strike)
+    const rollWeaponHit = async (a, crit, extraDice) => {
+        const r = await roll({ weapon: { type: 'dice', dice: a.dice, crit }, ...(extraDice ? { extra: { type: 'dice', dice: extraDice, crit } } : {}), ...riderSpecs(a, crit) });
+        return { weapon: Math.max(0, r.weapon.total + a.dmgMod), extra: r.extra?.total ?? 0, rs: riderRolls(a, r) };
+    };
     const weaponActions = ownedWeapons.filter((w) => w.is_equipped).map((w) => {
             const ranged = w.category === 'ranged';
             // Soul Brand (Reaver): the branded weapon uses CHA for attack and damage
@@ -106,29 +115,25 @@ function Actions() {
     };
 
     const soulStrikeDice = character.level >= 23 ? '3d8' : character.level >= 11 ? '2d8' : '1d8';
-    const rollSoulStrike = (a) => {
+    const rollSoulStrike = (a) => run(async () => {
         const crit = critKey != null && critKey === a.key;
         setCritKey(null);
-        const weapon = Math.max(0, rollDice(a.dice, crit) + a.dmgMod);
-        const extra = rollDice(soulStrikeDice, crit);
-        const rs = riderRolls(a, crit);
+        const { weapon, extra, rs } = await rollWeaponHit(a, crit, soulStrikeDice);
         onRoll(`Damage dealt: ${weapon}${riderText(rs)} + Soul Strike ${extra} force = ${weapon + riderSum(rs) + extra}${crit ? ' CRIT!' : ''} (spend 1 Temper)`);
-    };
+    });
 
     // Runic Strike (Rune Weaver): once per turn, a runed-weapon hit adds force damage
     const runicDice = runicStrikeDice(character.level);
     // no turn tracker on the sheet: Runic Strike locks after use until you press New turn
     const [runicUsed, setRunicUsed] = useState(false);
-    const rollRunicStrike = (a) => {
+    const rollRunicStrike = (a) => run(async () => {
         if (runicUsed) return onRoll('Runic Strike is once per turn. Press New turn to reset it.');
         setRunicUsed(true);
         const crit = critKey != null && critKey === a.key;
         setCritKey(null);
-        const weapon = Math.max(0, rollDice(a.dice, crit) + a.dmgMod);
-        const extra = rollDice(runicDice, crit);
-        const rs = riderRolls(a, crit);
+        const { weapon, extra, rs } = await rollWeaponHit(a, crit, runicDice);
         onRoll(`Damage dealt: ${weapon}${riderText(rs)} + Runic Strike ${extra} force = ${weapon + riderSum(rs) + extra}${crit ? ' CRIT!' : ''} (once per turn)`);
-    };
+    });
 
     // Call the Brand (Reaver L2): bonus action, any distance on the same plane; a holder makes a STR save vs class DC
     const classDc = 8 + proficiencyBonus(character.level) + modOf(character.cha);
@@ -155,34 +160,33 @@ function Actions() {
     };
 
     const [openItem, setOpenItem] = useState(null);
-    const rollHit = (a) => {
-        const r = rollToHit(a?.hit ?? toHit);
+    const rollHit = (a) => run(async () => {
+        const r = await rollD20(a?.hit ?? toHit);
         setCritKey(r.crit ? a.key : null);
         onRoll(`Chance to hit: ${r.total}${critMark(r)}`);
-    };
+    });
 
     // A natural 20 on this action's last to-hit doubles the damage dice (not the flat bonus), then the crit is used up
-    const rollDamage = (a) => {
+    const rollDamage = (a) => run(async () => {
         const crit = critKey != null && critKey === a.key;
         setCritKey(null);
-        if (a.beams > 1) return onRoll(beamDamageText(a.beams, a.dice, a.dmgMod, crit));
-        const weapon = Math.max(0, rollDice(a.dice, crit) + a.dmgMod);
-        const rs = riderRolls(a, crit);
+        if (a.beams > 1) return onRoll(await rollBeamDamage(a.beams, a.dice, a.dmgMod, crit));
+        const { weapon, rs } = await rollWeaponHit(a, crit);
         onRoll(`Damage dealt: ${weapon}${rs.length ? `${riderText(rs)} = ${weapon + riderSum(rs)}` : ''}${crit ? ' CRIT!' : ''}`);
-    };
+    });
 
     // Single-beam spell to-hit: remembers a crit under the spell's key
-    const spellHitText = (s) => {
-        const r = rollToHit(spellToHit + (s.base_to_hit_modifier || 0));
+    const spellHitText = async (s) => {
+        const r = await rollD20(spellToHit + (s.base_to_hit_modifier || 0));
         setCritKey(r.crit ? `s${s.id}` : null);
         return `Chance to hit: ${r.total}${critMark(r)}`;
     };
 
-    // Spends one slot at the spell's level, then shows the message. Stops if none are left.
-    const castSpell = (s, message) => {
+    // Spends one slot at the spell's level, then makes the message (makeMessage may ask the server to roll). Stops if none are left.
+    const castSpell = (s, makeMessage) => run(async () => {
         if (spendSlot && !spendSlot(s.base_level, s.id)) return onRoll(character.caster_type === 'body' ? `${s.name} is used until your next long rest.` : `No level ${s.base_level} slots left!`);
-        onRoll(message);
-    };
+        onRoll(await makeMessage());
+    });
 
     // --- Upcasting ---
     const [pickerFor, setPickerFor] = useState(null);   // id of the spell whose level picker is open
@@ -211,7 +215,7 @@ function Actions() {
         return up?.heal_dice || s.heal_dice;
     };
     const healMod = (s) => (s.heal_add_mod ? spellMod : 0);
-    const healText = (s, lvl) => `Healed: ${Math.max(0, rollDice(healAt(s, lvl)) + healMod(s))}`;
+    const healText = async (s, lvl) => `Healed: ${Math.max(0, (await rollTotal(healAt(s, lvl))) + healMod(s))}`;
 
     // Spells that can be upcast open the picker; cantrips and spells with no upcast rows (like Misty Step) cast right away
     const onCastClick = (s, castNow) => {
@@ -221,20 +225,20 @@ function Actions() {
     };
 
     // Called when a level is picked: spend that slot, remember the level, show the result
-    const castAtLevel = (s, lvl) => {
+    const castAtLevel = (s, lvl) => run(async () => {
         setPickerFor(null);
         if (spendSlot && !spendSlot(lvl)) return onRoll(`No level ${lvl} slots left!`);
         setCastLevels({ ...castLevels, [s.id]: lvl });
         const start = `${character.name} casts ${s.name} at level ${lvl}!`;
         const dice = diceAt(s, lvl);
         if (s.attack_type) return onRoll(beamsAt(s, character.level) > 1
-            ? `${start} ${beamRollText(beamsAt(s, character.level), spellToHit + (s.base_to_hit_modifier || 0), dice, s.dmgMod || 0)}`
-            : `${start} ${spellHitText(s)}`);
+            ? `${start} ${await rollBeamsText(beamsAt(s, character.level), spellToHit + (s.base_to_hit_modifier || 0), dice, s.dmgMod || 0)}`
+            : `${start} ${await spellHitText(s)}`);
         if (s.opponent_save_roll) return onRoll(`${start} Target must make a ${statName(s.opponent_save_roll)} roll and roll higher than a ${spellSave}`);
-        if (!dice && healAt(s, lvl)) return onRoll(`${start} ${healText(s, lvl)}`);
-        if (dice) return onRoll(`${start} Damage dealt: ${Math.max(0, rollDice(dice) + (s.dmgMod || 0))}`);
+        if (!dice && healAt(s, lvl)) return onRoll(`${start} ${await healText(s, lvl)}`);
+        if (dice) return onRoll(`${start} Damage dealt: ${Math.max(0, (await rollTotal(dice)) + (s.dmgMod || 0))}`);
         onRoll(start);
-    };
+    });
 
     const ACTION_LABELS = { action: 'Action', bonus: 'Bonus Action', reaction: 'Reaction' };
 
@@ -249,20 +253,18 @@ function Actions() {
     const listedFeatures = actionFeatures.filter((f) => !f.on_weapon_hit);
 
     // Weapon damage + an on-hit feature (Sigil Strike): spend its embers, add its dice to this damage roll
-    const rollWithHitFeature = (a, f) => {
+    const rollWithHitFeature = (a, f) => run(async () => {
         const cost = costOf(f);
         if (cost && !(spendEmbers && spendEmbers(cost))) return onRoll(`Not enough embers for ${f.name}: need ${cost}, have ${embers}.`);
         // crit doubles the weapon dice and the Sigil dice; dmgMod (stat + Cracks) stays flat
         const crit = critKey != null && critKey === a.key;
         setCritKey(null);
-        const weapon = Math.max(0, rollDice(a.dice, crit) + a.dmgMod);
-        const extra = rollDice(diceOf(f), crit);
-        const rs = riderRolls(a, crit);
+        const { weapon, extra, rs } = await rollWeaponHit(a, crit, diceOf(f));
         onRoll(`Damage dealt: ${weapon}${riderText(rs)} + ${f.name} ${extra} radiant = ${weapon + riderSum(rs) + extra}${crit ? ' CRIT!' : ''}${cost ? ` (-${cost} embers, ${embers - cost}/${embersMax} left)` : ''}`);
-    };
+    });
 
     // count = dice bought for per-die features (Bound Virtue). Spends embers first; blocked if the pool is too low.
-    const activateFeature = (f, count = 1) => {
+    const activateFeature = (f, count = 1) => run(async () => {
         if (isLocked(f)) return onRoll(`${f.name}: no uses left (${usedOf(f)}/${usesOf(f)}) until your next ${f.rest_lock} rest.`);
         const cost = costOf(f) * (f.embers_per_die ? count : 1);
         if (cost && !(spendEmbers && spendEmbers(cost))) return onRoll(`Not enough embers for ${f.name}: need ${cost}, have ${embers}.`);
@@ -271,10 +273,10 @@ function Actions() {
         const rollWith = dice && (f.embers_per_die ? `${count}${dice.slice(dice.indexOf('d'))}` : dice);
         const crackText = crackMax && f.cracks_removed ? ` -${Math.min(cracks, f.cracks_removed)} Crack` : crackMax && f.cracks_gained ? ` +${f.cracks_gained} Crack` : '';
         const usesText = f.rest_uses != null ? ` [${usesOf(f) - usedOf(f) - 1}/${usesOf(f)} uses left]` : '';
-        onRoll(`${character.name} uses ${f.name}${cost ? ` (-${cost} embers, ${embers - cost}/${embersMax} left)` : ''}${crackText}${usesText}!${rollWith ? ` Rolled ${rollWith}: ${rollDice(rollWith)}` : ''}`);
+        onRoll(`${character.name} uses ${f.name}${cost ? ` (-${cost} embers, ${embers - cost}/${embersMax} left)` : ''}${crackText}${usesText}!${rollWith ? ` Rolled ${rollWith}: ${await rollTotal(rollWith)}` : ''}`);
         if (crackMax && f.cracks_removed && removeCracks) removeCracks(f.cracks_removed);
         if (crackMax && f.cracks_gained && gainCracks) gainCracks(f.cracks_gained);
-    };
+    });
 
     // The buttons for one feature row (same in every feature group)
     const featureButtons = (f) => (
@@ -298,7 +300,7 @@ function Actions() {
                 <>
                     {f.dice && !costOf(f) && (
                         <button type="button" className="action-button damage-button hover-grow"
-                            onClick={() => onRoll(`${character.name} uses ${f.name}! Rolled: ${rollDice(diceOf(f))}`)}>
+                            onClick={() => run(async () => onRoll(`${character.name} uses ${f.name}! Rolled: ${await rollTotal(diceOf(f))}`))}>
                             {diceOf(f)}
                         </button>
                     )}
@@ -321,11 +323,11 @@ function Actions() {
         onRoll(on ? `Lantern Rune (${l.item}): bright light 20 ft and dim light 20 ft more (bonus action).` : `Lantern Rune (${l.item}): light off (bonus action).`);
     };
     const intMod = modOf(character.int);
-    const rollMending = (m) => {
+    const rollMending = (m) => run(async () => {
         if (restUses[m.key]) return onRoll('Mending Rune: used until your next long rest.');
         if (countUse) countUse(m.key);
-        onRoll(`Mending Rune (${m.item}): reduce the hit's damage by ${Math.max(0, rollDice('1d6') + intMod)} (reaction, 1/long rest).`);
-    };
+        onRoll(`Mending Rune (${m.item}): reduce the hit's damage by ${Math.max(0, (await rollTotal('1d6')) + intMod)} (reaction, 1/long rest).`);
+    });
     const itemNames = (list) => [...new Set(list.map((x) => x.item))].join(', ');
     const runeNotes = [
         runeFx.fleet && 'Fleet Rune: +5 ft walking speed (in your Speed distance).',
@@ -347,23 +349,23 @@ function Actions() {
             <div className="action-button-container">
                 {s.attack_type ? (
                     <button type='button' className='action-button hover-grow'
-                    onClick={() => onCastClick(s, () => castSpell(s, beamsAt(s, character.level) > 1
-                        ? `${character.name} casts ${s.name}! ${beamRollText(beamsAt(s, character.level), spellToHit + (s.base_to_hit_modifier || 0), s.base_damage_dice, s.dmgMod || 0)}`
-                        : `${character.name} casts ${s.name}! ${spellHitText(s)}`))}>
+                    onClick={() => onCastClick(s, () => castSpell(s, async () => beamsAt(s, character.level) > 1
+                        ? `${character.name} casts ${s.name}! ${await rollBeamsText(beamsAt(s, character.level), spellToHit + (s.base_to_hit_modifier || 0), s.base_damage_dice, s.dmgMod || 0)}`
+                        : `${character.name} casts ${s.name}! ${await spellHitText(s)}`))}>
                         {signed(spellToHit + (s.base_to_hit_modifier || 0))}
                     </button>
                 ) : s.opponent_save_roll ? (
-                    <button type='button' className='btn action-button hover-grow' onClick={() => onCastClick(s, () => castSpell(s, `Target must make a ${statName(s.opponent_save_roll)} roll and roll higher than a ${spellSave}`))}>{statName(s.opponent_save_roll)} {spellSave}</button>
+                    <button type='button' className='btn action-button hover-grow' onClick={() => onCastClick(s, () => castSpell(s, () => `Target must make a ${statName(s.opponent_save_roll)} roll and roll higher than a ${spellSave}`))}>{statName(s.opponent_save_roll)} {spellSave}</button>
                 ) : null}
 
                 {(s.base_damage_dice) ? (
                     // with a to-hit/save button the damage is just a roll; without one, this button is the cast
-                    <button type="button" className={`btn action-button  hover-grow${critClass(`s${s.id}`)}`} onClick={() => (s.attack_type || s.opponent_save_roll) ? rollDamage({ key: `s${s.id}`, dice: diceAt(s, castLevels[s.id] ?? s.base_level), dmgMod: s.dmgMod || 0, beams: beamsAt(s, character.level) }) : onCastClick(s, () => castSpell(s, `${character.name} casts ${s.name}! Damage dealt: ${Math.max(0, rollDice(s.base_damage_dice) + (s.dmgMod || 0))}`))}>{diceAt(s, castLevels[s.id] ?? s.base_level)}{s.dmgMod ? signed(s.dmgMod) : ''}</button>
+                    <button type="button" className={`btn action-button  hover-grow${critClass(`s${s.id}`)}`} onClick={() => (s.attack_type || s.opponent_save_roll) ? rollDamage({ key: `s${s.id}`, dice: diceAt(s, castLevels[s.id] ?? s.base_level), dmgMod: s.dmgMod || 0, beams: beamsAt(s, character.level) }) : onCastClick(s, () => castSpell(s, async () => `${character.name} casts ${s.name}! Damage dealt: ${Math.max(0, (await rollTotal(s.base_damage_dice)) + (s.dmgMod || 0))}`))}>{diceAt(s, castLevels[s.id] ?? s.base_level)}{s.dmgMod ? signed(s.dmgMod) : ''}</button>
                 ) : s.heal_dice ? (
                     // healing spells: dice (+ casting mod where the rules add it), never crits
-                    <button type="button" className="btn action-button hover-grow" onClick={() => onCastClick(s, () => castSpell(s, `${character.name} casts ${s.name}! ${healText(s, s.base_level)}`))}>{healAt(s, castLevels[s.id] ?? s.base_level)}{healMod(s) ? signed(healMod(s)) : ''}</button>
+                    <button type="button" className="btn action-button hover-grow" onClick={() => onCastClick(s, () => castSpell(s, async () => `${character.name} casts ${s.name}! ${await healText(s, s.base_level)}`))}>{healAt(s, castLevels[s.id] ?? s.base_level)}{healMod(s) ? signed(healMod(s)) : ''}</button>
                 ) : (
-                    <button type='button' className='btn action-button  hover-grow' onClick={() => onCastClick(s, () => castSpell(s, `${character.name} casts ${s.name}!`))}>Cast</button>
+                    <button type='button' className='btn action-button  hover-grow' onClick={() => onCastClick(s, () => castSpell(s, () => `${character.name} casts ${s.name}!`))}>Cast</button>
                 )}
 
                 {/* Level picker: shows after clicking a leveled spell's cast button */}

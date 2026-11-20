@@ -1,7 +1,7 @@
 // Character database reads and writes: sheet data, hp, levels, stats, create/delete.
 import pool from '../db.js';
 import { withEffectiveScores, effectiveScores, getBoostRows, statCap } from '../utils/abilityBoosts.js';
-import { getSpellCaps } from '../utils/spellLimits.js'; /*prep-done*/
+import { getSpellCaps } from '@tenebris/rules/spellLimits'; /*prep-done*/
 import { resolveSpeciesWrite, resolveRoleWrite } from './idMap.js';
 import content, { choiceFeaturesForRole, getRole, getCalling, scoreKey, hitDieSides } from './content.js';
 

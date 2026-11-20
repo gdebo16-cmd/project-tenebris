@@ -1,4 +1,4 @@
-import { modOf } from '../utils/math';
+import { modOf } from '@tenebris/rules/math';
 import { armorRuneEffects } from '../utils/runes';
 
 function ArmorClass({ character, ownedArmor }) {

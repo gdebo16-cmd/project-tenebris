@@ -16,8 +16,9 @@ import Conditions from './Conditions';
 import RollOrb from './RollOrb';
 import { CharacterContext } from './CharacterContext';
 import { STATS } from '../utils/stats';
-import { getSpellSlots, scaledAt } from '../utils/spellSlots';
-import { modOf, d20, proficiencyBonus } from '../utils/math';
+import { getSpellSlots, scaledAt } from '@tenebris/rules/spellSlots';
+import { modOf, proficiencyBonus } from '@tenebris/rules/math';
+import { roll } from '../dice';
 import Loader from '../components/Loader';
 
 import socket from '../utils/socket';
@@ -134,16 +135,26 @@ function CharacterSheet() {
     const crackMax = character.crack_max || 0;
     const breachDc = scaledAt(character.breach_dc_scaling, 'dc', character.level, character.breach_dc);
     const conSave = modOf(character.con) + ((character.class_saving_throws || []).includes('CON') ? proficiencyBonus(character.level) : 0);
-    const gainCracks = (n) => {
+    const gainCracks = async (n) => {
         if (!crackMax || n <= 0) return;
         const patch = { cracks: Math.min(crackMax, cracks + n) };
         const messages = [];
-        for (let i = 0; i < cracks + n - crackMax; i++) {
-            const roll = d20() + conSave;
-            if (roll >= breachDc) {
-                messages.push(`Breach! Endurance roll ${roll} vs DC ${breachDc}: success, nothing happens.`);
+        // one CON save per Crack past the max, all rolled by the server in one trip
+        const breaches = Math.max(0, cracks + n - crackMax);
+        let saves = [];
+        if (breaches > 0) {
+            try {
+                saves = Object.values(await roll(Object.fromEntries(Array.from({ length: breaches }, (_, i) => [`save${i}`, { type: 'd20', bonus: conSave }]))));
+            } catch (err) {
+                messages.push(`Roll failed: ${err.message}`);
+            }
+        }
+        for (const save of saves) {
+            const total = save.total;
+            if (total >= breachDc) {
+                messages.push(`Breach! Endurance roll ${total} vs DC ${breachDc}: success, nothing happens.`);
             } else {
-                messages.push(`Breach! Endurance roll ${roll} vs DC ${breachDc}: failed. Stunned until the end of your next turn.${character.breach_effect ? ` ${character.breach_effect}` : ''}`);
+                messages.push(`Breach! Endurance roll ${total} vs DC ${breachDc}: failed. Stunned until the end of your next turn.${character.breach_effect ? ` ${character.breach_effect}` : ''}`);
                 if (character.breach_drains_embers) patch.embers_spent = embersMax;
             }
         }
@@ -162,7 +173,18 @@ function CharacterSheet() {
     };
 
     const rest = async (type) => {
-        const pct = type === 'long' ? 1 : 0.2 + Math.random() * 0.4;
+        // A short rest recovers 20-60% and each condition may wear off: the server rolls both in one trip.
+        // A long rest recovers everything, so nothing needs rolling.
+        const activeConditions = Object.keys(conditions).filter((name) => conditions[name]);
+        let restRoll = null;
+        if (type !== 'long') {
+            try {
+                restRoll = await roll({ pct: { type: 'dice', dice: '1d41+19' }, ...Object.fromEntries(activeConditions.map((name, i) => [`c${i}`, { type: 'percent' }])) });
+            } catch (err) {
+                return showRoll(`Roll failed: ${err.message}`);
+            }
+        }
+        const pct = restRoll ? restRoll.pct.total / 100 : 1;
         
         const healAmount = Math.round((character.max_hp - hp) * pct);
         if (healAmount > 0) {
@@ -196,7 +218,8 @@ function CharacterSheet() {
 
     const newConditions = {};
     for (const [name, on] of Object.entries(conditions)) {
-        newConditions[name] = on && Math.random() >= pct;
+        // a condition stays only if its percent roll beats the recovery (a long rest clears them all)
+        newConditions[name] = on && !!restRoll && restRoll[`c${activeConditions.indexOf(name)}`] > pct * 100;
     }
     // Uses per rest: a long rest resets all; a short rest resets only features that recover on a short rest
     const newUses = {};

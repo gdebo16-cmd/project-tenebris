@@ -1,6 +1,9 @@
 // Max cantrips / leveled spells known per class by level (index 0 = level 1).
 // Source: Codex draft spell-learn-limits.md (2026-10-12). Subclasses use their parent class.
-export const SPELL_LIMITS = {
+// One class row: spells it can have at each level (index 0 = level 1)
+type LimitRow = { cantrips: number[]; spells: number[]; knownOnly?: boolean; shared?: boolean };
+
+export const SPELL_LIMITS: Record<string, LimitRow> = {
     Mage: {
         cantrips: [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7],
         spells: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34],
@@ -53,10 +56,10 @@ for (const name of ['Warrior', 'Assassin', 'Knight', 'Berserker', 'Pugilist', 'L
 }
 
 // Highest Body Magic spell level: 1st at L5, 2nd at L15, 3rd at L25 (0 = none yet)
-export const bodyMaxLevel = (level) => (level >= 25 ? 3 : level >= 15 ? 2 : level >= 5 ? 1 : 0);
+export const bodyMaxLevel = (level: number): number => (level >= 25 ? 3 : level >= 15 ? 2 : level >= 5 ? 1 : 0);
 
 // Subclass casters (the base class casts nothing). Checked before the class table.
-export const SUBCLASS_SPELL_LIMITS = {
+export const SUBCLASS_SPELL_LIMITS: Record<string, LimitRow> = {
     // full caster (Gabriel 2026-10-25): same limits as the Songsmith
     'Mark of Possession': {
         cantrips: [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6],
@@ -65,7 +68,7 @@ export const SUBCLASS_SPELL_LIMITS = {
 };
 
 // Returns { cantrips, spells } for that class (or subclass) at that level, or null if there is no cap.
-export function getLearnLimits(className, level, subclassName = null) {
+export function getLearnLimits(className: string | null | undefined, level: number, subclassName: string | null = null) {
     const sub = Object.keys(SUBCLASS_SPELL_LIMITS).find((k) => k.toLowerCase() === String(subclassName ?? '').trim().toLowerCase());
     if (sub) {
         const j = Math.min(Math.max(Number(level) || 1, 1), 30) - 1;
@@ -79,11 +82,10 @@ export function getLearnLimits(className, level, subclassName = null) {
 
 // Known vs prepared (Gabriel 2026-10-16): a caster can learn up to 2x the spells limit above and prepare only the limit.
 // Cantrips are unchanged (learn and prepare up to the cantrip limit). Returns null when the class has no cap.
-export function getSpellCaps(className, level, subclassName = null) {
+export function getSpellCaps(className: string | null | undefined, level: number, subclassName: string | null = null) {
     const l = getLearnLimits(className, level, subclassName);
     if (!l) return l;
     // known-only casters (Reaver, Body Magic) can prepare everything they know; shared = cantrips count toward the same total
     if (l.knownOnly || l.shared) return { cantrips: l.cantrips, prepared: l.spells, known: l.spells, shared: l.shared };
     return { cantrips: l.cantrips, prepared: l.spells, known: l.spells * 2 };
 }
-/*prep-done*/

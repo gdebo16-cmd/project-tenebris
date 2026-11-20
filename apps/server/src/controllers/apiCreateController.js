@@ -8,15 +8,13 @@ import { addWeapon, equipWeapon, addArmor, equipArmor } from '../models/inventor
 import { listStartingGearForRole, boostRowsForRole } from '../models/content.js';
 import { resolveRoleWrite } from '../models/idMap.js';
 import { listMagicOptions, checkMagicPicks } from '../models/magicModel.js';
+import { roll4d6DropLowest, rollDice } from '@tenebris/rules/dice';
+import { rng } from '../dice.js';
 
 const STATS = ["str", "dex", "con", "int", "wis", "cha", "luc", "spd"];
 
 // 4d6, drop the lowest
-function rollStatValue() {
-    const dice = [1, 2, 3, 4].map(() => Math.floor(Math.random() * 6) + 1);
-    dice.sort((a, b) => a - b);
-    return dice[1] + dice[2] + dice[3];
-}
+const rollStatValue = () => roll4d6DropLowest(rng).total;
 
 export async function getRaces(req, res) {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
@@ -289,7 +287,7 @@ export async function step4Submit(req, res) {
     const hitDie = await getHitDie(draft.class_id);
     if (!hitDie) return res.status(400).json({ error: 'Class not found' });
 
-    const baseHealth = Math.floor(Math.random() * hitDie) + 1;
+    const baseHealth = rollDice(`1d${hitDie}`, rng).total;
     const conMod = Math.floor(final.con / 2) - 5;
     // same per-level gain as the editor's level change: hit die / 2 + 1 + CON mod, at least 1
     const perLvl = Math.max(1, Math.floor(hitDie / 2) + 1 + conMod);
