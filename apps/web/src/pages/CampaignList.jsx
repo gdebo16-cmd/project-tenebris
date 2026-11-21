@@ -3,10 +3,9 @@ import { Link, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useCampaigns } from '../queries.ts';
-import usePageStyle from '../hooks/usePageStyle';
-import campaignListCss from '../styles/campaignList.css?inline';
 import SiteNav from '../components/SiteNav';
 import Loader from '../components/Loader';
+import styles from './CampaignList.module.css';
 
 
 function CampaignList() {
@@ -14,7 +13,6 @@ function CampaignList() {
     const [joinError, setJoinError] = useState('');
     const navigate = useNavigate();
 
-    usePageStyle(campaignListCss);
     const { data, isPending, error } = useCampaigns();
     const queryClient = useQueryClient();
 
@@ -44,8 +42,8 @@ function CampaignList() {
         }
     };
 
-    if (error) return <p>Failure is upon us: {error.message}</p>;
-    if (isPending) return <Loader text='Summoning your stories...'/>;
+    if (error) return <p className={styles.page}>Failure is upon us: {error.message}</p>;
+    if (isPending) return <Loader className={styles.page} text='Summoning your stories...'/>;
 
     const { campaigns } = data;
 
@@ -56,7 +54,7 @@ function CampaignList() {
                 <h1>Your Tales</h1>
             </header>
             <SiteNav />
-            <main>
+            <main className={styles.page}>
                 <section className="cl-panel">
                     <h2 className="cl-header"><strong>Start or Join a Tale</strong></h2>
                     <div className="cl-body cl-actions">
