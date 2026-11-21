@@ -1,0 +1,27 @@
+{
+    "eye_colors": ["Brown", "Hazel", "Green", "Blue", "Grey", "Amber", "Black", "Violet", "white", "red", "pink", "purple", "orange", "gold", "silver"],
+    "species": {
+      "igni": { "size_ids": [2, 3], "variants": ["Ember", "Ash", "Gold"] },
+      "human": { "size_ids": [2, 3], "variants": ["Default"] },
+      "elf": { "size_ids": [2, 3] },
+      "dwarf": { "size_ids": [2], "variants": ["Stone", "Hill", "Woodland"] },
+      "halfling": { "size_ids": [1, 2], "variants": ["Hobit", "Goblin", "Gnome"] },
+      "quillary": { "size_ids": [2, 3], "variants": ["Desert", "Forest", "Mountain"] },
+      "orc": { "size_ids": [ 2, 3], "variants": ["Blood", "Iron", "Highland"] },
+      "dross": { "size_ids": [2, 3], "variants": ["Blue", "Grey", "Green"] },
+      "radiant": { "size_ids": [2, 3], "variants": ["Sol", "Grace", "Sky"] },
+      "ent": { "size_ids": [1, 2, 3], "variants": ["Willow", "Oak", "Redwood"] },
+      "ouros": { "size_ids": [2, 3], "variants": ["Copper", "Rust", "Iron"] },
+      "morvyne": { "size_ids": [1, 2], "variants": ["Blue", "Black", "White"] },
+      "gemine": { "size_ids": [3, 4], "variants": ["Topaz", "Sapphire", "Emerald"] },
+      "vantus": { "size_ids": [2, 3], "variants": ["Grace", "Shade", "Twilight"] },            
+      "lumen": { "size_ids": [1, 2], "variants": ["Northern", "Woodland", "Honeydew"] },
+      "wyrdling": { "size_ids": [1, 2], "variants": ["Wyrmwood", "Hollows", "Grimwood"] },
+      "gehennan": { "size_ids": [2, 3] },
+      "lupine": { "size_ids": [2, 3] },
+      "vellari": { "size_ids": [2] },
+      "homunculi": { "size_ids": [1, 2, 3, 4], "variants": ["Onyx", "Ash", "Gold"] },
+      "uron": { "size_ids": [3, 4], "variants": ["Black", "Grizzly", "Polar"] },
+      "vespar": { "size_ids": [2, 3, 4], "variants": ["Nimbus", "Cumulus", "Stratus"] }
+    }
+  }

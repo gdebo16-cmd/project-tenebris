@@ -14,6 +14,7 @@ import { createCampaign, deleteCampaign, getCampaign, updateCampaign, listCampai
 import { getContent, getSpells } from '../controllers/contentController.js';
 import { roll } from '../controllers/apiRollController.js';
 import { getCatalog, listCampaignMonsters, addMonster, getMonsterSheet, updateMonster, deleteMonster } from '../controllers/apiMonsterController.js';
+import characterFormRouter from './characterForm.js';
 
 
 
@@ -34,6 +35,7 @@ router.post('/login', loginLimiter, login);
 router.post('/register', loginLimiter, register);
 router.get('/me', me);
 router.post('/roll', roll);
+router.use(characterFormRouter);
 router.post('/logout', logout);
 router.get('/home', home);
 router.get('/settings', getSettings);
