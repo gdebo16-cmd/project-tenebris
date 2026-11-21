@@ -7,6 +7,8 @@ import { legacyRaceIdForSpecies, legacySubraceIdForSpecies, legacyClassIdForRole
 const FORM_COLUMNS = new Set([
     'name', 'level', 'portrait_url',
     'species_id', 'size_id', 'variant', 'eye_color', 'look_description',
+    'role_id', 'calling_id', 'skill_proficiencies', 'feature_choices',
+    'str', 'dex', 'con', 'int', 'wis', 'cha', 'luc', 'spd', 'plus2_stat', 'plus1_stat', 'stat_rolls',
 ]);
 
 // A new, empty character marked as a draft. Answers its id.
@@ -25,8 +27,8 @@ export async function getFormCharacter(charId) {
     const { rows } = await pool.query(
         `SELECT id, user_id, is_draft, name, level, portrait_url,
                 species_id, size_id, variant, eye_color, look_description,
-                role_id, calling_id,
-                str, dex, con, "int", wis, cha, luc, spd, stat_rolls, money
+                role_id, calling_id, skill_proficiencies, feature_choices,
+                str, dex, con, "int", wis, cha, luc, spd, plus2_stat, plus1_stat, stat_rolls, money
          FROM characters WHERE id = $1`,
         [charId]
     );
@@ -40,8 +42,14 @@ export async function updateCharacterFields(charId, values) {
     for (const column of columns) {
         if (!FORM_COLUMNS.has(column)) throw new Error(`The form can't change characters.${column}`);
     }
-    const sets = columns.map((column, i) => `${column} = $${i + 2}`).join(', ');
-    await pool.query(`UPDATE characters SET ${sets} WHERE id = $1`, [charId, ...columns.map((c) => values[c])]);
+    // "int" is a SQL keyword. jsonb columns need a cast; node-pg will not guess them.
+    const jsonb = new Set(['feature_choices', 'stat_rolls']);
+    const sets = columns.map((column, i) => {
+        const name = column === 'int' ? '"int"' : column;
+        return `${name} = $${i + 2}${jsonb.has(column) ? '::jsonb' : ''}`;
+    }).join(', ');
+    const params = columns.map((column) => jsonb.has(column) ? JSON.stringify(values[column]) : values[column]);
+    await pool.query(`UPDATE characters SET ${sets} WHERE id = $1`, [charId, ...params]);
 }
 
 // Marks a draft as finished with its starting HP.

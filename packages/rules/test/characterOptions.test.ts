@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { characterOptions, giftsAllowed, sizeOptions, CALLING_LEVEL, type OptionsPack } from '../src/characterOptions.ts';
+import { characterOptions, choiceFeaturesFor, checkChoicePicks, giftsAllowed, sizeOptions, CALLING_LEVEL, type OptionsPack } from '../src/characterOptions.ts';
 
 // A tiny fake pack: 2 species (one with a sub-species), 1 role with 2 callings, 3 gifts.
 // Small on purpose, so every expected answer is easy to check by eye.
@@ -20,7 +20,19 @@ const pack: OptionsPack = {
     roles: [{
         id: 10, key: 'warrior', name: 'Warrior', hit_die: 'd12', primary_stat: 'Might', img_url: '/classes/warrior.png',
         skill_count: 2, skill_options: ['Balance', 'Presence', 'Awareness'], skill_fixed: ['Athletics'],
-        callings: [{ id: 100, key: 'reaper', name: 'Path of the Reaper' }, { id: 101, key: 'hero', name: 'Path of the Hero' }],
+        levels: [
+            { level: 1, features: [
+                { name: 'Preferred Arms', options: ['Minor', 'Great', 'Reach'], choice_count: 2, data: { choice_timing: 'create' } },
+                { name: 'Not a picker', options: ['Nope'], data: { choice_timing: 'level' } },
+            ] },
+            { level: 5, features: [{ name: 'Later', options: ['A', 'B'], choice_count: 1, data: { choice_timing: 'create' } }] },
+        ],
+        callings: [
+            { id: 100, key: 'reaper', name: 'Path of the Reaper', features: [
+                { name: 'Reap', level: 3, options: ['Hook', 'Scythe'], choice_count: 1, data: { choice_timing: 'create' } },
+            ] },
+            { id: 101, key: 'hero', name: 'Path of the Hero' },
+        ],
     }],
     primordial_blessings: [{ id: 1, name: 'Steady Bulwark' }, { id: 2, name: 'Swift Step' }, { id: 3, name: 'Iron Resolve' }],
     alignments: [
@@ -93,6 +105,46 @@ test('a species with sub-species lists them; one without lists its variants', ()
 test('only top-level species are listed, in sort order', () => {
     const names = characterOptions(pack, { level: 1 }).species.map((s) => s.name);
     assert.deepEqual(names, ['Elf', 'Igni']);   // Dawn Elf is inside Elf, not on its own
+});
+
+test('feature choices follow the role, the level and the calling', () => {
+    const at1 = characterOptions(pack, { level: 1, role_id: 10 }).features.map((f) => f.name);
+    assert.deepEqual(at1, ['Preferred Arms']);   // the level-5 feature and the non-create feature stay out
+    const at5 = characterOptions(pack, { level: 5, role_id: 10 }).features.map((f) => f.name);
+    assert.deepEqual(at5, ['Preferred Arms', 'Later']);
+    const reaper = characterOptions(pack, { level: 3, role_id: 10, calling_id: 100 }).features.map((f) => f.name);
+    assert.deepEqual(reaper, ['Preferred Arms', 'Reap']);
+    const hero = characterOptions(pack, { level: 3, role_id: 10, calling_id: 101 }).features.map((f) => f.name);
+    assert.deepEqual(hero, ['Preferred Arms']);
+    const tooSoon = characterOptions(pack, { level: 2, role_id: 10, calling_id: 100 }).features.map((f) => f.name);
+    assert.deepEqual(tooSoon, ['Preferred Arms']);
+});
+
+test('feature picks: a good set passes, a bad one gets an error', () => {
+    const features = choiceFeaturesFor(pack.roles[0], undefined, 1);
+    const key = features[0].key;
+    assert.deepEqual(checkChoicePicks(features, { [key]: ['Minor', 'Great'] }), { choices: { [key]: ['Minor', 'Great'] } });
+    assert.ok('choices' in checkChoicePicks(features, null));
+    const bad = [
+        { [key]: ['Minor'] },            // not enough
+        { [key]: ['Minor', 'Minor'] },   // twice
+        { [key]: ['Minor', 'Bow'] },     // not in the list
+        { 'class:nope:Nope:1': ['Minor'] },
+        [],
+    ];
+    for (const picks of bad) assert.ok('error' in checkChoicePicks(features, picks), JSON.stringify(picks));
+    // The same option from two rows of one feature is refused. Divine Blessing is allowed to repeat.
+    const twice = [
+        { key: 'class:warrior:Preferred Arms:1', name: 'Preferred Arms', level: 1, choose: 1, options: ['Minor', 'Great'], source: 'class' as const, optionInfo: {} },
+        { key: 'class:warrior:Preferred Arms:2', name: 'Preferred Arms', level: 2, choose: 1, options: ['Minor', 'Great'], source: 'class' as const, optionInfo: {} },
+    ];
+    assert.ok('error' in checkChoicePicks(twice, { [twice[0].key]: ['Minor'], [twice[1].key]: ['Minor'] }));
+    const blessing = { key: 'class:warrior:Divine Blessing:4', name: 'Divine Blessing', level: 4, choose: 1, options: ['+2 STR'], source: 'class' as const, optionInfo: {} };
+    assert.ok('choices' in checkChoicePicks([blessing, { ...blessing, key: 'class:warrior:Divine Blessing:6', level: 6 }], {
+        'class:warrior:Divine Blessing:4': ['+2 STR'],
+        'class:warrior:Divine Blessing:6': ['+2 STR'],
+    }, 6));
+    assert.ok('error' in checkChoicePicks([blessing], { [blessing.key]: ['+2 STR'] }, 3));
 });
 
 test('alignments sorted, personality split by category', () => {

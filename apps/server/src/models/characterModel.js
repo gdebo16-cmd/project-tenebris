@@ -2,6 +2,7 @@
 import pool from '../db.js';
 import { withEffectiveScores, effectiveScores, getBoostRows, statCap } from '../utils/abilityBoosts.js';
 import { getSpellCaps } from '@tenebris/rules/spellLimits'; /*prep-done*/
+import { checkChoicePicks } from '@tenebris/rules/characterOptions';
 import { resolveSpeciesWrite, resolveRoleWrite } from './idMap.js';
 import content, { choiceFeaturesForRole, getRole, getCalling, scoreKey, hitDieSides } from './content.js';
 
@@ -356,55 +357,27 @@ export async function getCharacterFeature(charId, userId, source, featureId) {
 }
 
 export async function checkFeatureChoices(roleId, callingId, level, picks, legacyClassId = null) {
-    if (picks == null) return { choices: {} };
-    if (typeof picks !== 'object' || Array.isArray(picks)) return { error: 'feature_choices must be an object' };
-    const byKey = new Map(choiceFeaturesForRole(roleId, callingId, level).map((f) => [f.key, f]));
+    // Create-time pickers come from the rules. Divine Blessing rows are added here because
+    // they are built from the pack's blessing list, not from a create-time feature.
+    const features = choiceFeaturesForRole(roleId, callingId, level).map((feature) => ({ ...feature }));
     const boostId = roleId ?? legacyClassId;
     if (boostId != null && boostId !== '') {
         const boostRows = await getBoostRows(boostId);
-        for (const r of boostRows) {
-            if (Number(r.level) > Number(level)) continue;
-            const key = r.key || (String(r.id).includes(':') ? String(r.id) : `class:${r.id}`);
-            byKey.set(key, {
-                source: 'class',
-                id: r.id,
+        for (const row of boostRows) {
+            if (Number(row.level) > Number(level)) continue;
+            const key = row.key || (String(row.id).includes(':') ? String(row.id) : `class:${row.id}`);
+            features.push({
                 key,
-                name: r.name,
-                level: Number(r.level),
-                options: r.options,
-                choice_count: 1,
+                name: row.name,
+                level: Number(row.level),
+                choose: 1,
+                options: row.options,
+                source: 'class',
+                optionInfo: {},
             });
         }
     }
-    const choices = {};
-    for (const [key, raw] of Object.entries(picks)) {
-        const vals = (Array.isArray(raw) ? raw : [raw]).filter((v) => v !== '' && v != null);
-        if (!vals.length) continue;
-        const f = byKey.get(key);
-        if (!f) return { error: 'One of those feature choices is not part of this class or subclass' };
-        if (Number(f.level) > level) return { error: `${f.name} unlocks at level ${f.level}` };
-        const count = f.choice_count ?? 1;
-        if (vals.length !== count) return { error: `Pick exactly ${count} for ${f.name}` };
-        if (!vals.every((v) => typeof v === 'string' && f.options.includes(v))) {
-            return { error: `That is not an option for ${f.name}` };
-        }
-        if (new Set(vals).size !== vals.length) return { error: 'Each option can only be picked once' };
-        choices[key] = vals;
-    }
-    // Option pools (several choice rows with the same name): no option twice across the pool
-    const seen = new Map();
-    for (const [key, vals] of Object.entries(choices)) {
-        const f = byKey.get(key);
-        if (f.name === 'Divine Blessing' || f.name === 'Ability Boost' || f.name === 'Primordial Ascent') continue;
-        const pool = `${f.source}:${f.name}`;
-        const taken = seen.get(pool) ?? new Set();
-        for (const v of vals) {
-            if (taken.has(v)) return { error: `You already picked ${v} from ${f.name}` };
-            taken.add(v);
-        }
-        seen.set(pool, taken);
-    }
-    return { choices };
+    return checkChoicePicks(features, picks, Number(level) || 1);
 }
 
 // Set one feature pick: feature_choices[key] = values (array)

@@ -5,17 +5,49 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 ## Now
 
 - **Stage 1, native rebuild:** R1–R3 done (R3 = commit `2d5c775`). Parallel worktrees set up in `AGENTS.md`.
-- **In progress:** nobody
+- **In progress:** Cursor — R4.3–R5 (character form + sheet blocks)
 
 ## Next
 
-- R4 Unified character form, starting with the server endpoint "what can this character pick?" (spec: `docs/specs/character-creator.md`).
+- R4.7 Personality tab (alignment chart, upbringing, lifestyle, outlook).
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-20 — Cursor (R4.5 fix, after R4.6)
+- Finished characters keep the old editor at `/characters/:id/edit-old`. The sheet Edit link goes there when `is_draft` is false. Drafts still use `/characters/:id/edit`.
+- Role-tab saves and every traits save (rolls, placements, bonuses, gifts) are refused on a finished character until R4.9. The role tab shows a failed load instead of a blank page.
+- Next is still R4.7.
+
+### 2026-11-20 — Cursor (R4.6)
+- Traits tab. `POST /api/characters/:id/stat-rolls` rolls one 4d6-drop-lowest (or resets placements / all 8 rolls). The traits save sends roll indexes, the +2, the +1, and gift ids. The server looks up the dice and writes the scores. Same stat may take both bonuses.
+- Gift ids are stored inside `stat_rolls` (with the rolls and the placement). There is no gifts column, and this slice does not add one.
+- PLACEHOLDER until `docs/DECISIONS.md`: rerolls are unlimited while `is_draft`, and refused after finish.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (48), `npm run test:e2e` (7 passed, smoke accounts in use). A saved Might score was the stored roll + 3, not a number sent by the browser. A repeated index and too many gifts were refused. After finish, another roll was refused.
+- Next is R4.7.
+
+### 2026-11-20 — Cursor (R4.5)
+- Role & calling tab. `checkRoleTab` in `packages/rules`: a calling below level 3 is refused, skills must be exactly the role's list, feature picks are checked. Saving the header below level 3 clears the calling and its picks. The role's other picks stay.
+- Choice features moved into `choiceFeaturesFor` / `checkChoicePicks` (`packages/rules`). The server and the old creator call those instead of keeping a second copy. Divine Blessing rows are still added by the server before the check, because they are not create-time features.
+- Rune thumbnails: `node scripts/thumbs.js assets/glyphs/classes` (18 WebP files).
+- No new placeholder. Checked on ports 4003 / 5176: typecheck, `npm test` (45), `npm run test:e2e` (6 passed, smoke accounts in use). A role save survived reload. Level 3→2 hid the calling. A hand-edited calling and a skill outside the list were refused.
+- Next is R4.6.
+
+### 2026-11-20 — Cursor (R4.4)
+- Species & look tab: species, sub-species or variant, eye color, that species' sizes, optional look. The picture is an 88px WebP thumbnail; a tap shows the full PNG and a second tap closes it. Picking a sub-species switches the picture.
+- `scripts/thumbs.js` (sharp) wrote 176px WebP copies to `assets/races/thumbs/` (44 files, about 1.6 KB each). The picker does not load the big PNGs until the picture is opened.
+- No new placeholder. Sizes above Large were already refused by `sizeOptions` / `checkSpeciesTab`. Checked again with a hand-edited `size_id: 5` (Enormous) — the server answers 400.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (40), `npm run test:e2e` (5 passed, smoke accounts in use). A species save survived reload. A hand-edited size of Enormous was refused.
+- Next is R4.5.
+
+### 2026-11-20 — Cursor (R4.3)
+- Form shell in `apps/web/src/features/character-form/`: header (name, level, portrait), five tabs in the URL (`?tab=`), `/characters/new` creates a draft and `/characters/:id/edit` edits it. Server errors show under Save.
+- Old `/create_char` routes still work. `/characters/:id/edit` is the new form now, so the sheet's Edit link already opens it. The old editor files stay until R4.9.
+- Checked on this worktree (ports 4003 / 5176): `npm run typecheck`, `npm test` (40), `npm run test:e2e` against `http://localhost:5176` — 4 passed. Smoke accounts were in use for that run. A draft survived a tab change and a reload; an empty name shows the server's error.
+- Next is R4.4.
 
 ### 2026-11-20 — Claude (R4.2, in the main folder at the owner's request, left uncommitted for him)
 - Rules: `packages/rules/src/characterForm.ts` (checkHeader, checkSpeciesTab, missingForFinish, startingHp) + `test/characterForm.test.ts` — 40/40 tests, typecheck clean.
