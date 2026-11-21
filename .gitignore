@@ -25,3 +25,6 @@ Thumbs.db
 # Playwright output
 test-results/
 playwright-report/
+
+# local content backups (e.g. before an elf sub-species update)
+*.bak-elf
