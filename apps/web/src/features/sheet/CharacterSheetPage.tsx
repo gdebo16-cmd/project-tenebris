@@ -84,7 +84,7 @@ export default function CharacterSheetPage() {
     return (
         <div className={styles.page}>
             <p className={styles.muted}>
-                <Link to="/home">Home</Link> · <Link to={`/characters/${creature.id}`}>Old sheet</Link>
+                <Link to="/home">Home</Link>
                 {canEdit && <> · <Link to={`/characters/${creature.id}/edit`}>Edit</Link></>}
                 {!canEdit && ' · Read-only: this is someone else\'s character'}
             </p>

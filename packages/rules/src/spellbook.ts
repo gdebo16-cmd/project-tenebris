@@ -1,5 +1,5 @@
-// Spell book rules (learn / prepare), moved out of apiSpellController so the old sheet's routes and the
-// new sheet's route (R5) ask the same questions and give the same answers. The server looks up the
+// Spell book rules (learn / prepare), kept out of apiSpellController so they can be tested on their own.
+// The server looks up the
 // numbers (caps, counts, highest slot) and these functions say yes (null) or no (the message to show).
 import type { getSpellCaps } from './spellLimits.ts';
 

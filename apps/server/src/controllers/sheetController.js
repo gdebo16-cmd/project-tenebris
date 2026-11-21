@@ -165,7 +165,7 @@ export async function getSpellbook(req, res) {
 }
 
 // POST /api/sheets/character/:id/spellbook   body: { op: 'learn' | 'unlearn' | 'prepare' | 'unprepare' | 'setAction' | 'removeAction', spellId }
-// The same rules as the old sheet's spell routes (one shared function).
+// The rules live in @tenebris/rules/spellbook; changeSpellbook (apiSpellController) looks up the numbers and saves.
 export async function changeBook(req, res) {
     const who = await editorOf(req, res);
     if (!who) return;

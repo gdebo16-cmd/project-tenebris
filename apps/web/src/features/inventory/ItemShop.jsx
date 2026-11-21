@@ -25,7 +25,7 @@ const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 const itemGroupLabel = (it) => (it.item_subtype ? `${cap(it.item_subtype)} ${CATEGORY_LABELS[it.item_category] ?? ''}`.trim() : (CATEGORY_LABELS[it.item_category] ?? cap(it.item_category ?? 'Other')));
 
 // The "shop": every armor and weapon, with Add / Remove buttons.
-// Used two ways: inside the sheet's Inventory tab, and on the /inventory page.
+// Used on the /inventory page.
 // onDone runs when you click "Done browsing".
 function ItemShop({ characterId, onDone }) {
     const { data, setData, loading, error } = useFetch(`/api/characters/${characterId}/inventory`);

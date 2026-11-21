@@ -80,8 +80,9 @@ test('creates a character on the new form, opens its sheet and rolls', async ({ 
     await expect(page).toHaveURL(new RegExp(`/characters/${id}$`));
     await expect(page.getByText(name).first()).toBeVisible();
 
-    await page.locator('.btn-to-hit').first().click();
-    await expect(page.locator('.roll-bubble.is-sent').first()).toContainText('to hit');
+    // The sheet (the block sheet is the default): roll Fists to hit through the server
+    await page.getByRole('button', { name: 'Fists to hit' }).click();
+    await expect(page.getByRole('region', { name: 'Rolls' })).toContainText('Fists: Chance to hit');
 
     expect((await page.request.delete(`/api/characters/${id}`)).ok()).toBeTruthy();
 });

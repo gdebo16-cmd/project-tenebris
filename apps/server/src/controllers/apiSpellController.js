@@ -1,6 +1,5 @@
-// The spell book (learn / unlearn / prepare / action spells) as JSON for React. Queries live in models/.
-// The rules (caps, levels) live in @tenebris/rules/spellbook; changeSpellbook() is shared with the new sheet (R5).
-import { ownsCharacter } from '../models/characterModel.js';
+// The spell book (learn / unlearn / prepare / action spells) for the sheet's /api/sheets/character/:id/spellbook route.
+// The rules (caps, levels) live in @tenebris/rules/spellbook; the sheet controller checks who may look or change.
 import * as Spells from '../models/spellModel.js';
 import { getSheetCharacter } from '../models/characterModel.js';
 import { getSpell } from '../models/spellPack.js';
@@ -21,17 +20,6 @@ async function loadLearned(charId, ch = null) {
     const rows = await Spells.getLearnedSpells(charId);
     const spellLimits = ch ? getSpellCaps(ch.class_name, ch.level, ch.subclass_name) : undefined;
     return { learnedSpells: rows, learnedIds: rows.map((r) => Number(r.id)), ...(ch ? { spellLimits } : {}) };
-}
-
-// Ownership check shared by every route. Returns charId, or null after sending 401/404.
-async function ownedCharId(req, res) {
-    if (!req.session.userId) { res.status(401).json({ error: 'Not logged in' }); return null; }
-    const charId = Number(req.params.id);
-    if (!(await ownsCharacter(charId, req.session.userId))) {
-        res.status(404).json({ error: 'Character not found' });
-        return null;
-    }
-    return charId;
 }
 
 // The book: every spell this character could learn (up to its highest slot level), plus what it knows.
@@ -87,31 +75,3 @@ export async function changeSpellbook(charId, ownerId, op, spellId) {
     }
     return { status: 200, body: await loadLearned(charId, ch) };
 }
-
-// GET /api/characters/:id/spellbook
-export async function getSpellbook(req, res) {
-    const charId = await ownedCharId(req, res);
-    if (charId === null) return;
-    res.json(await loadSpellbook(charId, req.session.userId));
-}
-
-// The old sheet's POST routes, one per change. body: { spell_id }
-const changeRoute = (op) => async (req, res) => {
-    const charId = await ownedCharId(req, res);
-    if (charId === null) return;
-    const { status, body } = await changeSpellbook(charId, req.session.userId, op, Number(req.body.spell_id));
-    res.status(status).json(body);
-};
-
-// POST /api/characters/:id/spells/learn   body: { spell_id }
-export const learnSpell = changeRoute('learn');
-// POST /api/characters/:id/spells/unlearn   body: { spell_id }
-export const unlearnSpell = changeRoute('unlearn');
-// POST /api/characters/:id/spells/prepare     body: { spell_id }
-export const prepareSpell = changeRoute('prepare');
-// POST /api/characters/:id/spells/unprepare   body: { spell_id }
-export const unprepareSpell = changeRoute('unprepare');
-// POST /api/characters/:id/spells/setAction     body: { spell_id }
-export const setAction = changeRoute('setAction');
-// POST /api/characters/:id/spells/removeAction     body: { spell_id }
-export const removeAction = changeRoute('removeAction');

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { login } from './helpers.js';
 
-// The new block sheet (R5) behind ?new=1: it loads from /api/sheets, and a to-hit roll comes back from the server.
+// The block sheet (R5) is the sheet at /characters/:id: it loads from /api/sheets, and a to-hit roll comes back from the server.
 test('new sheet: loads and rolls through the server', async ({ page }) => {
   await login(page);
   // Any finished character of the test account will do
@@ -9,7 +9,7 @@ test('new sheet: loads and rolls through the server', async ({ page }) => {
   test.skip(!home.characters?.length, 'The test account has no finished character');
   const id = home.characters[0].id;
 
-  await page.goto(`/characters/${id}?new=1`);
+  await page.goto(`/characters/${id}`);
   await expect(page.getByRole('heading', { name: home.characters[0].name })).toBeVisible();
 
   // Fists are on every character: roll to hit and expect the server's answer in the roll feed
@@ -36,13 +36,14 @@ test('new sheet: rest, features, casting and the spell book go through the serve
   expect((await page.request.post(`${base}/cast`, { data: { actionKey: 'not-a-spell' } })).status()).toBe(400);
   expect((await page.request.post(`${base}/spellbook`, { data: { op: 'burn', spellId: 1 } })).status()).toBe(400);
 
-  // A spell that isn't learned can't be unprepared: the same shared rule answers on the new route and the old one
+  // A spell that isn't learned can't be unprepared
   const notLearned = { op: 'unprepare', spellId: 999999 };
-  const newRoute = await page.request.post(`${base}/spellbook`, { data: notLearned });
-  expect(newRoute.status()).toBe(400);
-  expect((await newRoute.json()).error).toBe('You have to learn that spell first');
-  const oldRoute = await page.request.post(`/api/characters/${id}/spells/unprepare`, { data: { spell_id: 999999 } });
-  expect(oldRoute.status()).toBe(400);
+  const refused = await page.request.post(`${base}/spellbook`, { data: notLearned });
+  expect(refused.status()).toBe(400);
+  expect((await refused.json()).error).toBe('You have to learn that spell first');
+  // The old sheet's spell routes are gone
+  expect((await page.request.post(`/api/characters/${id}/spells/unprepare`, { data: { spell_id: 999999 } })).status()).toBe(404);
+  expect((await page.request.get(`/api/characters/${id}/spellbook`)).status()).toBe(404);
 
   // The spell book loads for the owner
   const book = await page.request.get(`${base}/spellbook`);
@@ -50,7 +51,7 @@ test('new sheet: rest, features, casting and the spell book go through the serve
   expect(Array.isArray((await book.json()).learnedSpells)).toBe(true);
 
   // A long rest from the sheet: the server's answer lands in the roll feed
-  await page.goto(`/characters/${id}?new=1`);
+  await page.goto(`/characters/${id}`);
   await page.getByRole('button', { name: 'Rest', exact: true }).click();
   await page.getByRole('button', { name: 'Long Rest' }).click();
   await expect(page.getByRole('region', { name: 'Rolls' })).toContainText('Long Rest: fully restored!');
@@ -70,7 +71,7 @@ test('new sheet: purse adds and spends coins through the server', async ({ page 
   const id = home.characters[0].id;
   const start = (await (await page.request.get(`/api/sheets/character/${id}`)).json()).creature.purse;
 
-  await page.goto(`/characters/${id}?new=1`);
+  await page.goto(`/characters/${id}`);
   await page.getByRole('button', { name: 'Gear', exact: true }).click();
   const purse = page.getByRole('region', { name: 'Purse' });
   await expect(purse.getByLabel(`${start.copper} Copper`, { exact: true })).toBeVisible();
@@ -122,8 +123,10 @@ test('new sheet: conditions and exhaustion change through the server', async ({ 
   expect((await page.request.post(`${base}/conditions`, { data: { conditions: { flying: true } } })).status()).toBe(400);
   expect((await page.request.post(`${base}/conditions`, { data: { exhaustion: 11 } })).status()).toBe(400);
   expect((await page.request.post(`${base}/conditions`, { data: {} })).status()).toBe(400);
+  // The old owner-only state route is gone
+  expect((await page.request.patch(`/api/characters/${id}/state`, { data: { exhaustion: 1 } })).status()).toBe(404);
 
-  await page.goto(`/characters/${id}?new=1`);
+  await page.goto(`/characters/${id}`);
   const block = page.getByRole('region', { name: 'Conditions' });
   const bleed = block.getByRole('button', { name: 'Bleed' });
   const wasBleeding = !!start.conditions.bleed;

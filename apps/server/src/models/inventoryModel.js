@@ -206,7 +206,7 @@ export async function getOwnedItems(charId) {
 }
 
 // Magical items (every rarity, Object of Power included) can be equipped, up to ITEM_SLOTS at once.
-export const ITEM_SLOTS = 3; // keep in sync with ITEM_SLOTS in client/src/sheet/actions/InventoryTab.jsx
+export const ITEM_SLOTS = 3; // magical item slots a character can equip
 
 // Returns 'ok', 'not_owned', 'not_equippable' or 'full'
 export async function equipItem(charId, itemId) {
