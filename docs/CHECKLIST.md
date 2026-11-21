@@ -54,7 +54,7 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 - [x] **R3** Rules to the server — Done when: the browser no longer rolls game dice or computes choices from the full pack — ✓ 2026-11-20 · owner + Claude · commit 2d5c775
   - note: the "what can this character pick?" endpoint moved to the start of R4 (agreed 2026-11-19).
 - [ ] **R4** Unified character form — Done when: create and edit use the same components and one save per section (spec: `docs/specs/character-creator.md`)
-  - note: R4.3 form shell done (header, five tabs, `/characters/new` and `/characters/:id/edit`). Left: R4.4–R4.9. Old `/create_char` routes still work.
+  - note: R4.3 form shell and R4.4 species & look tab done. Left: R4.5–R4.9. Old `/create_char` routes still work.
 - [ ] **R5** Sheet blocks — Done when: Character, Monster and DM layouts render from the same blocks (spec: `docs/specs/sheet.md`)
 - [ ] **R6** CSS Modules — Done when: no legacy page stylesheet is left
 - [ ] **R7** Server tidy-up — Done when: `grep -r idMap` finds nothing and a fresh database seeds from the pack

@@ -32,7 +32,7 @@ export default function CharacterForm() {
             {id ? <SavedHeader id={id} /> : <NewHeader />}
             <FormTabs active={tab} onSelect={selectTab} />
             <div className={styles.panel} role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
-                {tab === 'species' && <SpeciesTab />}
+                {tab === 'species' && <SpeciesTab id={id} />}
                 {tab === 'role' && <RoleTab />}
                 {tab === 'traits' && <TraitsTab />}
                 {tab === 'personality' && <PersonalityTab />}

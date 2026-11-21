@@ -9,13 +9,20 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Next
 
-- R4.4 Species & look tab (thumbnails, species / variant / eyes / size / look description).
+- R4.5 Role & calling tab (checkRoleTab, skills, feature choices, calling cleared below level 3).
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-20 — Cursor (R4.4)
+- Species & look tab: species, sub-species or variant, eye color, that species' sizes, optional look. The picture is an 88px WebP thumbnail; a tap shows the full PNG and a second tap closes it. Picking a sub-species switches the picture.
+- `scripts/thumbs.js` (sharp) wrote 176px WebP copies to `assets/races/thumbs/` (44 files, about 1.6 KB each). The picker does not load the big PNGs until the picture is opened.
+- No new placeholder. Sizes above Large were already refused by `sizeOptions` / `checkSpeciesTab`. Checked again with a hand-edited `size_id: 5` (Enormous) — the server answers 400.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (40), `npm run test:e2e` (5 passed, smoke accounts in use). A species save survived reload. A hand-edited size of Enormous was refused.
+- Next is R4.5.
 
 ### 2026-11-20 — Cursor (R4.3)
 - Form shell in `apps/web/src/features/character-form/`: header (name, level, portrait), five tabs in the URL (`?tab=`), `/characters/new` creates a draft and `/characters/:id/edit` edits it. Server errors show under Save.
