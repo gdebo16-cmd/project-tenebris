@@ -210,4 +210,4 @@ button.tile { border-color: var(--border, #b27f50); cursor: pointer; }
 .option { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
 .optionBox { width: 18px; height: 18px; accent-color: var(--accent, #d4af37); }
 .runeLine { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; }
-
+.filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; }

@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { ITEM_SLOTS, weaponOptions, wielderPowers, type ItemRune, type RuneInfo } from '@tenebris/rules/equipment';
+import { EMPTY_WEAPON_FILTER, RARITIES, WEAPON_CATEGORIES, filterSortWeapons, type WeaponFilter, type WeaponSort } from '@tenebris/rules/weapons';
 import type { SheetArmor, SheetItem, SheetWeapon } from '@tenebris/rules/creature';
 import styles from '../Sheet.module.css';
 import { useGear, useRuneInfo } from '../queries.ts';
@@ -16,6 +17,27 @@ type Props = Pick<BlockProps, 'creature' | 'canEdit' | 'onNote'> & { id: string 
 const runesOf = (item: SheetArmor | SheetWeapon) => (item.runes ?? []) as unknown as ItemRune[];
 const armorLabel = (a: SheetArmor) => `${a.armor_type ?? 'armor'}, +${String(a.ac_bonus ?? 0)} AC`;
 const weaponLabel = (w: SheetWeapon) => [w.damage_dice, w.weapon_category ?? w.category].filter(Boolean).join(' ');
+// Category / rarity filters and a sort for the weapon list, the same picks as the old sheet's filter
+function WeaponFilterBar({ value, onChange }: { value: WeaponFilter; onChange: (next: WeaponFilter) => void }) {
+    return (
+        <div className={styles.filters}>
+            <select className={styles.input} aria-label="Weapon category" value={value.category} onChange={(e) => onChange({ ...value, category: e.target.value })}>
+                <option value="">All categories</option>
+                {WEAPON_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select className={styles.input} aria-label="Rarity" value={value.rarity} onChange={(e) => onChange({ ...value, rarity: e.target.value })}>
+                <option value="">All rarities</option>
+                {RARITIES.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+            <select className={styles.input} aria-label="Sort weapons" value={value.sort} onChange={(e) => onChange({ ...value, sort: e.target.value as WeaponSort })}>
+                <option value="name">Sort: Name</option>
+                <option value="category">Sort: Category</option>
+                <option value="rarity">Sort: Rarity</option>
+            </select>
+        </div>
+    );
+}
+
 const itemLabel = (it: SheetItem) => `${String(it.rarity ?? '')}${Number(it.quantity) > 1 ? ` ×${String(it.quantity)}` : ''}`.trim();
 
 export default function InventoryBlock({ creature, canEdit, id, onNote }: Props) {
@@ -24,6 +46,7 @@ export default function InventoryBlock({ creature, canEdit, id, onNote }: Props)
     const runeInfo = useRuneInfo(id, canEdit && powers.runes);
     const info: RuneInfo | undefined = runeInfo.data?.isRuneWeaver ? runeInfo.data : undefined;
     const [error, setError] = useState('');
+    const [weaponFilter, setWeaponFilter] = useState<WeaponFilter>(EMPTY_WEAPON_FILTER);
     const busy = gear.isPending;
 
     async function send(path: string, body: Record<string, unknown>) {
@@ -56,6 +79,7 @@ export default function InventoryBlock({ creature, canEdit, id, onNote }: Props)
     const { armor, weapons, items } = creature.gear;
     const magicItems = items.filter((it) => it.item_category === 'magical_item');
     const slotsUsed = magicItems.filter((it) => it.is_equipped).length;
+    const shownWeapons = filterSortWeapons(weapons, weaponFilter);
 
     return (
         <section className={styles.block} aria-label="Gear">
@@ -82,7 +106,9 @@ export default function InventoryBlock({ creature, canEdit, id, onNote }: Props)
 
             <h3 className={styles.subheading}>Weapons</h3>
             {weapons.length === 0 && <span className={styles.muted}>No weapons yet.</span>}
-            {weapons.map((w) => {
+            {weapons.length > 0 && <WeaponFilterBar value={weaponFilter} onChange={setWeaponFilter} />}
+            {weapons.length > 0 && shownWeapons.length === 0 && <span className={styles.muted}>No weapons match.</span>}
+            {shownWeapons.map((w) => {
                 const opts = weaponOptions(creature, w);
                 const dice = opts.twoHands ? w.versatile_dice : w.damage_dice;
                 return (

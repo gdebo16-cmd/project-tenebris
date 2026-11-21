@@ -199,3 +199,36 @@ test('new sheet: gear tab equips, unequips and sets weapon options through the s
 
   expect(await weaponsNow()).toEqual(start);
 });
+
+// The Gear tab's weapon filter (category, rarity, sort), as on the old sheet. Nothing is saved.
+test('new sheet: gear tab filters the weapon list', async ({ page }) => {
+  await login(page);
+  const home = await (await page.request.get('/api/home')).json();
+  test.skip(!home.characters?.length, 'The test account has no finished character');
+  const id = home.characters[0].id;
+  const { creature } = await (await page.request.get(`/api/sheets/character/${id}`)).json();
+  const weapon = creature.gear.weapons.find((w) => w.weapon_category);
+  test.skip(!weapon, 'The test character has no weapon with a category');
+
+  await page.goto(`/characters/${id}`);
+  await page.getByRole('button', { name: 'Gear', exact: true }).click();
+  const gear = page.getByRole('region', { name: 'Gear', exact: true });
+  const row = gear.getByText(weapon.name, { exact: true });
+  await expect(row).toBeVisible();
+
+  // Its own category keeps it; another category hides it and says so
+  await gear.getByLabel('Weapon category').selectOption(weapon.weapon_category);
+  await expect(row).toBeVisible();
+  const other = weapon.weapon_category === 'Minor' ? 'Reach' : 'Minor';
+  const othersOwned = creature.gear.weapons.some((w) => w.weapon_category === other);
+  await gear.getByLabel('Weapon category').selectOption(other);
+  await expect(row).toBeHidden();
+  if (!othersOwned) await expect(gear.getByText('No weapons match.')).toBeVisible();
+
+  // Back to all; the sort picker offers name, category and rarity
+  await gear.getByLabel('Weapon category').selectOption('');
+  await expect(row).toBeVisible();
+  await gear.getByLabel('Sort weapons').selectOption('rarity');
+  await expect(row).toBeVisible();
+});
+
