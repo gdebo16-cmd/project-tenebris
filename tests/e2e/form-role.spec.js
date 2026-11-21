@@ -33,7 +33,7 @@ test('role tab clears a calling below level 3 and refuses a bad skill', async ({
     await expect(page.getByRole('combobox', { name: 'Calling' })).toHaveValue(String(calling.id));
     for (const skill of skills) await expect(page.getByRole('checkbox', { name: skill, exact: true })).toBeChecked();
 
-    await page.getByLabel('Level').fill('2');
+    await page.getByLabel('Level').selectOption('2');
     const headerSaved = page.waitForResponse((res) => res.url().includes('/form/header') && res.request().method() === 'PUT');
     await page.locator('form').first().getByRole('button', { name: 'Save' }).click();
     expect((await headerSaved).ok()).toBeTruthy();

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, keepUnrelatedChoices, missingForFinish, rerollAllowed, startingHp, type Options } from '../src/characterForm.ts';
+import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, keepUnrelatedChoices, levelChoices, missingForFinish, rerollAllowed, startingHp, MAX_LEVEL, type Options } from '../src/characterForm.ts';
 
 // Only the parts of the options the species check reads
 const options = {
@@ -25,11 +25,20 @@ test('header: bad bodies get an error', () => {
         { name: '   ' },
         { name: 'x'.repeat(61) },
         { name: 'Ash', level: 0 },
+        { name: 'Ash', level: 21 },
         { name: 'Ash', level: 31 },
         { name: 'Ash', level: 2.5 },
         { name: 'Ash', portrait_url: 'https://evil.example/x.png' },
     ];
     for (const body of bad) assert.ok('error' in checkHeader(body), JSON.stringify(body));
+    assert.equal(MAX_LEVEL, 20);
+    // A character already above the cap keeps that level, and cannot be raised.
+    assert.deepEqual(checkHeader({ name: 'Ash', level: 25 }, 25), { values: { name: 'Ash', level: 25, portrait_url: null } });
+    assert.equal((checkHeader({ name: 'Ash', level: 20 }, 25) as { values: { level: number } }).values.level, 20);
+    assert.ok('error' in checkHeader({ name: 'Ash', level: 26 }, 25));
+    assert.ok('error' in checkHeader({ name: 'Ash', level: 21 }, 25));
+    assert.deepEqual(levelChoices(25), [...Array.from({ length: 20 }, (_, i) => i + 1), 25]);
+    assert.deepEqual(levelChoices(4), Array.from({ length: 20 }, (_, i) => i + 1));
 });
 
 test('species: a species with variants saves its own id and the variant', () => {

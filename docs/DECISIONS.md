@@ -6,6 +6,7 @@ Write your answer after each **→**. Leave a question blank until you've decide
 
 - Grid: **hex** (2026-11-18)
 - Sessions: Postgres via `connect-pg-simple` (already in place)
+- Maximum character level → **20** (2026-11-20). One constant, `MAX_LEVEL` in `packages/rules`. A character already above 20 keeps that level and can still be opened and saved; it cannot be raised. The two characters on `rework` above 20 are left as they are.
 
 ## Wave 0 — needed first
 

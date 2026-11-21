@@ -5,7 +5,7 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 ## Now
 
 - **Stage 1, native rebuild:** R1–R3 done (R3 = commit `2d5c775`). R4 is ready for Gabriel to merge from `bot/cursor`.
-- **In progress:** none. R5 waits.
+- **In progress:** Cursor — R4 review fixes (level cap, then level-up, role/traits, then the form layout). R5 is not started.
 
 ## Next
 
@@ -16,6 +16,12 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-20 — Cursor (R4 review: max level 20)
+- Owner's decision: maximum level is 20. Recorded in `docs/DECISIONS.md` and `docs/PLAN.md`. One constant, `MAX_LEVEL` in `packages/rules/src/characterForm.ts`. The model, the options check, and the header dropdown use it.
+- Level 21 is refused. A character already above 20 keeps that level (it stays in the dropdown as one extra option) and can be saved or lowered. It cannot be raised. The two characters on `rework` above 20 were not changed.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (53), form e2e (7 passed, smoke accounts in use).
+- R5 is not started.
 
 ### 2026-11-20 — Cursor (R4.9)
 - Home "New character" and the sheet Edit link open the new form. `/api/home` lists draft rows under Unfinished (delete uses the existing character delete). The old `/create_char` pages, `/edit-old`, and `req.session.charDraft` are gone.

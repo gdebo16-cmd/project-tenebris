@@ -13,7 +13,7 @@ test('creates a character on the new form, opens its sheet and rolls', async ({ 
     await page.getByRole('link', { name: 'New character' }).click();
     await expect(page).toHaveURL(/\/characters\/new$/);
     await page.getByRole('textbox', { name: 'Name' }).fill(name);
-    await page.getByRole('spinbutton', { name: 'Level' }).fill('1');
+    await page.getByRole('combobox', { name: 'Level', exact: true }).selectOption('1');
     await page.getByRole('button', { name: 'Save' }).click();
     await expect(page).toHaveURL(/\/characters\/\d+\/edit\?tab=species/);
     const id = page.url().match(/\/characters\/(\d+)/)[1];

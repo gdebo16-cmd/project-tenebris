@@ -10,7 +10,7 @@ export type Options = ReturnType<typeof characterOptions>;
 type ColumnValue = string | number | null | string[] | Record<string, string[]> | StatRollState;
 export type TabResult = { error: string } | { values: Record<string, ColumnValue> };
 
-export const MAX_LEVEL = 30;
+export const MAX_LEVEL = 20;
 export const MAX_NAME_LENGTH = 60;
 export const MAX_LOOK_LENGTH = 1000;
 
@@ -25,13 +25,26 @@ const text = (value: unknown): string => (typeof value === 'string' ? value.trim
 
 // ---- Header: name, level, portrait (always visible above the tabs) ----
 
-export function checkHeader(body: Body): TabResult {
+// 1 through MAX_LEVEL, plus the character's own level when that is already above the cap.
+// Those characters keep their level. They can drop to the cap or below. They cannot be raised.
+export function levelChoices(currentLevel: number | null | undefined): number[] {
+    const choices: number[] = [];
+    for (let n = 1; n <= MAX_LEVEL; n++) choices.push(n);
+    const current = Number(currentLevel);
+    if (Number.isInteger(current) && current > MAX_LEVEL) choices.push(current);
+    return choices;
+}
+
+export function checkHeader(body: Body, currentLevel?: number | null): TabResult {
     const name = text(body?.name);
     if (!name) return { error: 'Give your character a name' };
     if (name.length > MAX_NAME_LENGTH) return { error: `Names can be at most ${MAX_NAME_LENGTH} characters` };
 
     const level = Number(body?.level ?? 1);
-    if (!Number.isInteger(level) || level < 1 || level > MAX_LEVEL) return { error: `Level must be a whole number from 1 to ${MAX_LEVEL}` };
+    const kept = Number.isInteger(Number(currentLevel)) && level === Number(currentLevel) && level > MAX_LEVEL;
+    if (!Number.isInteger(level) || level < 1 || (level > MAX_LEVEL && !kept)) {
+        return { error: `Level must be a whole number from 1 to ${MAX_LEVEL}` };
+    }
 
     // Portraits are pictures the site already has, so they're paths like /portraits/a.png
     const portrait = text(body?.portrait_url);

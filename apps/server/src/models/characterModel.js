@@ -5,10 +5,11 @@ import { getSpellCaps } from '@tenebris/rules/spellLimits'; /*prep-done*/
 import { checkChoicePicks } from '@tenebris/rules/characterOptions';
 import { resolveSpeciesWrite, resolveRoleWrite } from './idMap.js';
 import content, { choiceFeaturesForRole, getRole, getCalling, scoreKey, hitDieSides } from './content.js';
+import { MAX_LEVEL } from '@tenebris/rules/characterForm';
 
 // a character can only have a subclass from this level up (creator + editor check this too)
 export const SUBCLASS_LEVEL = 3;
-export const MAX_LEVEL = 30;
+export { MAX_LEVEL };
 
 function featureById(id) {
     return (content.features ?? []).find((f) => Number(f.id) === Number(id));

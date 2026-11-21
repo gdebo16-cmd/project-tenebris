@@ -113,6 +113,7 @@ function SavedHeader({ id }: { id: string }) {
         <FormHeader
             name={name}
             level={level}
+            savedLevel={form.data.header.level}
             portraitUrl={portraitUrl}
             summary={summary}
             saving={saveTab.isPending}

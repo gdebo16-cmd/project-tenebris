@@ -18,7 +18,7 @@ import * as Form from '../models/characterFormModel.js';
 
 // The tabs that can be saved so far. Each later slice (R4.5-R4.8) adds its check here.
 const TAB_CHECKS = {
-    header: (_options, body) => checkHeader(body),
+    header: (_options, body, ch) => checkHeader(body, ch?.level),
     species: (options, body) => checkSpeciesTab(options, body),
     role: (options, body) => checkRoleTab(options, body),
     traits: (options, body, ch) => checkTraitsTab(options, ch.stat_rolls, body),

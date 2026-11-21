@@ -1,6 +1,6 @@
 // Name, level and portrait. Stays on screen no matter which tab is open.
 import { useState } from 'react';
-import { MAX_LEVEL } from '@tenebris/rules/characterForm';
+import { levelChoices } from '@tenebris/rules/characterForm';
 import styles from './CharacterForm.module.css';
 import { usePortraits } from './queries.ts';
 
@@ -9,6 +9,7 @@ const DEFAULT_PORTRAIT = '/default-character.png';
 type Props = {
     name: string;
     level: string;
+    savedLevel?: number | null;
     portraitUrl: string | null;
     summary: string;
     saving: boolean;
@@ -19,7 +20,7 @@ type Props = {
     onSave: () => void;
 };
 
-export default function FormHeader({ name, level, portraitUrl, summary, saving, error, onName, onLevel, onPortrait, onSave }: Props) {
+export default function FormHeader({ name, level, savedLevel, portraitUrl, summary, saving, error, onName, onLevel, onPortrait, onSave }: Props) {
     const portraits = usePortraits();
     const [open, setOpen] = useState(false);
     const groups = groupPortraits(portraits.data ?? []);
@@ -43,7 +44,11 @@ export default function FormHeader({ name, level, portraitUrl, summary, saving, 
                     </label>
                     <label className={styles.field}>
                         <span className={styles.label}>Level</span>
-                        <input className={styles.input} type="number" min={1} max={MAX_LEVEL} value={level} onChange={(event) => onLevel(event.target.value)} aria-label="Level" />
+                        <select className={styles.input} aria-label="Level" value={level} onChange={(event) => onLevel(event.target.value)}>
+                            {levelChoices(savedLevel ?? Number(level)).map((n) => (
+                                <option key={n} value={String(n)}>{`Lv ${n}`}</option>
+                            ))}
+                        </select>
                     </label>
                 </div>
                 <p className={styles.summary}>{summary}</p>
