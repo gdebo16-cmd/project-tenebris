@@ -5,7 +5,7 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 ## Now
 
 - **Stage 1, native rebuild:** R1–R3 done (R3 = commit `2d5c775`). R4 is ready for Gabriel to merge from `bot/cursor`.
-- **In progress:** Cursor — R4 review fixes (level cap, then level-up, role/traits, then the form layout). R5 is not started.
+- **In progress:** Claude — R5 (sheet blocks), on bot/claude in tenebris-claude. Cursor — R4 review items 4–7 (form header, layout, mockup controls).
 
 ## Next
 
