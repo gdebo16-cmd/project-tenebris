@@ -21,7 +21,7 @@ function CharacterHeader({ character }) {
                 <span className='portrait-frame'><img className='title-portrait' src={character.portrait_url ?? '/default-character.png'} alt="" aria-hidden="true" /></span>
                 <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" id='logo' />
             </header>
-            {!desktop && <SheetNav characterId={character.id} isDraft={character.is_draft} />}
+            {!desktop && <SheetNav characterId={character.id} />}
             <section id='character-header'>
                 <h2 className='header-cell' id='character-name'>
                     <span className='portrait-frame'><img className='character-portrait' src={character.portrait_url ?? '/default-character.png'} alt={`Portrait of ${character.name}`} /></span>
@@ -35,7 +35,7 @@ function CharacterHeader({ character }) {
                 <div className={`hp-bar ${hp <= max / 4 ? 'very_hurt' : hp <= max / 2 ? 'hurt' : ''}` } id='hp-bar-fill' style={{ width: `${Math.min(100, Math.max(0, max ? (hp / max) * 100 : 0))}%` }}>
                 </div>
             </article>
-            {desktop && <SheetNav characterId={character.id} isDraft={character.is_draft} />}
+            {desktop && <SheetNav characterId={character.id} />}
         </>
     );
 }

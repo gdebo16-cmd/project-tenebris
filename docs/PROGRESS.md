@@ -4,18 +4,26 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Now
 
-- **Stage 1, native rebuild:** R1–R3 done (R3 = commit `2d5c775`). Parallel worktrees set up in `AGENTS.md`.
-- **In progress:** Cursor — R4.3–R5 (character form + sheet blocks)
+- **Stage 1, native rebuild:** R1–R3 done (R3 = commit `2d5c775`). R4 is ready for Gabriel to merge from `bot/cursor`.
+- **In progress:** none. R5 waits.
 
 ## Next
 
-- R4.9 Switch Home and the sheet Edit link to the new form, then remove the old creator.
+- Gabriel merges R4. R5 (sheet blocks) waits — ask before any migration.
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-20 — Cursor (R4.9)
+- Home "New character" and the sheet Edit link open the new form. `/api/home` lists draft rows under Unfinished (delete uses the existing character delete). The old `/create_char` pages, `/edit-old`, and `req.session.charDraft` are gone.
+- A finished character can save role, traits, and gear on this form. Rerolls stay locked after finish. Changing the level of a finished character is refused ("not ready yet") — this slice does not add level-up math.
+- PLACEHOLDER until `docs/DECISIONS.md` (unchanged): gifts 1, plus 1 at levels 4 and 8; rerolls unlimited while `is_draft`; callings do not add proficiencies; starting money is 10. Gift ids still live inside `stat_rolls`.
+- Left in place because other code still shares the file, and nothing else imported the deleted pages: `createCharacter`, `getEditCharacter`, `updateLevel`, `updateAbilities`, `applyBoostResult` in `characterModel.js`; `listStartingGearForRole` in `content.js`; `utils/choiceRules.js`; `apps/web/src/styles/char_create.css`. Kept `background.js` and `glyphs.js`.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (53), `npm run test:e2e` (9 passed, smoke accounts `smoketest` and `smoketest2` in use). The new character test walks the form, finishes, and rolls to hit.
+- R4 is done. R5 is not started.
 
 ### 2026-11-20 — Cursor (R4.8)
 - Inventory tab. Proficiencies come from the role. `armorTypesFromProf` and `weaponCategoryNamesFromProf` now live in `packages/rules/gear.ts`; the server re-exports them. Weapon and armor options are marked proficient or not.

@@ -8,11 +8,6 @@ import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import InventoryPage from './pages/InventoryPage';
 import CharacterForm from './features/character-form/CharacterForm.tsx';
-import EditCharacterPage from './pages/EditCharacterPage';
-import CreateStep1 from './pages/CreateStep1';
-import CreateStep2 from './pages/CreateStep2';
-import CreateStep3 from './pages/CreateStep3';
-import CreateStep4 from './pages/CreateStep4';
 import usePageTheme from './hooks/usePageTheme';
 import CampaignPage from './pages/CampaignPage';
 import CreateCampaign from './pages/CreateCampaign';
@@ -42,15 +37,10 @@ function App() {
                     <Route path="/campaign_list" element={<CampaignList />} />
                     <Route path="/join/:code" element={<JoinCampaign />} />
                     <Route path="/create_campaign" element={<CreateCampaign />} />
-                    <Route path="/create_char" element={<CreateStep1 />} />
-                    <Route path="/create_char/step2" element={<CreateStep2 />} />
-                    <Route path="/create_char/step3" element={<CreateStep3 />} />
-                    <Route path="/create_char/step4" element={<CreateStep4 />} />
                     <Route path="/characters/new" element={<CharacterForm />} />
                     <Route path="/characters/:id" element={<CharacterSheet />} />
                     <Route path="/characters/:id/inventory" element={<InventoryPage />} />
                     <Route path="/characters/:id/edit" element={<CharacterForm />} />
-                    <Route path="/characters/:id/edit-old" element={<EditCharacterPage />} />
                 </Route>
                 <Route path="*" element={<p>Page not found. <a href="/home">Go home</a></p>} />
             </Routes>

@@ -5,7 +5,7 @@ import useTabSlider from '../hooks/useTabSlider';
 // which tab matches the current page
 function activeIndex(path) {
     if (path.startsWith('/home')) return 0;
-    if (['/create_char', '/create_campaign', '/campaign_list'].some((p) => path.startsWith(p))) return 1;
+    if (['/characters/new', '/create_campaign', '/campaign_list'].some((p) => path.startsWith(p))) return 1;
     if (['/profile', '/settings'].some((p) => path.startsWith(p))) return 2;
     return -1;
 }
@@ -23,7 +23,7 @@ function SiteNav() {
 
                 <li id="character-nav" className="btn btn-nav" {...tabProps(1)}>Adventures
                     <ul className="drop-down" id="characterDropdown">
-                        <Link id="createCharacter" className="btn-drop-character" to="/create_char">Create Character</Link>
+                        <Link id="createCharacter" className="btn-drop-character" to="/characters/new">Create Character</Link>
                         <Link id="createCampaign" className="btn-drop-character" to="/create_campaign">Create Tale</Link>
                         <Link id="campaignList" className="btn-drop-character" to="/campaign_list">Tale List</Link>
                     </ul>

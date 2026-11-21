@@ -11,7 +11,7 @@ export async function getCampaign(req, res) {
     res.json({ campaign, members });
  }
 
-// preset campaign images live in client/public/campaigns (mirrors PORTRAIT_PATH in apiEditController.js)
+// preset campaign images live in client/public/campaigns
 const CAMPAIGN_IMG_PATH = /^\/campaigns\/[a-z0-9-]+\.webp$/;
 
 // PATCH /api/campaigns/:id   body: { name, description, campaign_img_url }

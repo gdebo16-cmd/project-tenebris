@@ -1,7 +1,7 @@
 // Login, register, logout, "who am I", home page list, and account settings as JSON for React. Queries live in models/.
 import bcrypt from "bcryptjs";
 import * as Users from '../models/userModel.js';
-import { listCharactersForUser } from '../models/characterModel.js';
+import { listCharactersForUser, listDraftsForUser } from '../models/characterModel.js';
 import { listCampaigns } from '../models/campaignModel.js';
 
 // GET /api/me  -> { id, username } or 401
@@ -57,13 +57,14 @@ export function logout(req, res) {
     req.session.destroy(() => res.json({ ok: true }));
 }
 
-// GET /api/home  -> { username, characters, draft }
+// GET /api/home  -> { username, characters, drafts, campaigns }
 export async function home(req, res) {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
 
     const characters = await listCharactersForUser(req.session.userId);
+    const drafts = await listDraftsForUser(req.session.userId);
     const campaigns = await listCampaigns(req.session.userId);
-    res.json({ username: req.session.username, characters, campaigns, draft: req.session.charDraft || null });
+    res.json({ username: req.session.username, characters, drafts, campaigns });
 }
 
 // GET /api/settings  -> { username, email }

@@ -130,12 +130,21 @@ export async function getSheetCharacter(charId, userId) {
 }
 
 export async function listCharactersForUser(userId) {
+    return listCharacters(userId, false);
+}
+
+// Drafts for the home page's Unfinished list. Kept apart from finished characters.
+export async function listDraftsForUser(userId) {
+    return listCharacters(userId, true);
+}
+
+async function listCharacters(userId, drafts) {
     const { rows } = await pool.query(
         `SELECT ch.id, ch.name, ch.portrait_url, ch.species_id, ch.role_id, ch.calling_id
         FROM characters ch
-        WHERE ch.user_id = $1 AND NOT ch.is_draft
+        WHERE ch.user_id = $1 AND ch.is_draft = $2
         ORDER BY ch.name`,
-        [userId]
+        [userId, drafts]
     );
     return rows.map((ch) => {
         const sp = speciesById(ch.species_id);
