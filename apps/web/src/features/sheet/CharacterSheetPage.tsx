@@ -8,7 +8,7 @@ import { ApiError } from '../../api.ts';
 import Loader from '../../components/Loader.jsx';
 import socket from '../../utils/socket.js';
 import styles from './Sheet.module.css';
-import { useAct, useSheet, useSheetChange } from './queries.ts';
+import { useAct, useSheet, useSheetChange, useSheetDo, type SheetDo } from './queries.ts';
 import SheetHeader from './blocks/SheetHeader.tsx';
 import HealthBlock from './blocks/HealthBlock.tsx';
 import CoreStatsBlock from './blocks/CoreStatsBlock.tsx';
@@ -17,7 +17,10 @@ import ConditionsBlock from './blocks/ConditionsBlock.tsx';
 import ActionsBlock from './blocks/ActionsBlock.tsx';
 import SpellsBlock from './blocks/SpellsBlock.tsx';
 import InventoryBlock from './blocks/InventoryBlock.tsx';
+import PurseBlock from './blocks/PurseBlock.tsx';
 import FeaturesBlock from './blocks/FeaturesBlock.tsx';
+import RestBlock from './blocks/RestBlock.tsx';
+import SpellBookBlock from './blocks/SpellBookBlock.tsx';
 import RollFeed, { type FeedEntry } from './blocks/RollFeed.tsx';
 
 const TABS = [
@@ -35,6 +38,7 @@ export default function CharacterSheetPage() {
     const sheet = useSheet(id);
     const act = useAct(id);
     const change = useSheetChange(id);
+    const sheetDo = useSheetDo(id);
     const [tab, setTab] = useState<TabId>('actions');
     const [feed, setFeed] = useState<FeedEntry[]>([]);
     const nextId = useRef(1);
@@ -65,6 +69,11 @@ export default function CharacterSheetPage() {
         act.mutateAsync(request).then((r) => note(`${prefix}${r.text}`), (err) => addToFeed('You', `Roll failed: ${messageOf(err)}`));
     };
 
+    // Feature uses, rests and casting: the server decides and saves; its text goes to the roll feed
+    const onDo = (request: SheetDo, prefix = '') => {
+        sheetDo.mutateAsync(request).then((r) => note(`${prefix}${r.text}`), (err) => addToFeed('You', messageOf(err)));
+    };
+
     if (sheet.isPending) return <Loader />;
     if (sheet.error) return <p className={styles.error} role="alert">{messageOf(sheet.error)}</p>;
 
@@ -90,6 +99,7 @@ export default function CharacterSheetPage() {
                     <CoreStatsBlock {...blockProps} />
                     <StatsBlock {...blockProps} />
                     <ConditionsBlock creature={creature} canEdit={canEdit} onChange={onState} />
+                    <RestBlock canEdit={canEdit} busy={sheetDo.isPending} onRest={(type) => onDo({ path: 'rest', body: { type } })} />
                 </div>
                 <div className={styles.stack}>
                     <nav className={styles.tabs} aria-label="Sheet sections">
@@ -99,9 +109,19 @@ export default function CharacterSheetPage() {
                         ))}
                     </nav>
                     {tab === 'actions' && <ActionsBlock {...blockProps} onState={onState} />}
-                    {tab === 'spells' && <SpellsBlock {...blockProps} onState={onState} />}
-                    {tab === 'gear' && <InventoryBlock creature={creature} canEdit={canEdit} />}
-                    {tab === 'features' && <FeaturesBlock creature={creature} />}
+                    {tab === 'spells' && (
+                        <>
+                            <SpellsBlock {...blockProps} onCast={(actionKey, castLevel) => onDo({ path: 'cast', body: { actionKey, castLevel } })} />
+                            <SpellBookBlock creature={creature} canEdit={canEdit} id={id} />
+                        </>
+                    )}
+                    {tab === 'gear' && (
+                        <>
+                            <PurseBlock creature={creature} canEdit={canEdit} id={id} onNote={note} />
+                            <InventoryBlock creature={creature} canEdit={canEdit} />
+                        </>
+                    )}
+                    {tab === 'features' && <FeaturesBlock creature={creature} canEdit={canEdit} onUse={(featureKey) => onDo({ path: 'feature', body: { featureKey } })} />}
                     <RollFeed entries={feed} />
                 </div>
             </div>

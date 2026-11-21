@@ -9,7 +9,8 @@
 import { characterOptions } from '@tenebris/rules/characterOptions';
 import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, keepUnrelatedChoices, leveledMaxHp, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
 import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
-import { checkGearTab, defaultGear, gearChoices, STARTING_MONEY } from '@tenebris/rules/gear';
+import { checkGearTab, defaultGear, gearChoices } from '@tenebris/rules/gear';
+import { checkMoneyPreset, moneyPresetOf, purseOf, MONEY_PRESETS } from '@tenebris/rules/money';
 import { roll4d6DropLowest, rollDice } from '@tenebris/rules/dice';
 import { rng } from '../dice.js';
 import formPack from '../models/formPack.js';
@@ -99,7 +100,10 @@ function traitsView(ch) {
 function gearView(ch, owned) {
     const choices = gearChoices(formPack, getRole(ch.role_id));
     return {
-        money: ch.money ?? 0,
+        // Default money: which preset the coins match (null = none picked yet); only a draft may pick
+        money_preset: moneyPresetOf(purseOf(ch)),
+        purse: purseOf(ch),
+        can_pick_money: Boolean(ch.is_draft),
         weapon_id: owned.weapon_id,
         armor_id: owned.armor_id,
         item_ids: owned.item_ids,
@@ -214,7 +218,15 @@ export async function saveTab(req, res) {
     res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 
-// Writes the kit and the placeholder money. Gear rows are not character columns.
+// Default money: a draft's coins become the preset's coins (all five columns). A finished character's money
+// only changes on the sheet, so this refuses.
+async function writeMoneyPreset(ch, key) {
+    if (!ch.is_draft) return { error: 'Money is set when the character is made. Change it on the sheet.' };
+    await Form.updateCharacterFields(ch.id, { ...MONEY_PRESETS[key].purse });
+    return {};
+}
+
+// Writes the kit, and the default money when a preset is sent. Gear rows are not character columns.
 async function saveGear(ch, req, res) {
     if (!ch.role_id) return res.status(400).json({ error: 'Pick a role first' });
 
@@ -222,8 +234,11 @@ async function saveGear(ch, req, res) {
     const checked = checkGearTab(choices, req.body);
     if ('error' in checked) return res.status(400).json({ error: checked.error });
 
+    if (checked.money_preset) {
+        const wrote = await writeMoneyPreset(ch, checked.money_preset);
+        if ('error' in wrote) return res.status(400).json({ error: wrote.error });
+    }
     await Form.replaceFormGear(ch.id, checked);
-    await Form.updateCharacterFields(ch.id, { money: checked.money });
     res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 
@@ -237,7 +252,6 @@ export async function defaultGearFor(req, res) {
     if ('error' in picked) return res.status(400).json({ error: picked.error });
 
     await Form.replaceFormGear(ch.id, { ...picked, item_ids: [] });
-    await Form.updateCharacterFields(ch.id, { money: STARTING_MONEY });
     res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 
@@ -276,10 +290,19 @@ export async function rollStat(req, res) {
     res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 
+// POST /api/characters/:id/finish   body (optional): { money_preset } — the default money picked but not saved yet
 export async function finish(req, res) {
-    const ch = await loadOwnCharacter(req, res);
+    let ch = await loadOwnCharacter(req, res);
     if (!ch) return;
     if (!ch.is_draft) return res.status(400).json({ error: 'This character is already finished' });
+
+    const rawPreset = req.body?.money_preset;
+    if (rawPreset != null && rawPreset !== '') {
+        const preset = checkMoneyPreset(rawPreset);
+        if ('error' in preset) return res.status(400).json({ error: preset.error });
+        await writeMoneyPreset(ch, preset.key);
+        ch = await Form.getFormCharacter(ch.id);
+    }
 
     const missing = missingForFinish(ch);
     if (missing.length > 0) return res.status(400).json({ error: 'Some tabs are not done yet', missing });

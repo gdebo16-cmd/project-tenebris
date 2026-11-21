@@ -1,6 +1,7 @@
 // The character form's save rules: one check per tab.
 // Each check takes what the browser sent (body) and answers either { error } or { values },
 // where values are the clean, safe column values to save. The server never saves the body itself.
+import { moneyPresetOf, purseOf } from './money.ts';
 import { CALLING_LEVEL, checkChoicePicks, type characterOptions, type ChoiceFeature } from './characterOptions.ts';
 
 // What characterOptions() answers: the choices a check compares the body against
@@ -159,6 +160,9 @@ export type FinishFields = {
     role_id?: number | null;
     str?: number | null; dex?: number | null; con?: number | null; int?: number | null;
     wis?: number | null; cha?: number | null; luc?: number | null; spd?: number | null;
+    // A draft must pick default money (its coins match one of MONEY_PRESETS)
+    is_draft?: boolean | null;
+    copper?: number | null; silver?: number | null; gold?: number | null; crowns?: number | null; oracles?: number | null;
 };
 
 export const STAT_COLUMNS = ['str', 'dex', 'con', 'int', 'wis', 'cha', 'luc', 'spd'] as const;
@@ -332,6 +336,7 @@ export function missingForFinish(ch: FinishFields): string[] {
     if (!ch.species_id || !ch.size_id || !ch.eye_color) missing.push('Species & look: species, size and eye color');
     if (!ch.role_id) missing.push('Role & calling: a role');
     if (STAT_COLUMNS.some((stat) => ch[stat] == null)) missing.push('Traits & gifts: place all 8 stat rolls');
+    if (ch.is_draft === true && !moneyPresetOf(purseOf(ch))) missing.push('Inventory: pick default money');
     return missing;
 }
 

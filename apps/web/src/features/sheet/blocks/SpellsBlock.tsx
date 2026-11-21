@@ -1,5 +1,5 @@
-// Spell slots and the prepared action spells. Casting a leveled spell spends a slot at the level picked;
-// the roll (to hit, damage or healing) is done by the server from the spell's own numbers.
+// Spell slots and the prepared action spells. Cast asks the server to spend a slot at the level picked and
+// roll what the spell does (to hit, the target's save, damage or healing), all in one trip.
 import { useState } from 'react';
 import { signed } from '@tenebris/rules/math';
 import { spellDiceAt, spellHealAt, type SpellAction } from '@tenebris/rules/creature';
@@ -7,34 +7,12 @@ import { statName } from '@tenebris/rules/stats';
 import styles from '../Sheet.module.css';
 import type { BlockProps } from './types.ts';
 
-type Props = BlockProps & { onState: (patch: Record<string, unknown>) => void };
+type Props = BlockProps & { onCast: (actionKey: string, castLevel: number) => void };
 
-export default function SpellsBlock({ creature, canEdit, onAct, onNote, onState }: Props) {
+export default function SpellsBlock({ creature, canEdit, onAct, onCast }: Props) {
     const { slots, usedSlots } = creature.spellcasting;
     const [castLevels, setCastLevels] = useState<Record<string, number>>({});
     const left = (level: number) => (slots[level - 1] ?? 0) - (usedSlots[level] ?? 0);
-
-    // Spends one slot at this level. Cantrips are free. Answers false when none are left.
-    function spend(level: number): boolean {
-        if (level === 0) return true;
-        if (left(level) <= 0) {
-            onNote(`No level ${level} slots left!`);
-            return false;
-        }
-        onState({ used_slots: { ...usedSlots, [level]: (usedSlots[level] ?? 0) + 1 } });
-        return true;
-    }
-
-    function cast(s: SpellAction) {
-        const level = castLevels[s.key] ?? s.base_level;
-        if (!spend(level)) return;
-        const start = `${creature.name} casts ${s.name}${level > s.base_level ? ` at level ${level}` : ''}! `;
-        if (s.attack_type) return onAct({ actionKey: s.key, kind: 'hit', castLevel: level }, start);
-        if (s.opponent_save_roll) return onNote(`${start}Target makes a ${statName(s.opponent_save_roll)} roll against ${s.saveDc}.`);
-        if (spellDiceAt(s, level)) return onAct({ actionKey: s.key, kind: 'damage', castLevel: level }, start);
-        if (spellHealAt(s, level)) return onAct({ actionKey: s.key, kind: 'heal', castLevel: level }, start);
-        onNote(start.trim());
-    }
 
     // The levels this spell may be cast at: its own level up to the highest slot level that still has a slot
     const levelsFor = (s: SpellAction) => {
@@ -78,7 +56,7 @@ export default function SpellsBlock({ creature, canEdit, onAct, onNote, onState 
                                     {levels.map((l) => <option key={l} value={l}>Level {l}</option>)}
                                 </select>
                             )}
-                            <button type="button" className={`${styles.button} ${styles.primary}`} disabled={!canEdit} onClick={() => cast(s)}>Cast</button>
+                            <button type="button" className={`${styles.button} ${styles.primary}`} disabled={!canEdit} onClick={() => onCast(s.key, level)}>Cast</button>
                             {s.attack_type && dice && (
                                 <button type="button" className={styles.button} disabled={!canEdit} aria-label={`${s.name} damage`}
                                     onClick={() => onAct({ actionKey: s.key, kind: 'damage', castLevel: level }, `${s.name}: `)}>{dice}</button>

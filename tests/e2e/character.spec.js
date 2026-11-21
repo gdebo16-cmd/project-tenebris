@@ -74,6 +74,8 @@ test('creates a character on the new form, opens its sheet and rolls', async ({ 
     const filled = page.waitForResponse((res) => res.url().includes('/form/gear/default') && res.request().method() === 'POST');
     await page.getByRole('button', { name: 'Auto default' }).click();
     expect((await filled).ok()).toBeTruthy();
+    // Default money is required: pick one (Finish saves it)
+    await page.getByRole('button', { name: /^Average/ }).click();
     await page.getByRole('tabpanel', { name: 'Inventory' }).getByRole('button', { name: 'Finish' }).click();
     await expect(page).toHaveURL(new RegExp(`/characters/${id}$`));
     await expect(page.getByText(name).first()).toBeVisible();

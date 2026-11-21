@@ -1,10 +1,12 @@
 // The spell book (learn / unlearn / prepare / action spells) as JSON for React. Queries live in models/.
+// The rules (caps, levels) live in @tenebris/rules/spellbook; changeSpellbook() is shared with the new sheet (R5).
 import { ownsCharacter } from '../models/characterModel.js';
 import * as Spells from '../models/spellModel.js';
 import { getSheetCharacter } from '../models/characterModel.js';
 import { getSpell } from '../models/spellPack.js';
 import { getSpellSlots } from '@tenebris/rules/spellSlots';
 import { getSpellCaps, bodyMaxLevel } from '@tenebris/rules/spellLimits'; /*prep-done*/
+import { learnRefusal, prepareRefusal } from '@tenebris/rules/spellbook';
 
 // Highest spell level a character can cast (number of slot tiers). Cantrips (0) are always allowed.
 // Body Magic has no slots: its highest level comes from the character level.
@@ -32,104 +34,84 @@ async function ownedCharId(req, res) {
     return charId;
 }
 
+// The book: every spell this character could learn (up to its highest slot level), plus what it knows.
+// ownerId = the character's owner (the caller has already checked who may look).
+export async function loadSpellbook(charId, ownerId) {
+    const ch = await getSheetCharacter(charId, ownerId);
+    if (!ch) return null;
+    const allSpells = await Spells.getLearnableSpells(ch.alignment_code);
+    const highestSlot = await highestSlotFor(ch);
+    const spells = allSpells.filter((s) => Number(s.base_level) <= highestSlot);
+    return { spells, ...(await loadLearned(charId, ch)) };
+}
+
+// One spell book change. Answers { status, body }: 200 with the learned spells, or 400 with { error }.
+// ownerId = the character's owner (the caller has already checked who may change it).
+export async function changeSpellbook(charId, ownerId, op, spellId) {
+    const ch = await getSheetCharacter(charId, ownerId);
+    if (!ch) return { status: 404, body: { error: 'Character not found' } };
+    const refuse = (error) => ({ status: 400, body: { error } });
+    const caps = getSpellCaps(ch.class_name, ch.level, ch.subclass_name);
+
+    if (op === 'learn') {
+        const spell = getSpell(spellId);
+        const refusal = learnRefusal({
+            exists: !!spell,
+            featureOnly: !!spell && Spells.isFeatureOnlySpell(spell.name),
+            baseLevel: Number(spell?.base_level),
+            highestSlot: spell ? await highestSlotFor(ch) : 0,
+            level: ch.level,
+            caps,
+            counts: caps && spell ? await Spells.spellCountsFromPack(charId, spellId) : null,
+        });
+        if (refusal) return refuse(refusal);
+        await Spells.learnSpell(charId, spellId);
+    } else if (op === 'unlearn') {
+        await Spells.unlearnSpell(charId, spellId);
+    } else if (op === 'prepare') {
+        const refusal = prepareRefusal({
+            baseLevel: Number(getSpell(spellId)?.base_level),
+            level: ch.level,
+            caps,
+            counts: caps ? await Spells.spellCountsFromPack(charId, spellId) : null,
+        });
+        if (refusal) return refuse(refusal);
+        if (!(await Spells.setPrepared(charId, spellId, true))) return refuse('You have to learn that spell first');
+    } else if (op === 'unprepare' || op === 'setAction' || op === 'removeAction') {
+        const rowCount = op === 'unprepare'
+            ? await Spells.setPrepared(charId, spellId, false)
+            : await Spells.setAction(charId, spellId, op === 'setAction');
+        if (!rowCount) return refuse('You have to learn that spell first');
+    } else {
+        return refuse('Unknown spell book change');
+    }
+    return { status: 200, body: await loadLearned(charId, ch) };
+}
+
 // GET /api/characters/:id/spellbook
 export async function getSpellbook(req, res) {
     const charId = await ownedCharId(req, res);
     if (charId === null) return;
-    const ch = await getSheetCharacter(charId, req.session.userId);
-    const allSpells = await Spells.getLearnableSpells(ch.alignment_code);
-    const highestSlot = await highestSlotFor(ch);
-    const spells = allSpells.filter((s) => Number(s.base_level) <= highestSlot);
-    res.json({ spells, ...(await loadLearned(charId, ch)) });
+    res.json(await loadSpellbook(charId, req.session.userId));
 }
+
+// The old sheet's POST routes, one per change. body: { spell_id }
+const changeRoute = (op) => async (req, res) => {
+    const charId = await ownedCharId(req, res);
+    if (charId === null) return;
+    const { status, body } = await changeSpellbook(charId, req.session.userId, op, Number(req.body.spell_id));
+    res.status(status).json(body);
+};
 
 // POST /api/characters/:id/spells/learn   body: { spell_id }
-export async function learnSpell(req, res) {
-    const charId = await ownedCharId(req, res);
-    if (charId === null) return;
-    const spellId = Number(req.body.spell_id);
-    const ch = await getSheetCharacter(charId, req.session.userId);
-    const spell = getSpell(spellId);
-    if (!spell) return res.status(400).json({ error: 'That spell does not exist' });
-    if (Spells.isFeatureOnlySpell(spell.name)) {
-        return res.status(400).json({ error: 'That spell is granted by a class feature and cannot be learned from the spellbook.' });
-    }
-    const baseLevel = Number(spell.base_level);
-    const highestSlot = await highestSlotFor(ch);
-    if (baseLevel > highestSlot) {
-        return res.status(400).json({ error: `You can't learn level ${baseLevel} spells yet. At level ${ch.level} you can cast up to level ${highestSlot}.` });
-    }
-    // Known caps: cantrips = the cantrip limit, leveled spells = 2x the spells limit (re-learning is never blocked)
-    const caps = getSpellCaps(ch.class_name, ch.level, ch.subclass_name);
-    if (caps) {
-        const counts = await Spells.spellCountsFromPack(charId, spellId);
-        if (!counts.already) {
-            if (caps.shared && counts.cantrips + counts.spells >= caps.known) {
-                return res.status(400).json({ error: `You already know the most spells you can (${caps.known}) at level ${ch.level}` });
-            }
-            if (baseLevel === 0 && counts.cantrips >= caps.cantrips) {
-                return res.status(400).json({ error: `You already know the most cantrips you can (${caps.cantrips}) at level ${ch.level}` });
-            }
-            if (baseLevel >= 1 && counts.spells >= caps.known) {
-                return res.status(400).json({ error: `You already know the most spells you can (${caps.known}) at level ${ch.level}` });
-            }
-        }
-    }
-    await Spells.learnSpell(charId, spellId);
-    res.json(await loadLearned(charId, ch));
-}
-
+export const learnSpell = changeRoute('learn');
 // POST /api/characters/:id/spells/unlearn   body: { spell_id }
-export async function unlearnSpell(req, res) {
-    const charId = await ownedCharId(req, res);
-    if (charId === null) return;
-    await Spells.unlearnSpell(charId, Number(req.body.spell_id));
-    res.json(await loadLearned(charId, await getSheetCharacter(charId, req.session.userId)));
-}
-
-// Shared by prepare / unprepare / setAction / removeAction: flip one flag on a learned spell
-async function setFlag(req, res, setter, value) {
-    const charId = await ownedCharId(req, res);
-    if (charId === null) return;
-    const rowCount = await setter(charId, Number(req.body.spell_id), value);
-    if (!rowCount) return res.status(400).json({ error: 'You have to learn that spell first' });
-    res.json(await loadLearned(charId));
-}
-
+export const unlearnSpell = changeRoute('unlearn');
 // POST /api/characters/:id/spells/prepare     body: { spell_id }
-// Prepared cap: leveled spells up to the spells limit, cantrips up to the cantrip limit
-export async function prepareSpell(req, res) {
-    const charId = await ownedCharId(req, res);
-    if (charId === null) return;
-    const spellId = Number(req.body.spell_id);
-    const ch = await getSheetCharacter(charId, req.session.userId);
-    const caps = getSpellCaps(ch.class_name, ch.level, ch.subclass_name);
-    if (caps) {
-        const counts = await Spells.spellCountsFromPack(charId, spellId);
-        if (!counts.already) return res.status(400).json({ error: 'You have to learn that spell first' });
-        const spell = getSpell(spellId);
-        if (!counts.already_prepared) {
-            if (caps.shared && counts.prepared_cantrips + counts.prepared_spells >= caps.prepared) {
-                return res.status(400).json({ error: `You can prepare ${caps.prepared} spells at level ${ch.level}. Unprepare one first.` });
-            }
-            if (Number(spell?.base_level) === 0 && counts.prepared_cantrips >= caps.cantrips) {
-                return res.status(400).json({ error: `You can prepare ${caps.cantrips} cantrips at level ${ch.level}` });
-            }
-            if (Number(spell?.base_level) >= 1 && counts.prepared_spells >= caps.prepared) {
-                return res.status(400).json({ error: `You can prepare ${caps.prepared} spells at level ${ch.level}. Unprepare one first.` });
-            }
-        }
-    }
-    const rowCount = await Spells.setPrepared(charId, spellId, true);
-    if (!rowCount) return res.status(400).json({ error: 'You have to learn that spell first' });
-    res.json(await loadLearned(charId, ch));
-}
-
+export const prepareSpell = changeRoute('prepare');
 // POST /api/characters/:id/spells/unprepare   body: { spell_id }
-export const unprepareSpell = (req, res) => setFlag(req, res, Spells.setPrepared, false);
-
+export const unprepareSpell = changeRoute('unprepare');
 // POST /api/characters/:id/spells/setAction     body: { spell_id }
-export const setAction = (req, res) => setFlag(req, res, Spells.setAction, true);
-
+export const setAction = changeRoute('setAction');
 // POST /api/characters/:id/spells/removeAction     body: { spell_id }
-export const removeAction = (req, res) => setFlag(req, res, Spells.setAction, false);
+export const removeAction = changeRoute('removeAction');

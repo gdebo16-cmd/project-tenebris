@@ -61,7 +61,8 @@ export function useDefaultGear(id: string) {
 
 export function useFinish(id: string) {
     return useMutation({
-        mutationFn: () => api<{ id: number }>(`/api/characters/${id}/finish`, { method: 'POST' }),
+        // money_preset: the default money picked on the Gear tab, saved as part of finishing
+        mutationFn: (body: { money_preset?: string } = {}) => api<{ id: number }>(`/api/characters/${id}/finish`, { method: 'POST', body }),
     });
 }
 

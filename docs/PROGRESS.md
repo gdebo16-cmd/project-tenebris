@@ -17,6 +17,13 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
+### 2026-11-21 - grokbot (R5.4-R5.5 missing pieces, bot/claude, uncommitted)
+- Owner's calls: embers, cracks and breach saves are gone; Body Magic (its once-per-rest spells, Lantern/Mending runes) is stashed; money is the owner's to write.
+- Rules: `packages/rules/src/features.ts` (uses per rest), `sheetState.ts` (spendFeatureUse, takeRest ported from the old rest(), spendSlot, castSpell), `spellbook.ts` (learn/prepare caps, moved out of apiSpellController). Creature gains `restUses`, `spellLimits` and per-feature `key` / `perRest` / `diceNow`. Tests: `sheetState.test.ts`, `spellbook.test.ts` (82/82).
+- Server: POST `/api/sheets/character/:id/feature` | `/rest` | `/cast`, GET+POST `/spellbook` (owner or DM). Old spell routes now share `changeSpellbook()`. No migration: uses `rest_uses`, `used_slots`, `conditions`, `exhaustion`, `character_spells`.
+- Web: FeaturesBlock (uses left + Use), RestBlock, SpellsBlock casts through `/cast` (the browser no longer spends slots), SpellBookBlock (prepare / action / forget / learn). e2e `sheet-new.spec.js` passes on 4001/5174.
+- Left: money (owner); then swap the default sheet. ConditionsBlock/exhaustion still save through PATCH /state (owner only).
+
 ### 2026-11-20 — Claude (R5.4–R5.5, bot/claude `e185d8e`)
 - New sheet at `/characters/:id?new=1` (old sheet stays the default): `apps/web/src/features/sheet/` — CharacterSheetPage + blocks SheetHeader, HealthBlock, CoreStatsBlock, StatsBlock (stats + skills), ConditionsBlock (+ exhaustion), ActionsBlock (weapons, bonus actions, Soul/Runic/Sigil), SpellsBlock (slots, cast level, cast/damage), InventoryBlock, FeaturesBlock, RollFeed. One `Sheet.module.css` with theme variables, laid out like the sheet mockup.
 - Every roll goes through `/act`; initiative, stats and skills are `kind: 'check'` (bonus from the Creature). 68/68 rules tests, typecheck, build OK. New e2e `sheet-new.spec.js`. Not yet seen in a browser.

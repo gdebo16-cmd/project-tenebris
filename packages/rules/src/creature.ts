@@ -7,6 +7,9 @@
 import { modOf, healthInit, proficiencyBonus } from './math.ts';
 import { scaledAt, beamsAt, getSpellSlots, type ScalingStep } from './spellSlots.ts';
 import { STATS, SKILLS, statKey, statName, type StatKey } from './stats.ts';
+import { getSpellCaps } from './spellLimits.ts';
+import { purseOf, type Purse } from './money.ts';
+import { featureKey, perRestUses, featureDiceAt, type PerRest, type RestUses } from './features.ts';
 import { weaponRuneEffects, armorRuneEffects, runicStrikeDice, utilityRuneEffects, type Rider, type Rune } from './runes.ts';
 
 // ---- What the server sends (only the fields this file reads) ----
@@ -29,6 +32,7 @@ export type SheetSpell = {
     base_damage_dice?: string | null; heal_dice?: string | null; heal_add_mod?: boolean; dmgMod?: number;
     beam_scaling?: ScalingStep[] | null;
     upcasts?: { cast_level: number; damage_dice?: string | null; heal_dice?: string | null }[] | null;
+    is_racial?: boolean; is_bonus?: boolean;   // race starter / bonus spells: always known, never count toward the caps
 };
 export type SheetCharacter = {
     id: number; name: string; level: number; portrait_url?: string | null;
@@ -38,6 +42,8 @@ export type SheetCharacter = {
     class_name?: string | null; subclass_name?: string | null; race_name?: string | null; subrace_name?: string | null;
     race_base_speed?: number | null; skill_proficiencies?: string[] | null; class_saving_throws?: string[] | null;
     conditions?: Record<string, boolean> | null; exhaustion?: number | null; used_slots?: Record<string, number> | null;
+    rest_uses?: RestUses | null;
+    copper?: number | null; silver?: number | null; gold?: number | null; crowns?: number | null; oracles?: number | null;
     has_embers?: boolean; embers_spent?: number | null; cracks?: number | null; crack_max?: number | null;
     breach_dc?: number | null; breach_dc_scaling?: ScalingStep[] | null;
 };
@@ -64,6 +70,9 @@ export type WeaponAction = {
     branded: boolean; runed: boolean; marked: boolean; sigil: boolean;
     rarity: string | null; description: string | null; category: string | null;
 };
+// A feature as the sheet shows it: its rest_uses key, uses left (null = no limit) and its dice at this level
+export type CreatureFeature = SheetFeature & { key: string; perRest: PerRest | null; diceNow: string | null };
+
 export type SpellAction = SheetSpell & {
     key: string; toHit: number; saveDc: number; beams: number; healMod: number; tile: 'action' | 'bonus' | 'reaction';
 };
@@ -87,6 +96,10 @@ export type Creature = {
     conditions: Record<string, boolean>;
     exhaustion: number;
     spellcasting: { toHit: number; saveDc: number; slots: number[]; usedSlots: Record<string, number> };
+    // The spell book caps (null = no cap): cantrips, prepared and known spells at this level
+    spellLimits: { cantrips: number; prepared: number; known: number; shared?: boolean } | null;
+    restUses: RestUses;             // per-rest feature uses spent (characters.rest_uses)
+    purse: Purse;                   // coins: copper, silver, gold, crowns, oracles (separate, never auto-changed)
     classDc: number;
     embers: { max: number; current: number };
     cracks: { current: number; max: number; breachDc: number; conSave: number };
@@ -96,7 +109,7 @@ export type Creature = {
     strikes: { soulStrikeDice: string; runicStrikeDice: string };
     gear: { armor: SheetArmor[]; weapons: SheetWeapon[]; items: SheetItem[] };
     allSpells: SheetSpell[];          // every learned spell (the spell book), prepared or not
-    features: SheetFeature[];
+    features: CreatureFeature[];
 };
 
 // Dual wield: the off-hand attack is a bonus action and loses the ability modifier on DAMAGE (5e).
@@ -187,6 +200,7 @@ export function characterToCreature(data: SheetData): Creature {
     // Stolen Radiance (has_embers): ceil(level / 2) + INT mod (min 1), + CON mod from level 17
     const embersMax = ch.has_embers ? Math.max(1, Math.ceil(level / 2) + mod('int') + (level >= 17 ? mod('con') : 0)) : 0;
 
+    const restUses: RestUses = ch.rest_uses ?? {};
     const proficientSkills = ch.skill_proficiencies ?? [];
     const spells = (data.learnedSpells ?? []).filter((s) => s.is_action && s.is_prepared).map((s): SpellAction => {
         const tile = s.action_type === 'bonus' ? 'bonus' : s.action_type === 'reaction' ? 'reaction' : 'action';
@@ -223,6 +237,9 @@ export function characterToCreature(data: SheetData): Creature {
         conditions: ch.conditions ?? {},
         exhaustion: Number(ch.exhaustion ?? 0),
         spellcasting: { toHit: spellToHit, saveDc: spellSave, slots: getSpellSlots(level, ch.spell_slots), usedSlots: ch.used_slots ?? {} },
+        spellLimits: getSpellCaps(ch.class_name, level, ch.subclass_name ?? null),
+        restUses,
+        purse: purseOf(ch),
         classDc: 8 + prof + mod('cha'),
         embers: { max: embersMax, current: Math.max(0, embersMax - Number(ch.embers_spent ?? 0)) },
         cracks: {
@@ -237,7 +254,7 @@ export function characterToCreature(data: SheetData): Creature {
         strikes: { soulStrikeDice: level >= 23 ? '3d8' : level >= 11 ? '2d8' : '1d8', runicStrikeDice: runicStrikeDice(level) },
         gear: { armor: ownedArmor, weapons: ownedWeapons, items: data.ownedItems ?? [] },
         allSpells: data.learnedSpells ?? [],
-        features: data.actionFeatures ?? [],
+        features: (data.actionFeatures ?? []).map((f) => ({ ...f, key: featureKey(f), perRest: perRestUses(f, level, restUses), diceNow: featureDiceAt(f, level) })),
     };
 }
 

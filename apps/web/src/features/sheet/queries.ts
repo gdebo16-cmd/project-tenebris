@@ -38,3 +38,57 @@ export function useSheetChange(id: string) {
         }),
     };
 }
+
+// Changes the server decides and saves (R5): use a feature, take a rest, cast a spell (spends the slot).
+// The browser names what it wants; the answer is the roll-feed text. The sheet reloads after each one.
+export type SheetDo =
+    | { path: 'feature'; body: { featureKey: string } }
+    | { path: 'rest'; body: { type: 'short' | 'long' } }
+    | { path: 'cast'; body: { actionKey: string; castLevel?: number } };
+
+export function useSheetDo(id: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ path, body }: SheetDo) => api<{ text: string }>(`/api/sheets/character/${id}/${path}`, { method: 'POST', body }),
+        onSettled: () => queryClient.invalidateQueries({ queryKey: sheetKey(id) }),
+    });
+}
+
+// ---- The spell book ----
+
+export type BookSpell = {
+    id: number; name: string; base_level: number;
+    alignment_name?: string | null; element_name?: string | null; state_name?: string | null;
+};
+export type LearnedSpell = BookSpell & { is_prepared?: boolean; is_action?: boolean; is_racial?: boolean; is_bonus?: boolean };
+export type SpellLimits = { cantrips: number; prepared: number; known: number; shared?: boolean } | null;
+export type SpellbookResponse = { spells: BookSpell[]; learnedSpells: LearnedSpell[]; learnedIds: number[]; spellLimits?: SpellLimits };
+export type SpellbookOp = 'learn' | 'unlearn' | 'prepare' | 'unprepare' | 'setAction' | 'removeAction';
+
+const bookKey = (id: string) => ['sheet', 'character', id, 'spellbook'];
+
+// Only loaded when the book is open
+export function useSpellbook(id: string, open: boolean) {
+    return useQuery({ queryKey: bookKey(id), queryFn: () => api<SpellbookResponse>(`/api/sheets/character/${id}/spellbook`), enabled: open });
+}
+
+// Learn, forget, prepare or mark as an action spell. The server checks the caps; the sheet and the book reload.
+export function useSpellbookChange(id: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (body: { op: SpellbookOp; spellId: number }) => api(`/api/sheets/character/${id}/spellbook`, { method: 'POST', body }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: sheetKey(id) }),
+    });
+}
+
+// ---- Money ----
+// Add or spend coins. The server checks the amounts and the purse (no change-making) and answers the new totals.
+export type MoneyBody = { action: 'add' | 'spend'; copper?: number; silver?: number; gold?: number; crowns?: number; oracles?: number };
+
+export function useMoney(id: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (body: MoneyBody) => api<{ purse: Record<string, number> }>(`/api/sheets/character/${id}/money`, { method: 'POST', body }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: sheetKey(id) }),
+    });
+}
