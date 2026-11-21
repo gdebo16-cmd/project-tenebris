@@ -30,31 +30,31 @@ function CreateCampaign() {
 
     return (
         <>
-            <header id="site-title">
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
+            <header id={styles.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Create Tale</h1>
             </header>
                 <SiteNav />
             <main className={styles.page}>
-                <section id="campaign-container" className="campaign-container">
+                <section className={styles.campaignContainer}>
                     <form onSubmit={submit}>
-                        <article id="campaign-name-container" className="campaign-tile">
-                            <label className="campaign-label" htmlFor="name">Tale Name</label>
-                            <input className="campaign-value" type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="A tale in the making" />
+                        <article className={styles.campaignTile}>
+                            <label className={styles.campaignLabel} htmlFor="name">Tale Name</label>
+                            <input className={styles.campaignValue} type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="A tale in the making" />
                         </article>
-                        <article id="campaign-description-container" className="campaign-tile">
-                            <label className="campaign-label" htmlFor="description">Description</label>
-                            <textarea className="campaign-value" id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="A brief description of the campaign" />
+                        <article className={styles.campaignTile}>
+                            <label className={styles.campaignLabel} htmlFor="description">Description</label>
+                            <textarea className={styles.campaignValue} id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="A brief description of the campaign" />
                         </article>
-                        <article id="campaign-button-container" className="campaign-tile">
-                            <button type="submit" id="submit-button" className="campaign-button">Create Tale</button>
+                        <article className={styles.campaignTile}>
+                            <button type="submit" className={styles.campaignButton}>Create Tale</button>
                         </article>
-                        {saveError && <p className="error-message">{saveError}</p>}
+                        {saveError && <p>{saveError}</p>}
                     </form>
                 </section>
             </main>
             <footer>
-                <p className="footer-text">copyrite Eldrid Tales LLC</p>
+                <p className={styles.footerText}>copyrite Eldrid Tales LLC</p>
             </footer>
         </>     
     );

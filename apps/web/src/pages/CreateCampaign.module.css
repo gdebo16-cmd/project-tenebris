@@ -1,25 +1,23 @@
-/* CreateCampaign styles (was styles/campCreate.css, added by the old usePageStyle hook).
-   Scoped to this page: CreateCampaign puts styles.page on its <main>, and every rule below
-   only applies while that element is on screen (html:has(.page)).
-   :where(...) adds no specificity, so each rule weighs exactly what it did before.
-   Class and id names stay global (:global) because shared parts such as SiteNav use them;
-   .page (written :local(.page)) is the only name this module makes local. */
+/* CreateCampaign styles (was styles/campCreate.css).
+   Class and id names are local to this module (CreateCampaign.jsx uses styles.x).
+   Rules that only name elements (html, body, header, main, a, ...) stay limited to this page
+   with :where(html:has(.page)); :where() adds no specificity. */
 
-:global :where(html:has(:local(.page))),
-:global :where(html:has(:local(.page))) * {
+:where(html:has(.page)),
+:where(html:has(.page)) * {
     font-family: var(--fontfam);
     font-weight: var(--fontweight);
     font-style: var(--fontstyle);
  }
 
-:global :where(html:has(:local(.page))) input[type="text"],
-:global :where(html:has(:local(.page))) input[type="textarea"] {
+:where(html:has(.page)) input[type="text"],
+:where(html:has(.page)) input[type="textarea"] {
   font-size: 2rem; 
 }
  
  
- :global html:where(:has(:local(.page))),
- :global body:where(:has(:local(.page))) {
+ html:where(:has(.page)),
+ body:where(:has(.page)) {
      margin: 0 ! important;
      padding: 0 ! important;
      width: 100vw;
@@ -38,7 +36,7 @@
      
  }
 
- :global body:where(:has(:local(.page))) {
+ body:where(:has(.page)) {
     content: '';
     position: absolute;
     top: 0;
@@ -50,7 +48,7 @@
     max-width: 3840px;
 }
 
-:global :where(html:has(:local(.page))) .fixed-bg {
+:where(html:has(.page)) :global(.fixed-bg) {
     position: absolute;
     top: 0;
     left: 0;
@@ -67,15 +65,15 @@
     flex-direction: column;
 }
 
-:global :where(html:has(:local(.page))) ul,
-:global :where(html:has(:local(.page))) li,
-:global :where(html:has(:local(.page))) a {
+:where(html:has(.page)) ul,
+:where(html:has(.page)) li,
+:where(html:has(.page)) a {
     list-style: none;
     text-decoration: none;
     color: var(--txt-color-1);
 }
 
-:global :where(html:has(:local(.page))) option {
+:where(html:has(.page)) option {
     background-color: var(--drop-down-bg);
     color: var(--drop-down-txt);
     border: var(--tileBorder);
@@ -85,7 +83,7 @@
     font-size: 100%;
 }
 
-:global :where(html:has(:local(.page))) footer {
+:where(html:has(.page)) footer {
     width: 100vw;
     height: 100svh;
     overflow: hidden ! important;
@@ -96,14 +94,14 @@
 }
 
 @media (max-width: 768px) {
-    :global :where(html:has(:local(.page))) header {
+    :where(html:has(.page)) header {
         display: flex;
         height: 8vh;
         width: 100vw;
         border-radius: 0 0 15% 15%;
     }
 
-    :global :where(html:has(:local(.page))) main {
+    :where(html:has(.page)) main {
         height: calc(100svh - 12vh);
         width: 100%;
         position: relative;
@@ -121,7 +119,7 @@
         background-color: rgba(var(--bgc-theme), 0.7);
     }
 
-    :global :where(html:has(:local(.page))) .title-logo {
+    .titleLogo {
         max-width: 50px;
         max-height: 50px;
         margin: 0;
@@ -130,7 +128,7 @@
         box-shadow: none;
     }
 
-    :global :where(html:has(:local(.page))) #site-title {
+    #siteTitle {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -153,7 +151,7 @@
 
     /*Main page styles*/
 
-    :global :where(html:has(:local(.page))) .campaign-container {
+    .campaignContainer {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -165,7 +163,7 @@
         overscroll-behavior: contain;
     }
 
-    :global :where(html:has(:local(.page))) .campaign-tile {
+    .campaignTile {
         display: flex;
         
         flex-direction: column;
@@ -180,7 +178,7 @@
         margin: 2%;
     }
     
-    :global :where(html:has(:local(.page))) .campaign-label {
+    .campaignLabel {
         border-radius: var(--tile) var(--tile) 0 0;
         border-bottom: var(--tileBorder);
         padding: 4%;
@@ -188,7 +186,7 @@
         font: inherit;
     }
 
-    :global :where(html:has(:local(.page))) .campaign-value {
+    .campaignValue {
         border: none;
         
         padding: 4%;
@@ -200,13 +198,13 @@
         margin: 0;
     }
 
-    :global :where(html:has(:local(.page))) .campaign-button-container {
+    .campaignButtonContainer {
         display: flex;
         justify-content: center;
         align-items: center;
     }
 
-    :global :where(html:has(:local(.page))) .campaign-button {
+    .campaignButton {
         background-color: var(--bg);
         border: none;
         border-radius: var(--tile);
@@ -217,7 +215,7 @@
         font: inherit;
     }
 
-    :global :where(html:has(:local(.page))) footer {
+    :where(html:has(.page)) footer {
         display: flex;
         position: fixed;
         top: calc(100svh - 2vh);
@@ -231,7 +229,7 @@
         overflow: hidden;
     }
 
-    :global :where(html:has(:local(.page))) .footer-text {
+    .footerText {
         display: none;
     }
 
@@ -240,11 +238,11 @@
 }
 
 @media (min-width: 769px) {
-    :global :where(html:has(:local(.page))) #site-title h1 {
+    #siteTitle h1 {
         display: none;
     }
 
-    :global :where(html:has(:local(.page))) .title-logo {
+    .titleLogo {
         content: url('/logo_banner.png');
         height: auto;
         width: auto;
@@ -253,14 +251,14 @@
         object-fit: contain;
     }
 
-    :global :where(html:has(:local(.page))) header {
+    :where(html:has(.page)) header {
         display: flex;
         height: 8vh;
         width: 100vw;
         border-radius: 0 0 15% 15%;
     }
 
-    :global :where(html:has(:local(.page))) #site-title {
+    #siteTitle {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -276,7 +274,7 @@
         box-shadow: var(--bs2);
     }
 
-    :global :where(html:has(:local(.page))) main {
+    :where(html:has(.page)) main {
         flex: 1 1 auto;
         box-sizing: border-box;
         width: 100%;
@@ -293,7 +291,7 @@
         align-items: flex-start;
     }
 
-    :global :where(html:has(:local(.page))) footer {
+    :where(html:has(.page)) footer {
         display: flex;
         position: fixed;
         left: 0;
@@ -316,7 +314,7 @@
         overflow: hidden;
     }
 
-    :global :where(html:has(:local(.page))) .campaign-container {
+    .campaignContainer {
         display: flex;
         flex-direction: column;
         width: min(900px, 90vw);
@@ -331,7 +329,7 @@
         box-shadow: var(--bs2);
     }
 
-    :global :where(html:has(:local(.page))) .campaign-tile {
+    .campaignTile {
         display: flex;
         flex-direction: column;
         margin: 0 0 2.5vh;
@@ -341,7 +339,7 @@
         background: none;
     }
 
-    :global :where(html:has(:local(.page))) .campaign-label {
+    .campaignLabel {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -355,7 +353,7 @@
         font-size: 150%;
     }
 
-    :global :where(html:has(:local(.page))) .campaign-value {
+    .campaignValue {
         box-sizing: border-box;
         width: 100%;
         margin: 0;
@@ -369,13 +367,13 @@
         font-size: 150%;
     }
 
-    :global :where(html:has(:local(.page))) .campaign-button-container {
+    .campaignButtonContainer {
         display: flex;
         justify-content: center;
         gap: 2vw;
     }
 
-    :global :where(html:has(:local(.page))) .campaign-button {
+    .campaignButton {
         display: inline-flex;
         justify-content: center;
         align-items: center;
@@ -392,7 +390,7 @@
         box-shadow: var(--bs2);
     }
 
-    :global :where(html:has(:local(.page))) footer .footer-text {
+    footer .footerText {
         background-image: var(--txt-gradient, linear-gradient(currentColor, currentColor));
         -webkit-background-clip: text;
         background-clip: text;
