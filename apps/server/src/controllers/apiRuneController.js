@@ -1,16 +1,9 @@
-// Rune Weaver rune routes (Inscribe Runes). Rules are enforced in models/runeModel.js.
-import * as Characters from '../models/characterModel.js';
+// Rune Weaver rune routes (Inscribe Runes). Owner or campaign DM, the same check as the /api/sheets routes.
+// The rules check the body (@tenebris/rules/equipment); models/runeModel.js enforces item types, prerequisites and limits.
 import * as Inventory from '../models/inventoryModel.js';
 import * as Runes from '../models/runeModel.js';
-
-const { ownsCharacter } = Characters;
-
-async function guard(req, res) {
-    if (!req.session.userId) { res.status(401).json({ error: 'Not logged in' }); return null; }
-    const charId = Number(req.params.id);
-    if (!(await ownsCharacter(charId, req.session.userId))) { res.status(404).json({ error: 'Character not found' }); return null; }
-    return charId;
-}
+import { checkRuneRequest } from '@tenebris/rules/equipment';
+import { editorOf } from './sheetController.js';
 
 // after a change, send everything the sheet needs to redraw
 const fresh = async (charId) => ({
@@ -21,32 +14,27 @@ const fresh = async (charId) => ({
 
 // GET /api/characters/:id/runes
 export async function getRunes(req, res) {
-    const charId = await guard(req, res); if (charId == null) return;
-    res.json(await Runes.getRuneInfo(charId));
+    const who = await editorOf(req, res); if (!who) return;
+    res.json(await Runes.getRuneInfo(who.charId));
 }
 
-// POST /api/characters/:id/runes/inscribe   body: { kind: 'weapon'|'armor', item_id, rune_id, choice_value }
-export async function inscribe(req, res) {
-    const charId = await guard(req, res); if (charId == null) return;
-    const b = req.body || {};
-    const r = await Runes.inscribeRune(charId, { kind: b.kind, itemId: Number(b.item_id), runeId: Number(b.rune_id), choiceValue: b.choice_value });
+// One rune route: who may change the sheet, the checked body, then the model's answer
+const runeRoute = (op, change) => async (req, res) => {
+    const who = await editorOf(req, res); if (!who) return;
+    const checked = checkRuneRequest(op, req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const r = await change(who.charId, checked.request);
     if (r.error) return res.status(r.status).json({ error: r.error });
-    res.json({ ...(await fresh(charId)), endedOldest: r.endedOldest });
-}
+    res.json({ ...(await fresh(who.charId)), ...(r.endedOldest ? { endedOldest: r.endedOldest } : {}) });
+};
+
+// POST /api/characters/:id/runes/inscribe   body: { kind: 'weapon'|'armor', item_id, rune_id, choice_value? }
+// endedOldest: the name of the rune that ended because the active limit was reached
+export const inscribe = runeRoute('inscribe', (charId, q) =>
+    Runes.inscribeRune(charId, { kind: q.kind, itemId: q.itemId, runeId: q.runeId, choiceValue: q.choiceValue }));
 
 // POST /api/characters/:id/runes/remove   body: { item_rune_id }
-export async function remove(req, res) {
-    const charId = await guard(req, res); if (charId == null) return;
-    const r = await Runes.removeRune(charId, Number(req.body?.item_rune_id));
-    if (r.error) return res.status(r.status).json({ error: r.error });
-    res.json(await fresh(charId));
-}
+export const remove = runeRoute('remove', (charId, q) => Runes.removeRune(charId, q.itemRuneId));
 
 // POST /api/characters/:id/runes/runed-weapon   body: { weapon_id | null }
-export async function runedWeapon(req, res) {
-    const charId = await guard(req, res); if (charId == null) return;
-    const id = req.body?.weapon_id == null ? null : Number(req.body.weapon_id);
-    const r = await Runes.setRunedWeapon(charId, id);
-    if (r.error) return res.status(r.status).json({ error: r.error });
-    res.json(await fresh(charId));
-}
+export const runedWeapon = runeRoute('runed-weapon', (charId, q) => Runes.setRunedWeapon(charId, q.weaponId));

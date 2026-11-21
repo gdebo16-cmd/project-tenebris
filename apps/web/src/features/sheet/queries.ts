@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api.ts';
 import type { Creature } from '@tenebris/rules/creature';
 import type { ActRequest } from '@tenebris/rules/actions';
+import type { RuneInfo } from '@tenebris/rules/equipment';
 
 export type SheetResponse = { creature: Creature; canEdit: boolean; access: 'owner' | 'dm' | 'viewer' };
 
@@ -94,4 +95,26 @@ export function useMoney(id: string) {
         mutationFn: (body: MoneyBody) => api<{ purse: Record<string, number> }>(`/api/sheets/character/${id}/money`, { method: 'POST', body }),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: sheetKey(id) }),
     });
+}
+
+// The Gear tab: equip / unequip, weapon options (dual wield, two hands, Soul Brand, sigil mark) and runes.
+// path is under /api/characters/:id, e.g. 'inventory/weapon/equip' or 'runes/inscribe' (owner or DM).
+// After each change the sheet reloads, so Armor Class and the Actions tab follow.
+const runesKey = (id: string) => ['sheet', 'character', id, 'runes'];
+export type GearChange = { path: string; body: Record<string, unknown> };
+
+export function useGear(id: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ path, body }: GearChange) => api<{ endedOldest?: string }>(`/api/characters/${id}/${path}`, { method: 'POST', body }),
+        onSuccess: () => Promise.all([
+            queryClient.invalidateQueries({ queryKey: sheetKey(id) }),
+            queryClient.invalidateQueries({ queryKey: runesKey(id) }),
+        ]),
+    });
+}
+
+// The rune catalog and limits, loaded only for a Rune Weaver
+export function useRuneInfo(id: string, enabled: boolean) {
+    return useQuery({ queryKey: runesKey(id), queryFn: () => api<RuneInfo>(`/api/characters/${id}/runes`), enabled });
 }

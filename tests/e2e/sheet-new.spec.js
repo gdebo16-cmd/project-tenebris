@@ -145,3 +145,57 @@ test('new sheet: conditions and exhaustion change through the server', async ({ 
   expect(end.exhaustion).toBe(start.exhaustion);
   expect(!!end.conditions.bleed).toBe(wasBleeding);
 });
+
+// The Gear tab: equip and unequip a weapon and switch a weapon option, all through the server (owner or DM).
+// The Actions tab follows each change. Everything is put back (net zero).
+test('new sheet: gear tab equips, unequips and sets weapon options through the server', async ({ page }) => {
+  await login(page);
+  const home = await (await page.request.get('/api/home')).json();
+  test.skip(!home.characters?.length, 'The test account has no finished character');
+  const id = home.characters[0].id;
+  const base = `/api/sheets/character/${id}`;
+  const weaponsNow = async () => (await (await page.request.get(base)).json()).creature.gear.weapons
+    .map((w) => ({ id: w.id, name: w.name, is_equipped: !!w.is_equipped, dual_wield: !!w.dual_wield, two_handed: !!w.two_handed }))
+    .sort((a, b) => a.id - b.id);
+  const start = await weaponsNow();
+  test.skip(!start.length, 'The test character has no weapon');
+  const weapon = start.find((w) => w.is_equipped) ?? start[0];
+
+  // Refusals: a bad id or a missing flag is 400, a weapon the character doesn't own is 404
+  const inv = `/api/characters/${id}/inventory/weapon`;
+  expect((await page.request.post(`${inv}/equip`, { data: { weapon_id: 'x' } })).status()).toBe(400);
+  expect((await page.request.post(`${inv}/dual-wield`, { data: { weapon_id: weapon.id } })).status()).toBe(400);
+  expect((await page.request.post(`${inv}/equip`, { data: { weapon_id: 999999 } })).status()).toBe(404);
+
+  await page.goto(`/characters/${id}`);
+  const actionsTab = page.getByRole('button', { name: 'Actions', exact: true });
+  const gearTab = page.getByRole('button', { name: 'Gear', exact: true });
+  const toHit = page.getByRole('button', { name: `${weapon.name} to hit` });
+  const gear = page.getByRole('region', { name: 'Gear', exact: true });
+  const flip = async (equipped) => {
+    await gearTab.click();
+    await gear.getByRole('button', { name: `${equipped ? 'Unequip' : 'Equip'} ${weapon.name}` }).click();
+    await expect(gear.getByRole('button', { name: `${equipped ? 'Equip' : 'Unequip'} ${weapon.name}` })).toBeVisible();
+    await actionsTab.click();
+    await expect(toHit).toHaveCount(equipped ? 0 : 1);
+  };
+
+  // Unequip then equip again (or the other way round if it starts unequipped)
+  await flip(weapon.is_equipped);
+  await flip(!weapon.is_equipped);
+
+  // An equipped one-handed weapon offers Dual wield: on (it moves to bonus actions), then off
+  await gearTab.click();
+  const equippedNow = (await weaponsNow()).find((w) => w.id === weapon.id).is_equipped;
+  const dual = gear.getByLabel(`${weapon.name} options`).getByRole('checkbox', { name: 'Dual wield' });
+  if (equippedNow && await dual.count()) {
+    const wasDual = weapon.dual_wield;
+    await dual.click();
+    await expect(dual).toBeChecked({ checked: !wasDual });
+    if (!wasDual) await expect(gear.getByText('Bonus action; no ability modifier on damage.')).toBeVisible();
+    await dual.click();
+    await expect(dual).toBeChecked({ checked: wasDual });
+  }
+
+  expect(await weaponsNow()).toEqual(start);
+});

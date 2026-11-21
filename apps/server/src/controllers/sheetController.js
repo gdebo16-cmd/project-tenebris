@@ -77,8 +77,9 @@ export async function act(req, res) {
 // Same pattern as /act: the browser names what it wants, the server checks who is asking, builds the Creature,
 // lets @tenebris/rules/sheetState decide, saves the result and answers the roll-feed text. Owner and DM may do these.
 
-// Checks the caller may change this sheet. Answers { charId, ownerId } or null after sending 401/403/404.
-async function editorOf(req, res) {
+// Checks the caller may change this sheet (owner or campaign DM). Answers { charId, ownerId } or null after sending 401/403/404.
+// Also used by the equip and rune routes (apiController, apiRuneController).
+export async function editorOf(req, res) {
     if (!req.session.userId) { res.status(401).json({ error: 'Not logged in' }); return null; }
     const charId = Number(req.params.id);
     if (!Number.isInteger(charId)) { res.status(404).json({ error: 'Character not found' }); return null; }

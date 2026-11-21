@@ -117,7 +117,7 @@ export default function CharacterSheetPage() {
                     {tab === 'gear' && (
                         <>
                             <PurseBlock creature={creature} canEdit={canEdit} id={id} onNote={note} />
-                            <InventoryBlock creature={creature} canEdit={canEdit} />
+                            <InventoryBlock creature={creature} canEdit={canEdit} id={id} onNote={note} />
                         </>
                     )}
                     {tab === 'features' && <FeaturesBlock creature={creature} canEdit={canEdit} onUse={(featureKey) => onDo({ path: 'feature', body: { featureKey } })} />}

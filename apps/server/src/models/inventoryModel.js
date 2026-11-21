@@ -1,4 +1,5 @@
 // Armor and weapon database reads and writes: catalog, owned items, add/remove, equip.
+import { ITEM_SLOTS } from '@tenebris/rules/equipment';
 import pool from '../db.js';
 import content, { getRole } from './content.js';
 import { spellName } from './spellPack.js';
@@ -206,7 +207,7 @@ export async function getOwnedItems(charId) {
 }
 
 // Magical items (every rarity, Object of Power included) can be equipped, up to ITEM_SLOTS at once.
-export const ITEM_SLOTS = 3; // magical item slots a character can equip
+export { ITEM_SLOTS }; // magical item slots a character can equip (@tenebris/rules/equipment)
 
 // Returns 'ok', 'not_owned', 'not_equippable' or 'full'
 export async function equipItem(charId, itemId) {

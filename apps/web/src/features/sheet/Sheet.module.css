@@ -201,3 +201,13 @@ button.tile { border-color: var(--border, #b27f50); cursor: pointer; }
 .purseInputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 6px; }
 .purseField { display: flex; align-items: center; gap: 6px; }
 .coinInput { width: 100%; min-width: 0; }
+
+/* Gear tab: equip, weapon options and runes */
+.subheading { margin: 6px 0 0; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.85; }
+.gearRow { flex-direction: column; align-items: stretch; }
+.gearLine { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.options { display: flex; flex-direction: column; gap: 6px; padding-left: 8px; border-left: 2px solid var(--border, #b27f50); }
+.option { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.optionBox { width: 18px; height: 18px; accent-color: var(--accent, #d4af37); }
+.runeLine { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; }
+
