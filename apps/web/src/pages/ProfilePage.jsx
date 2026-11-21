@@ -32,7 +32,7 @@ function ProfilePage() {
                 <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
                 <h1>Profile</h1>  
             </header>
-            <SiteNav />
+            <SiteNav className={styles.nav} />
             <main className={styles.page}>
                 <section className='profile-container'>
                         <article className="form-section profile-tile" id="profile-username-container">

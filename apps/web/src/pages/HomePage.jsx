@@ -41,7 +41,7 @@ function HomePage() {
                 <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
                 <h1>Welcome {username}!</h1>
             </header>
-            <SiteNav />
+            <SiteNav className={styles.nav} />
             <main className={styles.page}>
                 <nav className="home-tabs">
                     <button type="button" className={homeTab === 'current' ? 'home-tab is-active' : 'home-tab'} onClick={() => setHomeTab('current')}>Current Characters</button>
