@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import usePageStyle from '../hooks/usePageStyle';
-import registerCss from '../styles/register.css?inline';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys } from '../queries.ts';
+import styles from './RegisterPage.module.css';
 
 // Replaces Public/registration.html
 function RegisterPage() {
-    usePageStyle(registerCss);
     const navigate = useNavigate();
     // one state object for the whole form
     const [form, setForm] = useState({ username: '', password: '', email: '', name: '' });
@@ -40,7 +38,7 @@ function RegisterPage() {
                 <h1>Eldrid Tales</h1>
             </header>
 
-            <main>
+            <main className={styles.page}>
                 <section className="form-container">
                     <article className="form-title">
                         <h2 id="titleText">Create Your Legend</h2>
