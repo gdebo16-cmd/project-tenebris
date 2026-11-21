@@ -43,7 +43,7 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 - [x] **3** Take the quick wins (Wave 1: C3, C1, C2, C12) — Done when: content request under 600 KB and tests pass
 - [x] **4** Move into the skeleton — superseded by Stage 0
 - [ ] **5** Consolidate (Wave 2) — Done when: monster sheet runs on shared code and `migrate up` rebuilds a fresh database
-  - note: C5 and C7 done; C11 done in R2; C4 WebP conversion → R6; real monster sheet → R5; fresh-database seed data → R7
+  - note: C5 and C7 done; C11 done in R2; C4 WebP conversion → asset work (not done in R6); real monster sheet → R5; fresh-database seed data → R7
 - [x] **6** Share the rules (C6) — done as **R3** — ✓ 2026-11-20 · owner + Claude · commit 2d5c775
 - [ ] **7** Retire the legacy names (C8, C9) — done as **R7**
 
@@ -55,7 +55,7 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
   - note: the "what can this character pick?" endpoint moved to the start of R4 (agreed 2026-11-19).
 - [x] **R4** Unified character form — Done when: create and edit use the same components and one save per section (spec: `docs/specs/character-creator.md`) — ✓ 2026-11-20 · Cursor · commit 974afbf
 - [ ] **R5** Sheet blocks — Done when: Character, Monster and DM layouts render from the same blocks (spec: `docs/specs/sheet.md`)
-- [ ] **R6** CSS Modules — Done when: no legacy page stylesheet is left
+- [x] **R6** CSS Modules — Done when: no legacy page stylesheet is left — ✓ 2026-11-21 · grokbot · commit 20a862c
 - [ ] **R7** Server tidy-up — Done when: `grep -r idMap` finds nothing and a fresh database seeds from the pack
 
 - [ ] **Gate 1** (owner ticks) — tests green, server owns every roll, one name per concept, R1–R7 done

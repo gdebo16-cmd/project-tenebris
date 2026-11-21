@@ -73,7 +73,7 @@ Gate 1: tests green, server owns rolls, one name per concept, R1–R7 done.
 - Register bug: signing up without an email fails (server sends `null`, DB requires email). Fix in R4/R7.
 - Login rate limiter is off when `NODE_ENV` isn't `production`; staging test runs will need one shared login per run.
 - Web bundle is one 684 KB chunk (167 KB gzipped); code-splitting later.
-- PNG→WebP conversion deferred (code references ~200 `.png` names) — fold into R6 / asset work.
+- PNG→WebP conversion deferred (code references ~200 `.png` names) — not done in R6; still open for asset work.
 - Two monster images missing in both repos: `ash_hound.png`, `ochre.png`.
 
 ## Target skeleton

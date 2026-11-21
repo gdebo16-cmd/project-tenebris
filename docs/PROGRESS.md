@@ -4,18 +4,26 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Now
 
-- **Stage 1, native rebuild:** R1–R3 done (R3 = commit `2d5c775`). R4 is ready for Gabriel to merge from `bot/cursor`.
-- **In progress:** Claude — R5 (sheet blocks), on bot/claude in tenebris-claude. Cursor — R4 review items 4–7 (form header, layout, mockup controls).
+- **Stage 1, native rebuild:** R1–R4 done; R5 up to R5.5 (Character layout) is on main; R6 done (2026-11-21).
+- **Paused by Gabriel:** R5.6 (monster sheet) and R5.7 (DM page). No migration until he says so.
 
 ## Next
 
-- Gabriel merges R4. R5 (sheet blocks) waits — ask before any migration.
+- R7 (server tidy-up), or R5.6/R5.7 when Gabriel unpauses them. PNG→WebP is still open (asset work, not part of R6).
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-21 - grokbot (R6 CSS Modules, main `bf2b641`..`20a862c`, not pushed)
+- Every page that used `usePageStyle` now imports its own `pages/<Page>.module.css` (CampaignList, CampaignPage, CreateCampaign, HomePage, InventoryPage, JoinCampaign, LoginPage, ProfilePage, RegisterPage, SettingsPage). One commit per page; `usePageStyle.js` is deleted.
+- How the page sheets are scoped: each page puts `styles.page` on its `<main>` (and on its error `<p>` and `<Loader>`), and every rule is written `:global :where(html:has(:local(.page))) <old selector>`. `html` / `body` / `*` rules hang the check on that element instead (`body:where(:has(.page))`), and `body.subpage` became `body:has(.page)`. `:where()` adds no specificity, so every rule weighs what it did, and a page's rules only apply while it is on screen, as before. Class and id names stay global because SiteNav, TabList, ItemShop and the filters are styled by whichever page shows them. Turning those into local names is follow-up work, page by page.
+- Shared CSS: `components.css` split into `styles/base.css` (global input/select rules, still imported in main.jsx) and `features/inventory/ItemDetails.module.css` (the details popup, local class names). `loader.css` became `components/Loader.module.css`; Loader takes an optional `className`. `themes.css` stays global. Dead rules dropped: `.tile-icon`, `.spell-build-box`.
+- `charSheet.css` + `sheet-subpage.css` became `InventoryPage.module.css`: the 340 of 452 rules that name a class or id used nowhere in `src/` or `index.html` were dropped (old sheet leftovers). `char_create.css` was imported by nothing and is deleted.
+- Checks: before/after Playwright screenshots of all 10 pages at 1440×900 and 390×844 (plus the inventory tabs and details popup, the block sheet and the character form), in dev and in production builds: identical apart from 2–72 px of anti-aliasing noise that also shows up between two runs of the same build. Typecheck and build clean after every commit; rules 101/101; Playwright 17/17.
+- Bundle: the CSS moved out of the JS (JS 621 → 451 KB, CSS 55 → 214 KB; about the same in total).
 
 ### 2026-11-21 - grokbot (R5.5 money, conditions, sheet swap; bot/claude `e7fd9ae`, `f94cf65`, `46ec4b5`)
 - Money: owner's migration `1795282460378_add-character-money` (copper, silver, gold, crowns, oracles). Rules `money.ts` (purse, checks, presets). POST `/api/sheets/character/:id/money` (owner or DM, one atomic UPDATE, "Not enough silver."). Character form Gear tab: three default money buttons (Impoverished 10 cp, Average +10 sp, Wealthy +10 gp), drafts only; a finished character's money changes on the sheet. PurseBlock on the sheet's Gear tab.
