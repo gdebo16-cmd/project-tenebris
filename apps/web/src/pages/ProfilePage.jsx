@@ -1,9 +1,8 @@
-import usePageStyle from '../hooks/usePageStyle';
-import profileCss from '../styles/profile.css?inline';
 import SiteNav from '../components/SiteNav';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys } from '../queries.ts';
+import styles from './ProfilePage.module.css';
 
 
 const THEMES = ['default', 'green', 'purple', 'blue', 'red', 'orange', 'yellow', 'dark', 'light', 'hellfire', 'frozen', 'neon', 'gestalt', 'shadow-of-the-mountains', 'prestige', 'glass-green', 'glass-blue', 'glass-red', 'glass-orange', 'glass-yellow', 'glass-fire', 'dark-glass', 'light-glass', 'neon-glass', 'frozen-glass', 'gothic', 'pilgrim'];
@@ -13,7 +12,6 @@ const DISPLAYS = ['standard', 'compact', 'neon', 'glass', 'parchment', 'minimal'
 const BACKGROUNDS = ['default', 'green', 'purple', 'blue', 'red', 'orange', 'yellow', 'dark', 'light', 'hellfire', 'frozen', 'neon', 'gestalt', 'shadow-of-the-mountains', 'dark-map', 'light-map', 'hellfire-map', 'frozen-map', 'gothic', 'haunted-forest', 'frozen-fortress', 'volcanic-forge', 'sunken-ruins', 'elven-grove', 'desert-tomb', 'storm-lighthouse', 'throne-hall', 'arcane-observatory', 'autumn-village', 'teal', 'rose', 'amber-dusk', 'moonlit', 'emerald-mist', 'twilight', 'ash', 'copper', 'ocean', 'aurora', 'crimson-night', 'ivory-dawn', 'lavender'];
 
 function ProfilePage() {
-    usePageStyle(profileCss);
     const queryClient = useQueryClient();
 
     // Show the new look right away, remember it on this device, then save it to the account.
@@ -35,7 +33,7 @@ function ProfilePage() {
                 <h1>Profile</h1>  
             </header>
             <SiteNav />
-            <main>
+            <main className={styles.page}>
                 <section className='profile-container'>
                         <article className="form-section profile-tile" id="profile-username-container">
                             <label id="theme-label" className="tile-label tile-top" htmlFor="theme-select">Color scheme</label>
