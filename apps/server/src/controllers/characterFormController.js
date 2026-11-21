@@ -7,7 +7,7 @@
 //
 // The rules live in @tenebris/rules (characterOptions + characterForm); this file is the glue.
 import { characterOptions } from '@tenebris/rules/characterOptions';
-import { checkHeader, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, finishedFormBlock, keepUnrelatedChoices, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
+import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, finishedFormBlock, keepUnrelatedChoices, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
 import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
 import { roll4d6DropLowest, rollDice } from '@tenebris/rules/dice';
 import { rng } from '../dice.js';
@@ -21,6 +21,7 @@ const TAB_CHECKS = {
     species: (options, body) => checkSpeciesTab(options, body),
     role: (options, body) => checkRoleTab(options, body),
     traits: (options, body, ch) => checkTraitsTab(options, ch.stat_rolls, body),
+    personality: (options, body) => checkPersonalityTab(options, body),
 };
 
 // Sub-species are stored as the species id; the form wants the top-level species and the sub-species apart
@@ -106,6 +107,15 @@ function formView(ch) {
             feature_choices: ch.feature_choices ?? {},
         },
         traits: traitsView(ch),
+        personality: {
+            alignment_code: ch.alignment_code ?? null,
+            upbringing_id: ch.upbringing_id ?? null,
+            lifestyle_id: ch.lifestyle_id ?? null,
+            outlook_id: ch.outlook_id ?? null,
+            upbringing_state: ch.upbringing_state ?? null,
+            lifestyle_state: ch.lifestyle_state ?? null,
+            outlook_state: ch.outlook_state ?? null,
+        },
         missing: missingForFinish(ch),
         options: optionsFor(ch),
     };

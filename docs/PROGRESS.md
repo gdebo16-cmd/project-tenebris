@@ -9,13 +9,19 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Next
 
-- R4.7 Personality tab (alignment chart, upbringing, lifestyle, outlook).
+- R4.8 Inventory (proficiencies, gear, money placeholder, auto default, Finish).
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-20 — Cursor (R4.7)
+- Personality tab. The alignment chart is the real 3 by 3 (law axis by good axis). Upbringing, lifestyle and outlook save with the state each pick gives. A wildcard pick sends its chosen state; every other pick's state comes from the pack.
+- Two matching states are refused in the rules, before the database constraint `characters_personality_states_differ` can turn the save into a 500. No race element and no race spell.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (50), `npm run test:e2e` (8 passed, smoke accounts in use). Lawful Good, Orphan, Solitary and Confident survived a reload. A second pick forced onto the same state was refused.
+- Next is R4.8.
 
 ### 2026-11-20 — Cursor (R4.5 fix, after R4.6)
 - Finished characters keep the old editor at `/characters/:id/edit-old`. The sheet Edit link goes there when `is_draft` is false. Drafts still use `/characters/:id/edit`.

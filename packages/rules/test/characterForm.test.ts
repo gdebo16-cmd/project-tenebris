@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkHeader, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, finishedFormBlock, keepUnrelatedChoices, missingForFinish, rerollAllowed, startingHp, type Options } from '../src/characterForm.ts';
+import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, finishedFormBlock, keepUnrelatedChoices, missingForFinish, rerollAllowed, startingHp, type Options } from '../src/characterForm.ts';
 
 // Only the parts of the options the species check reads
 const options = {
@@ -196,6 +196,37 @@ test('stat roll requests: an index, or one reset, and rerolls lock after finish'
     assert.ok('ok' in rerollAllowed(true));
     const locked = rerollAllowed(false);
     assert.ok('error' in locked && locked.error.includes('finished'));
+});
+
+const personalityOptions = {
+    alignments: [{ code: 'LG', name: 'Lawful Good', law_axis: -1, good_axis: 1 }],
+    states: ['bless', 'subjugate', 'release'],
+    upbringings: [
+        { id: 1, name: 'Orphan', flavor: null, perk: null, state: 'bless', any_state: false },
+        { id: 19, name: 'Self-Taught Stray', flavor: null, perk: null, state: null, any_state: true },
+    ],
+    lifestyles: [{ id: 2, name: 'Nobility', flavor: null, perk: null, state: 'subjugate', any_state: false }],
+    outlooks: [{ id: 3, name: 'Hopeful', flavor: null, perk: null, state: 'release', any_state: false }],
+} as unknown as Options;
+
+test('personality: four picks save, and the states must differ', () => {
+    const saved = checkPersonalityTab(personalityOptions, {
+        alignment_code: 'LG', upbringing_id: 1, lifestyle_id: 2, outlook_id: 3,
+        upbringing_state: 'release', // ignored: Orphan's state comes from the pack
+    });
+    assert.ok('values' in saved);
+    if (!('values' in saved)) return;
+    assert.equal(saved.values.alignment_code, 'LG');
+    assert.equal(saved.values.upbringing_state, 'bless');
+    assert.equal(saved.values.lifestyle_state, 'subjugate');
+    assert.equal(saved.values.outlook_state, 'release');
+
+    const same = checkPersonalityTab(personalityOptions, {
+        alignment_code: 'LG', upbringing_id: 19, upbringing_state: 'subjugate', lifestyle_id: 2, outlook_id: 3,
+    });
+    assert.ok('error' in same && same.error.includes('different states'));
+    assert.ok('error' in checkPersonalityTab(personalityOptions, { alignment_code: 'CE', upbringing_id: 1, lifestyle_id: 2, outlook_id: 3 }));
+    assert.ok('error' in checkPersonalityTab(personalityOptions, { alignment_code: 'LG', upbringing_id: 19, lifestyle_id: 2, outlook_id: 3 }));
 });
 
 test('startingHp matches the old creator', () => {

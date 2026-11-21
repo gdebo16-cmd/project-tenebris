@@ -26,7 +26,11 @@ export type PackRole = {
 };
 export type PackGift = { id: number; name: string; tree?: string | null; prerequisite?: string | null; description?: string | null };
 export type PackAlignment = { code: string; name: string; law_axis: number; good_axis: number; sort?: number };
-export type PackPersonality = { id: number; category: string; name: string; flavor?: string | null; perk?: string | null; sort?: number };
+export type PackPersonality = {
+    id: number; category: string; name: string; flavor?: string | null; perk?: string | null;
+    state?: string | null; any_state?: boolean; sort?: number;
+};
+export type PackSpellState = { name: string; retired?: boolean };
 
 // packages/content/looks.json: eye colors, plus each species' sizes and variant colors (by species key)
 export type Looks = { eye_colors: string[]; species: Record<string, { size_ids?: number[]; variants?: string[] }> };
@@ -38,6 +42,7 @@ export type OptionsPack = {
     primordial_blessings: PackGift[];   // shown to players as "gifts"
     alignments: PackAlignment[];
     personality_options: PackPersonality[];
+    spell_states?: PackSpellState[];   // live magic states, for a pick that may choose any of them
     looks: Looks;
 };
 
@@ -178,7 +183,10 @@ export function characterOptions(pack: OptionsPack, picks: Picks) {
     const role = pack.roles.find((r) => r.id === picks.role_id);
     const personality = (category: string) =>
         pack.personality_options.filter((p) => p.category === category).sort(bySort)
-            .map((p) => ({ id: p.id, name: p.name, flavor: p.flavor ?? null, perk: p.perk ?? null }));
+            .map((p) => ({
+                id: p.id, name: p.name, flavor: p.flavor ?? null, perk: p.perk ?? null,
+                state: p.state ?? null, any_state: Boolean(p.any_state),
+            }));
 
     return {
         // Top-level species. A species with sub-species lists them; one without lists its variant colors.
@@ -217,6 +225,7 @@ export function characterOptions(pack: OptionsPack, picks: Picks) {
         },
 
         alignments: [...pack.alignments].sort(bySort).map((a) => ({ code: a.code, name: a.name, law_axis: a.law_axis, good_axis: a.good_axis })),
+        states: (pack.spell_states ?? []).filter((s) => !s.retired).map((s) => String(s.name).toLowerCase()),
         upbringings: personality('upbringing'),
         lifestyles: personality('lifestyle'),
         outlooks: personality('outlook'),

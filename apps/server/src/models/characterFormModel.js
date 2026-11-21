@@ -9,6 +9,7 @@ const FORM_COLUMNS = new Set([
     'species_id', 'size_id', 'variant', 'eye_color', 'look_description',
     'role_id', 'calling_id', 'skill_proficiencies', 'feature_choices',
     'str', 'dex', 'con', 'int', 'wis', 'cha', 'luc', 'spd', 'plus2_stat', 'plus1_stat', 'stat_rolls',
+    'alignment_code', 'upbringing_id', 'lifestyle_id', 'outlook_id', 'upbringing_state', 'lifestyle_state', 'outlook_state',
 ]);
 
 // A new, empty character marked as a draft. Answers its id.
@@ -28,7 +29,9 @@ export async function getFormCharacter(charId) {
         `SELECT id, user_id, is_draft, name, level, portrait_url,
                 species_id, size_id, variant, eye_color, look_description,
                 role_id, calling_id, skill_proficiencies, feature_choices,
-                str, dex, con, "int", wis, cha, luc, spd, plus2_stat, plus1_stat, stat_rolls, money
+                str, dex, con, "int", wis, cha, luc, spd, plus2_stat, plus1_stat, stat_rolls,
+                alignment_code, upbringing_id, lifestyle_id, outlook_id,
+                upbringing_state, lifestyle_state, outlook_state, money
          FROM characters WHERE id = $1`,
         [charId]
     );

@@ -288,6 +288,38 @@ export function checkTraitsTab(options: Options, stored: unknown, body: Body): T
     };
 }
 
+// ---- Personality ----
+
+// Each pick gives one magic state. The database refuses the row when two states match,
+// so this check says so first, instead of letting the save crash.
+const PERSONALITY = [
+    { key: 'upbringing', list: 'upbringings', label: 'upbringing' },
+    { key: 'lifestyle', list: 'lifestyles', label: 'lifestyle' },
+    { key: 'outlook', list: 'outlooks', label: 'outlook' },
+] as const;
+
+export function checkPersonalityTab(options: Options, body: Body): TabResult {
+    const code = text(body?.alignment_code);
+    if (!options.alignments.some((item) => item.code === code)) return { error: 'Pick an alignment' };
+
+    const values: Record<string, string | number | null> = { alignment_code: code };
+    const states: string[] = [];
+    for (const cat of PERSONALITY) {
+        const id = Number(body?.[`${cat.key}_id`]);
+        const picked = options[cat.list].find((item) => item.id === id);
+        if (!picked) return { error: `Pick an ${cat.label}` };
+        // A normal pick's state comes from the pack. Only a wildcard pick uses the state the browser sent.
+        const state = picked.any_state ? text(body?.[`${cat.key}_state`]).toLowerCase() : String(picked.state ?? '').toLowerCase();
+        if (picked.any_state && !options.states.includes(state)) return { error: `Pick a state for ${picked.name}` };
+        if (!state) return { error: `Pick an ${cat.label}` };
+        states.push(state);
+        values[`${cat.key}_id`] = picked.id;
+        values[`${cat.key}_state`] = state;
+    }
+    if (new Set(states).size !== 3) return { error: 'Upbringing, lifestyle and outlook must give 3 different states' };
+    return { values };
+}
+
 // What still stops this character from being finished, one line per tab. Empty = ready.
 export function missingForFinish(ch: FinishFields): string[] {
     const missing: string[] = [];

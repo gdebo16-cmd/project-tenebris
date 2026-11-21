@@ -31,6 +31,15 @@ export type CharacterFormData = {
         plus1: string | null;
         scores: Record<string, number | null>;
     };
+    personality: {
+        alignment_code: string | null;
+        upbringing_id: number | null;
+        lifestyle_id: number | null;
+        outlook_id: number | null;
+        upbringing_state: string | null;
+        lifestyle_state: string | null;
+        outlook_state: string | null;
+    };
     missing: string[];
     options: Options;
 };
