@@ -1,4 +1,4 @@
-// Character routes (load, hp, delete, equip/unequip and weapon options) as JSON for React. Queries live in models/.
+// Character routes (load, delete, equip/unequip and weapon options) as JSON for React. Queries live in models/.
 import * as Characters from '../models/characterModel.js';
 import * as Inventory from '../models/inventoryModel.js';
 import { getLearnedSpells, getClassSlots } from '../models/spellModel.js';
@@ -23,31 +23,6 @@ export async function getCharacter(req, res) {
     const learnedSpells = await getLearnedSpells(charId);
     const actionFeatures = await Characters.getActionFeatures(character.role_id, character.calling_id, character.level, character.species_id);
     res.json({ character, ownedArmor, ownedWeapons, ownedItems, learnedSpells, actionFeatures });
-}
-
-// PATCH /api/characters/:id/hp   body: { action: 'heal' | 'damage', amount }
-export async function updateHp(req, res) {
-    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-
-    const amount = Number(req.body.amount);
-    const change = req.body.action === 'heal' ? amount : -amount;
-    if (!Number.isInteger(amount) || amount < 0) return res.status(400).json({ error: 'Bad amount' });
-
-    const hp = await Characters.changeHp(req.params.id, req.session.userId, change);
-    if (!hp) return res.status(404).json({ error: 'Character not found' });
-    res.json(hp);
-}
-
-// PATCH /api/characters/:id/temp-hp   body: { amount } (doesn't stack: keeps the higher) or { clear: true }
-export async function updateTempHp(req, res) {
-    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-    const clear = req.body.clear === true;
-    const amount = clear ? 0 : Number(req.body.amount);
-    if (!Number.isInteger(amount) || amount < 0) return res.status(400).json({ error: 'Bad amount' });
-
-    const row = await Characters.setTempHp(req.params.id, req.session.userId, amount, clear);
-    if (!row) return res.status(404).json({ error: 'Character not found' });
-    res.json(row);
 }
 
 // DELETE /api/characters/:id

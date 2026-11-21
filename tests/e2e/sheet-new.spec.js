@@ -232,3 +232,83 @@ test('new sheet: gear tab filters the weapon list', async ({ page }) => {
   await expect(row).toBeVisible();
 });
 
+
+// Health: Damage and Heal from the sheet go through the sheet's own routes. Damage 1, heal 1 (net zero).
+test('new sheet: damage, heal and ward through the server', async ({ page }) => {
+  await login(page);
+  const home = await (await page.request.get('/api/home')).json();
+  test.skip(!home.characters?.length, 'The test account has no finished character');
+  const id = home.characters[0].id;
+  const base = `/api/sheets/character/${id}`;
+  const hpNow = async () => (await (await page.request.get(base)).json()).creature.hp;
+  const start = await hpNow();
+
+  // Refusals: a bad action or amount is 400, and the old PATCH routes are gone
+  expect((await page.request.post(`${base}/hp`, { data: { action: 'poke', amount: 1 } })).status()).toBe(400);
+  expect((await page.request.post(`${base}/hp`, { data: { action: 'heal', amount: 0 } })).status()).toBe(400);
+  expect((await page.request.post(`${base}/temp-hp`, { data: { amount: -2 } })).status()).toBe(400);
+  expect((await page.request.patch(`/api/characters/${id}/hp`, { data: { action: 'heal', amount: 1 } })).status()).toBe(404);
+  expect((await page.request.patch(`/api/characters/${id}/temp-hp`, { data: { amount: 1 } })).status()).toBe(404);
+
+  // With no ward and at least 1 HP, damage 1 then heal 1 puts it back exactly
+  test.skip(start.temp > 0 || start.current < 1, 'The test character has a ward or is down');
+  await page.goto(`/characters/${id}`);
+  const health = page.getByRole('region', { name: 'Health' });
+  await health.getByLabel('Amount').fill('1');
+  await health.getByRole('button', { name: 'Damage' }).click();
+  await expect(health).toContainText(`${start.current - 1} / ${start.max}`);
+  await health.getByLabel('Amount').fill('1');
+  await health.getByRole('button', { name: 'Heal' }).click();
+  await expect(health).toContainText(`${start.current} / ${start.max}`);
+
+  // Ward 3 shows, then clearing it (server only) takes it away again
+  await health.getByLabel('Amount').fill('3');
+  await health.getByRole('button', { name: 'Ward' }).click();
+  await expect(health).toContainText('+3 ward');
+  expect((await page.request.post(`${base}/temp-hp`, { data: { clear: true } })).ok()).toBeTruthy();
+
+  expect(await hpNow()).toEqual(start);
+});
+
+// The campaign DM may change a player's HP too: the second smoke account makes a throwaway tale, the first joins it
+// with its character, the DM damages and heals that character from the sheet (net zero), then the tale is deleted.
+test('new sheet: the campaign DM changes a player character\'s HP', async ({ browser }) => {
+  const dm = await (await browser.newContext()).newPage();
+  const player = await (await browser.newContext()).newPage();
+  await login(player, 'smoketest');
+  const theirs = (await (await player.request.get('/api/home')).json()).characters ?? [];
+  test.skip(!theirs.length, 'The test account has no finished character');
+  const pc = theirs[0];
+  const base = `/api/sheets/character/${pc.id}`;
+
+  await login(dm, 'smoketest2');
+  // Before the tale, the DM can't touch it
+  expect((await dm.request.post(`${base}/hp`, { data: { action: 'damage', amount: 1 } })).status()).toBe(404);
+
+  const created = await dm.request.post('/api/campaigns', { data: { name: `Smoke HP ${Date.now()}`, description: 'Created by the smoke tests.' } });
+  expect(created.ok()).toBeTruthy();
+  const campaignId = (await created.json()).id;
+  try {
+    const code = (await (await dm.request.get(`/api/campaigns/${campaignId}`)).json()).campaign.invite_code;
+    expect((await player.request.post('/api/campaigns/join', { data: { code } })).ok()).toBeTruthy();
+    expect((await player.request.put(`/api/campaigns/${campaignId}/character`, { data: { characterId: pc.id } })).ok()).toBeTruthy();
+
+    const sheet = await (await dm.request.get(base)).json();
+    expect(sheet.access).toBe('dm');
+    expect(sheet.canEdit).toBe(true);
+    const start = sheet.creature.hp;
+    test.skip(start.temp > 0 || start.current < 1, 'The player character has a ward or is down');
+
+    await dm.goto(`/characters/${pc.id}`);
+    const health = dm.getByRole('region', { name: 'Health' });
+    await health.getByLabel('Amount').fill('1');
+    await health.getByRole('button', { name: 'Damage' }).click();
+    await expect(health).toContainText(`${start.current - 1} / ${start.max}`);
+    await health.getByLabel('Amount').fill('1');
+    await health.getByRole('button', { name: 'Heal' }).click();
+    await expect(health).toContainText(`${start.current} / ${start.max}`);
+    expect((await (await dm.request.get(base)).json()).creature.hp).toEqual(start);
+  } finally {
+    expect((await dm.request.delete(`/api/campaigns/${campaignId}`)).ok()).toBeTruthy();
+  }
+});

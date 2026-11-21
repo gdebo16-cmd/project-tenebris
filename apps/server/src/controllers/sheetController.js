@@ -6,6 +6,7 @@ import { checkActRequest, resolveAct } from '@tenebris/rules/actions';
 import { spendFeatureUse, takeRest, checkRestRequest, castSpell, checkCastRequest, checkConditionsRequest, applyConditions } from '@tenebris/rules/sheetState';
 import { checkSpellbookRequest } from '@tenebris/rules/spellbook';
 import { checkMoneyRequest, shortCoinMessage, purseOf } from '@tenebris/rules/money';
+import { checkHpRequest, checkTempHpRequest, hpChange } from '@tenebris/rules/health';
 import * as Money from '../models/moneyModel.js';
 import { rng } from '../dice.js';
 import * as Characters from '../models/characterModel.js';
@@ -215,4 +216,28 @@ export async function conditions(req, res) {
     const saved = await Characters.updateSheetState(who.charId, who.ownerId, next);
     if (!saved) return res.status(404).json({ error: 'Character not found' });
     res.json({ conditions: saved.conditions ?? {}, exhaustion: Number(saved.exhaustion ?? 0) });
+}
+
+// POST /api/sheets/character/:id/hp   body: { action: 'heal' | 'damage', amount }
+// Owner or DM. Damage eats temporary HP first; healing stops at max HP. Answers { current_hp, temp_hp }.
+export async function hp(req, res) {
+    const who = await editorOf(req, res);
+    if (!who) return;
+    const checked = checkHpRequest(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const row = await Characters.changeHp(who.charId, who.ownerId, hpChange(checked.request));
+    if (!row) return res.status(404).json({ error: 'Character not found' });
+    res.json(row);
+}
+
+// POST /api/sheets/character/:id/temp-hp   body: { amount } (doesn't stack: keeps the higher) or { clear: true }
+// Owner or DM. Answers { temp_hp }.
+export async function tempHp(req, res) {
+    const who = await editorOf(req, res);
+    if (!who) return;
+    const checked = checkTempHpRequest(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const row = await Characters.setTempHp(who.charId, who.ownerId, checked.request.amount, checked.request.clear);
+    if (!row) return res.status(404).json({ error: 'Character not found' });
+    res.json(row);
 }

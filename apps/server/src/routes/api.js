@@ -2,7 +2,7 @@
 import * as Runes from '../controllers/apiRuneController.js';
 import { Router } from 'express';
 import {
-    getCharacter, updateHp, updateTempHp, deleteCharacter,
+    getCharacter, deleteCharacter,
     equipArmor, unequipArmor, equipWeapon, unequipWeapon, dualWieldWeapon, twoHandWeapon, soulBrandWeapon, sigilMarkWeapon, equipItem, unequipItem,
 } from '../controllers/apiController.js';
 import { me, login, logout, register, home, getSettings, updateSettings, getProfile, updateProfile, deleteAccount } from '../controllers/apiUserController.js';
@@ -46,8 +46,6 @@ router.put('/profile', updateProfile);
 // character sheet
 router.get('/characters/:id', getCharacter);
 router.delete('/characters/:id', deleteCharacter);
-router.patch('/characters/:id/hp', updateHp);
-router.patch('/characters/:id/temp-hp', updateTempHp);
 router.post('/characters/:id/inventory/armor/equip', equipArmor);
 router.post('/characters/:id/inventory/armor/unequip', unequipArmor);
 router.post('/characters/:id/inventory/weapon/equip', equipWeapon);

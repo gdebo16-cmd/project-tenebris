@@ -20,8 +20,7 @@ export function useAct(id: string) {
     });
 }
 
-// HP and temp HP go through the character endpoints; conditions and exhaustion through the sheet's own route
-// (owner or DM). The sheet reloads after each one.
+// HP, temp HP, conditions and exhaustion go through the sheet's own routes (owner or DM). The sheet reloads after each one.
 export type ConditionsChange = { conditions?: Record<string, boolean>; exhaustion?: number };
 
 export function useSheetChange(id: string) {
@@ -29,11 +28,11 @@ export function useSheetChange(id: string) {
     const refresh = () => queryClient.invalidateQueries({ queryKey: sheetKey(id) });
     return {
         hp: useMutation({
-            mutationFn: (body: { action: 'heal' | 'damage'; amount: number }) => api(`/api/characters/${id}/hp`, { method: 'PATCH', body }),
+            mutationFn: (body: { action: 'heal' | 'damage'; amount: number }) => api(`/api/sheets/character/${id}/hp`, { method: 'POST', body }),
             onSuccess: refresh,
         }),
         tempHp: useMutation({
-            mutationFn: (amount: number) => api(`/api/characters/${id}/temp-hp`, { method: 'PATCH', body: { amount } }),
+            mutationFn: (amount: number) => api(`/api/sheets/character/${id}/temp-hp`, { method: 'POST', body: { amount } }),
             onSuccess: refresh,
         }),
         conditions: useMutation({
