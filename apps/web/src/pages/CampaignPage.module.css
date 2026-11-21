@@ -1,14 +1,23 @@
-* {
+/* CampaignPage styles (was styles/campaignPage.css, added by the old usePageStyle hook).
+   Scoped to this page: CampaignPage puts styles.page on its <main>, and every rule below
+   only applies while that element is on screen (html:has(.page)).
+   :where(...) adds no specificity, so each rule weighs exactly what it did before.
+   Class and id names stay global (:global) because shared parts such as SiteNav use them;
+   .page (written :local(.page)) is the only name this module makes local. */
+
+:global :where(html:has(:local(.page))),
+:global :where(html:has(:local(.page))) * {
    font-family: var(--fontfam);
    font-weight: var(--fontweight);
    font-style: var(--fontstyle);
 }
 
-input[type="text"],
-input[type="textarea"] {
+:global :where(html:has(:local(.page))) input[type="text"],
+:global :where(html:has(:local(.page))) input[type="textarea"] {
   font-size: 2rem; 
 }
-html, body {
+:global html:where(:has(:local(.page))),
+:global body:where(:has(:local(.page))) {
     margin: 0 ! important;
     padding: 0 ! important;
     width: 100vw;
@@ -27,7 +36,7 @@ html, body {
     
 }
 
-body {
+:global body:where(:has(:local(.page))) {
    content: '';
    position: absolute;
    top: 0;
@@ -39,7 +48,7 @@ body {
    max-width: 3840px;
 }
 
-.fixed-bg {
+:global :where(html:has(:local(.page))) .fixed-bg {
    position: absolute;
    top: 0;
    left: 0;
@@ -56,15 +65,15 @@ body {
    flex-direction: column;
 }
 
-ul,
-li,
-a {
+:global :where(html:has(:local(.page))) ul,
+:global :where(html:has(:local(.page))) li,
+:global :where(html:has(:local(.page))) a {
     list-style: none;
     text-decoration: none;
     color: var(--text-color-1);
 }
 
-option {
+:global :where(html:has(:local(.page))) option {
     background-color: var(--drop-down-bg);
     color: var(--drop-down-txt);
     border-radius: var(--tile);
@@ -72,7 +81,7 @@ option {
     text-align: center;
 }
 
-footer {
+:global :where(html:has(:local(.page))) footer {
     width: 100vw;
     height: 100svh;
     overflow: hidden ! important;
@@ -82,19 +91,19 @@ footer {
     z-index: 1;
 }
 
-.slide {
+:global :where(html:has(:local(.page))) .slide {
     pointer-events: none;
 }
 
 @media (max-width: 768px) {
-    header {
+    :global :where(html:has(:local(.page))) header {
         display: flex;
         height: 8vh;
         width: 100vw;
         border-radius: 0 0 15% 15%;
     }
 
-    main {
+    :global :where(html:has(:local(.page))) main {
         height: calc(100svh - 12vh);
         width: 100%;
         position: relative;
@@ -112,7 +121,7 @@ footer {
         background-color: rgba(var(--bgc-theme), 0.7);
     }
     
-    .title-logo {
+    :global :where(html:has(:local(.page))) .title-logo {
         max-width: 50px;
         max-height: 50px;
         margin: 0;
@@ -121,7 +130,7 @@ footer {
         box-shadow: none;
     }
 
-    #site-title {
+    :global :where(html:has(:local(.page))) #site-title {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -141,7 +150,7 @@ footer {
         height: 10vh;
     }
 
-    #nav-container {
+    :global :where(html:has(:local(.page))) #nav-container {
         position: relative;
         top: -1vh;
         z-index: 1;
@@ -160,10 +169,10 @@ footer {
         box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
     }
 
-    #home-nav,
-    #character-nav,
-    #campaign-nav,
-    #settings-nav {
+    :global :where(html:has(:local(.page))) #home-nav,
+    :global :where(html:has(:local(.page))) #character-nav,
+    :global :where(html:has(:local(.page))) #campaign-nav,
+    :global :where(html:has(:local(.page))) #settings-nav {
         border: none;
         flex: 1 1 0;
         text-align: center;
@@ -178,13 +187,13 @@ footer {
         border-radius: 0;
     }
 
-    #character-nav,
-    #campaign-nav,
-    #settings-nav {
+    :global :where(html:has(:local(.page))) #character-nav,
+    :global :where(html:has(:local(.page))) #campaign-nav,
+    :global :where(html:has(:local(.page))) #settings-nav {
         position: relative;
     }
 
-    .drop-down {
+    :global :where(html:has(:local(.page))) .drop-down {
         display: flex;
         flex-direction: column;
         position: absolute;
@@ -203,7 +212,7 @@ footer {
         padding: 0;
     }
 
-    li:hover .drop-down {
+    :global :where(html:has(:local(.page))) li:hover .drop-down {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
@@ -213,13 +222,13 @@ footer {
         background-color: var(--drop-down-bg);
     }
 
-    #nav-container > li:hover,
-    #nav-container > li:focus-within {
+    :global :where(html:has(:local(.page))) #nav-container > li:hover,
+    :global :where(html:has(:local(.page))) #nav-container > li:focus-within {
         z-index: 20;
     }
 
-    .drop-down,
-    #campaign-nav .drop-down {
+    :global :where(html:has(:local(.page))) .drop-down,
+    :global :where(html:has(:local(.page))) #campaign-nav .drop-down {
         left: 0;
         right: 0;
         width: auto;
@@ -228,13 +237,13 @@ footer {
         transform: none;
     }
 
-    #settings-nav .drop-down {
+    :global :where(html:has(:local(.page))) #settings-nav .drop-down {
         left: 50%;
         right: auto;
         transform: translateX(-50%);
     }
 
-    #campaign-nav .drop-down {
+    :global :where(html:has(:local(.page))) #campaign-nav .drop-down {
         left: auto;
         right: 0;
         transform: none;
@@ -245,9 +254,9 @@ footer {
         
     }
 
-    .btn-drop-character,
-    .btn-drop-campaign,
-    .btn-drop-settings {
+    :global :where(html:has(:local(.page))) .btn-drop-character,
+    :global :where(html:has(:local(.page))) .btn-drop-campaign,
+    :global :where(html:has(:local(.page))) .btn-drop-settings {
         border-radius: 5px;
         color: var(--drop-down-txt);
         display: flex;
@@ -259,7 +268,7 @@ footer {
         font-size: 100%;
     }
 
-    main > .container.is-active {
+    :global :where(html:has(:local(.page))) main > .container.is-active {
         margin-top: 0 !important;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
@@ -269,7 +278,7 @@ footer {
         min-height: 0;
     }
 
-    .home-tabs {
+    :global :where(html:has(:local(.page))) .home-tabs {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -279,7 +288,7 @@ footer {
         
     }
 
-    .home-tab {
+    :global :where(html:has(:local(.page))) .home-tab {
         flex: 1;
         padding: 0.6rem 0.25rem;
         font: inherit;
@@ -293,25 +302,25 @@ footer {
         
     }
 
-    .home-tab + .home-tab {
+    :global :where(html:has(:local(.page))) .home-tab + .home-tab {
         border-left: none;
         
     }
 
-    .home-tab.is-active {
+    :global :where(html:has(:local(.page))) .home-tab.is-active {
         background-color: var(--bgc-top);
         color: var(--accent);
     }
 
-    main > .container:not(.is-active) {
+    :global :where(html:has(:local(.page))) main > .container:not(.is-active) {
         display: none !important;
     }
 
-    main > .container.is-active > .title {
+    :global :where(html:has(:local(.page))) main > .container.is-active > .title {
         display: none;
     }
 
-    .campaign-name {
+    :global :where(html:has(:local(.page))) .campaign-name {
         border: var(--tileBorder);
         margin: 0;
         width: 100%;
@@ -323,7 +332,7 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .camp-panel {
+    :global :where(html:has(:local(.page))) .camp-panel {
         border: var(--tileBorder);
         border-radius: 0 0 var(--tile) var(--tile);
         width: 96%;
@@ -336,7 +345,7 @@ footer {
         background-color: var(--bgc-char-name);
     }
 
-    .campaign-tile {
+    :global :where(html:has(:local(.page))) .campaign-tile {
         border: var(--tileBorder);
         margin: 0;
         padding: 2%;
@@ -353,7 +362,7 @@ footer {
         scrollbar-gutter: stable;
     }
 
-    .invite-join-panel {
+    :global :where(html:has(:local(.page))) .invite-join-panel {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -363,7 +372,7 @@ footer {
         
     }
 
-    .invite-join-tile {
+    :global :where(html:has(:local(.page))) .invite-join-tile {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -379,20 +388,20 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .invite-join-label {
+    :global :where(html:has(:local(.page))) .invite-join-label {
         margin: 2%;
         padding: 2%;
         font-size: 1.05em;
         text-transform: uppercase;
         
     }
-    .invite-join-code {
+    :global :where(html:has(:local(.page))) .invite-join-code {
         margin: 4%;
         font-size: 1.15em;
         text-transform: uppercase;
     }
 
-    .btn-share {
+    :global :where(html:has(:local(.page))) .btn-share {
         width: 90%;
         height: auto;
         min-height: 2.75rem;
@@ -407,7 +416,7 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .invite-join-tile2 {
+    :global :where(html:has(:local(.page))) .invite-join-tile2 {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -421,7 +430,7 @@ footer {
         background-color: var(--bgc-char-stat);
     }
 
-    .invite-join-select {
+    :global :where(html:has(:local(.page))) .invite-join-select {
         width: 90%;
         height: auto;
         min-height: 2.75rem;
@@ -436,7 +445,7 @@ footer {
         font-size: 16px;
     }
 
-    .camp-panel-label {
+    :global :where(html:has(:local(.page))) .camp-panel-label {
         margin: 0;
         font-size: 0.85em;
         opacity: 0.8;
@@ -444,7 +453,7 @@ footer {
         
     }
 
-    .camp-invite-code {
+    :global :where(html:has(:local(.page))) .camp-invite-code {
         margin: 0;
         font-size: 180%;
         letter-spacing: 0.15em;
@@ -453,7 +462,7 @@ footer {
         user-select: all;
     }
 
-    .edit-container {
+    :global :where(html:has(:local(.page))) .edit-container {
 
     display: flex;
     flex-wrap: wrap;
@@ -472,7 +481,7 @@ footer {
     scrollbar-color: transparent transparent;
     }
 
-    .camp-edit-form {
+    :global :where(html:has(:local(.page))) .camp-edit-form {
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
@@ -486,7 +495,7 @@ footer {
     }
         
         
-   .camp-panel-label {
+   :global :where(html:has(:local(.page))) .camp-panel-label {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -494,7 +503,7 @@ footer {
     justify-self: center;
    }
 
-    .camp-image-set {
+    :global :where(html:has(:local(.page))) .camp-image-set {
         display: flex;
         flex-wrap: wrap;
         justify-content: flex-start;
@@ -513,7 +522,7 @@ footer {
     }
  
 
-    .campaign-image {
+    :global :where(html:has(:local(.page))) .campaign-image {
         aspect-ratio: 16 / 9;   /* keeps a wide, visible shape */
         max-height: none;
         object-fit: cover;
@@ -528,7 +537,7 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .campaign-invite {
+    :global :where(html:has(:local(.page))) .campaign-invite {
         padding: 2%;
         width: 100%;
         text-align: center;
@@ -542,7 +551,7 @@ footer {
         border: var(--tileBorder);
     }
 
-    .btn-form {
+    :global :where(html:has(:local(.page))) .btn-form {
         padding: 2%;
         border-radius: 0 0 var(--tile) var(--tile);
         border: var(--tileBorder);
@@ -553,7 +562,7 @@ footer {
 
     }
 
-    .players-title {
+    :global :where(html:has(:local(.page))) .players-title {
         border: var(--tileBorder);
         margin: 0;
         width: 99.5%;
@@ -566,7 +575,7 @@ footer {
         color: var(--txt-color-1);
     }
 
-    .players-list {
+    :global :where(html:has(:local(.page))) .players-list {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -580,7 +589,7 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .player-tile {
+    :global :where(html:has(:local(.page))) .player-tile {
         display: flex;
         width: 100%;
         height: 5vh;
@@ -592,14 +601,14 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .player-name {
+    :global :where(html:has(:local(.page))) .player-name {
         flex: 1;
         color: var(--txt-color-1);
         font-size: 1.05em;
         margin-left: 2%;
     }
 
-    .player-role {
+    :global :where(html:has(:local(.page))) .player-role {
         padding: 2%;
         font-size: 0.75em;
         border: var(--tileBorder);
@@ -607,11 +616,11 @@ footer {
         background-color: var(--bgc-top);
     }
 
-    .player-role.role-dm {
+    :global :where(html:has(:local(.page))) .player-role.role-dm {
         color: var(--accent);
     }
 
-    .player-character {
+    :global :where(html:has(:local(.page))) .player-character {
         flex: 1;
         text-align: right;
         color: var(--txt-color-1);
@@ -619,7 +628,7 @@ footer {
         margin-right: 2%;
     }
 
-    .player-character a {
+    :global :where(html:has(:local(.page))) .player-character a {
         color: var(--accent);
         margin-right: 3%;
         font-size: 120%;
@@ -629,7 +638,7 @@ footer {
        Edit Campaign (DM only) - form shown in place of the Campaign tab view
    ========================================================================== */
 
-    .camp-edit-form {
+    :global :where(html:has(:local(.page))) .camp-edit-form {
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
@@ -640,7 +649,7 @@ footer {
         scrollbar-gutter: stable;
     }
 
-    .camp-edit-form .field {
+    :global :where(html:has(:local(.page))) .camp-edit-form .field {
         width: 100%;
         box-sizing: border-box;
         font: inherit;
@@ -651,13 +660,13 @@ footer {
         text-align: center;
     }
 
-    .camp-edit-form textarea.field {
+    :global :where(html:has(:local(.page))) .camp-edit-form textarea.field {
         resize: vertical;
         text-align: left;
         min-height: 6rem;
     }
 
-    .camp-img-grid {
+    :global :where(html:has(:local(.page))) .camp-img-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 0.6rem;
@@ -666,7 +675,7 @@ footer {
         
     }
 
-    .camp-img-choice {
+    :global :where(html:has(:local(.page))) .camp-img-choice {
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -683,8 +692,8 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .camp-img-choice img,
-    .camp-img-none::before {
+    :global :where(html:has(:local(.page))) .camp-img-choice img,
+    :global :where(html:has(:local(.page))) .camp-img-none::before {
         display: block;
         width: 100%;
         aspect-ratio: 16 / 9;
@@ -692,23 +701,23 @@ footer {
         border-radius: var(--tile);
     }
 
-    .camp-img-none::before {
+    :global :where(html:has(:local(.page))) .camp-img-none::before {
         content: "";
         background: var(--bg-color-2);
     }
 
-    .camp-img-choice:hover,
-    .camp-img-choice:focus-visible {
+    :global :where(html:has(:local(.page))) .camp-img-choice:hover,
+    :global :where(html:has(:local(.page))) .camp-img-choice:focus-visible {
         border-color: var(--accent);
     }
 
-    .camp-img-choice.is-selected {
+    :global :where(html:has(:local(.page))) .camp-img-choice.is-selected {
         border-color: var(--accent);
         outline: 2px solid var(--accent);
         outline-offset: 1px;
     }
 
-    .camp-edit-actions {
+    :global :where(html:has(:local(.page))) .camp-edit-actions {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
@@ -717,7 +726,7 @@ footer {
         
     }
 
-    .camp-edit-error {
+    :global :where(html:has(:local(.page))) .camp-edit-error {
         margin: 0;
         padding: 0.5rem 0.75rem;
         color: var(--txt-color-1);
@@ -726,7 +735,7 @@ footer {
         border-radius: var(--lowrad);
     }
 
-    .edit-btn {
+    :global :where(html:has(:local(.page))) .edit-btn {
         padding: 2%;
         border-radius: var(--tile);
         border: var(--tileBorder);
@@ -735,14 +744,14 @@ footer {
         width: 40%;
     }
 
-    .campaign-tile {
+    :global :where(html:has(:local(.page))) .campaign-tile {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: stretch;
     }
 
-    footer {
+    :global :where(html:has(:local(.page))) footer {
         display: flex;
         position: fixed;
         top: calc(100svh - 2vh);
@@ -756,11 +765,11 @@ footer {
         overflow: hidden;
     }
 
-    .footer-text {
+    :global :where(html:has(:local(.page))) .footer-text {
         display: none;
     }
 
-    .slide {
+    :global :where(html:has(:local(.page))) .slide {
         z-index: 3;
         box-sizing: border-box;
         background-color: var(--navSlideFill);
@@ -775,7 +784,7 @@ footer {
 @media (min-width: 769px) {
 
 /* #region Main Section */
-        main {
+        :global :where(html:has(:local(.page))) main {
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 5fr 1fr;
@@ -791,14 +800,14 @@ footer {
 /* #endregion Main Section */
 
 /* #region Edit Container Section */
-    .edit-container {
+    :global :where(html:has(:local(.page))) .edit-container {
         grid-area: a;
         padding: 0;
         margin: 0;
 
     }
 
-    .title-edit {
+    :global :where(html:has(:local(.page))) .title-edit {
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -810,13 +819,13 @@ footer {
         border-radius: var(--tile);
         box-shadow: var(--bs2);
     }
-    .edit-input {
+    :global :where(html:has(:local(.page))) .edit-input {
         border: var(--tileBorder);
         border-radius: var(--tile);
         box-shadow: var(--bs2);
         background-color: var(--bgc-char-name);
     }
-    .edit-label {
+    :global :where(html:has(:local(.page))) .edit-label {
         font-size: 1.2rem;
         font-weight: bold;
         margin: 0;
@@ -827,7 +836,7 @@ footer {
         border-radius: var(--tile);
         box-shadow: var(--bs2);
     }
-    .description-edit {
+    :global :where(html:has(:local(.page))) .description-edit {
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -839,7 +848,7 @@ footer {
         border-radius: var(--tile);
         box-shadow: var(--bs2);
     }
-    .edit-actions {
+    :global :where(html:has(:local(.page))) .edit-actions {
         display: flex;
         flex-direction: row;
         align-items: stretch;
@@ -848,7 +857,7 @@ footer {
         margin: 0 auto;
         padding: 2%;
     }
-    .action-button {
+    :global :where(html:has(:local(.page))) .action-button {
         width: 45%;
         padding: 2%;
         border: var(--tileBorder);
@@ -857,7 +866,7 @@ footer {
         background-color: var(--bgc-char-name);
         color: var(--txt-color-1);
     }
-    .image-grid {
+    :global :where(html:has(:local(.page))) .image-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: auto;
@@ -877,7 +886,7 @@ footer {
         border-radius: var(--tile);
 
     }
-    .image-choice {
+    :global :where(html:has(:local(.page))) .image-choice {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -892,12 +901,12 @@ footer {
 
 
     }
-    .image-choice.is-selected {
+    :global :where(html:has(:local(.page))) .image-choice.is-selected {
         border-color: var(--accent-2);
         
 
     }
-    .image-select {
+    :global :where(html:has(:local(.page))) .image-select {
         width: 100%;
         height: 10dvh;
         aspect-ratio: 16 / 9;
@@ -905,7 +914,7 @@ footer {
         border-radius: var(--tile);
         
     }
-    .image-campaign {
+    :global :where(html:has(:local(.page))) .image-campaign {
         width: 100%;
         aspect-ratio: 16 / 9;
         object-fit: cover;
@@ -913,7 +922,7 @@ footer {
         box-shadow: var(--bs2);
         border: var(--tileBorder);
     }
-    .edit-input-display {
+    :global :where(html:has(:local(.page))) .edit-input-display {
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -934,7 +943,7 @@ footer {
 
 /* #region Invite Container Section */
 
-    .invite-container {
+    :global :where(html:has(:local(.page))) .invite-container {
         grid-area: b;
         border-radius: var(--tile);
         background-color: color-mix(in srgb, var(--bgc-theme) 60%, transparent);
@@ -947,13 +956,13 @@ footer {
         box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
         
     }
-    .invite-tile {
+    :global :where(html:has(:local(.page))) .invite-tile {
         gap: 0.5rem;
         margin: 1% auto;
         padding: 1%;
     }
 
-    .invite-label {
+    :global :where(html:has(:local(.page))) .invite-label {
         font-size: 1.2rem;
         font-weight: bold;
         margin: 0;
@@ -964,7 +973,7 @@ footer {
         border-radius: var(--tile);
         box-shadow: var(--bs2);
     }
-    .invite-code {
+    :global :where(html:has(:local(.page))) .invite-code {
         font-size: 1.2rem;
         font-weight: bold;
         margin: 0;
@@ -978,7 +987,7 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .action-button {
+    :global :where(html:has(:local(.page))) .action-button {
         width: 45%;
         padding: 2%;
         border: var(--tileBorder);
@@ -987,7 +996,7 @@ footer {
         background-color: var(--bgc-char-name);
         color: var(--txt-color-1);
     }
-    .campaign-title {
+    :global :where(html:has(:local(.page))) .campaign-title {
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -1001,7 +1010,7 @@ footer {
         backdrop-filter: blur(6px);
     }
 
-    .invite-set {
+    :global :where(html:has(:local(.page))) .invite-set {
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -1014,7 +1023,7 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .share-button {
+    :global :where(html:has(:local(.page))) .share-button {
         width: 100%;
         padding: 2%;
         margin: 0 auto;
@@ -1025,7 +1034,7 @@ footer {
         color: var(--txt-color-1);
     }
 
-    .invite-label-2 {
+    :global :where(html:has(:local(.page))) .invite-label-2 {
         font-size: 1.2rem;
         font-weight: bold;
         margin: 0;
@@ -1037,7 +1046,7 @@ footer {
         box-shadow: var(--bs2);
     }
 
-    .invite-select {
+    :global :where(html:has(:local(.page))) .invite-select {
         width: 100%;
         margin: 0 auto;
         padding: 1%;
@@ -1051,7 +1060,7 @@ footer {
 
 /* #region Player Section */
 
-    .player-container {
+    :global :where(html:has(:local(.page))) .player-container {
         grid-area: c;
         border-radius: var(--tile);
         background-color: color-mix(in srgb, var(--bgc-theme) 60%, transparent);
@@ -1059,7 +1068,7 @@ footer {
         backdrop-filter: blur(6px);
     }
 
-   .monsters-container {
+   :global :where(html:has(:local(.page))) .monsters-container {
         grid-area: d;
         border-radius: var(--tile);
         background-color: color-mix(in srgb, var(--bgc-theme) 60%, transparent);
@@ -1069,12 +1078,12 @@ footer {
 
 
 
-    .home-tabs {
+    :global :where(html:has(:local(.page))) .home-tabs {
         display: none;
     }
 
 /* #region Footer Section */ 
-    footer {
+    :global :where(html:has(:local(.page))) footer {
         display: flex;
         position: fixed;
         left: 0;
@@ -1101,7 +1110,7 @@ footer {
 /* #region Site Title Section */
 
 /* #region Site Title Section */
-    .title-logo {
+    :global :where(html:has(:local(.page))) .title-logo {
         content: url('/logo_banner.png');
         height: auto;
         width: auto;
@@ -1110,18 +1119,18 @@ footer {
         object-fit: contain;
     }
 
-    header {
+    :global :where(html:has(:local(.page))) header {
         display: flex;
         height: 8vh;
         width: 100vw;
         border-radius: 0 0 15% 15%;
     }   
 
-    #site-title h1 {
+    :global :where(html:has(:local(.page))) #site-title h1 {
         display: none;
     }
 
-    #site-title {
+    :global :where(html:has(:local(.page))) #site-title {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -1140,7 +1149,7 @@ footer {
 /* #endregion Site Title Section */
 
 
-    .campaign-tile {
+    :global :where(html:has(:local(.page))) .campaign-tile {
         padding: 2vh 2vw;
         overflow: hidden;
         scrollbar-width: thin;
@@ -1157,7 +1166,7 @@ footer {
 
 /* #region Nav Section */
 
-    #nav-box {
+    :global :where(html:has(:local(.page))) #nav-box {
         position: relative;
         z-index: 5;
         display: flex;
@@ -1167,7 +1176,7 @@ footer {
         padding: 0;
     }
 
-    #nav-container {
+    :global :where(html:has(:local(.page))) #nav-container {
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -1187,9 +1196,9 @@ footer {
         box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
     }
 
-    #home-nav,
-    #character-nav,
-    #settings-nav {
+    :global :where(html:has(:local(.page))) #home-nav,
+    :global :where(html:has(:local(.page))) #character-nav,
+    :global :where(html:has(:local(.page))) #settings-nav {
         position: relative;
         display: flex;
         justify-content: center;
@@ -1206,7 +1215,7 @@ footer {
         box-shadow: none;
     }
 
-    .drop-down {
+    :global :where(html:has(:local(.page))) .drop-down {
         position: absolute;
         top: 100%;
         left: 50%;
@@ -1227,16 +1236,16 @@ footer {
         transition: opacity .3s ease;
     }
 
-    li:hover .drop-down,
-    li:focus-within .drop-down {
+    :global :where(html:has(:local(.page))) li:hover .drop-down,
+    :global :where(html:has(:local(.page))) li:focus-within .drop-down {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
     }
 
-    .btn-drop-character,
-    .btn-drop-campaign,
-    .btn-drop-settings {
+    :global :where(html:has(:local(.page))) .btn-drop-character,
+    :global :where(html:has(:local(.page))) .btn-drop-campaign,
+    :global :where(html:has(:local(.page))) .btn-drop-settings {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1247,9 +1256,9 @@ footer {
         border-radius: var(--tile);
     }
 
-    .btn-drop-character:hover,
-    .btn-drop-campaign:hover,
-    .btn-drop-settings:hover {
+    :global :where(html:has(:local(.page))) .btn-drop-character:hover,
+    :global :where(html:has(:local(.page))) .btn-drop-campaign:hover,
+    :global :where(html:has(:local(.page))) .btn-drop-settings:hover {
         background-color: var(--bgc-char-stat);
     }
 
@@ -1257,7 +1266,7 @@ footer {
    
 
 /* #region Slide Section */
-    .slide {
+    :global :where(html:has(:local(.page))) .slide {
         position: absolute;
         top: 0.6vh;
         bottom: 0.6vh;
@@ -1275,7 +1284,7 @@ footer {
 /* #endregion Slide Section */
 
 /* #region Players Section */
-    .players-title {
+    :global :where(html:has(:local(.page))) .players-title {
         font-weight: bold;
         text-align: center;
         color: var(--txt-color-1);
@@ -1286,7 +1295,7 @@ footer {
         border-radius: var(--tile) var(--tile) 0 0;
         box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
     }
-    .players-list {
+    :global :where(html:has(:local(.page))) .players-list {
         display: flex;
         background-color: var(--bg-color-1);
         border-radius: 0 0 var(--tile) var(--tile);
@@ -1298,7 +1307,7 @@ footer {
         margin: 0;
         padding: 0;
     }
-    .player-tile {
+    :global :where(html:has(:local(.page))) .player-tile {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -1314,7 +1323,7 @@ footer {
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent), var(--shadowInner, none);
     }
 
-    .player-name {
+    :global :where(html:has(:local(.page))) .player-name {
         font-weight: bold;
         font-size: 1.2rem;
         margin: 0;

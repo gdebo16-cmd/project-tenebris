@@ -3,15 +3,13 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useCampaign, useCampaignMonsters, useHome, useMonsterCatalog } from '../queries.ts';
-import usePageStyle from '../hooks/usePageStyle';
-import campaignPageCss from '../styles/campaignPage.css?inline';
 import Loader from '../components/Loader';
 import SiteNav from '../components/SiteNav';
 import campaignImages from '../data/campaignImages';
+import styles from './CampaignPage.module.css';
 
 
 function CampaignPage() {
-    usePageStyle(campaignPageCss);
     const {campId} = useParams();
     const queryClient = useQueryClient();
     const { data, isPending, error } = useCampaign(campId);
@@ -28,8 +26,8 @@ function CampaignPage() {
     const catalog = useMonsterCatalog(isDm);
     const [pickMonster, setPickMonster] = useState('');
 
-    if (error) return <p>Failure is upon us: {error.message}</p>;
-    if (isPending) return <Loader text='Summoning your stories...'/>;
+    if (error) return <p className={styles.page}>Failure is upon us: {error.message}</p>;
+    if (isPending) return <Loader className={styles.page} text='Summoning your stories...'/>;
 
     const {campaign, members} = data;
     
@@ -99,7 +97,7 @@ function CampaignPage() {
                 <h1>Campaign</h1>
             </header>
             <SiteNav />
-            <main>
+            <main className={styles.page}>
                 <nav className="home-tabs">
                     <button type="button" className={campTab === 'campaign' ? 'home-tab is-active' : 'home-tab'} onClick={() => setCampTab('campaign')}>Campaign</button>
                     <button type="button" className={campTab === 'invite' ? 'home-tab is-active' : 'home-tab'} onClick={() => setCampTab('invite')}>Invite / Join</button>
