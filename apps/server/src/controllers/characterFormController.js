@@ -9,6 +9,7 @@
 import { characterOptions } from '@tenebris/rules/characterOptions';
 import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, finishedFormBlock, keepUnrelatedChoices, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
 import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
+import { checkGearTab, defaultGear, gearChoices, STARTING_MONEY } from '@tenebris/rules/gear';
 import { roll4d6DropLowest, rollDice } from '@tenebris/rules/dice';
 import { rng } from '../dice.js';
 import formPack from '../models/formPack.js';
@@ -93,8 +94,24 @@ function traitsView(ch) {
     };
 }
 
+// Role proficiencies and the common gear lists. Callings are not added (see gear.ts).
+function gearView(ch, owned) {
+    const choices = gearChoices(formPack, getRole(ch.role_id));
+    return {
+        money: ch.money ?? 0,
+        weapon_id: owned.weapon_id,
+        armor_id: owned.armor_id,
+        item_ids: owned.item_ids,
+        proficiencies: choices.proficiencies,
+        weapons: choices.weapons,
+        armor: choices.armor,
+        items: choices.items,
+    };
+}
+
 // What GET /form answers, grouped the way the form's tabs are
-function formView(ch) {
+async function formView(ch) {
+    const owned = await Form.getFormGear(ch.id);
     return {
         id: ch.id,
         is_draft: ch.is_draft,
@@ -116,6 +133,7 @@ function formView(ch) {
             lifestyle_state: ch.lifestyle_state ?? null,
             outlook_state: ch.outlook_state ?? null,
         },
+        gear: gearView(ch, owned),
         missing: missingForFinish(ch),
         options: optionsFor(ch),
     };
@@ -132,7 +150,7 @@ export async function createDraft(req, res) {
 export async function getForm(req, res) {
     const ch = await loadOwnCharacter(req, res);
     if (!ch) return;
-    res.json(formView(ch));
+    res.json(await formView(ch));
 }
 
 export async function saveTab(req, res) {
@@ -141,6 +159,7 @@ export async function saveTab(req, res) {
 
     const tab = req.params.tab;
     if (!FORM_TABS.includes(tab)) return res.status(404).json({ error: `There is no "${tab}" tab` });
+    if (tab === 'gear') return saveGear(ch, req, res);
     const check = TAB_CHECKS[tab];
     if (!check) return res.status(400).json({ error: `The ${tab} tab can't be saved yet` });
 
@@ -165,7 +184,38 @@ export async function saveTab(req, res) {
     }
 
     await Form.updateCharacterFields(ch.id, checked.values);
-    res.json(formView(await Form.getFormCharacter(ch.id)));
+    res.json(await formView(await Form.getFormCharacter(ch.id)));
+}
+
+// Writes the kit and the placeholder money. Gear rows are not character columns.
+async function saveGear(ch, req, res) {
+    if (!ch.role_id) return res.status(400).json({ error: 'Pick a role first' });
+    const blocked = finishedFormBlock('gear', Boolean(ch.is_draft));
+    if (blocked) return res.status(400).json({ error: blocked });
+
+    const choices = gearChoices(formPack, getRole(ch.role_id));
+    const checked = checkGearTab(choices, req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+
+    await Form.replaceFormGear(ch.id, checked);
+    await Form.updateCharacterFields(ch.id, { money: checked.money });
+    res.json(await formView(await Form.getFormCharacter(ch.id)));
+}
+
+// POST /api/characters/:id/form/gear/default — the role's first proficient weapon and armor. This tab only.
+export async function defaultGearFor(req, res) {
+    const ch = await loadOwnCharacter(req, res);
+    if (!ch) return;
+    if (!ch.role_id) return res.status(400).json({ error: 'Pick a role first' });
+    const blocked = finishedFormBlock('gear', Boolean(ch.is_draft));
+    if (blocked) return res.status(400).json({ error: blocked });
+
+    const picked = defaultGear(gearChoices(formPack, getRole(ch.role_id)));
+    if ('error' in picked) return res.status(400).json({ error: picked.error });
+
+    await Form.replaceFormGear(ch.id, { ...picked, item_ids: [] });
+    await Form.updateCharacterFields(ch.id, { money: STARTING_MONEY });
+    res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 
 // POST /api/characters/:id/stat-rolls
@@ -204,7 +254,7 @@ export async function rollStat(req, res) {
     }
     values.stat_rolls = state;
     await Form.updateCharacterFields(ch.id, values);
-    res.json(formView(await Form.getFormCharacter(ch.id)));
+    res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 
 export async function finish(req, res) {

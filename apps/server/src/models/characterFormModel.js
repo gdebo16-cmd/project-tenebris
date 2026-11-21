@@ -10,6 +10,7 @@ const FORM_COLUMNS = new Set([
     'role_id', 'calling_id', 'skill_proficiencies', 'feature_choices',
     'str', 'dex', 'con', 'int', 'wis', 'cha', 'luc', 'spd', 'plus2_stat', 'plus1_stat', 'stat_rolls',
     'alignment_code', 'upbringing_id', 'lifestyle_id', 'outlook_id', 'upbringing_state', 'lifestyle_state', 'outlook_state',
+    'money',
 ]);
 
 // A new, empty character marked as a draft. Answers its id.
@@ -53,6 +54,55 @@ export async function updateCharacterFields(charId, values) {
     }).join(', ');
     const params = columns.map((column) => jsonb.has(column) ? JSON.stringify(values[column]) : values[column]);
     await pool.query(`UPDATE characters SET ${sets} WHERE id = $1`, [charId, ...params]);
+}
+
+// The one weapon, one armor and items this form saved. Equipped row wins when several exist.
+export async function getFormGear(charId) {
+    const weapons = await pool.query(`SELECT weapon_id, is_equipped FROM character_weapons WHERE character_id = $1`, [charId]);
+    const armor = await pool.query(`SELECT armor_id, is_equipped FROM character_armor WHERE character_id = $1`, [charId]);
+    const items = await pool.query(`SELECT item_id FROM character_items WHERE character_id = $1 ORDER BY item_id`, [charId]);
+    const weapon = weapons.rows.find((row) => row.is_equipped) ?? weapons.rows[0];
+    const piece = armor.rows.find((row) => row.is_equipped) ?? armor.rows[0];
+    return {
+        weapon_id: weapon ? Number(weapon.weapon_id) : null,
+        armor_id: piece ? Number(piece.armor_id) : null,
+        item_ids: items.rows.map((row) => Number(row.item_id)),
+    };
+}
+
+// Replaces this character's whole kit. The form owns the kit until R4.9; it is not a partial edit.
+export async function replaceFormGear(charId, { weapon_id, armor_id, item_ids }) {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        await client.query(`DELETE FROM character_weapons WHERE character_id = $1`, [charId]);
+        await client.query(`DELETE FROM character_armor WHERE character_id = $1`, [charId]);
+        await client.query(`DELETE FROM character_items WHERE character_id = $1`, [charId]);
+        if (weapon_id != null) {
+            await client.query(
+                `INSERT INTO character_weapons (character_id, weapon_id, is_equipped) VALUES ($1, $2, true)`,
+                [charId, weapon_id]
+            );
+        }
+        if (armor_id != null) {
+            await client.query(
+                `INSERT INTO character_armor (character_id, armor_id, is_equipped) VALUES ($1, $2, true)`,
+                [charId, armor_id]
+            );
+        }
+        for (const itemId of item_ids) {
+            await client.query(
+                `INSERT INTO character_items (character_id, item_id, quantity) VALUES ($1, $2, 1)`,
+                [charId, itemId]
+            );
+        }
+        await client.query('COMMIT');
+    } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+    } finally {
+        client.release();
+    }
 }
 
 // Marks a draft as finished with its starting HP.

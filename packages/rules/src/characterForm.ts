@@ -216,6 +216,7 @@ export function finishedFormBlock(tab: string, isDraft: boolean): string | null 
     if (isDraft) return null;
     if (tab === 'role') return 'Change the role of a finished character with the old editor for now';
     if (tab === 'traits') return 'Change the traits of a finished character with the old editor for now';
+    if (tab === 'gear') return 'Change the gear of a finished character with the old editor for now';
     return null;
 }
 

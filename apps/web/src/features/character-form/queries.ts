@@ -50,6 +50,21 @@ export function useStatRoll(id: string) {
     });
 }
 
+// Fills this tab with the role's starting weapon and armor, then reloads the form.
+export function useDefaultGear(id: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: () => api<CharacterFormData>(`/api/characters/${id}/form/gear/default`, { method: 'POST' }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['character-form', id] }),
+    });
+}
+
+export function useFinish(id: string) {
+    return useMutation({
+        mutationFn: () => api<{ id: number }>(`/api/characters/${id}/finish`, { method: 'POST' }),
+    });
+}
+
 export function useCreateCharacter() {
     return useMutation({
         mutationFn: (body: HeaderSave) => api<{ id: number }>('/api/characters', { method: 'POST', body }),

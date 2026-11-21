@@ -36,7 +36,7 @@ export default function CharacterForm() {
                 {tab === 'role' && <RoleTab id={id} />}
                 {tab === 'traits' && <TraitsTab id={id} />}
                 {tab === 'personality' && <PersonalityTab id={id} />}
-                {tab === 'gear' && <GearTab />}
+                {tab === 'gear' && <GearTab id={id} />}
             </div>
         </div>
     );

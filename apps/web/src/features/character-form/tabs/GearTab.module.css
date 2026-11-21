@@ -1,0 +1,42 @@
+/* Proficiencies, then weapon, armor, items and money. */
+
+.gear {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    max-width: 40rem;
+}
+
+.prof { margin: 0; }
+
+.prof p { margin: 0.15rem 0; }
+
+.field { display: flex; flex-direction: column; gap: 0.25rem; }
+
+.field select {
+    font: inherit;
+    font-size: 1rem;
+    padding: 0.35rem 0.4rem;
+    color: inherit;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+}
+
+.note { margin: 0; font-size: 0.85rem; opacity: 0.85; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.secondary {
+    padding: 0.4rem 0.7rem;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chosen { margin: 0; padding-left: 1.1rem; }
+
+.missing { margin: 0.2rem 0 0; padding-left: 1.1rem; }

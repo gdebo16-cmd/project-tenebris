@@ -185,6 +185,7 @@ test('a finished character keeps role and traits on the old editor until R4.9', 
     assert.equal(finishedFormBlock('header', false), null);
     assert.match(finishedFormBlock('role', false) ?? '', /old editor/);
     assert.match(finishedFormBlock('traits', false) ?? '', /old editor/);
+    assert.match(finishedFormBlock('gear', false) ?? '', /old editor/);
 });
 
 test('stat roll requests: an index, or one reset, and rerolls lock after finish', () => {

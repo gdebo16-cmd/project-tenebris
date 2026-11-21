@@ -9,13 +9,20 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Next
 
-- R4.8 Inventory (proficiencies, gear, money placeholder, auto default, Finish).
+- R4.9 Switch Home and the sheet Edit link to the new form, then remove the old creator.
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-20 — Cursor (R4.8)
+- Inventory tab. Proficiencies come from the role. `armorTypesFromProf` and `weaponCategoryNamesFromProf` now live in `packages/rules/gear.ts`; the server re-exports them. Weapon and armor options are marked proficient or not.
+- PLACEHOLDER until `docs/DECISIONS.md`: callings do not add proficiencies, and a new character starts with 10 money. The browser cannot send a different amount.
+- Auto default (`POST /api/characters/:id/form/gear/default`) fills this tab only: first proficient weapon and armor, equipped. Finish shows the missing lines when it refuses, and opens the sheet when it succeeds. The equipped weapon is on the sheet.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (54), `npm run test:e2e` (9 passed, smoke accounts in use).
+- Next is R4.9.
 
 ### 2026-11-20 — Cursor (R4.7)
 - Personality tab. The alignment chart is the real 3 by 3 (law axis by good axis). Upbringing, lifestyle and outlook save with the state each pick gives. A wildcard pick sends its chosen state; every other pick's state comes from the pack.
