@@ -1,12 +1,19 @@
+/* HomePage styles (was styles/home.css, added by the old usePageStyle hook).
+   Scoped to this page: HomePage puts styles.page on its <main>, and every rule below
+   only applies while that element is on screen (html:has(.page)).
+   :where(...) adds no specificity, so each rule weighs exactly what it did before.
+   Class and id names stay global (:global) because shared parts such as SiteNav use them;
+   .page (written :local(.page)) is the only name this module makes local. */
 
-input[type="text"],
-input[type="email"],
-input[type="password"] {
+:global :where(html:has(:local(.page))) input[type="text"],
+:global :where(html:has(:local(.page))) input[type="email"],
+:global :where(html:has(:local(.page))) input[type="password"] {
   font-size: 2rem; 
 }
 
 
-html, body {
+:global html:where(:has(:local(.page))),
+:global body:where(:has(:local(.page))) {
     margin: 0 ! important;
     padding: 0 ! important;
     width: 100vw;
@@ -25,7 +32,7 @@ html, body {
     
 }
 
-body {
+:global body:where(:has(:local(.page))) {
     content: '';
     position: absolute;
     top: 0;
@@ -37,7 +44,7 @@ body {
     max-width: 3840px;
 }
 
-.fixed-bg {
+:global :where(html:has(:local(.page))) .fixed-bg {
     position: absolute;
     top: 0;
     left: 0;
@@ -54,15 +61,15 @@ body {
     flex-direction: column;
 }
 
-ul,
-li,
-a {
+:global :where(html:has(:local(.page))) ul,
+:global :where(html:has(:local(.page))) li,
+:global :where(html:has(:local(.page))) a {
     list-style: none;
     text-decoration: none;
     color: var(--txt-color-1);
 }
 
-option {
+:global :where(html:has(:local(.page))) option {
     background-color: var(--drop-down-bg);
     color: var(--drop-down-txt);
     border: var(--tileBorder);
@@ -72,13 +79,13 @@ option {
     font-size: 100%;
 }
 
-header {
+:global :where(html:has(:local(.page))) header {
     width: 100%;
     margin-top: 0;
     padding-top: env(safe-area-inset-top);
 }
 
-footer {
+:global :where(html:has(:local(.page))) footer {
     width: 100vw;
     height: 100svh;
     overflow: hidden ! important;
@@ -90,20 +97,20 @@ footer {
 
 
 
-.slide {
+:global :where(html:has(:local(.page))) .slide {
     pointer-events: none;
 }
 
 @media (max-width: 768px) {
 
-    header {
+    :global :where(html:has(:local(.page))) header {
         display: flex;
         height: 8vh;
         width: 100vw;
         border-radius: 0 0 15% 15%;
     }
 
-    main {
+    :global :where(html:has(:local(.page))) main {
         height: calc(100svh - 12vh);
         width: 100%;
         overflow: hidden ! important;
@@ -119,7 +126,7 @@ footer {
         background-color: rgba(var(--bgc-theme), 0.7);
     }
 
-    .title-logo {
+    :global :where(html:has(:local(.page))) .title-logo {
         max-width: 40px;
         max-height: 40px;
         margin: 0;
@@ -128,7 +135,7 @@ footer {
         box-shadow: none;
     }
 
-    #site-title {
+    :global :where(html:has(:local(.page))) #site-title {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -150,7 +157,7 @@ footer {
     }
 
 
-    #nav-container {
+    :global :where(html:has(:local(.page))) #nav-container {
         position: relative;
         top: -1vh;
         z-index: 1;
@@ -168,10 +175,10 @@ footer {
         box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
     }
 
-    #home-nav,
-    #character-nav,
-    #campaign-nav,
-    #settings-nav {
+    :global :where(html:has(:local(.page))) #home-nav,
+    :global :where(html:has(:local(.page))) #character-nav,
+    :global :where(html:has(:local(.page))) #campaign-nav,
+    :global :where(html:has(:local(.page))) #settings-nav {
         border: none;
         flex: 1 1 0;
         text-align: center;
@@ -187,14 +194,14 @@ footer {
     }
 
 
-    #character-nav,
-    #campaign-nav,
-    #settings-nav {
+    :global :where(html:has(:local(.page))) #character-nav,
+    :global :where(html:has(:local(.page))) #campaign-nav,
+    :global :where(html:has(:local(.page))) #settings-nav {
         position: relative;
     }
 
 
-    .drop-down {
+    :global :where(html:has(:local(.page))) .drop-down {
         display: flex;
         flex-direction: column;
         position: absolute;
@@ -213,7 +220,7 @@ footer {
         padding: 0;
     }
 
-    li:hover .drop-down {
+    :global :where(html:has(:local(.page))) li:hover .drop-down {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
@@ -223,13 +230,13 @@ footer {
         background-color: var(--drop-down-bg);
     }
 
-    #nav-container > li:hover,
-    #nav-container > li:focus-within {
+    :global :where(html:has(:local(.page))) #nav-container > li:hover,
+    :global :where(html:has(:local(.page))) #nav-container > li:focus-within {
         z-index: 20;
     }
 
-    .drop-down,
-    #campaign-nav .drop-down {
+    :global :where(html:has(:local(.page))) .drop-down,
+    :global :where(html:has(:local(.page))) #campaign-nav .drop-down {
         left: 0;
         right: 0;
         width: auto;
@@ -238,14 +245,14 @@ footer {
         transform: none;
     }
 
-    #settings-nav .drop-down {
+    :global :where(html:has(:local(.page))) #settings-nav .drop-down {
         left: 50%;
         right: auto;
         
         transform: translateX(-50%);
     }
 
-    #campaign-nav .drop-down {
+    :global :where(html:has(:local(.page))) #campaign-nav .drop-down {
         left: auto;
         right: 0;
         transform: none;
@@ -256,9 +263,9 @@ footer {
         
     }
 
-    .btn-drop-character,
-    .btn-drop-campaign,
-    .btn-drop-settings {
+    :global :where(html:has(:local(.page))) .btn-drop-character,
+    :global :where(html:has(:local(.page))) .btn-drop-campaign,
+    :global :where(html:has(:local(.page))) .btn-drop-settings {
         border-radius: 5px;
         color: var(--drop-down-txt);
         display: flex;
@@ -272,12 +279,12 @@ footer {
 
 
 
-    .home-tabs {
+    :global :where(html:has(:local(.page))) .home-tabs {
         display: flex;
         
     }
 
-    .home-tab {
+    :global :where(html:has(:local(.page))) .home-tab {
         flex: 1;
         font: inherit;
         font-size: clamp(0.8rem, 3.6vw, 1rem);
@@ -291,31 +298,31 @@ footer {
         height: 7vh;
     }
 
-    .home-tab + .home-tab {
+    :global :where(html:has(:local(.page))) .home-tab + .home-tab {
         border-left: none;
     }
 
-      .home-tab.is-active {
+      :global :where(html:has(:local(.page))) .home-tab.is-active {
         background-color: var(--bgc-top);
         color: var(--accent);
     }
 
-     main > .container:not(.is-active) {
+     :global :where(html:has(:local(.page))) main > .container:not(.is-active) {
         display: none !important;
     }
 
-    main > .container.is-active {
+    :global :where(html:has(:local(.page))) main > .container.is-active {
         margin-top: 0 !important;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
 
         }
 
-    main > .container.is-active > .title {
+    :global :where(html:has(:local(.page))) main > .container.is-active > .title {
         display: none;
     }
 
-    footer {
+    :global :where(html:has(:local(.page))) footer {
         display: flex;
         position: fixed;
         top: calc(100svh - 2vh);
@@ -329,7 +336,7 @@ footer {
         overflow: hidden;
     }
 
-    .slide {
+    :global :where(html:has(:local(.page))) .slide {
         z-index: 3;
         box-sizing: border-box;
         background-color: var(--navSlideFill);
@@ -346,20 +353,20 @@ footer {
 /* ---------- header / nav ---------- */
 
 
-.container {
+:global :where(html:has(:local(.page))) .container {
     background-color: var(--panel-bg);
     border-radius: var(--tile);
     border: var(--tileBorder);
     box-shadow: var(--bs2);
 }
 
-#current-character-container {
+:global :where(html:has(:local(.page))) #current-character-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
 }
 
-#current-character-tile {
+:global :where(html:has(:local(.page))) #current-character-tile {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -377,13 +384,13 @@ footer {
     scrollbar-color: transparent transparent;
 }
 
-#current-campaign-container {
+:global :where(html:has(:local(.page))) #current-campaign-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
 }
 
-#current-campaign-tile {
+:global :where(html:has(:local(.page))) #current-campaign-tile {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -401,12 +408,12 @@ footer {
     scrollbar-color: transparent transparent;
 }
 
-.tile-list {
+:global :where(html:has(:local(.page))) .tile-list {
     padding: 2%;
     margin: 2%;
 }
 
-.char-tile {
+:global :where(html:has(:local(.page))) .char-tile {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(4, 1fr);
@@ -424,7 +431,7 @@ footer {
     border: var(--tileBorder);
 }
 
-.character-name {
+:global :where(html:has(:local(.page))) .character-name {
     grid-area: a;
     display: flex;
     justify-content: start;
@@ -437,7 +444,7 @@ footer {
     background-color: var(--bgc-char-name);
 }
 
-.character-image {
+:global :where(html:has(:local(.page))) .character-image {
     grid-area: d;
     width: 100%;
     height: 100%;
@@ -449,7 +456,7 @@ footer {
     z-index: 1;
 }
 
-.character-race {
+:global :where(html:has(:local(.page))) .character-race {
     grid-area: b;
     display: flex;
     align-items: center;
@@ -461,7 +468,7 @@ footer {
     backdrop-filter: var(--blur1);
 }
 
-.character-class {
+:global :where(html:has(:local(.page))) .character-class {
     grid-area: c;
     display: flex;
     align-items: center;
@@ -473,7 +480,7 @@ footer {
     backdrop-filter: var(--blur1);
 }
 
-.character-subclass {
+:global :where(html:has(:local(.page))) .character-subclass {
     grid-area: e;
     display: flex;
     align-items: center;
@@ -486,7 +493,7 @@ footer {
     border-radius: var(--radCornerBR);
 }
 
-.character-delete-button {
+:global :where(html:has(:local(.page))) .character-delete-button {
     grid-area: f;
     text-align: center;
     margin: 0;
@@ -500,7 +507,7 @@ footer {
 }
 
 
-.camp-tile {
+:global :where(html:has(:local(.page))) .camp-tile {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(6, 1fr);
@@ -517,7 +524,7 @@ footer {
     border: var(--tileBorder);
 }
 
-.campaign-name {
+:global :where(html:has(:local(.page))) .campaign-name {
     grid-area: a;
     text-align: center;
     display: flex;
@@ -531,7 +538,7 @@ footer {
     border: var(--tileBorder);
 }
 
-.campaign-image {
+:global :where(html:has(:local(.page))) .campaign-image {
     grid-area: b;
 
     width: 100%;
@@ -551,7 +558,7 @@ footer {
     overflow: hidden;
 }
 
-.campaign-description {
+:global :where(html:has(:local(.page))) .campaign-description {
     grid-area: c;
     display: flex;
     justify-content: center;
@@ -565,7 +572,7 @@ footer {
  
 }
 
-.campaign-delete-button {
+:global :where(html:has(:local(.page))) .campaign-delete-button {
     grid-area: d;
     border: var(--tileBorder);
     background-color: var(--bgc-char-delete);
@@ -577,16 +584,16 @@ footer {
     border-radius: 0 10px 0 0;
 }
 
-.campaign-delete-button:hover {
+:global :where(html:has(:local(.page))) .campaign-delete-button:hover {
     background-color: var(--damageColor);
     color: var(--txt-color-1);
     transform: scale(1.05);
 }
-.character-delete-button {
+:global :where(html:has(:local(.page))) .character-delete-button {
     border-radius: 0 10px 0 0;
 }
 
-.character-delete-button:hover {
+:global :where(html:has(:local(.page))) .character-delete-button:hover {
     background-color: var(--damageColor);
     color: var(--txt-color-1);
     transform: scale(1.05);
@@ -595,14 +602,14 @@ footer {
 
 /* desktop overrides last so they win over the shared rules above */
 @media (min-width: 769px) {
-    .sheet-panel,
-    .sheet-panel[hidden] {
+    :global :where(html:has(:local(.page))) .sheet-panel,
+    :global :where(html:has(:local(.page))) .sheet-panel[hidden] {
         display: contents !important;
     }
 
     
 
-    main {
+    :global :where(html:has(:local(.page))) main {
         flex: 1 1 auto;
         box-sizing: border-box;
         width: 100%;
@@ -625,7 +632,7 @@ footer {
         justify-items: stretch;
     }
 
-    footer {
+    :global :where(html:has(:local(.page))) footer {
         display: flex;
         position: fixed;
         left: 0;
@@ -648,11 +655,11 @@ footer {
         overflow: hidden;
     }
 
-    #site-title h1 {
+    :global :where(html:has(:local(.page))) #site-title h1 {
         display: none;
     }
 
-    .title-logo {
+    :global :where(html:has(:local(.page))) .title-logo {
         content: url('/logo_banner.png');
         height: auto;
         width: auto;
@@ -661,14 +668,14 @@ footer {
         object-fit: contain;
     }
 
-    header {
+    :global :where(html:has(:local(.page))) header {
         display: flex;
         height: 8vh;
         width: 100vw;
         border-radius: 0 0 15% 15%;
     }
 
-    #site-title {
+    :global :where(html:has(:local(.page))) #site-title {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -685,18 +692,18 @@ footer {
         overflow: visible;
     }
 
-    footer .footer-text {
+    :global :where(html:has(:local(.page))) footer .footer-text {
         background-image: var(--txt-gradient, linear-gradient(currentColor, currentColor));
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    .home-tabs {
+    :global :where(html:has(:local(.page))) .home-tabs {
         display: none;
     }
 
-    #nav-box {
+    :global :where(html:has(:local(.page))) #nav-box {
         position: relative;
         z-index: 5;
         display: flex;
@@ -706,7 +713,7 @@ footer {
         padding: 0;
     }
 
-    #nav-container {
+    :global :where(html:has(:local(.page))) #nav-container {
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -725,9 +732,9 @@ footer {
         box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
     }
 
-    #home-nav,
-    #character-nav,
-    #settings-nav {
+    :global :where(html:has(:local(.page))) #home-nav,
+    :global :where(html:has(:local(.page))) #character-nav,
+    :global :where(html:has(:local(.page))) #settings-nav {
         position: relative;
         display: flex;
         justify-content: center;
@@ -744,7 +751,7 @@ footer {
         box-shadow: none;
     }
 
-    .drop-down {
+    :global :where(html:has(:local(.page))) .drop-down {
         position: absolute;
         top: 100%;
         left: 50%;
@@ -765,16 +772,16 @@ footer {
         transition: opacity .3s ease;
     }
 
-    li:hover .drop-down,
-    li:focus-within .drop-down {
+    :global :where(html:has(:local(.page))) li:hover .drop-down,
+    :global :where(html:has(:local(.page))) li:focus-within .drop-down {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
     }
 
-    .btn-drop-character,
-    .btn-drop-campaign,
-    .btn-drop-settings {
+    :global :where(html:has(:local(.page))) .btn-drop-character,
+    :global :where(html:has(:local(.page))) .btn-drop-campaign,
+    :global :where(html:has(:local(.page))) .btn-drop-settings {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -785,13 +792,13 @@ footer {
         border-radius: var(--tile);
     }
 
-    .btn-drop-character:hover,
-    .btn-drop-campaign:hover,
-    .btn-drop-settings:hover {
+    :global :where(html:has(:local(.page))) .btn-drop-character:hover,
+    :global :where(html:has(:local(.page))) .btn-drop-campaign:hover,
+    :global :where(html:has(:local(.page))) .btn-drop-settings:hover {
         background-color: var(--bgc-char-stat);
     }
 
-    .container {
+    :global :where(html:has(:local(.page))) .container {
         display: flex;
         flex-direction: column;
         min-height: 0;
@@ -806,14 +813,14 @@ footer {
         border-radius: var(--tile);
     }
 
-    #current-character-container,
-    #current-campaign-container {
+    :global :where(html:has(:local(.page))) #current-character-container,
+    :global :where(html:has(:local(.page))) #current-campaign-container {
         flex-wrap: nowrap;
         justify-content: flex-start;
     }
 
-    #current-character-tile,
-    #current-campaign-tile {
+    :global :where(html:has(:local(.page))) #current-character-tile,
+    :global :where(html:has(:local(.page))) #current-campaign-tile {
         flex: 1 1 auto;
         width: 100%;
         margin: 0;
@@ -826,7 +833,7 @@ footer {
         overflow-x: hidden;
     }
 
-    #unfinished-character-tile {
+    :global :where(html:has(:local(.page))) #unfinished-character-tile {
         flex: 1 1 auto;
         width: 100%;
         margin: 0;
@@ -841,30 +848,30 @@ footer {
         overflow-x: hidden;
     }
 
-    .tile-list {
+    :global :where(html:has(:local(.page))) .tile-list {
         padding: 0;
         margin: 0;
         width: 100%;
     }
 
-    .char-tile {
+    :global :where(html:has(:local(.page))) .char-tile {
         width: 100%;
         box-sizing: border-box;
     }
 
-    .character-delete-button {
+    :global :where(html:has(:local(.page))) .character-delete-button {
         background-color: var(--bgc-char-name);
         color: var(--txt-color-1);
     }
 
-    .title {
+    :global :where(html:has(:local(.page))) .title {
         display: flex;
         justify-content: center;
         width: 100%;
         margin: 0 0 1vh;
     }
 
-    .title-text {
+    :global :where(html:has(:local(.page))) .title-text {
         margin: 0;
         text-align: center;
         background-image: var(--txt-gradient, linear-gradient(currentColor, currentColor));
@@ -873,11 +880,11 @@ footer {
         -webkit-text-fill-color: transparent;
     }
 
-    .campaign-tile {
+    :global :where(html:has(:local(.page))) .campaign-tile {
         width: 100%;
     }
 
-    .camp-tile {
+    :global :where(html:has(:local(.page))) .camp-tile {
         width: 100%;
         box-sizing: border-box;
         grid-template-columns: 2fr 1fr;
@@ -887,7 +894,7 @@ footer {
                              'c c';
     }
 
-    .campaign-image {
+    :global :where(html:has(:local(.page))) .campaign-image {
         width: 100%;
         height: auto;
         aspect-ratio: 16 / 9;
@@ -895,7 +902,7 @@ footer {
         align-self: start;
     }
 
-    .campaign-delete-button {
+    :global :where(html:has(:local(.page))) .campaign-delete-button {
         height: auto;
         padding: 0.5vh 0.5vw;
         font-size: 0.85rem;
@@ -903,7 +910,7 @@ footer {
         color: var(--txt-color-1);
     }
 
-    .campaign-name {
+    :global :where(html:has(:local(.page))) .campaign-name {
         margin: 0;
         min-height: 0;
         display: flex;
@@ -912,7 +919,7 @@ footer {
         text-align: center;
     }
 
-    .campaign-description {
+    :global :where(html:has(:local(.page))) .campaign-description {
         flex-shrink: 0;
         min-height: auto;
         padding: 1vh 1vw;
@@ -920,7 +927,7 @@ footer {
         overflow: visible;
     }
 
-    .slide {
+    :global :where(html:has(:local(.page))) .slide {
         position: absolute;
         top: 0.6vh;
         bottom: 0.6vh;

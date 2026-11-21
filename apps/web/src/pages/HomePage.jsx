@@ -3,13 +3,11 @@ import { Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useHome } from '../queries.ts';
-import usePageStyle from '../hooks/usePageStyle';
-import homeCss from '../styles/home.css?inline';
 import SiteNav from '../components/SiteNav';
 import Loader from '../components/Loader';
+import styles from './HomePage.module.css';
 
 function HomePage() {
-    usePageStyle(homeCss);
     const { data, isPending, error } = useHome();
     const queryClient = useQueryClient();
     const [homeTab, setHomeTab] = useState('current'); // which section shows on mobile
@@ -32,8 +30,8 @@ function HomePage() {
     const deleteCampaign = (e, camp) => remove(e, `Do you want to delete ${camp.name}? This cannot be undone.`, `/api/campaigns/${camp.id}`, camp.name);
     const deleteDraft = (e, ch) => remove(e, `Delete ${ch.name || 'this unfinished character'}?`, `/api/characters/${ch.id}`, ch.name || 'the unfinished character');
 
-    if (error) return <p>Failure is upon us: {error.message}</p>;
-    if (isPending) return <Loader text='Summoning your stories...'/>;
+    if (error) return <p className={styles.page}>Failure is upon us: {error.message}</p>;
+    if (isPending) return <Loader className={styles.page} text='Summoning your stories...'/>;
 
     const { username, characters, campaigns, drafts = [] } = data;
 
@@ -44,7 +42,7 @@ function HomePage() {
                 <h1>Welcome {username}!</h1>
             </header>
             <SiteNav />
-            <main>
+            <main className={styles.page}>
                 <nav className="home-tabs">
                     <button type="button" className={homeTab === 'current' ? 'home-tab is-active' : 'home-tab'} onClick={() => setHomeTab('current')}>Current Characters</button>
                     <button type="button" className={homeTab === 'campaign' ? 'home-tab is-active' : 'home-tab'} onClick={() => setHomeTab('campaign')}>Current Campaigns</button>
