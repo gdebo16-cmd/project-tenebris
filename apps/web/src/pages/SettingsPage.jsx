@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
-import usePageStyle from '../hooks/usePageStyle';
-import settingsCss from '../styles/settings.css?inline';
 import SiteNav from '../components/SiteNav';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useSettings } from '../queries.ts';
+import styles from './SettingsPage.module.css';
 
 // Replaces views/settings.ejs
 function SettingsPage() {
-    usePageStyle(settingsCss);
     const [form, setForm] = useState({ username: '', email: '', password: '' });
     const [message, setMessage] = useState('');
     const queryClient = useQueryClient();
@@ -54,7 +52,7 @@ function SettingsPage() {
                 <h1>Account Settings</h1>
             </header>
             <SiteNav />
-            <main>
+            <main className={styles.page}>
                 <section className='profile-container'>
                     <form onSubmit={submit}>
                         <article className="profile-tile" id="profile-username-container">
