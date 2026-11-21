@@ -26,10 +26,9 @@ const PICKS = [
 type PickKey = (typeof PICKS)[number]['key'];
 type PersonalityOption = Options['upbringings'][number];
 
-type Props = { id?: string };
+type Props = { id: string };
 
 export default function PersonalityTab({ id }: Props) {
-    if (!id) return <p>Save the header first. Then you can choose a personality.</p>;
     return <PersonalityFields id={id} />;
 }
 

@@ -8,10 +8,9 @@ import { useCharacterForm, useDefaultGear, useFinish, useSaveTab } from '../quer
 import { COINS, MONEY_PRESETS, MONEY_PRESET_KEYS, type MoneyPresetKey, type Purse } from '@tenebris/rules/money';
 import type { CharacterFormData } from '../types.ts';
 
-type Props = { id?: string };
+type Props = { id: string };
 
 export default function GearTab({ id }: Props) {
-    if (!id) return <p>Save the header first. Then you can pick gear.</p>;
     return <GearFields id={id} />;
 }
 

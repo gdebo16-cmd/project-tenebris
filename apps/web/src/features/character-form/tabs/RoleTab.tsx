@@ -17,10 +17,9 @@ function runeFull(key: string): string {
     return `/glyphs/classes/${key}.png`;
 }
 
-type Props = { id?: string };
+type Props = { id: string };
 
 export default function RoleTab({ id }: Props) {
-    if (!id) return <p>Save the header first. Then you can pick a role.</p>;
     return <RoleFields id={id} />;
 }
 

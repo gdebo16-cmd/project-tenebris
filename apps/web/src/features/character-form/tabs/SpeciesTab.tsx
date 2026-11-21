@@ -15,10 +15,9 @@ function thumbnail(image: string): string {
     return image.replace(/\/([^/]+)\.png$/, '/thumbs/$1.webp');
 }
 
-type Props = { id?: string };
+type Props = { id: string };
 
 export default function SpeciesTab({ id }: Props) {
-    if (!id) return <p>Save the header first. Then you can pick a species.</p>;
     return <SpeciesFields id={id} />;
 }
 

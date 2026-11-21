@@ -14,10 +14,9 @@ const STAT_LABELS: Record<string, string> = {
 
 type Roll = { rolls: number[]; dropped: number; total: number } | null;
 
-type Props = { id?: string };
+type Props = { id: string };
 
 export default function TraitsTab({ id }: Props) {
-    if (!id) return <p>Save the header first. Then you can roll stats.</p>;
     return <TraitsFields id={id} />;
 }
 

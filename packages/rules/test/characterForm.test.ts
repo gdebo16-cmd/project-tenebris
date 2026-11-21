@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, keepUnrelatedChoices, leveledMaxHp, levelChoices, missingForFinish, rerollAllowed, startingHp, MAX_LEVEL, type Options } from '../src/characterForm.ts';
+import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, keepUnrelatedChoices, leveledMaxHp, levelChoices, missingForFinish, rerollAllowed, startingHp, DEFAULT_CHARACTER_NAME, MAX_LEVEL, type Options } from '../src/characterForm.ts';
 
 // Only the parts of the options the species check reads
 const options = {
@@ -16,13 +16,15 @@ test('header: good bodies pass and come back clean', () => {
     assert.deepEqual(checkHeader({ name: 'Ash', level: '5', portrait_url: '/portraits/a.png' }),
         { values: { name: 'Ash', level: 5, portrait_url: '/portraits/a.png' } });
     assert.deepEqual(checkHeader({ name: 'Ash' }), { values: { name: 'Ash', level: 1, portrait_url: null } });   // level defaults to 1
+    // no name is fine: it becomes the default name
+    for (const body of [null, {}, { name: '' }, { name: '   ' }, { name: null }]) {
+        assert.deepEqual(checkHeader(body), { values: { name: DEFAULT_CHARACTER_NAME, level: 1, portrait_url: null } }, JSON.stringify(body));
+    }
+    assert.equal(DEFAULT_CHARACTER_NAME, 'One with no name');
 });
 
 test('header: bad bodies get an error', () => {
     const bad = [
-        null,
-        { name: '' },
-        { name: '   ' },
         { name: 'x'.repeat(61) },
         { name: 'Ash', level: 0 },
         { name: 'Ash', level: 21 },
@@ -74,6 +76,8 @@ test('missingForFinish lists what each tab still needs', () => {
     ]);
     const done = { name: 'Ash', species_id: 1, size_id: 3, eye_color: 'Brown', role_id: 1, str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, luc: 10, spd: 10 };
     assert.deepEqual(missingForFinish(done), []);
+    // a name is not needed to finish
+    assert.deepEqual(missingForFinish({ ...done, name: '' }), []);
     // A draft must also pick default money; its coins have to match a preset
     assert.deepEqual(missingForFinish({ ...done, is_draft: true }), ['Inventory: pick default money']);
     assert.deepEqual(missingForFinish({ ...done, is_draft: true, copper: 10, silver: 10 }), []);

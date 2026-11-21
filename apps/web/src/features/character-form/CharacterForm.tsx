@@ -1,5 +1,5 @@
 // One page for a new character and for editing one. The header is always visible; the tab is in the URL.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { ApiError } from '../../api.ts';
 import Loader from '../../components/Loader.jsx';
@@ -25,11 +25,21 @@ export default function CharacterForm() {
         setParams(nextParams, { replace: true });
     }
 
+    if (!id) {
+        return (
+            <div className={styles.page}>
+                <p className={styles.back}><Link to="/home">Back to home</Link></p>
+                <h1 className={styles.title}>New character</h1>
+                <NewCharacter tab={tab} />
+            </div>
+        );
+    }
+
     return (
         <div className={styles.page}>
             <p className={styles.back}><Link to="/home">Back to home</Link></p>
-            <h1 className={styles.title}>{id ? 'Edit character' : 'New character'}</h1>
-            {id ? <SavedHeader id={id} /> : <NewHeader />}
+            <h1 className={styles.title}>Edit character</h1>
+            <SavedHeader id={id} />
             <FormTabs active={tab} onSelect={selectTab} />
             <div className={styles.panel} role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
                 {tab === 'species' && <SpeciesTab id={id} />}
@@ -42,39 +52,41 @@ export default function CharacterForm() {
     );
 }
 
-// /characters/new — Save creates the draft, then opens the edit page on the species tab.
-function NewHeader() {
+// /characters/new: makes the draft straight away (no name yet: the server calls it "One with no name"),
+// then opens its edit page on the requested tab. The ref stops StrictMode's second effect run from
+// making a second draft.
+function NewCharacter({ tab }: { tab: FormTabId }) {
     const navigate = useNavigate();
     const create = useCreateCharacter();
-    const [name, setName] = useState('');
-    const [level, setLevel] = useState('1');
-    const [portraitUrl, setPortraitUrl] = useState<string | null>(null);
+    const started = useRef(false);
     const [error, setError] = useState('');
 
-    async function save() {
+    async function start() {
         setError('');
         try {
-            const created = await create.mutateAsync({ name, level: Number(level), portrait_url: portraitUrl });
-            navigate(`/characters/${created.id}/edit?tab=species`, { replace: true });
+            const created = await create.mutateAsync({ name: '', level: 1, portrait_url: null });
+            navigate(`/characters/${created.id}/edit?tab=${tab}`, { replace: true });
         } catch (err) {
             setError(messageOf(err));
         }
     }
 
-    return (
-        <FormHeader
-            name={name}
-            level={level}
-            portraitUrl={portraitUrl}
-            summary="Save the header to start the other tabs."
-            saving={create.isPending}
-            error={error}
-            onName={setName}
-            onLevel={setLevel}
-            onPortrait={setPortraitUrl}
-            onSave={save}
-        />
-    );
+    useEffect(() => {
+        if (started.current) return;
+        started.current = true;
+        void start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    if (error) {
+        return (
+            <div role="alert">
+                <p className={styles.error}>Couldn't start a new character: {error}</p>
+                <button type="button" className={styles.save} onClick={() => void start()} disabled={create.isPending}>Try again</button>
+            </div>
+        );
+    }
+    return <Loader text="Starting a new character…" />;
 }
 
 // /characters/:id/edit — the header loads from the server and saves back to it.

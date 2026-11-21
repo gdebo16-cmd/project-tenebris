@@ -1,6 +1,6 @@
 // Name, level and portrait. Stays on screen no matter which tab is open.
 import { useState } from 'react';
-import { levelChoices } from '@tenebris/rules/characterForm';
+import { levelChoices, DEFAULT_CHARACTER_NAME } from '@tenebris/rules/characterForm';
 import styles from './CharacterForm.module.css';
 import { usePortraits } from './queries.ts';
 
@@ -40,7 +40,7 @@ export default function FormHeader({ name, level, savedLevel, portraitUrl, summa
                 <div className={styles.nameLevel}>
                     <label className={styles.field}>
                         <span className={styles.label}>Name</span>
-                        <input className={styles.input} value={name} onChange={(event) => onName(event.target.value)} aria-label="Name" autoComplete="off" />
+                        <input className={styles.input} value={name} onChange={(event) => onName(event.target.value)} aria-label="Name" autoComplete="off" placeholder={DEFAULT_CHARACTER_NAME} />
                     </label>
                     <label className={styles.field}>
                         <span className={styles.label}>Level</span>

@@ -13,6 +13,8 @@ export type TabResult = { error: string } | { values: Record<string, ColumnValue
 
 export const MAX_LEVEL = 20;
 export const MAX_NAME_LENGTH = 60;
+// A character can be made and finished without a name; it can be named later.
+export const DEFAULT_CHARACTER_NAME = 'One with no name';
 export const MAX_LOOK_LENGTH = 1000;
 
 // Every tab of the form, in order. A tab without a check yet is refused by the server.
@@ -37,8 +39,7 @@ export function levelChoices(currentLevel: number | null | undefined): number[] 
 }
 
 export function checkHeader(body: Body, currentLevel?: number | null): TabResult {
-    const name = text(body?.name);
-    if (!name) return { error: 'Give your character a name' };
+    const name = text(body?.name) || DEFAULT_CHARACTER_NAME;
     if (name.length > MAX_NAME_LENGTH) return { error: `Names can be at most ${MAX_NAME_LENGTH} characters` };
 
     const level = Number(body?.level ?? 1);
@@ -332,7 +333,6 @@ export function checkPersonalityTab(options: Options, body: Body): TabResult {
 // What still stops this character from being finished, one line per tab. Empty = ready.
 export function missingForFinish(ch: FinishFields): string[] {
     const missing: string[] = [];
-    if (!ch.name) missing.push('Header: a name');
     if (!ch.species_id || !ch.size_id || !ch.eye_color) missing.push('Species & look: species, size and eye color');
     if (!ch.role_id) missing.push('Role & calling: a role');
     if (STAT_COLUMNS.some((stat) => ch[stat] == null)) missing.push('Traits & gifts: place all 8 stat rolls');

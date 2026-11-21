@@ -11,12 +11,15 @@ test('creates a character on the new form, opens its sheet and rolls', async ({ 
 
     await page.goto('/home');
     await page.getByRole('link', { name: 'New character' }).click();
-    await expect(page).toHaveURL(/\/characters\/new$/);
-    await page.getByRole('textbox', { name: 'Name' }).fill(name);
-    await page.getByRole('combobox', { name: 'Level', exact: true }).selectOption('1');
-    await page.getByRole('button', { name: 'Save' }).click();
+    // the draft is made straight away; it is named afterwards
     await expect(page).toHaveURL(/\/characters\/\d+\/edit\?tab=species/);
     const id = page.url().match(/\/characters\/(\d+)/)[1];
+    await expect(page.getByRole('textbox', { name: 'Name' })).toHaveValue('One with no name');
+    await page.getByRole('textbox', { name: 'Name' }).fill(name);
+    await page.getByRole('combobox', { name: 'Level', exact: true }).selectOption('1');
+    const headerSaved = page.waitForResponse((r) => r.url().endsWith(`/api/characters/${id}/form/header`));
+    await page.locator('form').filter({ has: page.getByRole('textbox', { name: 'Name' }) }).getByRole('button', { name: 'Save', exact: true }).click();
+    expect((await headerSaved).ok()).toBeTruthy();
 
     await page.goto('/home');
     const unfinished = page.locator('#unfinished-character-container');
