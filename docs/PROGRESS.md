@@ -4,7 +4,7 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Now
 
-- **Stage 1, native rebuild:** R1–R4 done; R5 up to R5.5 (Character layout) is on main; R6 done (2026-11-21).
+- **Stage 1, native rebuild:** R1–R4 done; R5 up to R5.5 (Character layout) is on main; R6 and R6.1 (local class names) done (2026-11-21).
 - **Paused by Gabriel:** R5.6 (monster sheet) and R5.7 (DM page). No migration until he says so.
 
 ## Next
@@ -16,6 +16,12 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-21 - grokbot (R6.1 local class names, main `f1f54db`..`c4e2b2a`, not pushed)
+- Class and id names in the page modules are local now (camelCase, `styles.x` in the JSX). Page modules no longer use `:global` except `:global(.fixed-bg)` (that div is in index.html). Rules that name a local class need no page check; rules that only name elements keep `:where(html:has(.page))`, and html/body rules use `html:where(:has(.page))` / `body:where(:has(.page))`. Styled ids stay ids (`id={styles.siteTitle}`) so specificity is unchanged; unstyled class names and ids nothing refers to were removed from the JSX (ids used by labels, aria or tests stay). Each page's dead rules (old nav copies, old sheet leftovers) are gone; the stale char_create.css comment is gone.
+- Shared components have their own modules: `SiteNav.module.css` (the nav rules the 6 nav pages used to copy), `TabList.module.css`, `features/inventory/ItemShop.module.css`. SiteNav, TabList and LogoutLink take `className`; WeaponFilter and ArmorFilter take `className` / `selectClassName` (ItemShop passes its `.filterContainer` / `.field`). The nav drift between pages is kept through `<SiteNav className={styles.nav} />` and a few rules at the end of the page module: Home (desktop width 85vw, no padding, `margin: 1em 0`), CampaignPage (mobile text colour), Profile (mobile dropdown border, no desktop hover colour on dropdown links). Unifying those is Gabriel's call.
+- campaign.spec finds the invite code by its "Invite code" label (the class is hashed now).
+- Checks: typecheck + build after every commit; rules 101/101; Playwright 17/17. The SiteNav and TabList commits were checked with computed-style dumps and screenshots (no differences); per Gabriel, the later commits were not screenshot-checked because the layout is going to change.
 
 ### 2026-11-21 - grokbot (R6 CSS Modules, main `bf2b641`..`20a862c`, not pushed)
 - Every page that used `usePageStyle` now imports its own `pages/<Page>.module.css` (CampaignList, CampaignPage, CreateCampaign, HomePage, InventoryPage, JoinCampaign, LoginPage, ProfilePage, RegisterPage, SettingsPage). One commit per page; `usePageStyle.js` is deleted.
