@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom';
+import styles from './ItemDetails.module.css';
 
 // Shared details popup for armor, weapons and items (shop and inventory).
 // item = { kind: 'armor' | 'weapon' | 'item', data }; children render under the stats (e.g. rune controls).
@@ -7,11 +8,11 @@ const props = (w) => w.properties ?? [];
 
 function ItemDetails({ item, onClose, typeLabel, children }) {
     return createPortal(
-        <article className="spell-details">
-            <button type='button' className='btn-round spell-details-close' onClick={onClose}>X</button>
-            <h3 className='spell-details-title'>{item.data.name}</h3>
-            <section className="details-container">
-                <section className="combat-box">
+        <article className={styles.popup}>
+            <button type='button' className={`btn-round ${styles.close}`} onClick={onClose}>X</button>
+            <h3 className={styles.title}>{item.data.name}</h3>
+            <section className={styles.container}>
+                <section className={styles.box}>
                     {item.kind === 'weapon' ? (
                         <>
                             <article className="combat-box-title"><h4>Weapon Details</h4></article>
@@ -52,7 +53,7 @@ function ItemDetails({ item, onClose, typeLabel, children }) {
             </section>
             {children}
             {item.data.description && (
-                <section className="spell-description-box">
+                <section className={styles.description}>
                     <p><strong>Description:</strong> <br /> {item.data.description}</p>
                 </section>
             )}

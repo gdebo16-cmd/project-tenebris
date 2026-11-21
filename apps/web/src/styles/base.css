@@ -1,0 +1,19 @@
+/* Global base rules for form controls, used on every page (was the element half of components.css). */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  font-size: 2rem; 
+}
+
+select {
+    font: inherit;
+    color: var(--txt-color-1);
+    background-color: var(--bgc-char-stat);
+    border: var(--tileBorder);
+    border-radius: var(--rad1);
+}
+
+select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
