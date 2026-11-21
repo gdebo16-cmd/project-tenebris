@@ -37,36 +37,36 @@ function HomePage() {
 
     return (
         <>
-            <header id="site-title">
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
+            <header id={styles.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Welcome {username}!</h1>
             </header>
             <SiteNav className={styles.nav} />
             <main className={styles.page}>
-                <nav className="home-tabs">
-                    <button type="button" className={homeTab === 'current' ? 'home-tab is-active' : 'home-tab'} onClick={() => setHomeTab('current')}>Current Characters</button>
-                    <button type="button" className={homeTab === 'campaign' ? 'home-tab is-active' : 'home-tab'} onClick={() => setHomeTab('campaign')}>Current Campaigns</button>
-                    <button type="button" className={homeTab === 'unfinished' ? 'home-tab is-active' : 'home-tab'} onClick={() => setHomeTab('unfinished')}>Unfinished Work</button>
+                <nav className={styles.homeTabs}>
+                    <button type="button" className={homeTab === 'current' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setHomeTab('current')}>Current Characters</button>
+                    <button type="button" className={homeTab === 'campaign' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setHomeTab('campaign')}>Current Campaigns</button>
+                    <button type="button" className={homeTab === 'unfinished' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setHomeTab('unfinished')}>Unfinished Work</button>
                 </nav>
-                <section id="current-character-container" className={homeTab === 'current' ? 'container is-active' : 'container'}>
-                    <article className="title" id="current-character-title">
-                        <h2 className="title-text">Current Characters</h2>
+                <section id={styles.currentCharacterContainer} className={homeTab === 'current' ? `${styles.container} ${styles.isActive}` : styles.container}>
+                    <article className={styles.title}>
+                        <h2 className={styles.titleText}>Current Characters</h2>
                         <Link to="/characters/new">New character</Link>
                     </article>
-                    <article className="char-list" id="current-character-tile">
+                    <article id={styles.currentCharacterTile}>
                         {characters.length === 0 ? (
                             <p>No Characters Available</p>
                         ) : (
-                            <ul className="tile-list" id="current-character-list">
+                            <ul className={styles.tileList}>
                                 {characters.map((ch) => (
-                                    <li key={ch.id} className='character-tile' id={`character-tile-${ch.id}`}>
-                                        <Link to={`/characters/${ch.id}`} className="char-tile">
-                                            <h3 className="character-name">{ch.name}</h3>
-                                            <img className="character-image" src={ch.portrait_url ?? '/default-character.png'} alt="Character Image" />
-                                            <p className="character-race">Race: {ch.race}</p>
-                                            <p className="character-class">Class: {ch.class}</p>
-                                            <p className="character-subclass">Sub-class: {ch.subclass}</p>
-                                            <button type="button" className="character-delete-button" onClick={(e) => deleteCharacter(e, ch)}>Delete</button>
+                                    <li key={ch.id} id={`character-tile-${ch.id}`}>
+                                        <Link to={`/characters/${ch.id}`} className={styles.charTile}>
+                                            <h3 className={styles.characterName}>{ch.name}</h3>
+                                            <img className={styles.characterImage} src={ch.portrait_url ?? '/default-character.png'} alt="Character Image" />
+                                            <p className={styles.characterRace}>Race: {ch.race}</p>
+                                            <p className={styles.characterClass}>Class: {ch.class}</p>
+                                            <p className={styles.characterSubclass}>Sub-class: {ch.subclass}</p>
+                                            <button type="button" className={styles.characterDeleteButton} onClick={(e) => deleteCharacter(e, ch)}>Delete</button>
                                         </Link>
                                     </li>
                                 ))}
@@ -74,24 +74,24 @@ function HomePage() {
                         )}
                     </article>
                 </section>
-                <section id="current-campaign-container" className={homeTab === 'campaign' ? 'container is-active' : 'container'}>
-                    <article className="title" id="current-campaign-title">
-                        <h2 className="title-text">Current Tales</h2>
+                <section id={styles.currentCampaignContainer} className={homeTab === 'campaign' ? `${styles.container} ${styles.isActive}` : styles.container}>
+                    <article className={styles.title}>
+                        <h2 className={styles.titleText}>Current Tales</h2>
                     </article>
-                    <article className="char-list" id="current-campaign-tile">
+                    <article id={styles.currentCampaignTile}>
                         {campaigns.length === 0 ? (
                             <p>No Tales to Tell</p>
                         ) : (
-                            <ul className="tile-list" id="current-campaign-list">
+                            <ul className={styles.tileList}>
                                 {campaigns.map((camp) => (
-                                    <li key={camp.id} className='campaign-tile' id={`campaign-tile-${camp.id}`}>
-                                        <Link to={`/campaign/${camp.id}`} className='camp-tile'>
-                                            <h3 className="campaign-name">{camp.name}</h3>
+                                    <li key={camp.id} className={styles.campaignTile} id={`campaign-tile-${camp.id}`}>
+                                        <Link to={`/campaign/${camp.id}`} className={styles.campTile}>
+                                            <h3 className={styles.campaignName}>{camp.name}</h3>
                                             {camp.campaign_img_url
-                                                ? <img className="campaign-image" src={camp.campaign_img_url} alt={`${camp.name} picture`} />
-                                                : <div className="campaign-image" role="img" aria-label={`${camp.name} picture`} />}
-                                            {camp.description && <p className="campaign-description">{camp.description}</p>}
-                                            <button type="button" className="campaign-delete-button" onClick={(e) => deleteCampaign(e, camp)}>Delete</button>
+                                                ? <img className={styles.campaignImage} src={camp.campaign_img_url} alt={`${camp.name} picture`} />
+                                                : <div className={styles.campaignImage} role="img" aria-label={`${camp.name} picture`} />}
+                                            {camp.description && <p className={styles.campaignDescription}>{camp.description}</p>}
+                                            <button type="button" className={styles.campaignDeleteButton} onClick={(e) => deleteCampaign(e, camp)}>Delete</button>
                                         </Link>
                                     </li>
                                 ))}
@@ -100,23 +100,23 @@ function HomePage() {
                     </article>
                     
                 </section>
-                <section id="unfinished-character-container" className={homeTab === 'unfinished' ? 'container is-active' : 'container'}>
-                    <article className="title" id="unfinished-character-title">
-                        <h2 className="title-text">Unfinished Work</h2>
+                <section id="unfinished-character-container" className={homeTab === 'unfinished' ? `${styles.container} ${styles.isActive}` : styles.container}>
+                    <article className={styles.title}>
+                        <h2 className={styles.titleText}>Unfinished Work</h2>
                     </article>
-                    <article className="char-list" id="unfinished-character-tile">
-                        <ul className="tile-list" id="unfinished-character-list">
+                    <article id={styles.unfinishedCharacterTile}>
+                        <ul className={styles.tileList}>
                         {drafts.length === 0 ? (
                             <p>You are all caught up!</p>
                         ) : drafts.map((ch) => (
-                            <li key={ch.id} className='character-tile' id={`character-tile-${ch.id}`}>
-                                <Link to={`/characters/${ch.id}/edit`} className='char-tile'>
-                                    <h3 className='character-name'>{ch.name || 'One with no name'}</h3>
-                                    <img className='character-image' src={ch.portrait_url ?? '/default-character.png'} alt='Character Image' />
-                                    <p className='character-race'>Race: {ch.race || 'Undecided'}</p>
-                                    <p className='character-class'>Class: {ch.class || 'Undecided'}</p>
-                                    <p className='character-subclass'>Sub-class: {ch.subclass || 'Undecided'}</p>
-                                    <button type='button' className='character-delete-button' onClick={(e) => deleteDraft(e, ch)}>Delete</button>
+                            <li key={ch.id} id={`character-tile-${ch.id}`}>
+                                <Link to={`/characters/${ch.id}/edit`} className={styles.charTile}>
+                                    <h3 className={styles.characterName}>{ch.name || 'One with no name'}</h3>
+                                    <img className={styles.characterImage} src={ch.portrait_url ?? '/default-character.png'} alt='Character Image' />
+                                    <p className={styles.characterRace}>Race: {ch.race || 'Undecided'}</p>
+                                    <p className={styles.characterClass}>Class: {ch.class || 'Undecided'}</p>
+                                    <p className={styles.characterSubclass}>Sub-class: {ch.subclass || 'Undecided'}</p>
+                                    <button type='button' className={styles.characterDeleteButton} onClick={(e) => deleteDraft(e, ch)}>Delete</button>
                                 </Link>
                             </li>
                         ))}
@@ -125,7 +125,7 @@ function HomePage() {
                 </section>
             </main>
             <footer>
-                <p className="footer-text" id="footer-text">copyrite Eldrid Tales LLC</p>
+                <p className={styles.footerText}>copyrite Eldrid Tales LLC</p>
             </footer>
         </>
     );
