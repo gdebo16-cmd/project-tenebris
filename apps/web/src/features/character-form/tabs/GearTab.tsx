@@ -1,10 +1,11 @@
-// Proficiencies from the role, then a weapon, armor and items. Money is a placeholder amount.
+// Proficiencies from the role, then a weapon, armor and items, and the default money (drafts pick one of three).
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ApiError } from '../../../api.ts';
 import formStyles from '../CharacterForm.module.css';
 import styles from './GearTab.module.css';
 import { useCharacterForm, useDefaultGear, useFinish, useSaveTab } from '../queries.ts';
+import { COINS, MONEY_PRESETS, MONEY_PRESET_KEYS, type MoneyPresetKey, type Purse } from '@tenebris/rules/money';
 import type { CharacterFormData } from '../types.ts';
 
 type Props = { id?: string };
@@ -23,6 +24,7 @@ function GearFields({ id }: { id: string }) {
     const [weaponId, setWeaponId] = useState('');
     const [armorId, setArmorId] = useState('');
     const [itemIds, setItemIds] = useState<number[]>([]);
+    const [moneyPreset, setMoneyPreset] = useState<MoneyPresetKey | null>(null);
     const [filled, setFilled] = useState(false);
     const [error, setError] = useState('');
     const [missing, setMissing] = useState<string[]>([]);
@@ -46,13 +48,17 @@ function GearFields({ id }: { id: string }) {
         setWeaponId(data.gear.weapon_id == null ? '' : String(data.gear.weapon_id));
         setArmorId(data.gear.armor_id == null ? '' : String(data.gear.armor_id));
         setItemIds(data.gear.item_ids);
+        setMoneyPreset(data.gear.money_preset);
     }
+
+    // The pick is sent with Save and with Finish; only a draft may pick
+    const moneyBody = gear.can_pick_money && moneyPreset ? { money_preset: moneyPreset } : {};
 
     async function onSave() {
         setError('');
         setMissing([]);
         try {
-            const saved = await save.mutateAsync({ weapon_id: Number(weaponId), armor_id: armorId || null, item_ids: itemIds });
+            const saved = await save.mutateAsync({ weapon_id: Number(weaponId), armor_id: armorId || null, item_ids: itemIds, ...moneyBody });
             apply(saved);
         } catch (err) { setError(messageOf(err)); }
     }
@@ -68,7 +74,7 @@ function GearFields({ id }: { id: string }) {
         setError('');
         setMissing([]);
         try {
-            await finish.mutateAsync();
+            await finish.mutateAsync(moneyBody);
             navigate(`/characters/${id}`);
         } catch (err) {
             setError(messageOf(err));
@@ -130,7 +136,23 @@ function GearFields({ id }: { id: string }) {
                     ))}
                 </ul>
             )}
-            <p>Money: {gear.money}. New characters start with 10 until that amount is decided.</p>
+            {gear.can_pick_money ? (
+                <fieldset className={styles.money}>
+                    <legend className={styles.note}>Default money</legend>
+                    <div className={styles.presets}>
+                        {MONEY_PRESET_KEYS.map((key) => (
+                            <button key={key} type="button" aria-pressed={moneyPreset === key}
+                                className={`${styles.preset} ${moneyPreset === key ? styles.presetOn : ''}`}
+                                onClick={() => setMoneyPreset(key)}>
+                                <span className={styles.presetName}>{MONEY_PRESETS[key].label}</span>
+                                <span className={styles.note}>{coinText(MONEY_PRESETS[key].purse)}</span>
+                            </button>
+                        ))}
+                    </div>
+                </fieldset>
+            ) : (
+                <p>Money: {coinText(gear.purse)}. Change it on the sheet.</p>
+            )}
             <div className={styles.actions}>
                 <button type="button" className={styles.secondary} disabled={fill.isPending} onClick={onDefault}>Auto default</button>
                 <button type="submit" className={formStyles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
@@ -144,6 +166,12 @@ function GearFields({ id }: { id: string }) {
             )}
         </form>
     );
+}
+
+// "10 copper, 10 silver" (coins that are 0 are left out)
+function coinText(purse: Purse): string {
+    const parts = COINS.filter((c) => purse[c] > 0).map((c) => `${purse[c]} ${c}`);
+    return parts.length ? parts.join(', ') : 'none';
 }
 
 function list(names: string[]): string {

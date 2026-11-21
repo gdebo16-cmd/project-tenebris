@@ -74,6 +74,10 @@ test('missingForFinish lists what each tab still needs', () => {
     ]);
     const done = { name: 'Ash', species_id: 1, size_id: 3, eye_color: 'Brown', role_id: 1, str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, luc: 10, spd: 10 };
     assert.deepEqual(missingForFinish(done), []);
+    // A draft must also pick default money; its coins have to match a preset
+    assert.deepEqual(missingForFinish({ ...done, is_draft: true }), ['Inventory: pick default money']);
+    assert.deepEqual(missingForFinish({ ...done, is_draft: true, copper: 10, silver: 10 }), []);
+    assert.deepEqual(missingForFinish({ ...done, is_draft: true, copper: 10, silver: 3 }), ['Inventory: pick default money']);
 });
 
 const arms = { key: 'class:warrior:Preferred Arms:1', name: 'Preferred Arms', level: 1, choose: 2, options: ['Minor', 'Great', 'Reach'], source: 'class' as const, optionInfo: {} };

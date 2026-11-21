@@ -40,3 +40,31 @@
 .chosen { margin: 0; padding-left: 1.1rem; }
 
 .missing { margin: 0.2rem 0 0; padding-left: 1.1rem; }
+
+/* Default money: three preset buttons, the picked one pressed */
+.money { margin: 0; padding: 0; border: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+.presets { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.preset {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    padding: 0.45rem 0.7rem;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.presetOn {
+    border-color: var(--accent, #d4af37);
+    background: color-mix(in srgb, var(--accent, #d4af37) 25%, transparent);
+    box-shadow: inset 0 0 0 1px var(--accent, #d4af37);
+}
+
+.presetName { font-weight: 600; }
+

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { armorTypesFromProf, checkGearTab, defaultGear, gearChoices, STARTING_MONEY, weaponCategoryNamesFromProf } from '../src/gear.ts';
+import { armorTypesFromProf, checkGearTab, defaultGear, gearChoices, weaponCategoryNamesFromProf } from '../src/gear.ts';
 
 const pack = {
     weapon_category: [{ id: 1, name: 'Minor' }, { id: 2, name: 'Great' }],
@@ -34,7 +34,7 @@ test('gear choices mark proficient and not, and skip rare or unique rows', () =>
     assert.deepEqual(choices.items.map((item) => item.name), ['Rope']);
 });
 
-test('a gear save uses the placeholder money and refuses an unknown weapon', () => {
+test('a gear save takes only a default-money preset key, never an amount, and refuses an unknown weapon', () => {
     const choices = gearChoices(pack, { armor_prof: 'Light Armor', weapon_prof: 'Minor' });
     const saved = checkGearTab(choices, { weapon_id: 11, armor_id: '', item_ids: [20], money: 999 });
     assert.ok(!('error' in saved));
@@ -42,7 +42,10 @@ test('a gear save uses the placeholder money and refuses an unknown weapon', () 
     assert.equal(saved.weapon_id, 11);
     assert.equal(saved.armor_id, null);
     assert.deepEqual(saved.item_ids, [20]);
-    assert.equal(saved.money, STARTING_MONEY);
+    assert.equal(saved.money_preset, null);   // no preset sent: money is left alone; an amount is ignored
+    const average = checkGearTab(choices, { weapon_id: 11, money_preset: 'average' });
+    assert.ok('money_preset' in average && average.money_preset === 'average');
+    assert.deepEqual(checkGearTab(choices, { weapon_id: 11, money_preset: 'rich' }), { error: 'Default money must be one of: Impoverished, Average, Wealthy' });
     assert.ok('error' in checkGearTab(choices, { weapon_id: 99 }));
     assert.ok('error' in checkGearTab(choices, { weapon_id: 10, item_ids: [20, 20] }));
 });

@@ -5,7 +5,7 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 ## Now
 
 - **Stage 1, native rebuild:** R1–R3 done (R3 = commit `2d5c775`). R4 is ready for Gabriel to merge from `bot/cursor`.
-- **In progress:** Cursor — R4 review fixes (level cap, then level-up, role/traits, then the form layout). R5 is not started.
+- **In progress:** Claude — R5 (sheet blocks), on bot/claude in tenebris-claude. Cursor — R4 review items 4–7 (form header, layout, mockup controls).
 
 ## Next
 
@@ -16,6 +16,35 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-21 - grokbot (R5.5 money, conditions, sheet swap; bot/claude `e7fd9ae`, `f94cf65`, `46ec4b5`)
+- Money: owner's migration `1795282460378_add-character-money` (copper, silver, gold, crowns, oracles). Rules `money.ts` (purse, checks, presets). POST `/api/sheets/character/:id/money` (owner or DM, one atomic UPDATE, "Not enough silver."). Character form Gear tab: three default money buttons (Impoverished 10 cp, Average +10 sp, Wealthy +10 gp), drafts only; a finished character's money changes on the sheet. PurseBlock on the sheet's Gear tab.
+- Conditions: POST `/api/sheets/character/:id/conditions` { conditions?, exhaustion? } (owner or DM; rules `checkConditionsRequest` / `applyConditions`). PATCH `/api/characters/:id/state` is gone. The Sigil hit button no longer spends embers.
+- Swap: `/characters/:id` is the block sheet (`?new=1` is ignored). Deleted `apps/web/src/sheet/`, SheetSwitch, `apps/web/src/dice.ts`, the web utils only the old sheet used (background, glyphs, runes, stats) and the old spell book routes. ItemShop / ItemDetails moved to `features/inventory` (inventory page).
+- Kept, though the web no longer calls them: `/api/roll`, GET `/api/characters/:id` (e2e tests read it), equip/unequip, dual-wield / two-hands / soul-brand / sigil-mark and the rune routes. The block sheet has no equip or rune controls yet. The old sheet's rules in `charSheet.css` stay (the inventory page loads that file).
+- Checks: 91/91 rules tests, typecheck, build, e2e 13/13 on 4001/5174.
+- Next: equip and rune controls on the block sheet (or drop those routes); R5.6/R5.7 need the owner's OK for their migrations.
+
+### 2026-11-21 - grokbot (R5.4-R5.5 missing pieces, bot/claude `e7fd9ae`)
+- Owner's calls: embers, cracks and breach saves are gone; Body Magic (its once-per-rest spells, Lantern/Mending runes) is stashed; money is the owner's to write.
+- Rules: `packages/rules/src/features.ts` (uses per rest), `sheetState.ts` (spendFeatureUse, takeRest ported from the old rest(), spendSlot, castSpell), `spellbook.ts` (learn/prepare caps, moved out of apiSpellController). Creature gains `restUses`, `spellLimits` and per-feature `key` / `perRest` / `diceNow`. Tests: `sheetState.test.ts`, `spellbook.test.ts` (82/82).
+- Server: POST `/api/sheets/character/:id/feature` | `/rest` | `/cast`, GET+POST `/spellbook` (owner or DM). Old spell routes now share `changeSpellbook()`. No migration: uses `rest_uses`, `used_slots`, `conditions`, `exhaustion`, `character_spells`.
+- Web: FeaturesBlock (uses left + Use), RestBlock, SpellsBlock casts through `/cast` (the browser no longer spends slots), SpellBookBlock (prepare / action / forget / learn). e2e `sheet-new.spec.js` passes on 4001/5174.
+- Left: money (owner); then swap the default sheet. ConditionsBlock/exhaustion still save through PATCH /state (owner only).
+
+### 2026-11-20 — Claude (R5.4–R5.5, bot/claude `e185d8e`)
+- New sheet at `/characters/:id?new=1` (old sheet stays the default): `apps/web/src/features/sheet/` — CharacterSheetPage + blocks SheetHeader, HealthBlock, CoreStatsBlock, StatsBlock (stats + skills), ConditionsBlock (+ exhaustion), ActionsBlock (weapons, bonus actions, Soul/Runic/Sigil), SpellsBlock (slots, cast level, cast/damage), InventoryBlock, FeaturesBlock, RollFeed. One `Sheet.module.css` with theme variables, laid out like the sheet mockup.
+- Every roll goes through `/act`; initiative, stats and skills are `kind: 'check'` (bonus from the Creature). 68/68 rules tests, typecheck, build OK. New e2e `sheet-new.spec.js`. Not yet seen in a browser.
+- Still on the old sheet only (do before swapping): feature activation (embers, per-rest uses, cracks/breach), rests, Body Magic once-per-rest spells, lanterns/Mending runes, spell book (learn/prepare), money. Spell slots are still spent from the browser.
+- Next: owner compares ?new=1 with the old sheet; then the missing pieces, the swap (R5.5 end), and R5.6/R5.7 (need migration OK).
+
+### 2026-11-20 — Claude (R5.1–R5.3, bot/claude)
+- Based on bot/cursor `bbd0db9` (R4 + review fixes 1–3), since main is mid-merge.
+- R5.1 `e7d32db`: `packages/rules/src/creature.ts` (Creature type + characterToCreature: AC, initiative, weapons incl. versatile/dual wield/Soul Brand/runed/sigil, fists, skills, spells, embers, cracks, speed), `stats.ts` and `runes.ts` moved into rules (web utils re-export them). Tests check every number against the old sheet's math.
+- R5.2–R5.3 `a11ee9a`: `GET /api/sheets/character/:id` -> { creature, canEdit, access } (owner/DM edit, other campaign players view) and `POST /api/sheets/character/:id/act` { actionKey, kind, castLevel?, extra?, featureKey? } — server finds the action, rolls, remembers a natural 20 (in memory) for the next damage. Rules in `actions.ts`.
+- 67/67 rules tests, typecheck clean, routes load. NOT run against the database from here (this shell can't reach Neon): needs a check on port 4001.
+- The old sheet still rolls through /api/roll; the new blocks (R5.4–R5.5) will use /act. Spell slot spending is still client state.
+- Next: R5.4 blocks + R5.5 Character layout. R5.6/R5.7 need the owner's OK for their migrations.
 
 ### 2026-11-20 — Cursor (R4 review: finished role and Endurance)
 - A finished character's role save also writes `class_id` and `subclass_id`, the same way finish does. A draft still waits until finish. Those columns go away in R7.

@@ -62,7 +62,7 @@ test('traits scores follow the server rolls, and a finished character cannot rer
     })).ok()).toBeTruthy();
     const draftSheet = await (await page.request.get(`/api/characters/${id}`)).json();
     expect(draftSheet.character.class_id).toBeNull();
-    expect((await page.request.post(`/api/characters/${id}/finish`)).ok()).toBeTruthy();
+    expect((await page.request.post(`/api/characters/${id}/finish`, { data: { money_preset: 'impoverished' } })).ok()).toBeTruthy();
 
     const sheetBefore = await (await page.request.get(`/api/characters/${id}`)).json();
     const sides = Number(String(form.options.roles.find((role) => role.key === 'warrior').hit_die).match(/\d+/)[0]);

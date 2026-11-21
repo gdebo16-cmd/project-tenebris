@@ -2,10 +2,9 @@ import { Link, useParams, useNavigate } from 'react-router';
 import usePageStyle from '../hooks/usePageStyle';
 import sheetCss from '../styles/charSheet.css?inline';
 import sheetSubpageCss from '../styles/sheet-subpage.css?inline';
-import ItemShop from '../sheet/actions/ItemShop';
+import ItemShop from '../features/inventory/ItemShop';
 
-// Replaces views/inventory.ejs. The list itself lives in ItemShop,
-// which the character sheet's Inventory tab also uses.
+// Replaces views/inventory.ejs. The list itself lives in ItemShop.
 function InventoryPage() {
     usePageStyle(sheetCss + sheetSubpageCss, 'subpage');
     const { id } = useParams();

@@ -10,7 +10,8 @@ const FORM_COLUMNS = new Set([
     'role_id', 'calling_id', 'skill_proficiencies', 'feature_choices',
     'str', 'dex', 'con', 'int', 'wis', 'cha', 'luc', 'spd', 'plus2_stat', 'plus1_stat', 'stat_rolls',
     'alignment_code', 'upbringing_id', 'lifestyle_id', 'outlook_id', 'upbringing_state', 'lifestyle_state', 'outlook_state',
-    'money',
+    // default money (Gear tab, drafts only): the coin columns, never the old `money` column
+    'copper', 'silver', 'gold', 'crowns', 'oracles',
 ]);
 
 // A new, empty character marked as a draft. Answers its id.
@@ -32,7 +33,8 @@ export async function getFormCharacter(charId) {
                 role_id, calling_id, skill_proficiencies, feature_choices,
                 str, dex, con, "int", wis, cha, luc, spd, plus2_stat, plus1_stat, stat_rolls,
                 alignment_code, upbringing_id, lifestyle_id, outlook_id,
-                upbringing_state, lifestyle_state, outlook_state, money
+                upbringing_state, lifestyle_state, outlook_state,
+                copper, silver, gold, crowns, oracles
          FROM characters WHERE id = $1`,
         [charId]
     );

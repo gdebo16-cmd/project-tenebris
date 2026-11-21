@@ -2,17 +2,17 @@
 import * as Runes from '../controllers/apiRuneController.js';
 import { Router } from 'express';
 import {
-    getCharacter, updateHp, updateTempHp, updateSheetState, deleteCharacter,
+    getCharacter, updateHp, updateTempHp, deleteCharacter,
     equipArmor, unequipArmor, equipWeapon, unequipWeapon, dualWieldWeapon, twoHandWeapon, soulBrandWeapon, sigilMarkWeapon, equipItem, unequipItem,
 } from '../controllers/apiController.js';
 import { me, login, logout, register, home, getSettings, updateSettings, getProfile, updateProfile, deleteAccount } from '../controllers/apiUserController.js';
 import { getInventory, addArmor, addWeapon, removeArmor, removeWeapon, addItem, removeItem } from '../controllers/apiInventoryController.js';
-import { getSpellbook, learnSpell, unlearnSpell, prepareSpell, unprepareSpell, setAction, removeAction } from '../controllers/apiSpellController.js';
 import { createCampaign, deleteCampaign, getCampaign, updateCampaign, listCampaigns, joinCampaign, setCampaignCharacter } from '../controllers/apiCampaignController.js';
 import { getContent, getSpells } from '../controllers/contentController.js';
 import { roll } from '../controllers/apiRollController.js';
 import { getCatalog, listCampaignMonsters, addMonster, getMonsterSheet, updateMonster, deleteMonster } from '../controllers/apiMonsterController.js';
 import characterFormRouter from './characterForm.js';
+import sheetsRouter from './sheets.js';
 
 
 
@@ -34,6 +34,7 @@ router.post('/register', loginLimiter, register);
 router.get('/me', me);
 router.post('/roll', roll);
 router.use(characterFormRouter);
+router.use(sheetsRouter);
 router.post('/logout', logout);
 router.get('/home', home);
 router.get('/settings', getSettings);
@@ -47,7 +48,6 @@ router.get('/characters/:id', getCharacter);
 router.delete('/characters/:id', deleteCharacter);
 router.patch('/characters/:id/hp', updateHp);
 router.patch('/characters/:id/temp-hp', updateTempHp);
-router.patch('/characters/:id/state', updateSheetState);
 router.post('/characters/:id/inventory/armor/equip', equipArmor);
 router.post('/characters/:id/inventory/armor/unequip', unequipArmor);
 router.post('/characters/:id/inventory/weapon/equip', equipWeapon);
@@ -71,15 +71,6 @@ router.post('/characters/:id/inventory/armor/remove', removeArmor);
 router.post('/characters/:id/inventory/weapon/remove', removeWeapon);
 router.post('/characters/:id/inventory/item', addItem);
 router.post('/characters/:id/inventory/item/remove', removeItem);
-
-// spell book (learn / unlearn spells)
-router.get('/characters/:id/spellbook', getSpellbook);
-router.post('/characters/:id/spells/learn', learnSpell);
-router.post('/characters/:id/spells/unlearn', unlearnSpell);
-router.post('/characters/:id/spells/prepare', prepareSpell);
-router.post('/characters/:id/spells/unprepare', unprepareSpell);
-router.post('/characters/:id/spells/setAction', setAction);
-router.post('/characters/:id/spells/removeAction', removeAction);
 
 // campaign creation and deletion
 router.get('/campaigns', listCampaigns);

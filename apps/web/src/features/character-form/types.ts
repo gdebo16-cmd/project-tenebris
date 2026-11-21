@@ -1,5 +1,6 @@
 // The shape GET /api/characters/:id/form returns. The server builds it in formView().
 import type { Options } from '@tenebris/rules/characterForm';
+import type { MoneyPresetKey, Purse } from '@tenebris/rules/money';
 
 export type CharacterFormData = {
     id: number;
@@ -41,7 +42,10 @@ export type CharacterFormData = {
         outlook_state: string | null;
     };
     gear: {
-        money: number;
+        // Default money: the preset the coins match (null = none picked), the coins, and whether it can still be picked (drafts only)
+        money_preset: MoneyPresetKey | null;
+        purse: Purse;
+        can_pick_money: boolean;
         weapon_id: number | null;
         armor_id: number | null;
         item_ids: number[];

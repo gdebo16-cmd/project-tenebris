@@ -1,5 +1,6 @@
 // What a role can use, and which common gear the inventory tab may offer.
 // Callings are not included. PLACEHOLDER until docs/DECISIONS.md: a calling does not add proficiencies.
+import { checkMoneyPreset, type MoneyPresetKey } from './money.ts';
 
 const ARMOR_PROF_TO_TYPE: Record<string, string> = {
     'light armor': 'light',
@@ -80,9 +81,6 @@ export function gearChoices(pack: GearPack, role: GearRole) {
     };
 }
 
-// PLACEHOLDER until docs/DECISIONS.md: every new character starts with this much money.
-export const STARTING_MONEY = 10;
-
 // The first proficient weapon and the first proficient armor. Items stay empty.
 export function defaultGear(choices: ReturnType<typeof gearChoices>): { error: string } | { weapon_id: number; armor_id: number | null } {
     const weapon = choices.weapons.find((item) => item.proficient);
@@ -93,8 +91,9 @@ export function defaultGear(choices: ReturnType<typeof gearChoices>): { error: s
 
 type GearBody = Record<string, unknown> | null | undefined;
 
-// The browser picks ids. Money is never taken from the browser.
-export function checkGearTab(choices: ReturnType<typeof gearChoices>, body: GearBody): { error: string } | { weapon_id: number; armor_id: number | null; item_ids: number[]; money: number } {
+// The browser picks ids. Money is never an amount from the browser: only a default-money preset key
+// (money_preset, optional; MONEY_PRESETS in money.ts), which the server turns into coins.
+export function checkGearTab(choices: ReturnType<typeof gearChoices>, body: GearBody): { error: string } | { weapon_id: number; armor_id: number | null; item_ids: number[]; money_preset: MoneyPresetKey | null } {
     const weaponId = Number(body?.weapon_id);
     if (!choices.weapons.some((weapon) => weapon.id === weaponId)) return { error: 'Pick a weapon from the list' };
 
@@ -107,5 +106,12 @@ export function checkGearTab(choices: ReturnType<typeof gearChoices>, body: Gear
     if (itemIds.some((id) => !choices.items.some((item) => item.id === id))) return { error: 'Pick items from the list' };
     if (new Set(itemIds).size !== itemIds.length) return { error: 'Each item can only be picked once' };
 
-    return { weapon_id: weaponId, armor_id: armorId, item_ids: itemIds, money: STARTING_MONEY };
+    let moneyPreset: MoneyPresetKey | null = null;
+    if (body?.money_preset != null && body.money_preset !== '') {
+        const preset = checkMoneyPreset(body.money_preset);
+        if ('error' in preset) return preset;
+        moneyPreset = preset.key;
+    }
+
+    return { weapon_id: weaponId, armor_id: armorId, item_ids: itemIds, money_preset: moneyPreset };
 }
