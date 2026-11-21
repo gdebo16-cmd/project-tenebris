@@ -30,39 +30,39 @@ function LoginPage() {
 
     return (
         <>
-            <header id="site-title">
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
+            <header id={styles.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Eldrid Tales</h1>
             </header>
 
             <main className={styles.page}>
-                <section className="form-container">
-                    <article className="form-title">
+                <section className={styles.formContainer}>
+                    <article className={styles.formTitle}>
                         
-                        <h2 id="titleText">Welcome to Your Legend</h2>
+                        <h2>Welcome to Your Legend</h2>
                     </article>
                     <form onSubmit={submit}>
-                        <article className="form-section user-name-container">
-                            <label id="userNameLabel" className="signin-label" htmlFor="userName">Enter Username</label>
-                            <input className="signin-value" type="text" id="userName" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                        <article className={styles.userNameContainer}>
+                            <label className={styles.signinLabel} htmlFor="userName">Enter Username</label>
+                            <input className={styles.signinValue} type="text" id="userName" value={username} onChange={(e) => setUsername(e.target.value)} required />
                         </article>
 
-                        <article className="form-section password-container ">
-                            <label id="passwordLabel" className="signin-label" htmlFor="password">Enter Password</label>
-                            <input className="signin-value" type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        <article className={styles.passwordContainer}>
+                            <label className={styles.signinLabel} htmlFor="password">Enter Password</label>
+                            <input className={styles.signinValue} type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                         </article>
 
                         {error && <p>{error}</p>}
 
-                        <article className="button-container">
-                            <button id="loginButton" className="btn btn-form" type="submit">Login</button>
-                            <Link to="/register" className="btn btn-form" id="newUserButton">Create New User</Link>
+                        <article className={styles.buttonContainer}>
+                            <button className={styles.btnForm} type="submit">Login</button>
+                            <Link to="/register" className={styles.btnForm}>Create New User</Link>
                         </article>
                     </form>
                 </section>
             </main>
             <footer>
-                <p className="footer-text" id="footer-text">© 2026 Eldrid Tales. All rights reserved.</p>
+                <p className={styles.footerText}>© 2026 Eldrid Tales. All rights reserved.</p>
             </footer>
         </>
     );
