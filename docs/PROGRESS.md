@@ -17,6 +17,12 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
+### 2026-11-20 — Cursor (R4 review: finished role and Endurance)
+- A finished character's role save also writes `class_id` and `subclass_id`, the same way finish does. A draft still waits until finish. Those columns go away in R7.
+- Changing Endurance on a finished character recomputes the stored max with the same gain as a level change: the level-1 CON mod and every later step. Current HP is clamped.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (54), form e2e (7 passed, smoke accounts in use).
+- R5 is not started.
+
 ### 2026-11-20 — Cursor (R4 review: level-up)
 - A finished character can change level from the header, up to 20, and down. The gain is the old editor's: hit die / 2 + 1 + CON mod, at least 1. `leveledMaxHp` matches `startingHp`. Stored max stays the base; current HP is clamped and not refilled. Drafts still get HP only when they finish.
 - Checked on ports 4003 / 5176: typecheck, `npm test` (54), form e2e (7 passed, smoke accounts in use). A finished warrior gained one hit-die step at level 2 and lost it again at level 1.

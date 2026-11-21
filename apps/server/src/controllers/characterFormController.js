@@ -183,6 +183,21 @@ export async function saveTab(req, res) {
         await Characters.updateLevel(ch.id, req.session.userId, Number(checked.values.level), newMax);
     }
 
+    // Endurance changes the CON mod inside the level-1 HP and inside every later gain.
+    if (!ch.is_draft && tab === 'traits' && checked.values.con !== undefined && Number(checked.values.con) !== Number(ch.con)) {
+        const info = await Characters.getLevelInfo(ch.id, req.session.userId);
+        if (!info) return res.status(404).json({ error: 'Character not found' });
+        const newMax = leveledMaxHp(
+            Number(info.hitpoint_die) || 0,
+            Number(info.con),
+            Number(info.level) || 1,
+            Number(info.max_hp),
+            Number(info.level) || 1,
+            Number(checked.values.con),
+        );
+        await Characters.updateLevel(ch.id, req.session.userId, Number(info.level) || 1, newMax);
+    }
+
     // The server decides: below level 3 the calling is gone, even if the browser still sends one on the header.
     if (tab === 'header' && Number(checked.values.level) < CALLING_LEVEL) {
         Object.assign(checked.values, clearedCalling(ch.feature_choices));
@@ -193,6 +208,9 @@ export async function saveTab(req, res) {
     }
 
     await Form.updateCharacterFields(ch.id, checked.values);
+    if (!ch.is_draft && tab === 'role') {
+        await Form.syncLegacyClass(ch.id, checked.values.role_id, checked.values.calling_id ?? null);
+    }
     res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 

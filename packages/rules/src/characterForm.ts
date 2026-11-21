@@ -347,11 +347,14 @@ export function startingHp(hitDieSides: number, con: number, level: number, firs
     return Math.max(1, firstRoll + conMod + (level - 1) * gainPerLevel(hitDieSides, con));
 }
 
-// Level change for a finished character. Peel the old gains off the stored base max, then apply the new level.
-// Level-down uses the same line. The stored max stays the base; calling and CON-boost HP are added when the sheet is read.
-export function leveledMaxHp(hitDieSides: number, con: number, oldLevel: number, oldMax: number, newLevel: number): number {
-    const perLevel = gainPerLevel(hitDieSides, con);
+// Peel the old level-1 CON mod and the old gains off the stored base max, then apply the new level and CON.
+// Pass newCon when Endurance changed. Level-down uses the same line. Never below 1.
+// The stored max stays the base; calling and CON-boost HP are added when the sheet is read.
+export function leveledMaxHp(hitDieSides: number, con: number, oldLevel: number, oldMax: number, newLevel: number, newCon: number = con): number {
     const from = Number(oldLevel) || 1;
-    const baseHp = Number(oldMax) - (from - 1) * perLevel;
-    return Math.max(1, baseHp + (Number(newLevel) - 1) * perLevel);
+    const to = Number(newLevel) || 1;
+    const oldMod = Math.floor(Number(con) / 2) - 5;
+    const newMod = Math.floor(Number(newCon) / 2) - 5;
+    const baseHp = Number(oldMax) - (from - 1) * gainPerLevel(hitDieSides, con) - oldMod;
+    return Math.max(1, baseHp + newMod + (to - 1) * gainPerLevel(hitDieSides, newCon));
 }

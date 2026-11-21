@@ -105,6 +105,15 @@ export async function replaceFormGear(charId, { weapon_id, armor_id, item_ids })
     }
 }
 
+// The sheet still reads class_id and subclass_id. A finished character's role save keeps them in step.
+// Drafts wait until finish. These columns go away in R7.
+export async function syncLegacyClass(charId, roleId, callingId) {
+    await pool.query(
+        `UPDATE characters SET class_id = $2, subclass_id = $3 WHERE id = $1`,
+        [charId, await legacyClassIdForRole(roleId), await legacySubclassIdForCalling(callingId)]
+    );
+}
+
 // Marks a draft as finished with its starting HP.
 // Also fills the old race/class ids, because the current sheet still reads them (they go away in R7).
 export async function finishCharacter(ch, maxHp) {

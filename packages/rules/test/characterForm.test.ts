@@ -247,4 +247,6 @@ test('leveledMaxHp matches startingHp and the old level editor, up and down', ()
     // A max that was not rolled still moves by the same gain per level.
     assert.equal(leveledMaxHp(12, 14, 3, 30, 5), 30 + 2 * 9);
     assert.equal(leveledMaxHp(12, 14, 3, 30, 1), 30 - 2 * 9);
+    // Same level, new Endurance: level-1 CON mod and every later gain both move. 27 was 7 + 2 + 2*9.
+    assert.equal(leveledMaxHp(12, 14, 3, 27, 3, 12), 7 + 1 + 2 * 8);
 });
