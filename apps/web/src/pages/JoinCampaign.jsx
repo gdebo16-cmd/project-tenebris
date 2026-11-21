@@ -3,12 +3,10 @@ import { useParams, useNavigate, Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys } from '../queries.ts';
-import usePageStyle from '../hooks/usePageStyle';
-import joinCampaignCss from '../styles/joinCampaign.css?inline';
+import styles from './JoinCampaign.module.css';
 
 
 export default function JoinCampaign() {
-    usePageStyle(joinCampaignCss);
     const { code } = useParams();
     const [error, setError] = useState('');
     const ran = useRef(false);
@@ -40,7 +38,7 @@ export default function JoinCampaign() {
             <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
             <h1>Join a Tale</h1>
         </header>
-        <main>
+        <main className={styles.page}>
         <div>
         {error ? (
             <>
