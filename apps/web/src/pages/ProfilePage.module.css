@@ -1,18 +1,16 @@
-/* ProfilePage styles (was styles/profile.css, added by the old usePageStyle hook).
-   Scoped to this page: ProfilePage puts styles.page on its <main>, and every rule below
-   only applies while that element is on screen (html:has(.page)).
-   :where(...) adds no specificity, so each rule weighs exactly what it did before.
-   Class and id names stay global (:global) because shared parts such as SiteNav use them;
-   .page (written :local(.page)) is the only name this module makes local. */
+/* ProfilePage styles (was styles/profile.css).
+   Class and id names are local to this module (ProfilePage.jsx uses styles.x).
+   Rules that only name elements (html, body, header, main, a, ...) stay limited to this page
+   with :where(html:has(.page)); :where() adds no specificity. */
 
-:global :where(html:has(:local(.page))) input[type="text"],
-:global :where(html:has(:local(.page))) input[type="email"],
-:global :where(html:has(:local(.page))) input[type="password"] {
+:where(html:has(.page)) input[type="text"],
+:where(html:has(.page)) input[type="email"],
+:where(html:has(.page)) input[type="password"] {
   font-size: 2rem; 
 }
 
-:global html:where(:has(:local(.page))),
-:global body:where(:has(:local(.page))) {
+html:where(:has(.page)),
+body:where(:has(.page)) {
     margin: 0 ! important;
     padding: 0 ! important;
     width: 100vw;
@@ -33,7 +31,7 @@
     
 }
 
-:global body:where(:has(:local(.page))) {
+body:where(:has(.page)) {
     content: '';
     position: absolute;
     top: 0;
@@ -45,7 +43,7 @@
     max-width: 3840px;
 }
 
-:global :where(html:has(:local(.page))) .fixed-bg {
+:where(html:has(.page)) :global(.fixed-bg) {
     position: absolute;
     top: 0;
     left: 0;
@@ -62,20 +60,20 @@
     flex-direction: column;
 }
 
-:global :where(html:has(:local(.page))) ul,
-:global :where(html:has(:local(.page))) li,
-:global :where(html:has(:local(.page))) a {
+:where(html:has(.page)) ul,
+:where(html:has(.page)) li,
+:where(html:has(.page)) a {
     list-style: none;
     text-decoration: none;
     color: var(--txt-color-1);
 }
 
-:global :where(html:has(:local(.page))) select {
+:where(html:has(.page)) select {
     border: none;
     box-shadow: none;
 }
 
-:global :where(html:has(:local(.page))) option {
+:where(html:has(.page)) option {
     background-color: var(--drop-down-bg);
     color: var(--drop-down-txt);
     border: none;
@@ -87,7 +85,7 @@
 }
 
 
-:global :where(html:has(:local(.page))) footer {
+:where(html:has(.page)) footer {
     width: 100vw;
     height: 100svh;
     overflow: hidden ! important;
@@ -98,7 +96,7 @@
 }
 
 
-:global :where(html:has(:local(.page))) .title-logo {
+.titleLogo {
     max-width: 70px;
     max-height: 70px;
     margin: 0;
@@ -109,7 +107,7 @@
 }
 
 
-:global :where(html:has(:local(.page))) .profile-container {
+.profileContainer {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -122,7 +120,7 @@
     margin-top: 10vh;
 }
 
-:global :where(html:has(:local(.page))) .profile-tile {
+.profileTile {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -132,7 +130,7 @@
     border: var(--tileBorder);
 }
 
-:global :where(html:has(:local(.page))) .tile-label {
+.tileLabel {
     text-align: center;
     background-color: var(--bg);
     border-radius: var(--tile) var(--tile) 0 0;
@@ -140,7 +138,7 @@
     border-bottom: var(--tileBorder);
 }
 
-:global :where(html:has(:local(.page))) .tile-value {
+.tileValue {
     text-align: center;
     box-shadow: var(--bs2), var(--shadowInner, none);
     padding: 4%;
@@ -151,7 +149,7 @@
     font-family: inherit;
 }
 
-:global :where(html:has(:local(.page))) .profile-tile {
+.profileTile {
     text-align: center;
     font-size: 120%;
     border-radius: var(--tile);
@@ -159,31 +157,15 @@
     margin: 5%;
 }
 
-:global :where(html:has(:local(.page))) .profile-label {
-    
-    box-shadow: var(--bs2);
-    padding: 4%;
-    font: inherit;
-}
-
-
-:global :where(html:has(:local(.page))) .profile-button {
-    color: var(--txt-color-1);
-    box-shadow: var(--bs2);
-    padding: 4%;
-    font: inherit;
-    border-radius: var(--rad2);
-}
-
 @media (max-width: 768px) {
-    :global :where(html:has(:local(.page))) header {
+    :where(html:has(.page)) header {
         display: flex;
         height: 8vh;
         width: 100vw;
         border-radius: 0 0 15% 15%;
     }
 
-    :global :where(html:has(:local(.page))) main {
+    :where(html:has(.page)) main {
         height: calc(100svh - 12vh);
         width: 100%;
         position: relative;
@@ -201,7 +183,7 @@
         background-color: rgba(var(--bgc-theme), 0.7);
     }
 
-    :global :where(html:has(:local(.page))) .title-logo {
+    .titleLogo {
         max-width: 50px;
         max-height: 50px;
         margin: 0;
@@ -210,7 +192,7 @@
         box-shadow: none;
     }
     
-    :global :where(html:has(:local(.page))) #site-title {
+    #siteTitle {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -232,7 +214,7 @@
 
 
 
-    :global :where(html:has(:local(.page))) footer {
+    :where(html:has(.page)) footer {
         display: flex;
         position: fixed;
         top: calc(100svh - 2vh);
@@ -246,45 +228,24 @@
         overflow: hidden;
     }
 
-    :global :where(html:has(:local(.page))) .footer-text {
+    .footerText {
         display: none;
         
        }
 
     
-    :global :where(html:has(:local(.page))) .profile-tile {
+    .profileTile {
     
         border-radius: var(--tile);
         box-shadow: var(--bs2);
         margin: 5%;
     }
-
-      :global :where(html:has(:local(.page))) .profile-label {
-        padding: 4%;
-       
-        font: inherit;
-    }
-
-    :global :where(html:has(:local(.page))) .profile-value {
-
-        padding: 4%;
-        text-align: center;
-    }
-
-    :global :where(html:has(:local(.page))) .profile-button {
-        padding: 4%;
-        font: inherit;
-    }
 }
 
 /* desktop block kept last so it wins over the shared rules above */
 @media (min-width: 769px) {
-    :global :where(html:has(:local(.page))) .sheet-panel,
-    :global :where(html:has(:local(.page))) .sheet-panel[hidden] {
-        display: contents !important;
-    }
 
-    :global :where(html:has(:local(.page))) main {
+    :where(html:has(.page)) main {
         flex: 1 1 auto;
         box-sizing: border-box;
         width: 100%;
@@ -301,7 +262,7 @@
         align-items: flex-start;
     }
 
-    :global :where(html:has(:local(.page))) footer {
+    :where(html:has(.page)) footer {
         display: flex;
         position: fixed;
         left: 0;
@@ -324,11 +285,11 @@
         overflow: hidden;
     }
 
-    :global :where(html:has(:local(.page))) #site-title h1 {
+    #siteTitle h1 {
         display: none;
     }
 
-    :global :where(html:has(:local(.page))) .title-logo {
+    .titleLogo {
         content: url('/logo_banner.png');
         height: auto;
         width: auto;
@@ -337,14 +298,14 @@
         object-fit: contain;
     }
 
-    :global :where(html:has(:local(.page))) header {
+    :where(html:has(.page)) header {
         display: flex;
         height: 10vh;
         width: 100vw;
         border-radius: 0 0 15% 15%;
     }
 
-    :global :where(html:has(:local(.page))) #site-title {
+    #siteTitle {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -360,14 +321,14 @@
         box-shadow: var(--bs2);
     }
 
-    :global :where(html:has(:local(.page))) footer .footer-text {
+    footer .footerText {
         background-image: var(--txt-gradient, linear-gradient(currentColor, currentColor));
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    :global :where(html:has(:local(.page))) .profile-container {
+    .profileContainer {
         width: min(1100px, 90vw);
         margin: 0 auto;
         padding: 3vh 3vw;
@@ -384,7 +345,7 @@
         box-shadow: var(--bs2);
     }
 
-    :global :where(html:has(:local(.page))) .profile-tile {
+    .profileTile {
         box-sizing: border-box;
         width: 100%;
         min-width: 0;

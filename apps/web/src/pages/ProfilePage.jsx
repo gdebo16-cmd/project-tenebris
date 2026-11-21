@@ -28,41 +28,41 @@ function ProfilePage() {
 
     return (
         <>
-            <header id="site-title">
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
+            <header id={styles.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Profile</h1>  
             </header>
             <SiteNav className={styles.nav} />
             <main className={styles.page}>
-                <section className='profile-container'>
-                        <article className="form-section profile-tile" id="profile-username-container">
-                            <label id="theme-label" className="tile-label tile-top" htmlFor="theme-select">Color scheme</label>
-                            <select className="field tile-value tile-bottom" id="theme-value" aria-label="Color scheme" defaultValue={localStorage.getItem('siteTheme') || 'default'} onChange={pickTheme}>
+                <section className={styles.profileContainer}>
+                        <article className={styles.profileTile}>
+                            <label className={styles.tileLabel} htmlFor="theme-select">Color scheme</label>
+                            <select className={styles.tileValue} aria-label="Color scheme" defaultValue={localStorage.getItem('siteTheme') || 'default'} onChange={pickTheme}>
                                 {THEMES.map((t) => (
-                                <option className='option' id={`theme-option-${t}`} key={t} value={t}>{pretty(t)}</option>
+                                <option id={`theme-option-${t}`} key={t} value={t}>{pretty(t)}</option>
                                 ))}
                             </select>
                         </article>
-                        <article className="form-section profile-tile" id="profile-email-container">
-                            <label id="display-label" className="tile-label tile-top" htmlFor="display-select">Display</label>
-                            <select className="field tile-value tile-bottom" id="display-select" aria-label="Display" defaultValue={localStorage.getItem('siteDisplay') || 'standard'} onChange={pickDisplay}>
+                        <article className={styles.profileTile}>
+                            <label className={styles.tileLabel} htmlFor="display-select">Display</label>
+                            <select className={styles.tileValue} id="display-select" aria-label="Display" defaultValue={localStorage.getItem('siteDisplay') || 'standard'} onChange={pickDisplay}>
                                 {DISPLAYS.map((d) => (
-                                <option className='option' id={`display-option-${d}`} key={d} value={d}>{pretty(d)}</option>
+                                <option id={`display-option-${d}`} key={d} value={d}>{pretty(d)}</option>
                                 ))}
                             </select>
                         </article>
-                        <article className="form-section profile-tile" id="profile-background-container">
-                            <label id="background-label" className="tile-label tile-top" htmlFor="background-select">Background</label>
-                            <select className="field tile-value tile-bottom" id="background-select" aria-label="Background" defaultValue={localStorage.getItem('siteBackground') || 'default'} onChange={pickBackground}>
+                        <article className={styles.profileTile}>
+                            <label className={styles.tileLabel} htmlFor="background-select">Background</label>
+                            <select className={styles.tileValue} id="background-select" aria-label="Background" defaultValue={localStorage.getItem('siteBackground') || 'default'} onChange={pickBackground}>
                                 {BACKGROUNDS.map((b) => (
-                                <option className='option' id={`background-option-${b}`} key={b} value={b}>{pretty(b)}</option>
+                                <option id={`background-option-${b}`} key={b} value={b}>{pretty(b)}</option>
                                 ))}
                             </select>
                         </article>
                 </section>
             </main>
             <footer>
-                <p className="footer-text" id="footer-text">copyrite Eldrid Tales LLC</p>
+                <p className={styles.footerText}>copyrite Eldrid Tales LLC</p>
             </footer>
         </>
     );
