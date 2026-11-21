@@ -17,7 +17,15 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
-### 2026-11-21 - grokbot (R5.4-R5.5 missing pieces, bot/claude, uncommitted)
+### 2026-11-21 - grokbot (R5.5 money, conditions, sheet swap; bot/claude `e7fd9ae`, `f94cf65`, `46ec4b5`)
+- Money: owner's migration `1795282460378_add-character-money` (copper, silver, gold, crowns, oracles). Rules `money.ts` (purse, checks, presets). POST `/api/sheets/character/:id/money` (owner or DM, one atomic UPDATE, "Not enough silver."). Character form Gear tab: three default money buttons (Impoverished 10 cp, Average +10 sp, Wealthy +10 gp), drafts only; a finished character's money changes on the sheet. PurseBlock on the sheet's Gear tab.
+- Conditions: POST `/api/sheets/character/:id/conditions` { conditions?, exhaustion? } (owner or DM; rules `checkConditionsRequest` / `applyConditions`). PATCH `/api/characters/:id/state` is gone. The Sigil hit button no longer spends embers.
+- Swap: `/characters/:id` is the block sheet (`?new=1` is ignored). Deleted `apps/web/src/sheet/`, SheetSwitch, `apps/web/src/dice.ts`, the web utils only the old sheet used (background, glyphs, runes, stats) and the old spell book routes. ItemShop / ItemDetails moved to `features/inventory` (inventory page).
+- Kept, though the web no longer calls them: `/api/roll`, GET `/api/characters/:id` (e2e tests read it), equip/unequip, dual-wield / two-hands / soul-brand / sigil-mark and the rune routes. The block sheet has no equip or rune controls yet. The old sheet's rules in `charSheet.css` stay (the inventory page loads that file).
+- Checks: 91/91 rules tests, typecheck, build, e2e 13/13 on 4001/5174.
+- Next: equip and rune controls on the block sheet (or drop those routes); R5.6/R5.7 need the owner's OK for their migrations.
+
+### 2026-11-21 - grokbot (R5.4-R5.5 missing pieces, bot/claude `e7fd9ae`)
 - Owner's calls: embers, cracks and breach saves are gone; Body Magic (its once-per-rest spells, Lantern/Mending runes) is stashed; money is the owner's to write.
 - Rules: `packages/rules/src/features.ts` (uses per rest), `sheetState.ts` (spendFeatureUse, takeRest ported from the old rest(), spendSlot, castSpell), `spellbook.ts` (learn/prepare caps, moved out of apiSpellController). Creature gains `restUses`, `spellLimits` and per-feature `key` / `perRest` / `diceNow`. Tests: `sheetState.test.ts`, `spellbook.test.ts` (82/82).
 - Server: POST `/api/sheets/character/:id/feature` | `/rest` | `/cast`, GET+POST `/spellbook` (owner or DM). Old spell routes now share `changeSpellbook()`. No migration: uses `rest_uses`, `used_slots`, `conditions`, `exhaustion`, `character_spells`.
