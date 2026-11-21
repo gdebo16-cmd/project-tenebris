@@ -92,111 +92,111 @@ function CampaignPage() {
 
     return (
         <>
-            <header id="site-title">
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
+            <header id={styles.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Campaign</h1>
             </header>
             <SiteNav className={styles.nav} />
             <main className={styles.page}>
-                <nav className="home-tabs">
-                    <button type="button" className={campTab === 'campaign' ? 'home-tab is-active' : 'home-tab'} onClick={() => setCampTab('campaign')}>Campaign</button>
-                    <button type="button" className={campTab === 'invite' ? 'home-tab is-active' : 'home-tab'} onClick={() => setCampTab('invite')}>Invite / Join</button>
-                    <button type="button" className={campTab === 'players' ? 'home-tab is-active' : 'home-tab'} onClick={() => setCampTab('players')}>Current Players</button>
+                <nav className={styles.homeTabs}>
+                    <button type="button" className={campTab === 'campaign' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setCampTab('campaign')}>Campaign</button>
+                    <button type="button" className={campTab === 'invite' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setCampTab('invite')}>Invite / Join</button>
+                    <button type="button" className={campTab === 'players' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setCampTab('players')}>Current Players</button>
                     {isDm && (
-                    <button type="button" className={campTab === 'monsters' ? 'home-tab is-active' : 'home-tab'} onClick={() => setCampTab('monsters')}>Monsters</button>
+                    <button type="button" className={campTab === 'monsters' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setCampTab('monsters')}>Monsters</button>
                     )}
                 </nav>
-                <section className={campTab === 'campaign' ? 'container campaign-tile camp-area-a is-active' : 'campaign-container'}>
+                <section className={campTab === 'campaign' ? `${styles.container} ${styles.campaignTile} ${styles.isActive}` : undefined}>
                     {editing ? (
                     <>
-                        <div className="edit-container">
-                            <article className="title-edit">
+                        <div className={styles.editContainer}>
+                            <article className={styles.titleEdit}>
                                 <h2><strong>Edit Tale</strong></h2>
                             </article>
                             
                             <form onSubmit={saveEdit}>
-                                <div className="title-edit">
-                                    <label className="edit-label" htmlFor="camp-edit-name">Title</label>
-                                    <input id="camp-edit-name" className="edit-input" type="text" maxLength={120} value={form.name}
+                                <div className={styles.titleEdit}>
+                                    <label className={styles.editLabel} htmlFor="camp-edit-name">Title</label>
+                                    <input id="camp-edit-name" className={styles.editInput} type="text" maxLength={120} value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })} />
                                 </div>
-                                <div className="description-edit">
-                                    <label className="edit-label" htmlFor="camp-edit-desc">Description</label>
-                                    <textarea id="camp-edit-desc" className="edit-input" rows={5} value={form.description}
+                                <div className={styles.descriptionEdit}>
+                                    <label className={styles.editLabel} htmlFor="camp-edit-desc">Description</label>
+                                    <textarea id="camp-edit-desc" className={styles.editInput} rows={5} value={form.description}
                                         onChange={(e) => setForm({ ...form, description: e.target.value })} />
                                 </div>
                                 
-                                <div className="edit-actions">
-                                    <button type="submit" className="action-button" disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
-                                    <button type="button" className="action-button" disabled={saving} onClick={() => setEditing(false)}>Return</button>
+                                <div className={styles.editActions}>
+                                    <button type="submit" className={styles.actionButton} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
+                                    <button type="button" className={styles.actionButton} disabled={saving} onClick={() => setEditing(false)}>Return</button>
                                 </div>
-                                <div className="image-edit">
-                                    <div className="image-grid">
+                                <div>
+                                    <div className={styles.imageGrid}>
                                         {campaignImages.map((img) => (
                                             <button type="button" key={img.url} title={img.label}
-                                                className={form.campaign_img_url === img.url ? 'image-choice is-selected' : 'image-choice'}
+                                                className={form.campaign_img_url === img.url ? `${styles.imageChoice} ${styles.isSelected}` : styles.imageChoice}
                                                 onClick={() => setForm({ ...form, campaign_img_url: img.url })}>
-                                                <img className="image-select" src={img.url} alt={img.label} loading="lazy" />
+                                                <img className={styles.imageSelect} src={img.url} alt={img.label} loading="lazy" />
                                             </button>
                                         ))}
                                     </div>
                                 </div>
-                                {editError && <p className="edit-error" role="alert">{editError}</p>}
+                                {editError && <p role="alert">{editError}</p>}
                             </form>    
                         </div>
                     </>    
                     ) : (
                         <>
-                            <h2 className="title-edit"><strong>{campaign.name}</strong></h2>
+                            <h2 className={styles.titleEdit}><strong>{campaign.name}</strong></h2>
                             {campaign.campaign_img_url
-                                ? <img className="image-campaign" src={campaign.campaign_img_url} alt={`${campaign.name} picture`} />
-                                : <div className="image-campaign" role="img" aria-label={`${campaign.name} picture`} />}
-                            <div className="description-edit">
-                                <div className="campaign-description">
-                                    <p className="edit-label">Description</p>
-                                    <input className="edit-input-display" type="text" value={campaign.description} readOnly />
+                                ? <img className={styles.imageCampaign} src={campaign.campaign_img_url} alt={`${campaign.name} picture`} />
+                                : <div className={styles.imageCampaign} role="img" aria-label={`${campaign.name} picture`} />}
+                            <div className={styles.descriptionEdit}>
+                                <div>
+                                    <p className={styles.editLabel}>Description</p>
+                                    <input className={styles.editInputDisplay} type="text" value={campaign.description} readOnly />
                                 </div>
                             </div>
                             {campaign.role === 'dm' && (
-                                <div className="edit-actions">
-                                    <button type="button" className="action-button" onClick={startEdit}>Edit Tale</button>
+                                <div className={styles.editActions}>
+                                    <button type="button" className={styles.actionButton} onClick={startEdit}>Edit Tale</button>
                                 </div>
                             )}
                         </>
                     )}
                 </section>
-                <section className={campTab === 'invite' ? 'invite-container is-active' : 'invite-container'}>
-                    <article className='invite-tile'>
-                        <h2 className="campaign-title"><strong>Invite / Join</strong></h2>
+                <section className={campTab === 'invite' ? `${styles.inviteContainer} ${styles.isActive}` : styles.inviteContainer}>
+                    <article className={styles.inviteTile}>
+                        <h2 className={styles.campaignTitle}><strong>Invite / Join</strong></h2>
                         {campaign.role === 'dm' && (
-                            <div className="invite-set">
-                                <p className="invite-label">Invite code</p>
-                                <p className="invite-code">{campaign.invite_code}</p>
-                                <button type="button" className="share-button" onClick={shareInvite}>
+                            <div className={styles.inviteSet}>
+                                <p className={styles.inviteLabel}>Invite code</p>
+                                <p className={styles.inviteCode}>{campaign.invite_code}</p>
+                                <button type="button" className={styles.shareButton} onClick={shareInvite}>
                                     {copied ? 'Copied!' : 'Share invite link'}
                                 </button>
                             </div>
                         )}
-                            <div className="invite-set">
-                                <label className="invite-label-2" htmlFor="camp-character">Your character</label>
-                                <select id="camp-character" className="invite-select" value={selectedId} onChange={chooseCharacter}>
-                                    <option className='invite-option-disabled' value="" disabled>Choose a character</option>
+                            <div className={styles.inviteSet}>
+                                <label className={styles.inviteLabel2} htmlFor="camp-character">Your character</label>
+                                <select id="camp-character" className={styles.inviteSelect} value={selectedId} onChange={chooseCharacter}>
+                                    <option value="" disabled>Choose a character</option>
                                     {characters.map((ch) => (
-                                        <option className="invite-option-selected" key={ch.id} value={ch.id}>{ch.name}</option>
+                                        <option key={ch.id} value={ch.id}>{ch.name}</option>
                                     ))}
                                 </select>
                             </div>
                     </article>
                 </section>
-                <section className={campTab === 'players' ? 'is-active' : 'player-container'}>
-                    <h2 className="players-title"><strong>Current Players</strong></h2>
-                    <ul className="players-list">
+                <section className={campTab === 'players' ? styles.isActive : styles.playerContainer}>
+                    <h2 className={styles.playersTitle}><strong>Current Players</strong></h2>
+                    <ul className={styles.playersList}>
                         {members.map((mem) => (
-                            <li className="player-tile" key={mem.username}>
-                                <span className="player-name">{mem.username}</span>
-                                <span className={`player-role role-${mem.role}`}>{mem.role === 'dm' ? 'DM' : 'Player'}</span>
+                            <li className={styles.playerTile} key={mem.username}>
+                                <span className={styles.playerName}>{mem.username}</span>
+                                <span className={mem.role === 'dm' ? `${styles.playerRole} ${styles.roleDm}` : styles.playerRole}>{mem.role === 'dm' ? 'DM' : 'Player'}</span>
                                 {/* players never see the DM's character status; the DM sees everything */}
-                                {!(mem.role === 'dm' && campaign.role !== 'dm') && <span className="player-character">
+                                {!(mem.role === 'dm' && campaign.role !== 'dm') && <span className={styles.playerCharacter}>
                                     {mem.character_name
                                         ? (campaign.role === 'dm'
                                             ? <Link to={`/characters/${mem.character_id}`}>{mem.character_name}</Link>
@@ -208,20 +208,20 @@ function CampaignPage() {
                     </ul>
                 </section>
                 {isDm && (
-                <section className={campTab === 'monsters' ? 'campaign-tile is-active' : 'monsters-container'}>
-                    <article className="monsters-title">
-                        <h2 className="monsters-title"><strong>Monsters</strong></h2>
+                <section className={campTab === 'monsters' ? `${styles.campaignTile} ${styles.isActive}` : styles.monstersContainer}>
+                    <article>
+                        <h2><strong>Monsters</strong></h2>
                     </article>
-                    <article className="monsters-list">
-                        <select className='monsters-set' value={pickMonster} onChange={(e) => setPickMonster(e.target.value)}>
-                            <option className='monsters-def-option' value="">Choose a monster…</option>
-                                {(catalog.data || []).map((m) => <option className='monsters-option' key={m.id} value={m.id}>{m.name}</option>)}
+                    <article>
+                        <select value={pickMonster} onChange={(e) => setPickMonster(e.target.value)}>
+                            <option value="">Choose a monster…</option>
+                                {(catalog.data || []).map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                         </select>
-                        <button type="button" className="action-button" onClick={addMonster} disabled={!pickMonster}>Add Monster</button>
+                        <button type="button" className={styles.actionButton} onClick={addMonster} disabled={!pickMonster}>Add Monster</button>
                         <ul>
                             {(monsters.data || []).map((m) => (
-                                <li className='monsters-item' key={m.id}>
-                                    <Link className='monsters-link' to={`/monsters/${m.id}`}>{m.nickname || m.name}</Link> (HP {m.current_hp})
+                                <li key={m.id}>
+                                    <Link to={`/monsters/${m.id}`}>{m.nickname || m.name}</Link> (HP {m.current_hp})
                                 </li>
                             ))}
                         </ul>

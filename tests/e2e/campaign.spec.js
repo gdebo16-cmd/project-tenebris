@@ -19,7 +19,7 @@ test('a DM creates a tale and a player joins it', async ({ browser }) => {
   // on desktop width it is already showing.
   const inviteTab = dm.getByRole('button', { name: 'Invite / Join' });
   if (await inviteTab.isVisible()) await inviteTab.click();
-  const code = (await dm.locator('.invite-code').textContent()).trim();
+  const code = (await dm.getByText('Invite code', { exact: true }).locator('xpath=following-sibling::p[1]').textContent()).trim();
   expect(code).not.toBe('');
 
   // Player joins with the code and lands on the same tale
