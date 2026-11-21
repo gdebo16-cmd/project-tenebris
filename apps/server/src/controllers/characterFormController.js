@@ -7,20 +7,23 @@
 //
 // The rules live in @tenebris/rules (characterOptions + characterForm); this file is the glue.
 import { characterOptions } from '@tenebris/rules/characterOptions';
-import { checkHeader, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, finishedFormBlock, keepUnrelatedChoices, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
+import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, keepUnrelatedChoices, leveledMaxHp, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
 import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
+import { checkGearTab, defaultGear, gearChoices, STARTING_MONEY } from '@tenebris/rules/gear';
 import { roll4d6DropLowest, rollDice } from '@tenebris/rules/dice';
 import { rng } from '../dice.js';
 import formPack from '../models/formPack.js';
 import { getRole, hitDieSides } from '../models/content.js';
 import * as Form from '../models/characterFormModel.js';
+import * as Characters from '../models/characterModel.js';
 
 // The tabs that can be saved so far. Each later slice (R4.5-R4.8) adds its check here.
 const TAB_CHECKS = {
-    header: (_options, body) => checkHeader(body),
+    header: (_options, body, ch) => checkHeader(body, ch?.level),
     species: (options, body) => checkSpeciesTab(options, body),
     role: (options, body) => checkRoleTab(options, body),
     traits: (options, body, ch) => checkTraitsTab(options, ch.stat_rolls, body),
+    personality: (options, body) => checkPersonalityTab(options, body),
 };
 
 // Sub-species are stored as the species id; the form wants the top-level species and the sub-species apart
@@ -92,8 +95,24 @@ function traitsView(ch) {
     };
 }
 
+// Role proficiencies and the common gear lists. Callings are not added (see gear.ts).
+function gearView(ch, owned) {
+    const choices = gearChoices(formPack, getRole(ch.role_id));
+    return {
+        money: ch.money ?? 0,
+        weapon_id: owned.weapon_id,
+        armor_id: owned.armor_id,
+        item_ids: owned.item_ids,
+        proficiencies: choices.proficiencies,
+        weapons: choices.weapons,
+        armor: choices.armor,
+        items: choices.items,
+    };
+}
+
 // What GET /form answers, grouped the way the form's tabs are
-function formView(ch) {
+async function formView(ch) {
+    const owned = await Form.getFormGear(ch.id);
     return {
         id: ch.id,
         is_draft: ch.is_draft,
@@ -106,6 +125,16 @@ function formView(ch) {
             feature_choices: ch.feature_choices ?? {},
         },
         traits: traitsView(ch),
+        personality: {
+            alignment_code: ch.alignment_code ?? null,
+            upbringing_id: ch.upbringing_id ?? null,
+            lifestyle_id: ch.lifestyle_id ?? null,
+            outlook_id: ch.outlook_id ?? null,
+            upbringing_state: ch.upbringing_state ?? null,
+            lifestyle_state: ch.lifestyle_state ?? null,
+            outlook_state: ch.outlook_state ?? null,
+        },
+        gear: gearView(ch, owned),
         missing: missingForFinish(ch),
         options: optionsFor(ch),
     };
@@ -122,7 +151,7 @@ export async function createDraft(req, res) {
 export async function getForm(req, res) {
     const ch = await loadOwnCharacter(req, res);
     if (!ch) return;
-    res.json(formView(ch));
+    res.json(await formView(ch));
 }
 
 export async function saveTab(req, res) {
@@ -131,6 +160,7 @@ export async function saveTab(req, res) {
 
     const tab = req.params.tab;
     if (!FORM_TABS.includes(tab)) return res.status(404).json({ error: `There is no "${tab}" tab` });
+    if (tab === 'gear') return saveGear(ch, req, res);
     const check = TAB_CHECKS[tab];
     if (!check) return res.status(400).json({ error: `The ${tab} tab can't be saved yet` });
 
@@ -138,12 +168,35 @@ export async function saveTab(req, res) {
     const checked = check(options, req.body, ch);
     if ('error' in checked) return res.status(400).json({ error: checked.error });
 
-    // Until R4.9 the old editor owns a finished character's level, role and traits.
-    if (!ch.is_draft && checked.values.level !== undefined && checked.values.level !== ch.level) {
-        return res.status(400).json({ error: 'Change the level of a finished character with the level editor for now' });
+    // A finished character's level change recomputes the stored base max. Current HP is clamped, not refilled.
+    // Drafts have no HP until finish, so a draft's level is only a number.
+    if (!ch.is_draft && tab === 'header' && checked.values.level !== undefined && Number(checked.values.level) !== Number(ch.level)) {
+        const info = await Characters.getLevelInfo(ch.id, req.session.userId);
+        if (!info) return res.status(404).json({ error: 'Character not found' });
+        const newMax = leveledMaxHp(
+            Number(info.hitpoint_die) || 0,
+            Number(info.con),
+            Number(info.level) || 1,
+            Number(info.max_hp),
+            Number(checked.values.level),
+        );
+        await Characters.updateLevel(ch.id, req.session.userId, Number(checked.values.level), newMax);
     }
-    const blocked = finishedFormBlock(tab, Boolean(ch.is_draft));
-    if (blocked) return res.status(400).json({ error: blocked });
+
+    // Endurance changes the CON mod inside the level-1 HP and inside every later gain.
+    if (!ch.is_draft && tab === 'traits' && checked.values.con !== undefined && Number(checked.values.con) !== Number(ch.con)) {
+        const info = await Characters.getLevelInfo(ch.id, req.session.userId);
+        if (!info) return res.status(404).json({ error: 'Character not found' });
+        const newMax = leveledMaxHp(
+            Number(info.hitpoint_die) || 0,
+            Number(info.con),
+            Number(info.level) || 1,
+            Number(info.max_hp),
+            Number(info.level) || 1,
+            Number(checked.values.con),
+        );
+        await Characters.updateLevel(ch.id, req.session.userId, Number(info.level) || 1, newMax);
+    }
 
     // The server decides: below level 3 the calling is gone, even if the browser still sends one on the header.
     if (tab === 'header' && Number(checked.values.level) < CALLING_LEVEL) {
@@ -155,7 +208,37 @@ export async function saveTab(req, res) {
     }
 
     await Form.updateCharacterFields(ch.id, checked.values);
-    res.json(formView(await Form.getFormCharacter(ch.id)));
+    if (!ch.is_draft && tab === 'role') {
+        await Form.syncLegacyClass(ch.id, checked.values.role_id, checked.values.calling_id ?? null);
+    }
+    res.json(await formView(await Form.getFormCharacter(ch.id)));
+}
+
+// Writes the kit and the placeholder money. Gear rows are not character columns.
+async function saveGear(ch, req, res) {
+    if (!ch.role_id) return res.status(400).json({ error: 'Pick a role first' });
+
+    const choices = gearChoices(formPack, getRole(ch.role_id));
+    const checked = checkGearTab(choices, req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+
+    await Form.replaceFormGear(ch.id, checked);
+    await Form.updateCharacterFields(ch.id, { money: checked.money });
+    res.json(await formView(await Form.getFormCharacter(ch.id)));
+}
+
+// POST /api/characters/:id/form/gear/default — the role's first proficient weapon and armor. This tab only.
+export async function defaultGearFor(req, res) {
+    const ch = await loadOwnCharacter(req, res);
+    if (!ch) return;
+    if (!ch.role_id) return res.status(400).json({ error: 'Pick a role first' });
+
+    const picked = defaultGear(gearChoices(formPack, getRole(ch.role_id)));
+    if ('error' in picked) return res.status(400).json({ error: picked.error });
+
+    await Form.replaceFormGear(ch.id, { ...picked, item_ids: [] });
+    await Form.updateCharacterFields(ch.id, { money: STARTING_MONEY });
+    res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 
 // POST /api/characters/:id/stat-rolls
@@ -166,10 +249,6 @@ export async function rollStat(req, res) {
 
     const request = checkStatRollBody(req.body);
     if ('error' in request) return res.status(400).json({ error: request.error });
-
-    // Rolls, resets, placements, bonuses and gifts all stay on the old editor until R4.9.
-    const blocked = finishedFormBlock('traits', Boolean(ch.is_draft));
-    if (blocked) return res.status(400).json({ error: blocked });
 
     // Rolling again, and clearing the dice, are rerolls. Moving a roll to another stat is not.
     const reroll = 'index' in request || request.reset === 'rolls';
@@ -194,7 +273,7 @@ export async function rollStat(req, res) {
     }
     values.stat_rolls = state;
     await Form.updateCharacterFields(ch.id, values);
-    res.json(formView(await Form.getFormCharacter(ch.id)));
+    res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 
 export async function finish(req, res) {

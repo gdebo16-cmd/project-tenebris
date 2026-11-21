@@ -7,8 +7,6 @@ import {
 } from '../controllers/apiController.js';
 import { me, login, logout, register, home, getSettings, updateSettings, getProfile, updateProfile, deleteAccount } from '../controllers/apiUserController.js';
 import { getInventory, addArmor, addWeapon, removeArmor, removeWeapon, addItem, removeItem } from '../controllers/apiInventoryController.js';
-import { getEditCharacter, editNameAndRace, editClass, editLevel, editAbilities, editFeatureChoice, editPortrait, editAlignment } from '../controllers/apiEditController.js';
-import { getRaces, getSubraces, step1Submit, getStep2, step2Submit, getStep3, step3Submit, getStep4, step4Submit, boostOptions, clearDraft, getDraft, rollStat, selectSubclass, getStartingGear } from '../controllers/apiCreateController.js';
 import { getSpellbook, learnSpell, unlearnSpell, prepareSpell, unprepareSpell, setAction, removeAction } from '../controllers/apiSpellController.js';
 import { createCampaign, deleteCampaign, getCampaign, updateCampaign, listCampaigns, joinCampaign, setCampaignCharacter } from '../controllers/apiCampaignController.js';
 import { getContent, getSpells } from '../controllers/contentController.js';
@@ -43,23 +41,6 @@ router.put('/settings', updateSettings);
 router.delete('/settings', deleteAccount);
 router.get('/profile', getProfile);
 router.put('/profile', updateProfile);
-
-// character creation
-router.get('/create_char/races', getRaces);
-router.get('/races/:id/subraces', getSubraces);
-router.post('/create_char/step1', step1Submit);
-router.get('/create_char/step2', getStep2);
-router.post('/create_char/step2', step2Submit);
-router.get('/create_char/subclasses/:classId', selectSubclass);
-router.get('/create_char/gear', getStartingGear);
-router.get('/create_char/step3', getStep3);
-router.post('/create_char/step3', step3Submit);
-router.get('/create_char/step4', getStep4);
-router.post('/create_char/step4', step4Submit);
-router.get('/create_char/draft', getDraft);
-router.delete('/create_char/draft', clearDraft);
-router.post('/create_char/roll/:stat', rollStat);
-router.post('/boost_options', boostOptions);
 
 // character sheet
 router.get('/characters/:id', getCharacter);
@@ -99,16 +80,6 @@ router.post('/characters/:id/spells/prepare', prepareSpell);
 router.post('/characters/:id/spells/unprepare', unprepareSpell);
 router.post('/characters/:id/spells/setAction', setAction);
 router.post('/characters/:id/spells/removeAction', removeAction);
-
-// character editor
-router.get('/characters/:id/edit', getEditCharacter);
-router.post('/characters/:id/edit/name', editNameAndRace);
-router.post('/characters/:id/edit/portrait', editPortrait);
-router.post('/characters/:id/edit/alignment', editAlignment);
-router.post('/characters/:id/edit/class', editClass);
-router.post('/characters/:id/edit/level', editLevel);
-router.post('/characters/:id/edit/abilities', editAbilities);
-router.post('/characters/:id/edit/features', editFeatureChoice);
 
 // campaign creation and deletion
 router.get('/campaigns', listCampaigns);

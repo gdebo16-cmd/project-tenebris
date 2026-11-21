@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkHeader, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, finishedFormBlock, keepUnrelatedChoices, missingForFinish, rerollAllowed, startingHp, type Options } from '../src/characterForm.ts';
+import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, keepUnrelatedChoices, leveledMaxHp, levelChoices, missingForFinish, rerollAllowed, startingHp, MAX_LEVEL, type Options } from '../src/characterForm.ts';
 
 // Only the parts of the options the species check reads
 const options = {
@@ -25,11 +25,20 @@ test('header: bad bodies get an error', () => {
         { name: '   ' },
         { name: 'x'.repeat(61) },
         { name: 'Ash', level: 0 },
+        { name: 'Ash', level: 21 },
         { name: 'Ash', level: 31 },
         { name: 'Ash', level: 2.5 },
         { name: 'Ash', portrait_url: 'https://evil.example/x.png' },
     ];
     for (const body of bad) assert.ok('error' in checkHeader(body), JSON.stringify(body));
+    assert.equal(MAX_LEVEL, 20);
+    // A character already above the cap keeps that level, and cannot be raised.
+    assert.deepEqual(checkHeader({ name: 'Ash', level: 25 }, 25), { values: { name: 'Ash', level: 25, portrait_url: null } });
+    assert.equal((checkHeader({ name: 'Ash', level: 20 }, 25) as { values: { level: number } }).values.level, 20);
+    assert.ok('error' in checkHeader({ name: 'Ash', level: 26 }, 25));
+    assert.ok('error' in checkHeader({ name: 'Ash', level: 21 }, 25));
+    assert.deepEqual(levelChoices(25), [...Array.from({ length: 20 }, (_, i) => i + 1), 25]);
+    assert.deepEqual(levelChoices(4), Array.from({ length: 20 }, (_, i) => i + 1));
 });
 
 test('species: a species with variants saves its own id and the variant', () => {
@@ -179,14 +188,6 @@ test('traits: a bad placement, an unrolled index, or too many gifts gets an erro
     assert.ok('error' in checkTraitsTab(giftOptions, unrolled, { placement: allPlaced, plus2: 'str', plus1: 'dex' }));
 });
 
-test('a finished character keeps role and traits on the old editor until R4.9', () => {
-    assert.equal(finishedFormBlock('role', true), null);
-    assert.equal(finishedFormBlock('traits', true), null);
-    assert.equal(finishedFormBlock('header', false), null);
-    assert.match(finishedFormBlock('role', false) ?? '', /old editor/);
-    assert.match(finishedFormBlock('traits', false) ?? '', /old editor/);
-});
-
 test('stat roll requests: an index, or one reset, and rerolls lock after finish', () => {
     assert.deepEqual(checkStatRollBody({ index: 0 }), { index: 0 });
     assert.deepEqual(checkStatRollBody({ index: '7' }), { index: 7 });
@@ -198,8 +199,54 @@ test('stat roll requests: an index, or one reset, and rerolls lock after finish'
     assert.ok('error' in locked && locked.error.includes('finished'));
 });
 
+const personalityOptions = {
+    alignments: [{ code: 'LG', name: 'Lawful Good', law_axis: -1, good_axis: 1 }],
+    states: ['bless', 'subjugate', 'release'],
+    upbringings: [
+        { id: 1, name: 'Orphan', flavor: null, perk: null, state: 'bless', any_state: false },
+        { id: 19, name: 'Self-Taught Stray', flavor: null, perk: null, state: null, any_state: true },
+    ],
+    lifestyles: [{ id: 2, name: 'Nobility', flavor: null, perk: null, state: 'subjugate', any_state: false }],
+    outlooks: [{ id: 3, name: 'Hopeful', flavor: null, perk: null, state: 'release', any_state: false }],
+} as unknown as Options;
+
+test('personality: four picks save, and the states must differ', () => {
+    const saved = checkPersonalityTab(personalityOptions, {
+        alignment_code: 'LG', upbringing_id: 1, lifestyle_id: 2, outlook_id: 3,
+        upbringing_state: 'release', // ignored: Orphan's state comes from the pack
+    });
+    assert.ok('values' in saved);
+    if (!('values' in saved)) return;
+    assert.equal(saved.values.alignment_code, 'LG');
+    assert.equal(saved.values.upbringing_state, 'bless');
+    assert.equal(saved.values.lifestyle_state, 'subjugate');
+    assert.equal(saved.values.outlook_state, 'release');
+
+    const same = checkPersonalityTab(personalityOptions, {
+        alignment_code: 'LG', upbringing_id: 19, upbringing_state: 'subjugate', lifestyle_id: 2, outlook_id: 3,
+    });
+    assert.ok('error' in same && same.error.includes('different states'));
+    assert.ok('error' in checkPersonalityTab(personalityOptions, { alignment_code: 'CE', upbringing_id: 1, lifestyle_id: 2, outlook_id: 3 }));
+    assert.ok('error' in checkPersonalityTab(personalityOptions, { alignment_code: 'LG', upbringing_id: 19, lifestyle_id: 2, outlook_id: 3 }));
+});
+
 test('startingHp matches the old creator', () => {
     assert.equal(startingHp(12, 14, 1, 7), 9);             // 7 + CON mod 2
     assert.equal(startingHp(12, 14, 3, 7), 9 + 2 * 9);      // + (6 + 1 + 2) per level after the first
     assert.equal(startingHp(6, 3, 1, 1), 1);               // never below 1 (1 - 4)
+});
+
+test('leveledMaxHp matches startingHp and the old level editor, up and down', () => {
+    const level1 = startingHp(12, 14, 1, 7);
+    assert.equal(leveledMaxHp(12, 14, 1, level1, 3), startingHp(12, 14, 3, 7));
+    assert.equal(leveledMaxHp(12, 14, 3, startingHp(12, 14, 3, 7), 1), level1);
+    // A level-1 max that was already floored at 1 still gains a full step. A fresh starting roll stays floored.
+    assert.equal(startingHp(6, 3, 1, 1), 1);
+    assert.equal(leveledMaxHp(6, 3, 1, 1, 2), 2);
+    assert.equal(startingHp(6, 3, 2, 1), 1);
+    // A max that was not rolled still moves by the same gain per level.
+    assert.equal(leveledMaxHp(12, 14, 3, 30, 5), 30 + 2 * 9);
+    assert.equal(leveledMaxHp(12, 14, 3, 30, 1), 30 - 2 * 9);
+    // Same level, new Endurance: level-1 CON mod and every later gain both move. 27 was 7 + 2 + 2*9.
+    assert.equal(leveledMaxHp(12, 14, 3, 27, 3, 12), 7 + 1 + 2 * 8);
 });

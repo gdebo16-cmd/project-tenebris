@@ -31,6 +31,25 @@ export type CharacterFormData = {
         plus1: string | null;
         scores: Record<string, number | null>;
     };
+    personality: {
+        alignment_code: string | null;
+        upbringing_id: number | null;
+        lifestyle_id: number | null;
+        outlook_id: number | null;
+        upbringing_state: string | null;
+        lifestyle_state: string | null;
+        outlook_state: string | null;
+    };
+    gear: {
+        money: number;
+        weapon_id: number | null;
+        armor_id: number | null;
+        item_ids: number[];
+        proficiencies: { armor: string[]; weapons: string[]; tools: string[] };
+        weapons: { id: number; name: string; proficient: boolean }[];
+        armor: { id: number; name: string; proficient: boolean }[];
+        items: { id: number; name: string }[];
+    };
     missing: string[];
     options: Options;
 };

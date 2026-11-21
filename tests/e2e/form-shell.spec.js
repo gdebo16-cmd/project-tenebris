@@ -13,7 +13,7 @@ test('form shell keeps the header and the tab across a reload', async ({ page })
 
     const name = `Form ${Date.now()}`;
     await page.getByLabel('Name').fill(name);
-    await page.getByLabel('Level').fill('4');
+    await page.getByLabel('Level').selectOption('4');
     await page.getByRole('button', { name: 'Save' }).click();
     await expect(page).toHaveURL(/\/characters\/\d+\/edit\?tab=species/);
     await expect(page.getByLabel('Name')).toHaveValue(name);

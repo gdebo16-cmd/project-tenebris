@@ -35,8 +35,8 @@ export default function CharacterForm() {
                 {tab === 'species' && <SpeciesTab id={id} />}
                 {tab === 'role' && <RoleTab id={id} />}
                 {tab === 'traits' && <TraitsTab id={id} />}
-                {tab === 'personality' && <PersonalityTab />}
-                {tab === 'gear' && <GearTab />}
+                {tab === 'personality' && <PersonalityTab id={id} />}
+                {tab === 'gear' && <GearTab id={id} />}
             </div>
         </div>
     );
@@ -113,6 +113,7 @@ function SavedHeader({ id }: { id: string }) {
         <FormHeader
             name={name}
             level={level}
+            savedLevel={form.data.header.level}
             portraitUrl={portraitUrl}
             summary={summary}
             saving={saveTab.isPending}

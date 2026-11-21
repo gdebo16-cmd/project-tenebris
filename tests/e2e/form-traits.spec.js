@@ -60,28 +60,61 @@ test('traits scores follow the server rolls, and a finished character cannot rer
             feature_choices: {},
         },
     })).ok()).toBeTruthy();
+    const draftSheet = await (await page.request.get(`/api/characters/${id}`)).json();
+    expect(draftSheet.character.class_id).toBeNull();
     expect((await page.request.post(`/api/characters/${id}/finish`)).ok()).toBeTruthy();
 
-    const locked = await page.request.post(`/api/characters/${id}/stat-rolls`, { data: { index: 0 } });
-    expect(locked.status()).toBe(400);
-    expect((await locked.json()).error).toBe('Change the traits of a finished character with the old editor for now');
-
-    const traitsAgain = await page.request.put(`/api/characters/${id}/form/traits`, {
-        data: { placement, plus2: 'str', plus1: 'dex', gifts: [] },
+    const sheetBefore = await (await page.request.get(`/api/characters/${id}`)).json();
+    const sides = Number(String(form.options.roles.find((role) => role.key === 'warrior').hit_die).match(/\d+/)[0]);
+    const conMod = Math.floor(Number(sheetBefore.character.con) / 2) - 5;
+    const perLevel = Math.max(1, Math.floor(sides / 2) + 1 + conMod);
+    const raised = await page.request.put(`/api/characters/${id}/form/header`, {
+        data: { name: sheetBefore.character.name, level: 2, portrait_url: null },
     });
-    expect(traitsAgain.status()).toBe(400);
-    expect((await traitsAgain.json()).error).toBe('Change the traits of a finished character with the old editor for now');
+    expect(raised.ok()).toBeTruthy();
+    const sheetAfter = await (await page.request.get(`/api/characters/${id}`)).json();
+    expect(sheetAfter.character.level).toBe(2);
+    expect(sheetAfter.character.max_hp).toBe(sheetBefore.character.max_hp + perLevel);
+    expect(sheetAfter.character.current_hp).toBe(sheetBefore.character.current_hp);
 
-    const roleAgain = await page.request.put(`/api/characters/${id}/form/role`, {
+    const lowered = await page.request.put(`/api/characters/${id}/form/header`, {
+        data: { name: sheetBefore.character.name, level: 1, portrait_url: null },
+    });
+    expect(lowered.ok()).toBeTruthy();
+    const sheetBack = await (await page.request.get(`/api/characters/${id}`)).json();
+    expect(sheetBack.character.level).toBe(1);
+    expect(sheetBack.character.max_hp).toBe(sheetBefore.character.max_hp);
+    expect(sheetBack.character.class_id).not.toBeNull();
+
+    const oldMod = Math.floor(Number(sheetBack.character.con) / 2) - 5;
+    const newCon = totals[0];
+    const newMod = Math.floor(newCon / 2) - 5;
+    const swapped = await page.request.put(`/api/characters/${id}/form/traits`, {
+        data: { placement: { ...placement, str: 2, con: 0 }, plus2: 'str', plus1: 'dex', gifts: [] },
+    });
+    expect(swapped.ok()).toBeTruthy();
+    const endured = await (await page.request.get(`/api/characters/${id}`)).json();
+    expect(endured.character.con).toBe(newCon);
+    expect(endured.character.max_hp).toBe(Math.max(1, sheetBack.character.max_hp - oldMod + newMod));
+
+    const other = form.options.roles.find((role) => role.key !== 'warrior');
+    const otherOptions = await (await page.request.get(`/api/character-options?level=1&role_id=${other.id}`)).json();
+    const recastSave = await page.request.put(`/api/characters/${id}/form/role`, {
         data: {
-            role_id: roleOptions.roles.find((role) => role.key === 'warrior').id,
+            role_id: other.id,
             calling_id: null,
-            skills: roleOptions.skills.from.slice(0, roleOptions.skills.choose),
+            skills: otherOptions.skills.from.slice(0, otherOptions.skills.choose),
             feature_choices: {},
         },
     });
-    expect(roleAgain.status()).toBe(400);
-    expect((await roleAgain.json()).error).toBe('Change the role of a finished character with the old editor for now');
+    expect(recastSave.ok()).toBeTruthy();
+    const recast = await (await page.request.get(`/api/characters/${id}`)).json();
+    expect(recast.character.class_id).not.toBe(sheetBack.character.class_id);
+    expect(recast.character.subclass_id).toBeNull();
+
+    const locked = await page.request.post(`/api/characters/${id}/stat-rolls`, { data: { index: 0 } });
+    expect(locked.status()).toBe(400);
+    expect((await locked.json()).error).toMatch(/finished/i);
 
     expect((await page.request.delete(`/api/characters/${id}`)).ok()).toBeTruthy();
 });

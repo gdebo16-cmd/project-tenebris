@@ -2,6 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { choiceFeaturesFor, choiceKey } from '@tenebris/rules/characterOptions';
+import { armorTypesFromProf, weaponCategoryNamesFromProf } from '@tenebris/rules/gear';
+
+export { armorTypesFromProf, weaponCategoryNamesFromProf };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const file = path.join(__dirname, '..', '..', '..', '..', 'packages', 'content', 'content.json');
@@ -65,31 +68,7 @@ export function choiceFeaturesForRole(roleId, callingId, level) {
 
 
 // ----- Starting gear from the pack (not class_item_proficiencies) -----
-const ARMOR_PROF_TO_TYPE = {
-    'light armor': 'light',
-    'medium armor': 'medium',
-    'heavy armor': 'heavy',
-    shields: 'shield',
-    shield: 'shield',
-};
-
-export function armorTypesFromProf(armorProf) {
-    const types = new Set();
-    for (const part of String(armorProf ?? '').split(',')) {
-        const key = part.trim().toLowerCase();
-        if (!key || key === '-' || key === 'none' || key === 'null') continue;
-        const t = ARMOR_PROF_TO_TYPE[key];
-        if (t) types.add(t);
-    }
-    return [...types];
-}
-
-export function weaponCategoryNamesFromProf(weaponProf) {
-    return String(weaponProf ?? '')
-        .split(',')
-        .map((s) => s.trim())
-        .filter((s) => s && s !== '-' && s.toLowerCase() !== 'none' && s.toLowerCase() !== 'null');
-}
+// armorTypesFromProf and weaponCategoryNamesFromProf live in @tenebris/rules/gear.
 
 function isCommonItem(row) {
     return String(row?.rarity ?? 'common').toLowerCase() === 'common';

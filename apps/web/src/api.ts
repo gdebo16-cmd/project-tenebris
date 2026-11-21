@@ -9,10 +9,12 @@
 
 export class ApiError extends Error {
     status: number;
-    constructor(status: number, message: string) {
+    missing: string[];
+    constructor(status: number, message: string, missing: string[] = []) {
         super(message);
         this.name = 'ApiError';
         this.status = status;
+        this.missing = missing;
     }
 }
 
@@ -32,6 +34,6 @@ export async function api<T = unknown>(path: string, { method = 'GET', body, cac
         body: body === undefined ? undefined : JSON.stringify(body),
     });
     const data = await res.json().catch(() => null); // some answers have no body
-    if (!res.ok) throw new ApiError(res.status, data?.error ?? `HTTP error! status: ${res.status}`);
+    if (!res.ok) throw new ApiError(res.status, data?.error ?? `HTTP error! status: ${res.status}`, Array.isArray(data?.missing) ? data.missing : []);
     return data as T;
 }

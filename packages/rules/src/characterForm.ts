@@ -10,7 +10,7 @@ export type Options = ReturnType<typeof characterOptions>;
 type ColumnValue = string | number | null | string[] | Record<string, string[]> | StatRollState;
 export type TabResult = { error: string } | { values: Record<string, ColumnValue> };
 
-export const MAX_LEVEL = 30;
+export const MAX_LEVEL = 20;
 export const MAX_NAME_LENGTH = 60;
 export const MAX_LOOK_LENGTH = 1000;
 
@@ -25,13 +25,26 @@ const text = (value: unknown): string => (typeof value === 'string' ? value.trim
 
 // ---- Header: name, level, portrait (always visible above the tabs) ----
 
-export function checkHeader(body: Body): TabResult {
+// 1 through MAX_LEVEL, plus the character's own level when that is already above the cap.
+// Those characters keep their level. They can drop to the cap or below. They cannot be raised.
+export function levelChoices(currentLevel: number | null | undefined): number[] {
+    const choices: number[] = [];
+    for (let n = 1; n <= MAX_LEVEL; n++) choices.push(n);
+    const current = Number(currentLevel);
+    if (Number.isInteger(current) && current > MAX_LEVEL) choices.push(current);
+    return choices;
+}
+
+export function checkHeader(body: Body, currentLevel?: number | null): TabResult {
     const name = text(body?.name);
     if (!name) return { error: 'Give your character a name' };
     if (name.length > MAX_NAME_LENGTH) return { error: `Names can be at most ${MAX_NAME_LENGTH} characters` };
 
     const level = Number(body?.level ?? 1);
-    if (!Number.isInteger(level) || level < 1 || level > MAX_LEVEL) return { error: `Level must be a whole number from 1 to ${MAX_LEVEL}` };
+    const kept = Number.isInteger(Number(currentLevel)) && level === Number(currentLevel) && level > MAX_LEVEL;
+    if (!Number.isInteger(level) || level < 1 || (level > MAX_LEVEL && !kept)) {
+        return { error: `Level must be a whole number from 1 to ${MAX_LEVEL}` };
+    }
 
     // Portraits are pictures the site already has, so they're paths like /portraits/a.png
     const portrait = text(body?.portrait_url);
@@ -211,14 +224,6 @@ export function scoreFromRolls(state: StatRollState, stat: StatName, plus2: stri
     return roll.total + (stat === plus2 ? 2 : 0) + (stat === plus1 ? 1 : 0);
 }
 
-// Until R4.9 a finished character's role and traits stay on the old editor.
-export function finishedFormBlock(tab: string, isDraft: boolean): string | null {
-    if (isDraft) return null;
-    if (tab === 'role') return 'Change the role of a finished character with the old editor for now';
-    if (tab === 'traits') return 'Change the traits of a finished character with the old editor for now';
-    return null;
-}
-
 // PLACEHOLDER until docs/DECISIONS.md: rerolls are unlimited on a draft and refused after finish.
 export function rerollAllowed(isDraft: boolean): { error: string } | { ok: true } {
     if (!isDraft) return { error: 'Rolls are locked once a character is finished' };
@@ -288,6 +293,38 @@ export function checkTraitsTab(options: Options, stored: unknown, body: Body): T
     };
 }
 
+// ---- Personality ----
+
+// Each pick gives one magic state. The database refuses the row when two states match,
+// so this check says so first, instead of letting the save crash.
+const PERSONALITY = [
+    { key: 'upbringing', list: 'upbringings', label: 'upbringing' },
+    { key: 'lifestyle', list: 'lifestyles', label: 'lifestyle' },
+    { key: 'outlook', list: 'outlooks', label: 'outlook' },
+] as const;
+
+export function checkPersonalityTab(options: Options, body: Body): TabResult {
+    const code = text(body?.alignment_code);
+    if (!options.alignments.some((item) => item.code === code)) return { error: 'Pick an alignment' };
+
+    const values: Record<string, string | number | null> = { alignment_code: code };
+    const states: string[] = [];
+    for (const cat of PERSONALITY) {
+        const id = Number(body?.[`${cat.key}_id`]);
+        const picked = options[cat.list].find((item) => item.id === id);
+        if (!picked) return { error: `Pick an ${cat.label}` };
+        // A normal pick's state comes from the pack. Only a wildcard pick uses the state the browser sent.
+        const state = picked.any_state ? text(body?.[`${cat.key}_state`]).toLowerCase() : String(picked.state ?? '').toLowerCase();
+        if (picked.any_state && !options.states.includes(state)) return { error: `Pick a state for ${picked.name}` };
+        if (!state) return { error: `Pick an ${cat.label}` };
+        states.push(state);
+        values[`${cat.key}_id`] = picked.id;
+        values[`${cat.key}_state`] = state;
+    }
+    if (new Set(states).size !== 3) return { error: 'Upbringing, lifestyle and outlook must give 3 different states' };
+    return { values };
+}
+
 // What still stops this character from being finished, one line per tab. Empty = ready.
 export function missingForFinish(ch: FinishFields): string[] {
     const missing: string[] = [];
@@ -298,10 +335,26 @@ export function missingForFinish(ch: FinishFields): string[] {
     return missing;
 }
 
-// Starting HP: the server's hit-die roll + CON mod, plus (hit die / 2 + 1 + CON mod, at least 1) per level after the first.
-// Same formula as the old creator. Never below 1.
+// Hit die / 2 + 1 + CON mod, and never less than 1. The old creator and the old level editor share this.
+function gainPerLevel(hitDieSides: number, con: number): number {
+    const conMod = Math.floor(Number(con) / 2) - 5;
+    return Math.max(1, Math.floor(Number(hitDieSides) / 2) + 1 + conMod);
+}
+
+// Starting HP: the server's hit-die roll + CON mod, plus one gain per level after the first. Never below 1.
 export function startingHp(hitDieSides: number, con: number, level: number, firstRoll: number): number {
-    const conMod = Math.floor(con / 2) - 5;
-    const perLevel = Math.max(1, Math.floor(hitDieSides / 2) + 1 + conMod);
-    return Math.max(1, firstRoll + conMod + (level - 1) * perLevel);
+    const conMod = Math.floor(Number(con) / 2) - 5;
+    return Math.max(1, firstRoll + conMod + (level - 1) * gainPerLevel(hitDieSides, con));
+}
+
+// Peel the old level-1 CON mod and the old gains off the stored base max, then apply the new level and CON.
+// Pass newCon when Endurance changed. Level-down uses the same line. Never below 1.
+// The stored max stays the base; calling and CON-boost HP are added when the sheet is read.
+export function leveledMaxHp(hitDieSides: number, con: number, oldLevel: number, oldMax: number, newLevel: number, newCon: number = con): number {
+    const from = Number(oldLevel) || 1;
+    const to = Number(newLevel) || 1;
+    const oldMod = Math.floor(Number(con) / 2) - 5;
+    const newMod = Math.floor(Number(newCon) / 2) - 5;
+    const baseHp = Number(oldMax) - (from - 1) * gainPerLevel(hitDieSides, con) - oldMod;
+    return Math.max(1, baseHp + newMod + (to - 1) * gainPerLevel(hitDieSides, newCon));
 }

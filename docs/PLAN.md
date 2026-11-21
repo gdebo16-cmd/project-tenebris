@@ -12,6 +12,7 @@ Source of truth for decisions. Change a decision here first. Full step wording i
 | **Rebuild most of the app to be native React, simple, and readable for an early-level programmer** — rework anything | Locked | 2026-11-19 |
 | **TypeScript** for the whole repo (server, web, rules); TS 7, `noEmit`, Node runs `.ts` directly (type stripping), no build step for the server | Locked | 2026-11-19 |
 | **One unified character form** for create + edit; spec in `docs/specs/character-creator.md` | Locked | 2026-11-19 |
+| Maximum character level is **20** (`MAX_LEVEL` in `packages/rules`) | Locked | 2026-11-20 |
 | **Sheets as blocks** in Character / Monster / DM layouts; spec in `docs/specs/sheet.md` | Locked | 2026-11-19 |
 | Permissions: **DM edits everything; players edit only their own sheet** | Locked | 2026-11-19 |
 | Data loading: **TanStack Query** + one `api.ts` (replaces raw fetch / `useFetch` / `sendJson`) | Locked | 2026-11-19 |

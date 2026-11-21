@@ -30,12 +30,12 @@ function HomePage() {
     };
     const deleteCharacter = (e, ch) => remove(e, `Do you want to delete ${ch.name}? This cannot be undone.`, `/api/characters/${ch.id}`, ch.name);
     const deleteCampaign = (e, camp) => remove(e, `Do you want to delete ${camp.name}? This cannot be undone.`, `/api/campaigns/${camp.id}`, camp.name);
-    const deleteDraft = (e) => remove(e, 'Delete this unfinished character?', '/api/create_char/draft', 'the unfinished character');
+    const deleteDraft = (e, ch) => remove(e, `Delete ${ch.name || 'this unfinished character'}?`, `/api/characters/${ch.id}`, ch.name || 'the unfinished character');
 
     if (error) return <p>Failure is upon us: {error.message}</p>;
     if (isPending) return <Loader text='Summoning your stories...'/>;
 
-    const { username, characters, campaigns, draft } = data;
+    const { username, characters, campaigns, drafts = [] } = data;
 
     return (
         <>
@@ -53,6 +53,7 @@ function HomePage() {
                 <section id="current-character-container" className={homeTab === 'current' ? 'container is-active' : 'container'}>
                     <article className="title" id="current-character-title">
                         <h2 className="title-text">Current Characters</h2>
+                        <Link to="/characters/new">New character</Link>
                     </article>
                     <article className="char-list" id="current-character-tile">
                         {characters.length === 0 ? (
@@ -107,20 +108,20 @@ function HomePage() {
                     </article>
                     <article className="char-list" id="unfinished-character-tile">
                         <ul className="tile-list" id="unfinished-character-list">
-                        {draft ? (
-                            <li key={draft.id} className='character-tile' id={`character-tile-${draft.id}`}>
-                                <Link to={draft.class_id ? '/create_char/step3' : '/create_char/step2'} className='char-tile'>
-                                    <h3 className='character-name'>{draft.name || 'One with no name'}</h3>
-                                    <img className='character-image' src='/default-character.png' alt='Character Image' />
-                                    <p className='character-race'>Race: {draft.race || 'Undecided'}</p>
-                                    <p className='character-class'>Class: {draft.class || 'Undecided'}</p>
-                                    <p className='character-subclass'>Sub-class: {draft.subclass || 'Undecided'}</p>
-                                    <button type='button' className='character-delete-button' onClick={deleteDraft}>Delete</button>
+                        {drafts.length === 0 ? (
+                            <p>You are all caught up!</p>
+                        ) : drafts.map((ch) => (
+                            <li key={ch.id} className='character-tile' id={`character-tile-${ch.id}`}>
+                                <Link to={`/characters/${ch.id}/edit`} className='char-tile'>
+                                    <h3 className='character-name'>{ch.name || 'One with no name'}</h3>
+                                    <img className='character-image' src={ch.portrait_url ?? '/default-character.png'} alt='Character Image' />
+                                    <p className='character-race'>Race: {ch.race || 'Undecided'}</p>
+                                    <p className='character-class'>Class: {ch.class || 'Undecided'}</p>
+                                    <p className='character-subclass'>Sub-class: {ch.subclass || 'Undecided'}</p>
+                                    <button type='button' className='character-delete-button' onClick={(e) => deleteDraft(e, ch)}>Delete</button>
                                 </Link>
                             </li>
-                        ) : (
-                            <p>You are all caught up!</p>
-                        )}
+                        ))}
                         </ul>
                     </article>
                 </section>
