@@ -1,15 +1,13 @@
 import { useState} from 'react';
 import { useNavigate } from 'react-router';
-import usePageStyle from '../hooks/usePageStyle';
-import campCreateCss from '../styles/campCreate.css?inline';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys } from '../queries.ts';
 import SiteNav from '../components/SiteNav';
+import styles from './CreateCampaign.module.css';
 
 
 function CreateCampaign() {
-    usePageStyle(campCreateCss);
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -37,7 +35,7 @@ function CreateCampaign() {
                 <h1>Create Tale</h1>
             </header>
                 <SiteNav />
-            <main>
+            <main className={styles.page}>
                 <section id="campaign-container" className="campaign-container">
                     <form onSubmit={submit}>
                         <article id="campaign-name-container" className="campaign-tile">
