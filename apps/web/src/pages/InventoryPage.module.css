@@ -1,0 +1,1437 @@
+/* InventoryPage styles (was styles/charSheet.css + styles/sheet-subpage.css, added by the old usePageStyle hook).
+   charSheet.css was written for the old character sheet, which is gone. Rules that name a class or id
+   used nowhere in the app (src/ and index.html) were dropped (340 of 452); everything that can still match is kept as it was.
+   Scoped to this page: InventoryPage puts styles.page on its <main>, and every rule below
+   only applies while that element is on screen (html:has(.page)). The old "body.subpage" class is now body:has(.page).
+   :where(...) adds no specificity, so each rule weighs exactly what it did before.
+   Class and id names stay global (:global) because ItemShop and the filters use them;
+   .page (written :local(.page)) is the only name this module makes local. */
+
+/* #region Universal Layout Section */
+
+:global :where(html:has(:local(.page))),
+:global :where(html:has(:local(.page))) * {
+    font-family: var(--fontfam);
+    font-weight: var(--fontweight);
+    font-style: var(--fontstyle);
+    color: var(--text);
+ }
+ 
+ :global html:where(:has(:local(.page))),
+ :global body:where(:has(:local(.page))) {
+     margin: 0 ! important;
+     padding: 0 ! important;
+     width: 100vw;
+     height: 100dvh;
+     overflow: hidden ! important;
+     scroll-behavior: smooth ! important;
+     overscroll-behavior: none ! important;
+     -webkit-overflow-scrolling: touch ! important;
+     -ms-overflow-style: none ! important;
+     -webkit-tap-highlight-color: transparent ! important;
+     -webkit-touch-callout: none ! important;
+     -webkit-user-select: none ! important;
+     -moz-user-select: none ! important;
+     -ms-user-select: none ! important;
+     user-select: none ! important;
+     max-width: var(--maxW);
+     -webkit-text-size-adjust: 100%;
+     text-size-adjust: 100%;
+ }
+ 
+ :global body:where(:has(:local(.page))) {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100vw;
+     height: 100svh;
+     background-color: var(--bgc-theme);
+     z-index: -2 ! important;
+     max-width: 3840px;
+     font-family: var(--fontF);
+     font-weight: var(--fontW1);
+     font-style: var(--fontstyle);
+     margin: 0;
+     display: flex;
+     flex-direction: column;
+ }
+ 
+ :global :where(html:has(:local(.page))) .fixed-bg {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100vw;
+     height: 100svh;
+     overflow: hidden;
+     min-height: 100dvh;
+     background-image: var(--background);
+     background-size: cover;
+     background-position: center bottom;
+     background-repeat: no-repeat;
+     z-index: -1;
+     display: flex;
+     flex-direction: column;
+ }
+ 
+ :global :where(html:has(:local(.page))) ul,
+ :global :where(html:has(:local(.page))) li,
+ :global :where(html:has(:local(.page))) a {
+     list-style: none;
+     text-decoration: none;
+     color: var(--txt-color-1);
+ }
+ 
+ :global :where(html:has(:local(.page))) option {
+     background-color: var(--drop-down-bg);
+     color: var(--drop-down-txt);
+     border: var(--tileBorder);
+     padding: 0;
+     margin: 0;
+     text-align: center;
+     font-size: 100%;
+ }
+ 
+ 
+ :global :where(html:has(:local(.page))) header {
+     width: 100%;
+     margin-top: 0;
+     padding-top: env(safe-area-inset-top);
+ }
+ 
+ :global :where(html:has(:local(.page))) footer {
+     width: 100vw;
+     height: 100svh;
+     overflow: hidden ! important;
+     background-color: var(--bgc-theme);
+     margin-bottom: 0 !important;
+     padding-bottom: env(safe-area-inset-bottom);
+     z-index: 1;
+ }
+
+    :global :where(html:has(:local(.page))) [role="tabpanel"] {
+        padding: 2%;
+    }
+    
+    :global :where(html:has(:local(.page))) .action-container > [role="tabpanel"]::-webkit-scrollbar,
+    :global :where(html:has(:local(.page))) .action-panel-container > [role="tabpanel"]::-webkit-scrollbar,
+    :global :where(html:has(:local(.page))) .panel-shell > [role="tabpanel"]::-webkit-scrollbar,
+    :global :where(html:has(:local(.page))) .roll-feed::-webkit-scrollbar {
+        display: none;
+    }
+
+    :global :where(html:has(:local(.page))) .action-container > [role="tabpanel"][hidden],
+    :global :where(html:has(:local(.page))) .action-panel-container > [role="tabpanel"][hidden],
+    :global :where(html:has(:local(.page))) .panel-shell > [role="tabpanel"][hidden] {
+        display: none !important;
+    }
+
+    
+    
+
+    :global :where(html:has(:local(.page))) .action-tab-list {
+        position: relative;
+        display: flex;
+        justify-content: space-around;
+        align-items: stretch;
+        gap: 0;
+        background-color: var(--bgc-top);
+        border: var(--tileBorder);
+        border-radius: var(--tile);
+        box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
+        overflow: auto;
+        scrollbar-width: none;
+        scrollbar-color: rgba(255,255,255,0.35) transparent;
+    }
+
+    
+
+    :global :where(html:has(:local(.page))) [role="tab"] {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+        min-width: 0;
+        padding: 2.8%;
+        overflow-wrap: anywhere;
+        text-align: center;
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        font-size: 80%;
+        color: var(--txt-tab);
+    }
+
+    /* restored from components.css (removed with it): the open tab gets its own colour and sinks in */
+    :global :where(html:has(:local(.page))) [role="tab"][aria-selected="true"] {
+        font-weight: var(--fontW1);
+        border-top: none;
+        border-left: none;
+        background-color: transparent;
+        color: var(--txt-color-1);
+        box-shadow: none;
+        transform: none;
+    }
+
+    :global :where(html:has(:local(.page))) .slide {
+        pointer-events: none;
+    }
+
+/* #endregion */
+/* #region Universal Proficiencies Tab Section */
+:global :where(html:has(:local(.page))) .tab-title {
+    text-align: center;
+    margin: 2%;
+    padding: 3%;
+}
+
+/* #endregion */
+
+:global :where(html:has(:local(.page))) input[type="text"],
+:global :where(html:has(:local(.page))) input[type="email"],
+:global :where(html:has(:local(.page))) input[type="password"] {
+  font-size: 2rem; 
+}
+
+@media (min-width: 769px) {
+    /* #region breakpoints Section */
+    
+        :global :where(html:has(:local(.page))) footer {
+            display: flex;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: calc(100dvh - 8vh);
+            z-index: 10;
+            height: 10vh;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            font-size: 150%;
+            color: var(--txt-color-1);
+            border-top: var(--tileBorder);
+            box-shadow: var(--bs2);
+            background-color: var(--bgc-theme);
+            border-radius: 50% 50% 0 0;
+            overflow: hidden;
+        }
+    
+        :global :where(html:has(:local(.page))) header {
+            display: flex;
+            height: 10vh;
+            flex-shrink: 0;
+            width: 100vw;
+            border-radius: 0 0 15% 15%;
+        }
+    
+        :global :where(html:has(:local(.page))) #site-title {
+            background-color: var(--bgc-theme);
+            color: var(--txt-color-1);
+            position: relative;
+            top: 0;
+            border-bottom: var(--tileBorder);
+            z-index: 20;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            font-size: 150%;
+            justify-content: center;
+            align-items: center;
+            box-shadow: var(--bs2), var(--shadowInner, none);
+        }
+    
+    /* #endregion */   
+    /* #region Header Section */
+    
+    
+    :global :where(html:has(:local(.page))) #character-name,
+    :global :where(html:has(:local(.page))) #character-race,
+    :global :where(html:has(:local(.page))) #character-class,
+    :global :where(html:has(:local(.page))) #character-rest {
+        border: var(--tileBorder);
+        padding-top: 1vh;
+        text-align: center;
+    }
+    
+    :global :where(html:has(:local(.page))) #character-name {
+        flex: 3 1 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-left: 4dvw;
+    }
+    
+    
+    
+    
+    :global :where(html:has(:local(.page))) #character-race,
+    :global :where(html:has(:local(.page))) #character-class,
+    :global :where(html:has(:local(.page))) #character-rest {
+        flex: 2 1 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* #endregion */    
+    /* #region Nav Section */
+    :global :where(html:has(:local(.page))) #nav-box {
+        position: relative;
+        z-index: 5;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    :global :where(html:has(:local(.page))) #nav-container {
+        position: relative;
+        left: 6%;
+        background-color: color-mix(in srgb, var(--bgc-theme) 60%, transparent);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border: var(--tileBorder);
+        border-radius: var(--tile);
+        box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
+        box-sizing: border-box;
+        width: 82vw;
+        gap: 0;
+        margin: 1vh auto;
+        padding: 0;
+        text-align: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+        position: relative;
+    }
+    
+    :global :where(html:has(:local(.page))) #home-nav,
+    :global :where(html:has(:local(.page))) #character-nav,
+    :global :where(html:has(:local(.page))) #campaign-nav,
+    :global :where(html:has(:local(.page))) #settings-nav {
+        min-width: 10rem;
+        flex: 1 1 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1vh 2vw;
+        font-size: 1.3rem;
+        cursor: pointer;
+        color: var(--txt-color-1);
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    :global :where(html:has(:local(.page))) #home-nav {
+        border-radius: 0;
+    }
+    
+    :global :where(html:has(:local(.page))) #settings-nav {
+        border-radius: 0;
+    }
+    
+    :global :where(html:has(:local(.page))) #nav-container > :last-child {
+        border-radius: var(--tile);
+    }
+    
+    :global :where(html:has(:local(.page))) #character-nav,
+    :global :where(html:has(:local(.page))) #campaign-nav,
+    :global :where(html:has(:local(.page))) #settings-nav {
+        position: relative;
+    }
+    
+    :global :where(html:has(:local(.page))) .drop-down {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        max-width: 100vw;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: 10;
+        background-color: var(--drop-down-bg);
+        transition: all .5s ease;
+        padding: 0;
+    }
+    
+    :global :where(html:has(:local(.page))) .title-logo {
+        max-width: 33vw;
+        max-height: 9vh;
+        margin: 0 auto;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+        display: block;
+        content: url('/logo_banner.png');
+        height: auto;
+        width: auto;
+        object-fit: contain;
+    }
+    
+    :global :where(html:has(:local(.page))) li:hover .drop-down {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        width: 100%;
+        box-shadow: var(--bs2);
+    }
+    
+    :global :where(html:has(:local(.page))) .btn-drop-character,
+    :global :where(html:has(:local(.page))) .btn-drop-campaign,
+    :global :where(html:has(:local(.page))) .btn-drop-settings {
+        color: var(--drop-down-txt);
+        padding: 8%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: var(--tileBorder);
+        font-size: 80%;
+        box-shadow: var(--bs2);
+    }
+    
+    :global :where(html:has(:local(.page))) #settings-nav .drop-down {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+    }
+    
+    
+    :global :where(html:has(:local(.page))) #root {
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+    }
+    
+    /* #endregion */   
+    /* #region Main Section */
+    :global :where(html:has(:local(.page))) main {
+        max-height: calc(100dvh - 35%);
+        padding: 1%;
+        gap: 1%;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+        grid-template-areas: 
+            "D D B B E E "
+            "F F F A C C "
+            "F F F A C C "
+            "F F F A C C "
+            "F F F A C C ";
+            
+    }
+
+    /* #endregion */   
+    /* #region Conditions Section */
+
+         :global :where(html:has(:local(.page))) .conditions {
+            grid-area: E;
+            border-radius: var(--tile);
+            border: var(--tileBorder);
+            box-shadow: var(--bs2), var(--shadowInner, none);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+ 
+    
+
+ 
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+    /* #endregion */    
+    /* #region Actions Panel Section */
+        /* #region Action Section */
+        :global :where(html:has(:local(.page))) .action-container {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            
+        }
+        :global :where(html:has(:local(.page))) .action-title {
+            text-align: center;
+            font-size: 130%;
+            padding: 2%;
+            margin: 0;
+            text-align: center;
+            border-radius: var(--tile) var(--tile) 0 0;
+            border-bottom: none;
+        }
+        :global :where(html:has(:local(.page))) .action-set {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            padding: 0.3rem;
+            margin: 0;
+            border-radius: 0 0 var(--tile) var(--tile);
+        }
+        :global :where(html:has(:local(.page))) .action-item {
+            width: 100%;
+            height: auto;
+            max-height: none;
+            min-height: 2.5rem;
+            padding: 0;
+            z-index: 1;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            flex-shrink: 0;
+            border: var(--tileBorder);
+            border-radius: var(--tile);
+            box-shadow: var(--shadowInner, none);
+        }
+        :global :where(html:has(:local(.page))) .caption-btn {
+            flex: 1 1 0;
+            font-size: 110%;
+            border: none;
+            padding: 2%;
+            background-color: var(--surface);
+            border-radius: var(--tile) 0 0 var(--tile);
+            box-shadow: var(--shadowInner, none);
+        }
+        :global :where(html:has(:local(.page))) .action-button,
+        :global :where(html:has(:local(.page))) .damage-button {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        :global :where(html:has(:local(.page))) .action-button {
+            flex: 1 1 0;
+            font-size: 130%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background-color: var(--accent-2);
+        }
+
+        :global :where(html:has(:local(.page))) .action-button:hover {
+            transform: scale(1.05);
+        }
+
+    /* #endregion */
+        /* #region Equipped/learned Item Section */
+        :global :where(html:has(:local(.page))) .learned {
+            flex: 1 1 0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 70%;
+            color: var(--accent);
+            padding: 2%;
+            text-decoration: underline;
+        }
+        :global :where(html:has(:local(.page))) em {
+            color: var(--txt-color-1);
+            margin-left: 1%;
+            flex: 1 1 32%;
+        }
+        /* #endregion */
+        /* #region Spell Section */
+
+     /* #region SpellBook Section */
+
+        /* Spell Tabs ruleset */
+
+        /* #endregion */
+    
+    
+    
+    
+    
+
+    
+     
+
+    
+    
+    
+        :global :where(html:has(:local(.page))) .shop-title {
+            text-align: center;
+            font-size: 140%;
+            color: var(--txt-color-1);
+            background-color: var(--bgc-char-name);
+            margin: 0;
+            padding: 3%;
+            border-radius: var(--tile) var(--tile) 0 0;
+            border: var(--tileBorder);
+        }
+    
+
+    
+    
+    
+        :global :where(html:has(:local(.page))) .learned {
+            flex: 1 1 0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 70%;
+            color: var(--accent);
+            padding: 2%;
+            text-decoration: underline;
+        }
+
+    
+    
+
+        /* #endregion */
+        /* #region Inventory Section */
+        :global :where(html:has(:local(.page))) .item-shop {
+            min-height: 20rem;
+            margin-top: 0.5rem;
+        }
+
+        :global :where(html:has(:local(.page))) .shop-form {
+            flex: 1 1 0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        :global :where(html:has(:local(.page))) .shop-btn {
+            width: 100%;
+            margin: 0;
+            padding: 6%;
+            border: none;
+            text-align: right;
+            background-color: var(--accent);
+            border-radius: 0 var(--tile) var(--tile) 0;
+        }
+
+        :global :where(html:has(:local(.page))) .shop-button {
+            width: 100%;
+            margin: 0 0 2% 0;
+            border: var(--tileBorder);
+            background-color: var(--bgc-char-stat);
+            color: var(--txt-color-1);
+            border-radius: 0 0 var(--tile) var(--tile);
+            box-shadow: var(--bs2);
+            padding: 3%;
+        }
+    
+        :global :where(html:has(:local(.page))) .filter-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: stretch;
+            width: 100%;
+            
+        }
+    
+        :global :where(html:has(:local(.page))) .field {
+            flex: 1 1 0;
+            background-color: var(--bgc-char-stat);
+            color: var(--txt-color-1);
+            border: var(--tileBorder);
+            appearance: none;
+            box-sizing: border-box;
+            min-width: 0;
+            padding: 0.4rem 1.4em 0.4rem 0.5rem;
+            font: inherit;
+            text-align: center;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+            background-position: right 0.75em center, right 0.45em center;
+            background-size: 0.3em 0.3em;
+            background-repeat: no-repeat;
+            margin: 0;
+            border-radius: 0;
+        }
+    
+        :global :where(html:has(:local(.page))) .filter-container .field + .field {
+            border-left: none;
+        }
+    
+    
+    
+    
+    
+        /* #endregion */ 
+    /* #endregion */    
+    /* #region Overflow Guard Section */
+        :global :where(html:has(:local(.page))) main > *,
+        :global :where(html:has(:local(.page))) .sheet-panel,
+        :global :where(html:has(:local(.page))) #stat-container,
+        :global :where(html:has(:local(.page))) .health-container,
+        :global :where(html:has(:local(.page))) .skills-container,
+        :global :where(html:has(:local(.page))) #armor-class-container,
+        :global :where(html:has(:local(.page))) #initiative-container,
+        :global :where(html:has(:local(.page))) #proficiency-bonus-container,
+        :global :where(html:has(:local(.page))) .action-panel-container,
+        :global :where(html:has(:local(.page))) .action-container,
+        :global :where(html:has(:local(.page))) .condition-container,
+        :global :where(html:has(:local(.page))) #skills-container,
+        :global :where(html:has(:local(.page))) .condition-tile {
+                min-width: 0;
+                max-width: 100%;
+                min-height: 0;
+            }
+    /* #endregion */   
+    /* #region Slide Section */
+    
+        :global :where(html:has(:local(.page))) .slide {
+            z-index: 3;
+            box-sizing: border-box;
+            pointer-events: none;
+            background-color: var(--navSlideFill);
+            background-image: linear-gradient(180deg, var(--navSlideShine), rgba(255, 255, 255, 0.06));
+            border: 1px solid var(--navSlideBorder);
+            border-radius: var(--tile);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 10px var(--navSlideGlow), var(--shadowInner, none);
+            transition: transform .35s ease, width .35s ease, height .35s ease;
+        }
+    /* #endregion */   
+    /* #region Roll Orb Section */
+        
+    
+        :global :where(html:has(:local(.page))) .roll-feed {
+            list-style: none;
+            margin: 0;
+            padding: 0.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox; Chrome/Safari use the shared ::-webkit-scrollbar rule above */
+            touch-action: pan-y; /* lets a finger scroll the feed inside the orb */
+            overscroll-behavior: contain;
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    /* #endregion */
+   
+    :global :where(html:has(:local(.page))) .filter-container {
+        display: flex;
+        gap: 0;
+        width: 100%;
+    }
+    
+    :global :where(html:has(:local(.page))) .field {
+        flex: 1 1 0;
+        min-width: 0;
+        box-sizing: border-box;
+        padding: .4rem .5rem;
+        font: inherit;
+        text-align: center;
+        background-color: var(--bgc-char-stat);
+        color: var(--txt-color-1);
+        border: var(--tileBorder);
+        cursor: pointer;
+        margin: 0;
+        border-radius: 0;
+    }
+  /* #region Unused Section */
+  /*  
+    .action-container > [role="tabpanel"],
+    .panel-shell > [role="tabpanel"] {
+        border: var(--tileBorder);
+        min-height: 0;
+        flex: 1 1 auto;
+        overflow-y: auto;
+        box-sizing: border-box;
+    } 
+        
+    main.subpage-main {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            grid-template-columns: none;
+            grid-template-rows: none;
+            grid-template-areas: none;
+            place-items: stretch;
+            width: min(960px, 100%);
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            gap: 1rem;
+            overflow: visible;
+    }
+
+    .action-item > .action-button-container,
+    .action-item > form,
+    .action-button-container > form {
+        display: flex;
+        align-self: stretch;
+        margin: 0;
+    }
+
+            .title-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: center;
+            text-align: center;
+        
+        }
+
+        .btn-action:disabled,
+        .btn-action:disabled:hover {
+            background-color: var(--accent);
+            color: var(--txt-color-1);
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+        }
+  */
+
+  /* #endregion */
+}
+
+@media (max-width: 768px) {      
+    /* #region breakpoint Section */
+        :global :where(html:has(:local(.page))) input {
+            font-size: 2rem; 
+        }
+        :global :where(html:has(:local(.page))) header {
+                display: flex;
+                height: 13vh;
+                width: 100vw;
+                border-radius: 0 0 15% 15%;
+                position: relative;          /* anchors the phone portrait */
+                flex-shrink: 0;
+            }
+        :global html:where(:has(:local(.page))),
+        :global body:where(:has(:local(.page))),
+        :global :where(html:has(:local(.page))) header,
+        :global :where(html:has(:local(.page))) #site-title,
+        :global :where(html:has(:local(.page))) #nav-box,
+        :global :where(html:has(:local(.page))) #character-header,
+        :global :where(html:has(:local(.page))) #nav-container,
+        :global :where(html:has(:local(.page))) #character-rest,
+        :global :where(html:has(:local(.page))) main {
+                box-sizing: border-box;
+            }
+        /* #endregion */
+    /* #region Main Section */
+    
+        :global :where(html:has(:local(.page))) main {
+                flex-direction: column;
+                overflow-x: hidden;
+                overflow-y: auto;
+                height: calc(100svh - 20vh);   /* header 13vh + nav 6vh visible + character bar 6vh; runs under the fixed footer */
+                width: 100%;
+                overscroll-behavior: contain;
+                backdrop-filter: var(--blur);
+                -webkit-backdrop-filter: blur(3px);
+                flex: none;
+                min-height: 0;
+                padding-bottom: calc(4vh + env(safe-area-inset-bottom));
+            }
+    
+        /* #endregion */      
+    /* #region Header Section */
+        :global :where(html:has(:local(.page))) #site-title {
+                background-color: var(--bgc-theme);
+                color: var(--txt-color-1);
+                position: relative;
+                top: 0;
+                border-bottom: var(--tileBorder);
+                z-index: 2;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                font-size: var(--fontS1);
+                justify-content: center;
+                align-items: center;
+                box-shadow: var(--bs2);
+                text-decoration: underline;
+                text-decoration-thickness: 2px;
+                text-underline-offset: 5px;
+                height: 13vh;
+            }
+    
+    
+        :global :where(html:has(:local(.page))) .title-logo {
+            max-width: 70px;
+            max-height: 70px;
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+        }
+    
+    
+    
+    
+        :global :where(html:has(:local(.page))) #character-name,
+        :global :where(html:has(:local(.page))) #character-race,
+        :global :where(html:has(:local(.page))) #character-class,
+        :global :where(html:has(:local(.page))) #character-rest {
+            margin: 0;
+            padding: 1%;
+            font-size: 100%;
+            word-break: auto-phrase;
+            hyphens: auto;
+            text-align: center;
+            border: var(--tileBorder);
+            background-color: var(--bg-color-header);
+        }
+    
+        :global :where(html:has(:local(.page))) #character-name {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1 1 0;
+        }
+        :global :where(html:has(:local(.page))) #character-race {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1 1 0;
+        }
+        :global :where(html:has(:local(.page))) #character-class {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1 1 0;
+        }
+
+    
+    
+    
+
+    
+
+    
+    
+    
+
+        /* #endregion */
+    /* #region Nav Section */
+        :global :where(html:has(:local(.page))) #nav-container {
+            position: relative;
+            top: 0;
+            z-index: 1;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            width: 100%;
+            min-height: 9vh;
+            background-color: var(--bg-color-nav);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            justify-content: center;
+            align-items: stretch;
+            margin-top: -3vh;
+            padding-top: 3vh;
+            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
+        }
+    
+        :global :where(html:has(:local(.page))) #home-nav,
+        :global :where(html:has(:local(.page))) #character-nav,
+        :global :where(html:has(:local(.page))) #campaign-nav,
+        :global :where(html:has(:local(.page))) #settings-nav {
+            border: none;
+            border-top: none;
+            flex: 1 1 0;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80%;
+            padding: 2%;
+            margin: 0;
+            background-color: transparent;
+            box-shadow: none;
+            border-radius: 0;
+        }
+    
+    
+        :global :where(html:has(:local(.page))) #character-nav,
+        :global :where(html:has(:local(.page))) #campaign-nav,
+        :global :where(html:has(:local(.page))) #settings-nav {
+            position: relative;
+        }
+    
+        :global :where(html:has(:local(.page))) #home-nav {
+            border-left: none;
+        }
+    
+        :global :where(html:has(:local(.page))) #settings-nav {
+            border-radius: 0;
+        }
+    
+        :global :where(html:has(:local(.page))) .drop-down {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            max-width: 100vw;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 10;
+            border-radius: var(--tile);
+            transition: all .5s ease;
+            height: 10vh;
+            margin: 0;
+            padding: 0;
+        }
+    
+        :global :where(html:has(:local(.page))) li:hover .drop-down {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            width: 100%;
+            box-shadow: var(--bs2);
+            border-radius: var(--tile);
+            background-color: var(--drop-down-bg);
+        }
+    
+        :global :where(html:has(:local(.page))) #nav-container > li:hover,
+        :global :where(html:has(:local(.page))) #nav-container > li:focus-within {
+            z-index: 20;
+        }
+    
+    
+        :global :where(html:has(:local(.page))) #settings-nav .drop-down {
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+        }
+    
+    
+        :global :where(html:has(:local(.page))) .btn-drop-character,
+        :global :where(html:has(:local(.page))) .btn-drop-campaign,
+        :global :where(html:has(:local(.page))) .btn-drop-settings {
+            border-radius: 5px;
+            color: var(--drop-down-txt);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: var(--tileBorder);
+            box-shadow: var(--bs2);
+            height: 10vh;
+            font-size: 100%;
+        }
+        /* #endregion */
+    /* #region Conditions Panel Section */
+        /* #region Condition Section */
+        :global :where(html:has(:local(.page))) .conditions {
+            grid-area: E;
+            border-radius: var(--tile);
+            border: var(--tileBorder);
+            box-shadow: var(--bs2), var(--shadowInner, none);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+ 
+    
+
+ 
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+        /* #endregion */
+    /* #endregion */
+    /* #region Combat Panel Section */
+        /* #region Tabs/Panel layout Section */
+        :global :where(html:has(:local(.page))) .action-tab-list {
+                background-color: var(--bg-color-1);
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                margin: 1% 0 1% 0;
+                box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
+            
+        }
+
+    
+        /* #endregion */
+        /* #region Actions Section */
+    
+
+        :global :where(html:has(:local(.page))) .action-container {
+            padding: 0;
+            margin: 0;
+            
+        }
+    
+    
+        :global :where(html:has(:local(.page))) .action-set {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            padding: 0.3rem;
+            margin: 0;
+            border-radius: 0 0 var(--tile) var(--tile);
+        }
+    
+        :global :where(html:has(:local(.page))) .action-title {
+            border-radius: var(--tile) var(--tile) 0 0;
+            border-bottom: var(--tileBorder);
+            background-color: var(--bg-color-1);
+            padding: 2%;
+            margin: 0;
+            text-align: center;
+        }
+    
+        :global :where(html:has(:local(.page))) .action-item {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: space-between;
+            border: var(--tileBorder);
+            border-radius: var(--tile);
+            overflow: hidden;
+        }
+    
+        :global :where(html:has(:local(.page))) .caption-btn {
+            flex: 1 1 0;
+            border: none;
+            padding: 2%;
+            background-color: var(--bg-color-1);
+            border-radius: var(--tile) 0 0 var(--tile);
+        }
+    
+
+        :global :where(html:has(:local(.page))) .action-button {
+            background-color: var(--accent-2);
+            display: flex;;
+            align-items: center;
+            justify-content: center;
+            flex: 1 1 0;
+            height: 100%;
+            margin: 0;
+            font-size: 80%;
+            border: none;
+            overflow: hidden;
+        }
+    
+    
+        /* #endregion */
+        /* #region Spell Tab Section */
+        
+    
+    
+    
+    
+    
+    
+    
+     
+
+    
+    
+    
+        :global :where(html:has(:local(.page))) .shop-title {
+            text-align: center;
+            font-size: 140%;
+            color: var(--txt-color-1);
+            background-color: var(--bgc-char-name);
+            margin: 0;
+            padding: 3%;
+            border-radius: var(--tile) var(--tile) 0 0;
+            border: var(--tileBorder);
+        }
+    
+
+    
+    
+    
+        :global :where(html:has(:local(.page))) .learned {
+            flex: 1 1 0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 70%;
+            color: var(--accent);
+            padding: 2%;
+            text-decoration: underline;
+    
+        }
+
+        /*spell book specific styles — level column beside spell list (match desktop)*/
+
+        /* #endregion */
+        /* #region Inventory Section */
+
+        :global :where(html:has(:local(.page))) .shop-button {
+            width: 100%;
+            margin: 0 0 2% 0;
+            border: var(--tileBorder);
+            background-color: var(--bgc-char-stat);
+            color: var(--txt-color-1);
+            border-radius: 0 0 var(--tile) var(--tile);
+            box-shadow: var(--bs2);
+            padding: 3%;
+        }
+
+        :global :where(html:has(:local(.page))) .shop-form {
+            flex: 1 1 0;
+            display: flex;
+            align-self: stretch;
+            margin: 0;
+            padding: 0;
+            border-radius: 0 var(--tile) var(--tile) 0;
+        }
+
+        :global :where(html:has(:local(.page))) .shop-btn {
+            flex: 1 1 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 2%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80%;
+            text-align: center;
+            background-color: var(--accent);
+            color: var(--txt-action);
+            border-radius: 0 var(--tile) var(--tile) 0;
+        }
+    
+        :global :where(html:has(:local(.page))) .filter-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: stretch;
+            width: 100%;
+            
+        }
+    
+        :global :where(html:has(:local(.page))) .field {
+            flex: 1 1 0;
+            background-color: var(--bgc-char-stat);
+            color: var(--txt-color-1);
+            border: var(--tileBorder);
+            appearance: none;
+            box-sizing: border-box;
+            min-width: 0;
+            padding: 0.4rem 1.4em 0.4rem 0.5rem;
+            font: inherit;
+            text-align: center;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+            background-position: right 0.75em center, right 0.45em center;
+            background-size: 0.3em 0.3em;
+            background-repeat: no-repeat;
+            margin: 0;
+            border-radius: 0;
+        }
+    
+        :global :where(html:has(:local(.page))) .filter-container .field + .field {
+            border-left: none;
+        }
+    
+    
+    
+    
+    
+        /* #endregion */
+    /* #endregion */
+    /* #region Footer Section */
+        :global :where(html:has(:local(.page))) footer {
+            display: flex;
+            position: fixed;
+            top: calc(100svh - 2vh);
+            z-index: 10;
+            height: 3vh;
+            width: 100%;
+            border-top: var(--tileBorder);
+            box-shadow: var(--bs2);
+            border-radius: 50% 50% 0 0;
+            overflow: hidden;
+        }
+    
+        :global :where(html:has(:local(.page))) .footer-text {
+            display: none;
+        }
+    /* #endregion */
+    /* #region Slide Section */
+        :global :where(html:has(:local(.page))) .slide {
+            z-index: 3;
+            box-sizing: border-box;
+            background-color: var(--navSlideFill);
+            background-image: linear-gradient(180deg, var(--navSlideShine), rgba(255, 255, 255, 0.06));
+            border: 1px solid var(--navSlideBorder);
+            border-radius: var(--tile);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 10px var(--navSlideGlow);
+            transition: transform .35s ease, width .35s ease, height .35s ease;
+        }
+    
+    /* #endregion */
+    /* #region Roll Orb Section */
+        
+    
+        :global :where(html:has(:local(.page))) .roll-feed {
+            list-style: none;
+            margin: 0;
+            padding: 0.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox; Chrome/Safari use the shared ::-webkit-scrollbar rule above */
+            touch-action: pan-y; /* lets a finger scroll the feed inside the orb */
+            overscroll-behavior: contain;
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    /* #endregion */
+}
+/* Character-sheet subpages (Edit Character, Inventory). Loaded after charSheet.css, only on those pages. */
+
+/* ---------- edit / inventory subpages ---------- */
+
+:global body:has(:local(.page)) {
+    height: auto;
+    max-height: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+:global body:has(:local(.page)) main.subpage-main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    grid-template-columns: none;
+    grid-template-rows: none;
+    grid-template-areas: none;
+    place-items: stretch;
+    width: min(960px, 100%);
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+    gap: 1rem;
+    overflow: visible;
+}
+
+:global body:has(:local(.page)) .panel-shell {
+    width: 100%;
+    min-height: 60vh;
+}
+
+:global body:has(:local(.page)) .action-tab-list {
+    flex-shrink: 0;
+}
+
+:global body:has(:local(.page)) .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+:global body:has(:local(.page)) .form-section {
+    width: 100%;
+}
+
+:global body:has(:local(.page)) .tile-bottom,
+:global body:has(:local(.page)) select.tile-bottom,
+:global body:has(:local(.page)) input.tile-bottom {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: var(--tileBorder);
+    border-radius: var(--lowrad);
+    background-color: var(--bg-color-5);
+    color: var(--txt-color-1);
+    font: inherit;
+    box-sizing: border-box;
+}
+
+:global body:has(:local(.page)) .button-container {
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+:global body:has(:local(.page)) .btn-form {
+    cursor: pointer;
+    padding: 0.6rem 1.25rem;
+    border: var(--tileBorder);
+    border-radius: var(--tile);
+    background-color: var(--bgc-top);
+    color: var(--accent);
+    font: inherit;
+    box-shadow: var(--bs2);
+}
+
+/* editor tile labels (STRENGTH, Name, Class...): centered with side padding so the rounded, clipped tile corner can't cut them off */
+:global body:has(:local(.page)) .form-section > .tile-top {
+    display: block;
+    padding: 0.4rem 0.75rem;
+    text-align: center;
+}
+
+/* editor Class tab: creator-style description box + feature tree (same look as char_create.css) */
+
+/* "Subclass unlocks at level 3" under the locked subclass dropdown */
+
+/* ---------- editor portrait picker ---------- */
+
+/* collapsible portrait picker: arrow turns when open */
+/* flex on <details> breaks open/close in iOS Safari, so keep the picker block-level */
+
+/* portrait picker: glass tile look under every display (same values as the glass display),
+   with <details> kept block-level so open/close still works on iPhone */
+
+/* header strip: same as the old <p class="tile-top"> */
+
+/* group titles: same as the old <h3 class="portrait-group-title"> */
+
