@@ -58,3 +58,11 @@ test('spells: beams, upcasts, heals, and things a spell cannot do', () => {
     assert.ok('error' in resolveAct(creature, { actionKey: 's8', kind: 'damage', castLevel: 0 }, null, fixedDice(5)));
     assert.ok('error' in resolveAct(creature, { actionKey: 'w999', kind: 'hit' }, null, fixedDice(5)));
 });
+
+test('checks: initiative, stats and skills use the server-side bonus', () => {
+    assert.deepEqual(resolveAct(creature, { actionKey: 'initiative', kind: 'check' }, null, fixedDice(10)), { text: `Initiative: ${10 + creature.initiative}`, critKey: null });
+    assert.deepEqual(resolveAct(creature, { actionKey: 'stat:cha', kind: 'check' }, null, fixedDice(10)), { text: 'Confidence roll: 14', critKey: null });
+    const finesse = creature.skills.find((s) => s.id === 'finesse')!;
+    assert.deepEqual(resolveAct(creature, { actionKey: 'skill:finesse', kind: 'check' }, null, fixedDice(3)), { text: `Finesse check: ${3 + finesse.value}`, critKey: null });
+    assert.ok('error' in resolveAct(creature, { actionKey: 'stat:nope', kind: 'check' }, null, fixedDice(3)));
+});

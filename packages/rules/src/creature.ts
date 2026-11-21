@@ -74,6 +74,9 @@ export type Creature = {
     name: string;
     level: number;
     portrait: string | null;
+    species: string | null;          // "Lupine (Husky)"
+    role: string | null;
+    calling: string | null;
     hp: { current: number; max: number; temp: number; band: number };
     armorClass: { value: number; resist: string[] };
     initiative: number;
@@ -204,6 +207,9 @@ export function characterToCreature(data: SheetData): Creature {
         name: ch.name,
         level,
         portrait: ch.portrait_url ?? null,
+        species: ch.race_name ? `${ch.race_name}${ch.subrace_name ? ` (${ch.subrace_name})` : ''}` : null,
+        role: ch.class_name ?? null,
+        calling: ch.subclass_name ?? null,
         hp: { current: hpNow, max: hpMax, temp: Number(ch.temp_hp ?? 0), band },
         armorClass: { value: 10 + conMod + armorBonus + shieldBonus + armorRunes.acBonus, resist: armorRunes.resist },
         initiative: init,

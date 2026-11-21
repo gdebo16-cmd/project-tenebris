@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import RequireLogin from './components/RequireLogin';
-import CharacterSheet from './sheet/CharacterSheet';
+import SheetSwitch from './features/sheet/SheetSwitch.tsx';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
@@ -38,7 +38,7 @@ function App() {
                     <Route path="/join/:code" element={<JoinCampaign />} />
                     <Route path="/create_campaign" element={<CreateCampaign />} />
                     <Route path="/characters/new" element={<CharacterForm />} />
-                    <Route path="/characters/:id" element={<CharacterSheet />} />
+                    <Route path="/characters/:id" element={<SheetSwitch />} />
                     <Route path="/characters/:id/inventory" element={<InventoryPage />} />
                     <Route path="/characters/:id/edit" element={<CharacterForm />} />
                 </Route>

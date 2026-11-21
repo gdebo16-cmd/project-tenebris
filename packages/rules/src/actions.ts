@@ -4,17 +4,18 @@ import { rollDice, rollToHit, rollBeams, critMark, type Rng } from './dice.ts';
 import { beamRollText, beamDamageText, scaledAt, type ScalingStep } from './spellSlots.ts';
 import { spellDiceAt, spellHealAt, type Creature, type WeaponAction, type SpellAction } from './creature.ts';
 
-export type ActKind = 'hit' | 'damage' | 'heal';
+// check = a plain d20 check: actionKey 'initiative', 'stat:<str|dex|…>' or 'skill:<skill id>'
+export type ActKind = 'hit' | 'damage' | 'heal' | 'check';
 // Extra dice added to a weapon hit: Soul Strike (Reaver), Runic Strike (Rune Weaver), or an on-hit feature (Sigil Strike)
 export type ActRequest = { actionKey: string; kind: ActKind; castLevel?: number; extra?: 'soulStrike' | 'runicStrike'; featureKey?: string };
 
-const KINDS: ActKind[] = ['hit', 'damage', 'heal'];
+const KINDS: ActKind[] = ['hit', 'damage', 'heal', 'check'];
 
 // Checks the request body. Only names and small numbers are accepted; no dice, no bonuses.
 export function checkActRequest(body: unknown): { error: string } | { request: ActRequest } {
     const b = (body ?? {}) as Record<string, unknown>;
     if (typeof b.actionKey !== 'string' || b.actionKey.length === 0 || b.actionKey.length > 60) return { error: 'Which action?' };
-    if (!KINDS.includes(b.kind as ActKind)) return { error: 'kind must be hit, damage or heal' };
+    if (!KINDS.includes(b.kind as ActKind)) return { error: 'kind must be hit, damage, heal or check' };
     const castLevel = b.castLevel == null ? undefined : Number(b.castLevel);
     if (castLevel !== undefined && (!Number.isInteger(castLevel) || castLevel < 0 || castLevel > 9)) return { error: 'castLevel must be 0 to 9' };
     const extra = b.extra == null ? undefined : b.extra;
@@ -27,6 +28,7 @@ export type ActResult = { error: string } | { text: string; critKey: string | nu
 
 // lastCritKey = the action whose last to-hit was a natural 20 (the server remembers it), so its next damage crits.
 export function resolveAct(creature: Creature, request: ActRequest, lastCritKey: string | null, rng: Rng): ActResult {
+    if (request.kind === 'check') return resolveCheck(creature, request.actionKey, rng);
     const weapon = [...creature.actions, ...creature.bonusActions].find((a) => a.key === request.actionKey);
     if (weapon) return resolveWeapon(creature, weapon, request, lastCritKey, rng);
     const spell = creature.spells.find((s) => s.key === request.actionKey);
@@ -103,4 +105,17 @@ function resolveSpell(creature: Creature, s: SpellAction, request: ActRequest, l
         return { text: beamDamageText(hits, crit), critKey: null };
     }
     return { text: `Damage dealt: ${Math.max(0, rollDice(dice, rng, crit).total + dmgMod)}${crit ? ' CRIT!' : ''}`, critKey: null };
+}
+
+// Plain d20 checks, with the bonus worked out from the Creature (never sent by the browser)
+function resolveCheck(creature: Creature, key: string, rng: Rng): ActResult {
+    let label: string | null = null;
+    let bonus = 0;
+    if (key === 'initiative') { label = 'Initiative'; bonus = creature.initiative; }
+    const stat = key.startsWith('stat:') ? creature.stats.find((s) => s.key === key.slice(5)) : undefined;
+    if (stat) { label = `${stat.label} roll`; bonus = stat.mod; }
+    const skill = key.startsWith('skill:') ? creature.skills.find((s) => s.id === key.slice(6)) : undefined;
+    if (skill) { label = `${skill.name} check`; bonus = skill.value; }
+    if (!label) return { error: "That isn't a check this character can roll" };
+    return { text: `${label}: ${rollToHit(bonus, rng).total}`, critKey: null };
 }
