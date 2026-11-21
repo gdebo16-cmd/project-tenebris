@@ -5,6 +5,11 @@ import formStyles from '../CharacterForm.module.css';
 import styles from './SpeciesTab.module.css';
 import { useCharacterForm, useSaveTab } from '../queries.ts';
 
+// A variant's own picture: igni + Ember -> /races/igni-ember.png (Art's files, all lowercase)
+function variantImage(key: string, variant: string): string {
+    return `/races/${key}-${variant.toLowerCase().replace(/\s+/g, '-')}.png`;
+}
+
 // /races/human.png -> /races/thumbs/human.webp. The list never loads the big PNG.
 function thumbnail(image: string): string {
     return image.replace(/\/([^/]+)\.png$/, '/thumbs/$1.webp');
@@ -27,6 +32,7 @@ function SpeciesFields({ id }: { id: string }) {
     const [eyeColor, setEyeColor] = useState('');
     const [look, setLook] = useState('');
     const [artOpen, setArtOpen] = useState(false);
+    const [brokenArt, setBrokenArt] = useState('');
     const [filled, setFilled] = useState(false);
     const [error, setError] = useState('');
 
@@ -48,7 +54,9 @@ function SpeciesFields({ id }: { id: string }) {
     const options = form.data.options;
     const species = options.species.find((item) => String(item.id) === speciesId) ?? null;
     const sub = species?.subspecies.find((item) => String(item.id) === subspeciesId) ?? null;
-    const image = sub?.image ?? species?.image ?? null;
+    // The sub-species or picked variant replaces the species picture. A variant with no file yet falls back.
+    const variantArt = species && !sub && variant ? variantImage(species.key, variant) : null;
+    const image = sub?.image ?? (variantArt && variantArt !== brokenArt ? variantArt : null) ?? species?.image ?? null;
 
     function pickSpecies(nextId: string) {
         setSpeciesId(nextId);
@@ -85,7 +93,7 @@ function SpeciesFields({ id }: { id: string }) {
                         aria-label={artOpen ? 'Hide the full picture' : 'Show the full picture'}
                         onClick={() => setArtOpen((open) => !open)}
                     >
-                        <img className={artOpen ? styles.fullArt : styles.thumb} src={artOpen ? image : thumbnail(image)} alt="" />
+                        <img className={artOpen ? styles.fullArt : styles.thumb} src={artOpen ? image : thumbnail(image)} alt="" onError={() => { if (image === variantArt) setBrokenArt(image); }} />
                     </button>
                 )}
                 <label className={styles.field}>
@@ -102,7 +110,7 @@ function SpeciesFields({ id }: { id: string }) {
                 <Choice label="Sub-species" value={subspeciesId} onChange={(value) => { setSubspeciesId(value); setArtOpen(false); }} options={species.subspecies.map((item) => ({ value: String(item.id), label: item.name }))} />
             )}
             {species && species.subspecies.length === 0 && species.variants.length > 0 && (
-                <Choice label="Variant" value={variant} onChange={setVariant} options={species.variants.map((name) => ({ value: name, label: name }))} />
+                <Choice label="Variant" value={variant} onChange={(value) => { setVariant(value); setArtOpen(false); }} options={species.variants.map((name) => ({ value: name, label: name }))} />
             )}
             {species && (
                 <Choice label="Size" value={sizeId} onChange={setSizeId} options={species.sizes.map((item) => ({ value: String(item.id), label: item.name }))} />
