@@ -47,43 +47,43 @@ function SettingsPage() {
 
     return (
         <>
-            <header id="site-title">
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
+            <header id={styles.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Account Settings</h1>
             </header>
             <SiteNav />
             <main className={styles.page}>
-                <section className='profile-container'>
+                <section className={styles.profileContainer}>
                     <form onSubmit={submit}>
-                        <article className="profile-tile" id="profile-username-container">
-                            <label className="profile-label" htmlFor="username">Username</label>
-                            <input className="field profile-value" type="text" id="username" name="username" value={form.username} onChange={update} />
+                        <article className={styles.profileTile}>
+                            <label className={styles.profileLabel} htmlFor="username">Username</label>
+                            <input className={styles.profileValue} type="text" id="username" name="username" value={form.username} onChange={update} />
                         </article>
 
-                        <article className="form-section profile-tile" id="profile-email-container">
-                            <label className="profile-label" htmlFor="email">Email</label>
-                            <input className="field profile-value" type="email" id="email" name="email" value={form.email} onChange={update} />
+                        <article className={styles.profileTile}>
+                            <label className={styles.profileLabel} htmlFor="email">Email</label>
+                            <input className={styles.profileValue} type="email" id="email" name="email" value={form.email} onChange={update} />
                         </article>
 
-                        <article className="form-section profile-tile" id="profile-password-container">
-                            <label className="profile-label" htmlFor="password">Password</label>
-                            <input className="field profile-value" type="password" id="password" name="password" value={form.password} onChange={update} />
+                        <article className={styles.profileTile}>
+                            <label className={styles.profileLabel} htmlFor="password">Password</label>
+                            <input className={styles.profileValue} type="password" id="password" name="password" value={form.password} onChange={update} />
                         </article>
 
                         {message && <p>{message}</p>}
 
-                        <article className="form-section profile-tile" id="profile-submit-container">
-                            <button className="profile-button" id="submit" type="submit">Update Account</button>
+                        <article className={styles.profileTile}>
+                            <button className={styles.profileButton} type="submit">Update Account</button>
                         </article>
                     </form>
 
-                    <article className="form-section profile-tile" id="profile-delete-container">
-                        <button className="profile-button" id="delete-account" type="button" onClick={deleteAccount}>Delete Profile</button>
+                    <article className={styles.profileTile}>
+                        <button className={styles.profileButton} type="button" onClick={deleteAccount}>Delete Profile</button>
                     </article>
                 </section>
             </main>
             <footer>
-                <p className="footer-text" id="footer-text">copyrite Eldrid Tales LLC</p>
+                <p className={styles.footerText}>copyrite Eldrid Tales LLC</p>
             </footer>
         </>
     );
