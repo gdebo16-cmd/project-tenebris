@@ -34,8 +34,8 @@ export default function JoinCampaign() {
 
     return (
         <>
-        <header id="site-title">
-            <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
+        <header id={styles.siteTitle}>
+            <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
             <h1>Join a Tale</h1>
         </header>
         <main className={styles.page}>
@@ -51,7 +51,7 @@ export default function JoinCampaign() {
         </div>
         </main>
         <footer>
-            <p className="footer-text">copyrite Eldrid Tales LLC</p>
+            <p className={styles.footerText}>copyrite Eldrid Tales LLC</p>
         </footer>
         </>
     );
