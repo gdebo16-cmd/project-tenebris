@@ -1,11 +1,11 @@
+import styles from './Loader.module.css';
 
-import '../styles/loader.css';
-
-function Loader({ text = 'Trying my best...' }) {
+// className: extra class for the outer box (a page passes its own so its styles still apply while loading)
+function Loader({ text = 'Trying my best...', className = '' }) {
     return (
-        <div className="loader" role="status" aria-live='polite'>
-            <div className='loader-ring'></div>
-            <p className='loader-text'>{text}</p>
+        <div className={className ? `${styles.loader} ${className}` : styles.loader} role="status" aria-live='polite'>
+            <div className={styles.ring}></div>
+            <p>{text}</p>
         </div>
     );
 }

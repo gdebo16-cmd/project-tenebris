@@ -1,5 +1,6 @@
+/* Loader: the full-screen "loading" ring (was styles/loader.css). */
 .loader { position: fixed; inset: 0; display: grid; place-items: center; align-content: center; gap: 12px; }
-.loader-ring {
+.ring {
   width: 100px;
   height: 100px;
   background: linear-gradient(135deg, #8e63f1, #ecb848);
@@ -7,7 +8,7 @@
   animation: liquid 4s ease-in-out infinite;
 }
 
-@keyframes liquid { 
+@keyframes liquid {
   0% { border-radius: 42% 58% 70% 30% / 55% 30% 70% 45%; }
   50% { border-radius: 70% 30% 42% 58% / 30% 70% 45% 55%; }
   100% { border-radius: 42% 58% 70% 30% / 55% 30% 70% 45%; }
