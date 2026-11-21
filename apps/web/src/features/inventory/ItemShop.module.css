@@ -1,0 +1,304 @@
+/* ItemShop styles. Also styles the armor / weapon filters (WeaponFilter and ArmorFilter take
+   className and selectClassName) and adds its own class to the TabList bar. */
+
+.actionContainer {
+    padding: 2%;
+}
+
+.panelShell > .actionContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.panelShell > .actionContainer[hidden] {
+    display: none !important;
+}
+
+@media (min-width: 769px) {
+    .actionContainer {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .actionTitle {
+        text-align: center;
+        font-size: 130%;
+        padding: 2%;
+        margin: 0;
+        text-align: center;
+        border-radius: var(--tile) var(--tile) 0 0;
+        border-bottom: none;
+    }
+
+    .actionSet {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        padding: 0.3rem;
+        margin: 0;
+        border-radius: 0 0 var(--tile) var(--tile);
+    }
+
+    .actionItem {
+        width: 100%;
+        height: auto;
+        max-height: none;
+        min-height: 2.5rem;
+        padding: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: stretch;
+        flex-shrink: 0;
+        border: var(--tileBorder);
+        border-radius: var(--tile);
+        box-shadow: var(--shadowInner, none);
+    }
+
+    .captionBtn {
+        flex: 1 1 0;
+        font-size: 110%;
+        border: none;
+        padding: 2%;
+        background-color: var(--surface);
+        border-radius: var(--tile) 0 0 var(--tile);
+        box-shadow: var(--shadowInner, none);
+    }
+
+    .shopTitle {
+        text-align: center;
+        font-size: 140%;
+        color: var(--txt-color-1);
+        background-color: var(--bgc-char-name);
+        margin: 0;
+        padding: 3%;
+        border-radius: var(--tile) var(--tile) 0 0;
+        border: var(--tileBorder);
+    }
+
+    .itemShop {
+        min-height: 20rem;
+        margin-top: 0.5rem;
+    }
+
+    .shopForm {
+        flex: 1 1 0;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .shopBtn {
+        width: 100%;
+        margin: 0;
+        padding: 6%;
+        border: none;
+        text-align: right;
+        background-color: var(--accent);
+        border-radius: 0 var(--tile) var(--tile) 0;
+    }
+
+    .shopButton {
+        width: 100%;
+        margin: 0 0 2% 0;
+        border: var(--tileBorder);
+        background-color: var(--bgc-char-stat);
+        color: var(--txt-color-1);
+        border-radius: 0 0 var(--tile) var(--tile);
+        box-shadow: var(--bs2);
+        padding: 3%;
+    }
+
+    .filterContainer {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .field {
+        flex: 1 1 0;
+        background-color: var(--bgc-char-stat);
+        color: var(--txt-color-1);
+        border: var(--tileBorder);
+        appearance: none;
+        box-sizing: border-box;
+        min-width: 0;
+        padding: 0.4rem 1.4em 0.4rem 0.5rem;
+        font: inherit;
+        text-align: center;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+        background-position: right 0.75em center, right 0.45em center;
+        background-size: 0.3em 0.3em;
+        background-repeat: no-repeat;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .filterContainer .field + .field {
+        border-left: none;
+    }
+
+    .actionContainer {
+        min-width: 0;
+        max-width: 100%;
+        min-height: 0;
+    }
+
+    .filterContainer {
+        display: flex;
+        gap: 0;
+        width: 100%;
+    }
+
+    .field {
+        flex: 1 1 0;
+        min-width: 0;
+        box-sizing: border-box;
+        padding: .4rem .5rem;
+        font: inherit;
+        text-align: center;
+        background-color: var(--bgc-char-stat);
+        color: var(--txt-color-1);
+        border: var(--tileBorder);
+        cursor: pointer;
+        margin: 0;
+        border-radius: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .actionContainer {
+        padding: 0;
+        margin: 0;
+    }
+
+    .actionSet {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        padding: 0.3rem;
+        margin: 0;
+        border-radius: 0 0 var(--tile) var(--tile);
+    }
+
+    .actionTitle {
+        border-radius: var(--tile) var(--tile) 0 0;
+        border-bottom: var(--tileBorder);
+        background-color: var(--bg-color-1);
+        padding: 2%;
+        margin: 0;
+        text-align: center;
+    }
+
+    .actionItem {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+        border: var(--tileBorder);
+        border-radius: var(--tile);
+        overflow: hidden;
+    }
+
+    .captionBtn {
+        flex: 1 1 0;
+        border: none;
+        padding: 2%;
+        background-color: var(--bg-color-1);
+        border-radius: var(--tile) 0 0 var(--tile);
+    }
+
+    .shopTitle {
+        text-align: center;
+        font-size: 140%;
+        color: var(--txt-color-1);
+        background-color: var(--bgc-char-name);
+        margin: 0;
+        padding: 3%;
+        border-radius: var(--tile) var(--tile) 0 0;
+        border: var(--tileBorder);
+    }
+
+    .shopButton {
+        width: 100%;
+        margin: 0 0 2% 0;
+        border: var(--tileBorder);
+        background-color: var(--bgc-char-stat);
+        color: var(--txt-color-1);
+        border-radius: 0 0 var(--tile) var(--tile);
+        box-shadow: var(--bs2);
+        padding: 3%;
+    }
+
+    .shopForm {
+        flex: 1 1 0;
+        display: flex;
+        align-self: stretch;
+        margin: 0;
+        padding: 0;
+        border-radius: 0 var(--tile) var(--tile) 0;
+    }
+
+    .shopBtn {
+        flex: 1 1 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 2%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 80%;
+        text-align: center;
+        background-color: var(--accent);
+        color: var(--txt-action);
+        border-radius: 0 var(--tile) var(--tile) 0;
+    }
+
+    .filterContainer {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .field {
+        flex: 1 1 0;
+        background-color: var(--bgc-char-stat);
+        color: var(--txt-color-1);
+        border: var(--tileBorder);
+        appearance: none;
+        box-sizing: border-box;
+        min-width: 0;
+        padding: 0.4rem 1.4em 0.4rem 0.5rem;
+        font: inherit;
+        text-align: center;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+        background-position: right 0.75em center, right 0.45em center;
+        background-size: 0.3em 0.3em;
+        background-repeat: no-repeat;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .filterContainer .field + .field {
+        border-left: none;
+    }
+}
+
+.panelShell {
+    width: 100%;
+    min-height: 60vh;
+}

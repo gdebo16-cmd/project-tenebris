@@ -8,6 +8,7 @@ import WeaponFilter from '../../components/WeaponFilter';
 import ArmorFilter from '../../components/ArmorFilter';
 import { filterSortWeapons, EMPTY_WEAPON_FILTER } from '../../utils/weapons';
 import { filterSortArmor, EMPTY_ARMOR_FILTER } from '../../utils/armor';
+import styles from './ItemShop.module.css';
 
 const TABS = [
     { id: 'armor', label: 'Armor' },
@@ -53,13 +54,13 @@ function ItemShop({ characterId, onDone }) {
     const itemButton = (kind, itemId, owned) => (
         owned ? (
             <>
-                <form className="shop-form" onSubmit={(e) => { e.preventDefault(); changeItem(kind, itemId, 'remove'); }}>
-                    <button type="submit" id="remove-item-button" className="shop-btn">Remove</button>
+                <form className={styles.shopForm} onSubmit={(e) => { e.preventDefault(); changeItem(kind, itemId, 'remove'); }}>
+                    <button type="submit" className={styles.shopBtn}>Remove</button>
                 </form>
             </>
         ) : (
-            <form className="shop-form" onSubmit={(e) => { e.preventDefault(); changeItem(kind, itemId, 'add'); }}>
-                <button type="submit" id="add-item-button" className="shop-btn">Add</button>
+            <form className={styles.shopForm} onSubmit={(e) => { e.preventDefault(); changeItem(kind, itemId, 'add'); }}>
+                <button type="submit" className={styles.shopBtn}>Add</button>
             </form>
         )
     );
@@ -90,64 +91,64 @@ function ItemShop({ characterId, onDone }) {
 
     return (
         <>
-            <section className="title-tile">
-                <h3 className="shop-title">Item Shop</h3>
-                <button type="button" className="shop-button" onClick={onDone}>Done browsing</button>
+            <section>
+                <h3 className={styles.shopTitle}>Item Shop</h3>
+                <button type="button" className={styles.shopButton} onClick={onDone}>Done browsing</button>
                 {saveError && <p>{saveError}</p>}
             </section>
             
-            <section className="panel-shell item-shop">
+            <section className={`${styles.panelShell} ${styles.itemShop}`}>
             <TabList tabs={TABS} active={tab} onChange={setTab} prefix="inv-" />
 
-            <article role="tabpanel" id="inv-panel-armor" className="action-container" aria-labelledby="inv-tab-armor" hidden={tab !== 'armor'}>
-                <h3 className="action-title">Armor</h3>
-                <ArmorFilter value={armorFilter} onChange={setArmorFilter} />
-                <ul className="action-set">
+            <article role="tabpanel" id="inv-panel-armor" className={styles.actionContainer} aria-labelledby="inv-tab-armor" hidden={tab !== 'armor'}>
+                <h3 className={styles.actionTitle}>Armor</h3>
+                <ArmorFilter value={armorFilter} onChange={setArmorFilter} className={styles.filterContainer} selectClassName={styles.field} />
+                <ul className={styles.actionSet}>
                     {filterSortArmor(armor, armorFilter).map((a) => (
-                        <li key={a.id} className="action-item">
-                            <button type="button" className="caption-btn hover-grow" onClick={() => setOpenItem({ kind: 'armor', data: a })}>{a.name}</button>
+                        <li key={a.id} className={styles.actionItem}>
+                            <button type="button" className={styles.captionBtn} onClick={() => setOpenItem({ kind: 'armor', data: a })}>{a.name}</button>
                             {itemButton('armor', a.id, ownedArmorIds.includes(Number(a.id)))}
                         </li>
                     ))}
                 </ul>
             </article>
 
-            <article role="tabpanel" id="inv-panel-weapons" className="action-container" aria-labelledby="inv-tab-weapons" hidden={tab !== 'weapons'}>
-                <h3 className="action-title">Weapons</h3>
-                <WeaponFilter value={weaponFilter} onChange={setWeaponFilter} />
-                <ul className="action-set">
+            <article role="tabpanel" id="inv-panel-weapons" className={styles.actionContainer} aria-labelledby="inv-tab-weapons" hidden={tab !== 'weapons'}>
+                <h3 className={styles.actionTitle}>Weapons</h3>
+                <WeaponFilter value={weaponFilter} onChange={setWeaponFilter} className={styles.filterContainer} selectClassName={styles.field} />
+                <ul className={styles.actionSet}>
                     {filterSortWeapons(weapons, weaponFilter).map((w) => (
-                        <li key={w.id} className="action-item">
-                            <button type="button" className="caption-btn hover-grow" onClick={() => setOpenItem({ kind: 'weapon', data: w })}>{w.name}</button>
+                        <li key={w.id} className={styles.actionItem}>
+                            <button type="button" className={styles.captionBtn} onClick={() => setOpenItem({ kind: 'weapon', data: w })}>{w.name}</button>
                             {itemButton('weapon', w.id, ownedWeaponIds.includes(Number(w.id)))}
                         </li>
                     ))}
                 </ul>
             </article>
 
-            <article role="tabpanel" id="inv-panel-items" className="action-container" aria-labelledby="inv-tab-items" hidden={tab !== 'items'}>
-                <h3 className="action-title">Items</h3>
-                <div className="filter-container name-value-top-half">
-                    <select className="field cat-filter" aria-label="Item type" value={itemFilter.category} onChange={setItem('category')}>
+            <article role="tabpanel" id="inv-panel-items" className={styles.actionContainer} aria-labelledby="inv-tab-items" hidden={tab !== 'items'}>
+                <h3 className={styles.actionTitle}>Items</h3>
+                <div className={styles.filterContainer}>
+                    <select className={styles.field} aria-label="Item type" value={itemFilter.category} onChange={setItem('category')}>
                         <option value="">All types</option>
                         {itemTypes.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
-                    <select className="field rare-filter" aria-label="Rarity" value={itemFilter.rarity} onChange={setItem('rarity')}>
+                    <select className={styles.field} aria-label="Rarity" value={itemFilter.rarity} onChange={setItem('rarity')}>
                         <option value="">All rarities</option>
                         {itemRarities.map((r) => <option key={r} value={r}>{r}</option>)}
                     </select>
-                    <select className="field name-filter" aria-label="Sort items" value={itemFilter.sort} onChange={setItem('sort')}>
+                    <select className={styles.field} aria-label="Sort items" value={itemFilter.sort} onChange={setItem('sort')}>
                         <option value="name">Sort: Name</option>
                         <option value="rarity">Sort: Rarity</option>
                     </select>
                 </div>
                 {itemGroups.map(([group, list]) => (
                     <section key={group}>
-                        <h3 className="action-title">{group}</h3>
-                        <ul className="action-set">
+                        <h3 className={styles.actionTitle}>{group}</h3>
+                        <ul className={styles.actionSet}>
                             {list.map((it) => (
-                                <li key={it.id} className="action-item">
-                                    <button type="button" className="caption-btn hover-grow" onClick={() => setOpenItem({ kind: 'item', data: it })}>{it.name}</button>
+                                <li key={it.id} className={styles.actionItem}>
+                                    <button type="button" className={styles.captionBtn} onClick={() => setOpenItem({ kind: 'item', data: it })}>{it.name}</button>
                                     {itemButton('item', it.id, ownedItemIds.includes(Number(it.id)))}
                                 </li>
                             ))}

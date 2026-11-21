@@ -108,22 +108,9 @@
      padding-bottom: env(safe-area-inset-bottom);
      z-index: 1;
  }
-
-    :global :where(html:has(:local(.page))) [role="tabpanel"] {
-        padding: 2%;
-    }
     
-    :global :where(html:has(:local(.page))) .action-container > [role="tabpanel"]::-webkit-scrollbar,
-    :global :where(html:has(:local(.page))) .action-panel-container > [role="tabpanel"]::-webkit-scrollbar,
-    :global :where(html:has(:local(.page))) .panel-shell > [role="tabpanel"]::-webkit-scrollbar,
     :global :where(html:has(:local(.page))) .roll-feed::-webkit-scrollbar {
         display: none;
-    }
-
-    :global :where(html:has(:local(.page))) .action-container > [role="tabpanel"][hidden],
-    :global :where(html:has(:local(.page))) .action-panel-container > [role="tabpanel"][hidden],
-    :global :where(html:has(:local(.page))) .panel-shell > [role="tabpanel"][hidden] {
-        display: none !important;
     }
 
     /* restored from components.css (removed with it): the open tab gets its own colour and sinks in */
@@ -414,54 +401,6 @@
     /* #endregion */    
     /* #region Actions Panel Section */
         /* #region Action Section */
-        :global :where(html:has(:local(.page))) .action-container {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            
-        }
-        :global :where(html:has(:local(.page))) .action-title {
-            text-align: center;
-            font-size: 130%;
-            padding: 2%;
-            margin: 0;
-            text-align: center;
-            border-radius: var(--tile) var(--tile) 0 0;
-            border-bottom: none;
-        }
-        :global :where(html:has(:local(.page))) .action-set {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-            padding: 0.3rem;
-            margin: 0;
-            border-radius: 0 0 var(--tile) var(--tile);
-        }
-        :global :where(html:has(:local(.page))) .action-item {
-            width: 100%;
-            height: auto;
-            max-height: none;
-            min-height: 2.5rem;
-            padding: 0;
-            z-index: 1;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: stretch;
-            flex-shrink: 0;
-            border: var(--tileBorder);
-            border-radius: var(--tile);
-            box-shadow: var(--shadowInner, none);
-        }
-        :global :where(html:has(:local(.page))) .caption-btn {
-            flex: 1 1 0;
-            font-size: 110%;
-            border: none;
-            padding: 2%;
-            background-color: var(--surface);
-            border-radius: var(--tile) 0 0 var(--tile);
-            box-shadow: var(--shadowInner, none);
-        }
         :global :where(html:has(:local(.page))) .action-button,
         :global :where(html:has(:local(.page))) .damage-button {
             cursor: pointer;
@@ -507,28 +446,6 @@
 
         /* #endregion */
     
-    
-    
-    
-    
-
-    
-     
-
-    
-    
-    
-        :global :where(html:has(:local(.page))) .shop-title {
-            text-align: center;
-            font-size: 140%;
-            color: var(--txt-color-1);
-            background-color: var(--bgc-char-name);
-            margin: 0;
-            padding: 3%;
-            border-radius: var(--tile) var(--tile) 0 0;
-            border: var(--tileBorder);
-        }
-    
 
     
     
@@ -549,75 +466,6 @@
 
         /* #endregion */
         /* #region Inventory Section */
-        :global :where(html:has(:local(.page))) .item-shop {
-            min-height: 20rem;
-            margin-top: 0.5rem;
-        }
-
-        :global :where(html:has(:local(.page))) .shop-form {
-            flex: 1 1 0;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        :global :where(html:has(:local(.page))) .shop-btn {
-            width: 100%;
-            margin: 0;
-            padding: 6%;
-            border: none;
-            text-align: right;
-            background-color: var(--accent);
-            border-radius: 0 var(--tile) var(--tile) 0;
-        }
-
-        :global :where(html:has(:local(.page))) .shop-button {
-            width: 100%;
-            margin: 0 0 2% 0;
-            border: var(--tileBorder);
-            background-color: var(--bgc-char-stat);
-            color: var(--txt-color-1);
-            border-radius: 0 0 var(--tile) var(--tile);
-            box-shadow: var(--bs2);
-            padding: 3%;
-        }
-    
-        :global :where(html:has(:local(.page))) .filter-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: stretch;
-            width: 100%;
-            
-        }
-    
-        :global :where(html:has(:local(.page))) .field {
-            flex: 1 1 0;
-            background-color: var(--bgc-char-stat);
-            color: var(--txt-color-1);
-            border: var(--tileBorder);
-            appearance: none;
-            box-sizing: border-box;
-            min-width: 0;
-            padding: 0.4rem 1.4em 0.4rem 0.5rem;
-            font: inherit;
-            text-align: center;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
-            background-position: right 0.75em center, right 0.45em center;
-            background-size: 0.3em 0.3em;
-            background-repeat: no-repeat;
-            margin: 0;
-            border-radius: 0;
-        }
-    
-        :global :where(html:has(:local(.page))) .filter-container .field + .field {
-            border-left: none;
-        }
     
     
     
@@ -627,18 +475,17 @@
     /* #endregion */    
     /* #region Overflow Guard Section */
         :global :where(html:has(:local(.page))) main > *,
-        :global :where(html:has(:local(.page))) .sheet-panel,
-        :global :where(html:has(:local(.page))) #stat-container,
-        :global :where(html:has(:local(.page))) .health-container,
-        :global :where(html:has(:local(.page))) .skills-container,
-        :global :where(html:has(:local(.page))) #armor-class-container,
-        :global :where(html:has(:local(.page))) #initiative-container,
-        :global :where(html:has(:local(.page))) #proficiency-bonus-container,
-        :global :where(html:has(:local(.page))) .action-panel-container,
-        :global :where(html:has(:local(.page))) .action-container,
-        :global :where(html:has(:local(.page))) .condition-container,
-        :global :where(html:has(:local(.page))) #skills-container,
-        :global :where(html:has(:local(.page))) .condition-tile {
+:global :where(html:has(:local(.page))) .sheet-panel,
+:global :where(html:has(:local(.page))) #stat-container,
+:global :where(html:has(:local(.page))) .health-container,
+:global :where(html:has(:local(.page))) .skills-container,
+:global :where(html:has(:local(.page))) #armor-class-container,
+:global :where(html:has(:local(.page))) #initiative-container,
+:global :where(html:has(:local(.page))) #proficiency-bonus-container,
+:global :where(html:has(:local(.page))) .action-panel-container,
+:global :where(html:has(:local(.page))) .condition-container,
+:global :where(html:has(:local(.page))) #skills-container,
+:global :where(html:has(:local(.page))) .condition-tile {
                 min-width: 0;
                 max-width: 100%;
                 min-height: 0;
@@ -676,27 +523,6 @@
         
         
     /* #endregion */
-   
-    :global :where(html:has(:local(.page))) .filter-container {
-        display: flex;
-        gap: 0;
-        width: 100%;
-    }
-    
-    :global :where(html:has(:local(.page))) .field {
-        flex: 1 1 0;
-        min-width: 0;
-        box-sizing: border-box;
-        padding: .4rem .5rem;
-        font: inherit;
-        text-align: center;
-        background-color: var(--bgc-char-stat);
-        color: var(--txt-color-1);
-        border: var(--tileBorder);
-        cursor: pointer;
-        margin: 0;
-        border-radius: 0;
-    }
   /* #region Unused Section */
   /*  
     .action-container > [role="tabpanel"],
@@ -1022,50 +848,6 @@
         /* #region Actions Section */
     
 
-        :global :where(html:has(:local(.page))) .action-container {
-            padding: 0;
-            margin: 0;
-            
-        }
-    
-    
-        :global :where(html:has(:local(.page))) .action-set {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-            padding: 0.3rem;
-            margin: 0;
-            border-radius: 0 0 var(--tile) var(--tile);
-        }
-    
-        :global :where(html:has(:local(.page))) .action-title {
-            border-radius: var(--tile) var(--tile) 0 0;
-            border-bottom: var(--tileBorder);
-            background-color: var(--bg-color-1);
-            padding: 2%;
-            margin: 0;
-            text-align: center;
-        }
-    
-        :global :where(html:has(:local(.page))) .action-item {
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
-            justify-content: space-between;
-            border: var(--tileBorder);
-            border-radius: var(--tile);
-            overflow: hidden;
-        }
-    
-        :global :where(html:has(:local(.page))) .caption-btn {
-            flex: 1 1 0;
-            border: none;
-            padding: 2%;
-            background-color: var(--bg-color-1);
-            border-radius: var(--tile) 0 0 var(--tile);
-        }
-    
-
         :global :where(html:has(:local(.page))) .action-button {
             background-color: var(--accent-2);
             display: flex;;
@@ -1082,29 +864,6 @@
     
         /* #endregion */
         /* #region Spell Tab Section */
-        
-    
-    
-    
-    
-    
-    
-    
-     
-
-    
-    
-    
-        :global :where(html:has(:local(.page))) .shop-title {
-            text-align: center;
-            font-size: 140%;
-            color: var(--txt-color-1);
-            background-color: var(--bgc-char-name);
-            margin: 0;
-            padding: 3%;
-            border-radius: var(--tile) var(--tile) 0 0;
-            border: var(--tileBorder);
-        }
     
 
     
@@ -1126,77 +885,6 @@
 
         /* #endregion */
         /* #region Inventory Section */
-
-        :global :where(html:has(:local(.page))) .shop-button {
-            width: 100%;
-            margin: 0 0 2% 0;
-            border: var(--tileBorder);
-            background-color: var(--bgc-char-stat);
-            color: var(--txt-color-1);
-            border-radius: 0 0 var(--tile) var(--tile);
-            box-shadow: var(--bs2);
-            padding: 3%;
-        }
-
-        :global :where(html:has(:local(.page))) .shop-form {
-            flex: 1 1 0;
-            display: flex;
-            align-self: stretch;
-            margin: 0;
-            padding: 0;
-            border-radius: 0 var(--tile) var(--tile) 0;
-        }
-
-        :global :where(html:has(:local(.page))) .shop-btn {
-            flex: 1 1 0;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 2%;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 80%;
-            text-align: center;
-            background-color: var(--accent);
-            color: var(--txt-action);
-            border-radius: 0 var(--tile) var(--tile) 0;
-        }
-    
-        :global :where(html:has(:local(.page))) .filter-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: stretch;
-            width: 100%;
-            
-        }
-    
-        :global :where(html:has(:local(.page))) .field {
-            flex: 1 1 0;
-            background-color: var(--bgc-char-stat);
-            color: var(--txt-color-1);
-            border: var(--tileBorder);
-            appearance: none;
-            box-sizing: border-box;
-            min-width: 0;
-            padding: 0.4rem 1.4em 0.4rem 0.5rem;
-            font: inherit;
-            text-align: center;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
-            background-position: right 0.75em center, right 0.45em center;
-            background-size: 0.3em 0.3em;
-            background-repeat: no-repeat;
-            margin: 0;
-            border-radius: 0;
-        }
-    
-        :global :where(html:has(:local(.page))) .filter-container .field + .field {
-            border-left: none;
-        }
     
     
     
@@ -1282,11 +970,6 @@
     padding: 1rem;
     gap: 1rem;
     overflow: visible;
-}
-
-:global body:has(:local(.page)) .panel-shell {
-    width: 100%;
-    min-height: 60vh;
 }
 
 :global body:has(:local(.page)) .form-container {
