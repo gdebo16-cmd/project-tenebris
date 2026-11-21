@@ -211,6 +211,14 @@ export function scoreFromRolls(state: StatRollState, stat: StatName, plus2: stri
     return roll.total + (stat === plus2 ? 2 : 0) + (stat === plus1 ? 1 : 0);
 }
 
+// Until R4.9 a finished character's role and traits stay on the old editor.
+export function finishedFormBlock(tab: string, isDraft: boolean): string | null {
+    if (isDraft) return null;
+    if (tab === 'role') return 'Change the role of a finished character with the old editor for now';
+    if (tab === 'traits') return 'Change the traits of a finished character with the old editor for now';
+    return null;
+}
+
 // PLACEHOLDER until docs/DECISIONS.md: rerolls are unlimited on a draft and refused after finish.
 export function rerollAllowed(isDraft: boolean): { error: string } | { ok: true } {
     if (!isDraft) return { error: 'Rolls are locked once a character is finished' };

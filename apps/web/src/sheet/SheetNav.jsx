@@ -6,7 +6,7 @@ import useTabSlider from '../hooks/useTabSlider';
 const SHEET_TAB = 3;
 
 // The menu at the top of the character sheet (same links as character.ejs)
-function SheetNav({ characterId }) {
+function SheetNav({ characterId, isDraft }) {
     const { tabProps, barProps, slideStyle } = useTabSlider(SHEET_TAB);
     return (
         <nav id="nav-box">
@@ -32,7 +32,7 @@ function SheetNav({ characterId }) {
 
                 <li id="campaign-nav" className="btn btn-nav" {...tabProps(3)}>Character Editor
                     <ul className="drop-down" id="campaignDropdown">
-                        <Link id="charSheetEdit" className="btn-drop-campaign" to={`/characters/${characterId}/edit`}>Edit Character</Link>
+                        <Link id="charSheetEdit" className="btn-drop-campaign" to={isDraft ? `/characters/${characterId}/edit` : `/characters/${characterId}/edit-old`}>Edit Character</Link>
                     </ul>
                 </li>
             </ul>

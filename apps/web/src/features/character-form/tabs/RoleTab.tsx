@@ -59,8 +59,8 @@ function RoleFields({ id }: { id: string }) {
         if (level < CALLING_LEVEL) setCallingId('');
     }, [level]);
 
-    if (form.isPending || !form.data) return null;
     if (form.error) return <p className={formStyles.error} role="alert">{messageOf(form.error)}</p>;
+    if (form.isPending || !form.data) return null;
 
     const options = roleId && live.data ? live.data : form.data.options;
     const role = options.roles.find((item) => String(item.id) === roleId) ?? null;

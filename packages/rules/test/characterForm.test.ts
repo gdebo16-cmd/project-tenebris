@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkHeader, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, keepUnrelatedChoices, missingForFinish, rerollAllowed, startingHp, type Options } from '../src/characterForm.ts';
+import { checkHeader, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, finishedFormBlock, keepUnrelatedChoices, missingForFinish, rerollAllowed, startingHp, type Options } from '../src/characterForm.ts';
 
 // Only the parts of the options the species check reads
 const options = {
@@ -177,6 +177,14 @@ test('traits: a bad placement, an unrolled index, or too many gifts gets an erro
     for (const body of bad) assert.ok('error' in checkTraitsTab(giftOptions, stored, body), JSON.stringify(body));
     const unrolled = { rolls: stored.rolls.map((roll, i) => i === 0 ? null : roll) };
     assert.ok('error' in checkTraitsTab(giftOptions, unrolled, { placement: allPlaced, plus2: 'str', plus1: 'dex' }));
+});
+
+test('a finished character keeps role and traits on the old editor until R4.9', () => {
+    assert.equal(finishedFormBlock('role', true), null);
+    assert.equal(finishedFormBlock('traits', true), null);
+    assert.equal(finishedFormBlock('header', false), null);
+    assert.match(finishedFormBlock('role', false) ?? '', /old editor/);
+    assert.match(finishedFormBlock('traits', false) ?? '', /old editor/);
 });
 
 test('stat roll requests: an index, or one reset, and rerolls lock after finish', () => {

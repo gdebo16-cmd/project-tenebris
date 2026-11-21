@@ -64,7 +64,24 @@ test('traits scores follow the server rolls, and a finished character cannot rer
 
     const locked = await page.request.post(`/api/characters/${id}/stat-rolls`, { data: { index: 0 } });
     expect(locked.status()).toBe(400);
-    expect((await locked.json()).error).toMatch(/finished/i);
+    expect((await locked.json()).error).toBe('Change the traits of a finished character with the old editor for now');
+
+    const traitsAgain = await page.request.put(`/api/characters/${id}/form/traits`, {
+        data: { placement, plus2: 'str', plus1: 'dex', gifts: [] },
+    });
+    expect(traitsAgain.status()).toBe(400);
+    expect((await traitsAgain.json()).error).toBe('Change the traits of a finished character with the old editor for now');
+
+    const roleAgain = await page.request.put(`/api/characters/${id}/form/role`, {
+        data: {
+            role_id: roleOptions.roles.find((role) => role.key === 'warrior').id,
+            calling_id: null,
+            skills: roleOptions.skills.from.slice(0, roleOptions.skills.choose),
+            feature_choices: {},
+        },
+    });
+    expect(roleAgain.status()).toBe(400);
+    expect((await roleAgain.json()).error).toBe('Change the role of a finished character with the old editor for now');
 
     expect((await page.request.delete(`/api/characters/${id}`)).ok()).toBeTruthy();
 });

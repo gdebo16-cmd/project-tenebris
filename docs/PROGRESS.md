@@ -17,6 +17,11 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
+### 2026-11-20 — Cursor (R4.5 fix, after R4.6)
+- Finished characters keep the old editor at `/characters/:id/edit-old`. The sheet Edit link goes there when `is_draft` is false. Drafts still use `/characters/:id/edit`.
+- Role-tab saves and every traits save (rolls, placements, bonuses, gifts) are refused on a finished character until R4.9. The role tab shows a failed load instead of a blank page.
+- Next is still R4.7.
+
 ### 2026-11-20 — Cursor (R4.6)
 - Traits tab. `POST /api/characters/:id/stat-rolls` rolls one 4d6-drop-lowest (or resets placements / all 8 rolls). The traits save sends roll indexes, the +2, the +1, and gift ids. The server looks up the dice and writes the scores. Same stat may take both bonuses.
 - Gift ids are stored inside `stat_rolls` (with the rolls and the placement). There is no gifts column, and this slice does not add one.

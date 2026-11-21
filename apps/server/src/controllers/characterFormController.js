@@ -7,7 +7,7 @@
 //
 // The rules live in @tenebris/rules (characterOptions + characterForm); this file is the glue.
 import { characterOptions } from '@tenebris/rules/characterOptions';
-import { checkHeader, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, keepUnrelatedChoices, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
+import { checkHeader, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, finishedFormBlock, keepUnrelatedChoices, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
 import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
 import { roll4d6DropLowest, rollDice } from '@tenebris/rules/dice';
 import { rng } from '../dice.js';
@@ -138,10 +138,12 @@ export async function saveTab(req, res) {
     const checked = check(options, req.body, ch);
     if ('error' in checked) return res.status(400).json({ error: checked.error });
 
-    // A finished character's level changes HP, which the old level editor still handles (until R4.9)
+    // Until R4.9 the old editor owns a finished character's level, role and traits.
     if (!ch.is_draft && checked.values.level !== undefined && checked.values.level !== ch.level) {
         return res.status(400).json({ error: 'Change the level of a finished character with the level editor for now' });
     }
+    const blocked = finishedFormBlock(tab, Boolean(ch.is_draft));
+    if (blocked) return res.status(400).json({ error: blocked });
 
     // The server decides: below level 3 the calling is gone, even if the browser still sends one on the header.
     if (tab === 'header' && Number(checked.values.level) < CALLING_LEVEL) {
@@ -164,6 +166,10 @@ export async function rollStat(req, res) {
 
     const request = checkStatRollBody(req.body);
     if ('error' in request) return res.status(400).json({ error: request.error });
+
+    // Rolls, resets, placements, bonuses and gifts all stay on the old editor until R4.9.
+    const blocked = finishedFormBlock('traits', Boolean(ch.is_draft));
+    if (blocked) return res.status(400).json({ error: blocked });
 
     // Rolling again, and clearing the dice, are rerolls. Moving a roll to another stat is not.
     const reroll = 'index' in request || request.reset === 'rolls';

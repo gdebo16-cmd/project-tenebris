@@ -8,6 +8,7 @@ import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import InventoryPage from './pages/InventoryPage';
 import CharacterForm from './features/character-form/CharacterForm.tsx';
+import EditCharacterPage from './pages/EditCharacterPage';
 import CreateStep1 from './pages/CreateStep1';
 import CreateStep2 from './pages/CreateStep2';
 import CreateStep3 from './pages/CreateStep3';
@@ -49,6 +50,7 @@ function App() {
                     <Route path="/characters/:id" element={<CharacterSheet />} />
                     <Route path="/characters/:id/inventory" element={<InventoryPage />} />
                     <Route path="/characters/:id/edit" element={<CharacterForm />} />
+                    <Route path="/characters/:id/edit-old" element={<EditCharacterPage />} />
                 </Route>
                 <Route path="*" element={<p>Page not found. <a href="/home">Go home</a></p>} />
             </Routes>
