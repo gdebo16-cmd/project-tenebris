@@ -5,17 +5,23 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 ## Now
 
 - **Stage 1, native rebuild:** R1–R3 done (R3 = commit `2d5c775`). Parallel worktrees set up in `AGENTS.md`.
-- **In progress:** nobody
+- **In progress:** Cursor — R4.3–R5 (character form + sheet blocks)
 
 ## Next
 
-- R4 Unified character form, starting with the server endpoint "what can this character pick?" (spec: `docs/specs/character-creator.md`).
+- R4.4 Species & look tab (thumbnails, species / variant / eyes / size / look description).
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-20 — Cursor (R4.3)
+- Form shell in `apps/web/src/features/character-form/`: header (name, level, portrait), five tabs in the URL (`?tab=`), `/characters/new` creates a draft and `/characters/:id/edit` edits it. Server errors show under Save.
+- Old `/create_char` routes still work. `/characters/:id/edit` is the new form now, so the sheet's Edit link already opens it. The old editor files stay until R4.9.
+- Checked on this worktree (ports 4003 / 5176): `npm run typecheck`, `npm test` (40), `npm run test:e2e` against `http://localhost:5176` — 4 passed. Smoke accounts were in use for that run. A draft survived a tab change and a reload; an empty name shows the server's error.
+- Next is R4.4.
 
 ### 2026-11-20 — Claude (R4.2, in the main folder at the owner's request, left uncommitted for him)
 - Rules: `packages/rules/src/characterForm.ts` (checkHeader, checkSpeciesTab, missingForFinish, startingHp) + `test/characterForm.test.ts` — 40/40 tests, typecheck clean.

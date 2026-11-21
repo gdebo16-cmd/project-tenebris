@@ -1,0 +1,201 @@
+/* The character form. Five tabs stay in one row at every width; phones use the short names. */
+
+.page {
+    box-sizing: border-box;
+    min-height: 100vh;
+    padding: 1rem;
+    background: var(--bg, #0d042c);
+    color: var(--text, #facd8d);
+    font-family: var(--fontfam, Georgia, serif);
+}
+
+.page * { box-sizing: border-box; }
+
+.back { margin: 0 0 0.5rem; }
+
+.back a { color: var(--accent, #d4af37); }
+
+.title {
+    margin: 0 0 0.75rem;
+    font-size: 1.4rem;
+}
+
+.header {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.75rem 1rem;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.portraitButton {
+    padding: 0;
+    border: 3px ridge var(--accent, #d4af37);
+    background: transparent;
+    cursor: pointer;
+}
+
+.portrait {
+    display: block;
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: cover;
+}
+
+.headerFields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.nameLevel {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+}
+
+.field {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+/* Name uses the free space. Level stays a short box so it doesn't stretch across the row. */
+.field:first-child { flex: 1 1 auto; }
+.field:last-child { flex: 0 0 5rem; }
+
+.label { font-size: 0.85rem; }
+
+/* components.css sets text inputs to 2rem; this page keeps them readable */
+.page input[type='text'],
+.page input[type='number'],
+.input {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.35rem 0.5rem;
+    color: var(--text, #facd8d);
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+}
+
+.summary {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+.save {
+    align-self: flex-start;
+    padding: 0.4rem 1rem;
+    font: inherit;
+    color: var(--bg, #0d042c);
+    background: var(--accent, #d4af37);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save:disabled { opacity: 0.6; cursor: wait; }
+
+.error {
+    margin: 0.25rem 0 0;
+    color: #ffb4b4;
+}
+
+.portraitPanel {
+    grid-column: 1 / -1;
+    max-height: 16rem;
+    overflow: auto;
+    padding: 0.5rem;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+}
+
+.portraitGroup {
+    margin: 0.5rem 0 0.25rem;
+    font-size: 0.9rem;
+}
+
+.portraitGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.portraitPick,
+.portraitPickSelected {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 4.5rem;
+    padding: 0.2rem;
+    font: inherit;
+    font-size: 0.65rem;
+    color: inherit;
+    background: transparent;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.portraitPick img,
+.portraitPickSelected img {
+    width: 3rem;
+    height: 3rem;
+    object-fit: cover;
+}
+
+.portraitPickSelected { border-color: var(--accent, #d4af37); }
+
+.tabList {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.25rem;
+    margin: 0 0 0.75rem;
+}
+
+.tab,
+.tabSelected {
+    min-width: 0;
+    padding: 0.45rem 0.2rem;
+    font: inherit;
+    font-size: 0.85rem;
+    color: inherit;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+}
+
+.tabSelected {
+    background: color-mix(in srgb, var(--accent, #d4af37) 35%, var(--surface, #1a1030));
+    border-bottom-color: transparent;
+}
+
+.shortName { display: none; }
+
+.panel {
+    padding: 0.75rem 0;
+}
+
+@media (max-width: 640px) {
+    .label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    .field:last-child { flex-basis: 4rem; }
+
+    .longName { display: none; }
+
+    .shortName { display: inline; }
+
+    .tab,
+    .tabSelected { font-size: 0.75rem; padding: 0.4rem 0.1rem; }
+}
