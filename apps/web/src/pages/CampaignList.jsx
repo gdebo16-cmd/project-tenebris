@@ -49,44 +49,44 @@ function CampaignList() {
 
     return (
         <>
-            <header id="site-title">
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
+            <header id={styles.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Your Tales</h1>
             </header>
             <SiteNav />
             <main className={styles.page}>
-                <section className="cl-panel">
-                    <h2 className="cl-header"><strong>Start or Join a Tale</strong></h2>
-                    <div className="cl-body cl-actions">
-                        <Link className="btn cl-create" to="/create_campaign">Tell a New Tale</Link>
-                        <form onSubmit={joinCampaign} className="cl-join">
-                            <input className="field" type="text" placeholder="Invite code" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={8} />
-                            <button className="btn cl-join-btn" type="submit">Join</button>
+                <section className={styles.clPanel}>
+                    <h2 className={styles.clHeader}><strong>Start or Join a Tale</strong></h2>
+                    <div className={`${styles.clBody} ${styles.clActions}`}>
+                        <Link className={styles.clCreate} to="/create_campaign">Tell a New Tale</Link>
+                        <form onSubmit={joinCampaign} className={styles.clJoin}>
+                            <input className={styles.field} type="text" placeholder="Invite code" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={8} />
+                            <button className={styles.clJoinBtn} type="submit">Join</button>
                         </form>
-                        {joinError && <p className="cl-error">{joinError}</p>}
+                        {joinError && <p className={styles.clError}>{joinError}</p>}
                     </div>
                 </section>
-                <section className="cl-panel">
-                    <h2 className="cl-header"><strong>Your Tales</strong></h2>
-                    <div className="cl-body">
+                <section className={styles.clPanel}>
+                    <h2 className={styles.clHeader}><strong>Your Tales</strong></h2>
+                    <div className={styles.clBody}>
                         {campaigns.length === 0 ? (
-                            <p className="cl-empty">No Tales Yet</p>
+                            <p className={styles.clEmpty}>No Tales Yet</p>
                         ) : (
-                            <ul className="cl-list">
+                            <ul className={styles.clList}>
                                 {campaigns.map((camp) => (
-                                    <li key={camp.id} className="cl-card">
-                                        <Link className="cl-card-link" to={`/campaign/${camp.id}`}>
+                                    <li key={camp.id} className={styles.clCard}>
+                                        <Link className={styles.clCardLink} to={`/campaign/${camp.id}`}>
                                             {camp.campaign_img_url
-                                                ? <img className="cl-card-image" src={camp.campaign_img_url} alt="" />
-                                                : <div className="cl-card-image" aria-hidden="true" />}
-                                            <div className="cl-card-text">
-                                                <h3 className="cl-card-name">{camp.name}</h3>
-                                                <span className={`cl-role role-${camp.role}`}>{camp.role === 'dm' ? 'DM' : 'Player'}</span>
-                                                <p className="cl-card-description">{camp.description}</p>
+                                                ? <img className={styles.clCardImage} src={camp.campaign_img_url} alt="" />
+                                                : <div className={styles.clCardImage} aria-hidden="true" />}
+                                            <div className={styles.clCardText}>
+                                                <h3 className={styles.clCardName}>{camp.name}</h3>
+                                                <span className={camp.role === 'dm' ? `${styles.clRole} ${styles.roleDm}` : styles.clRole}>{camp.role === 'dm' ? 'DM' : 'Player'}</span>
+                                                <p className={styles.clCardDescription}>{camp.description}</p>
                                             </div>
                                         </Link>
                                         {camp.role === 'dm' && (
-                                            <button type="button" className="btn cl-delete" onClick={(e) => deleteCampaign(e, camp)}>Delete</button>
+                                            <button type="button" className={styles.clDelete} onClick={(e) => deleteCampaign(e, camp)}>Delete</button>
                                         )}
                                     </li>
                                 ))}
@@ -96,7 +96,7 @@ function CampaignList() {
                 </section>
             </main>
             <footer>
-                <p className="footer-text">copyrite Eldrid Tales LLC</p>
+                <p className={styles.footerText}>copyrite Eldrid Tales LLC</p>
             </footer>
         </>
     );
