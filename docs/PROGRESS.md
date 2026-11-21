@@ -17,6 +17,12 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
+### 2026-11-20 — Claude (R5.4–R5.5, bot/claude `e185d8e`)
+- New sheet at `/characters/:id?new=1` (old sheet stays the default): `apps/web/src/features/sheet/` — CharacterSheetPage + blocks SheetHeader, HealthBlock, CoreStatsBlock, StatsBlock (stats + skills), ConditionsBlock (+ exhaustion), ActionsBlock (weapons, bonus actions, Soul/Runic/Sigil), SpellsBlock (slots, cast level, cast/damage), InventoryBlock, FeaturesBlock, RollFeed. One `Sheet.module.css` with theme variables, laid out like the sheet mockup.
+- Every roll goes through `/act`; initiative, stats and skills are `kind: 'check'` (bonus from the Creature). 68/68 rules tests, typecheck, build OK. New e2e `sheet-new.spec.js`. Not yet seen in a browser.
+- Still on the old sheet only (do before swapping): feature activation (embers, per-rest uses, cracks/breach), rests, Body Magic once-per-rest spells, lanterns/Mending runes, spell book (learn/prepare), money. Spell slots are still spent from the browser.
+- Next: owner compares ?new=1 with the old sheet; then the missing pieces, the swap (R5.5 end), and R5.6/R5.7 (need migration OK).
+
 ### 2026-11-20 — Claude (R5.1–R5.3, bot/claude)
 - Based on bot/cursor `bbd0db9` (R4 + review fixes 1–3), since main is mid-merge.
 - R5.1 `e7d32db`: `packages/rules/src/creature.ts` (Creature type + characterToCreature: AC, initiative, weapons incl. versatile/dual wield/Soul Brand/runed/sigil, fists, skills, spells, embers, cracks, speed), `stats.ts` and `runes.ts` moved into rules (web utils re-export them). Tests check every number against the old sheet's math.
