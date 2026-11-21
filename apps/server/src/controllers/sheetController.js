@@ -3,7 +3,7 @@
 // canEdit: the owner and the campaign's DM may change the sheet; other players in the campaign only look.
 import { characterToCreature } from '@tenebris/rules/creature';
 import { checkActRequest, resolveAct } from '@tenebris/rules/actions';
-import { spendFeatureUse, takeRest, checkRestRequest, castSpell, checkCastRequest } from '@tenebris/rules/sheetState';
+import { spendFeatureUse, takeRest, checkRestRequest, castSpell, checkCastRequest, checkConditionsRequest, applyConditions } from '@tenebris/rules/sheetState';
 import { checkSpellbookRequest } from '@tenebris/rules/spellbook';
 import { checkMoneyRequest, shortCoinMessage, purseOf } from '@tenebris/rules/money';
 import * as Money from '../models/moneyModel.js';
@@ -199,4 +199,19 @@ export async function money(req, res) {
         if (err?.code === '22003') return res.status(400).json({ error: 'That is more coins than a purse can hold.' });
         throw err;
     }
+}
+
+// POST /api/sheets/character/:id/conditions   body: { conditions?: { blind: true, ... }, exhaustion?: 0..10 }
+// Owner or DM. Named conditions are set; the others stay. Answers the saved { conditions, exhaustion }.
+export async function conditions(req, res) {
+    const who = await editorOf(req, res);
+    if (!who) return;
+    const checked = checkConditionsRequest(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const creature = await creatureOf(res, who.charId, who.ownerId);
+    if (!creature) return;
+    const next = applyConditions({ conditions: creature.conditions, exhaustion: creature.exhaustion }, checked.request);
+    const saved = await Characters.updateSheetState(who.charId, who.ownerId, next);
+    if (!saved) return res.status(404).json({ error: 'Character not found' });
+    res.json({ conditions: saved.conditions ?? {}, exhaustion: Number(saved.exhaustion ?? 0) });
 }

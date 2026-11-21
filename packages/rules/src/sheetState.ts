@@ -149,3 +149,43 @@ export function castSpell(creature: Creature, request: CastRequest, rng: Rng): C
     if (heal) return done(`Healed: ${Math.max(0, rollDice(heal, rng).total + s.healMod)}`);
     return done('');
 }
+
+// ---- Conditions and exhaustion ----
+
+// The 12 conditions a character can have (characters.conditions keys)
+export const CONDITIONS = ['blind', 'charm', 'deaf', 'lock', 'mad', 'disease', 'panic', 'out', 'bleed', 'ground', 'weak', 'sleep'] as const;
+export type ConditionName = (typeof CONDITIONS)[number];
+export const MAX_EXHAUSTION = 10;
+
+export type ConditionsRequest = { conditions?: Partial<Record<ConditionName, boolean>>; exhaustion?: number };
+
+// { conditions?: { blind: true, ... }, exhaustion?: 0..10 }. Only known conditions, true/false; at least one change.
+export function checkConditionsRequest(body: unknown): { error: string } | { request: ConditionsRequest } {
+    const b = (body ?? {}) as Record<string, unknown>;
+    const request: ConditionsRequest = {};
+    if (b.conditions !== undefined) {
+        if (b.conditions === null || typeof b.conditions !== 'object' || Array.isArray(b.conditions)) return { error: 'conditions must be { name: true or false }' };
+        const conditions: Partial<Record<ConditionName, boolean>> = {};
+        for (const [name, on] of Object.entries(b.conditions as Record<string, unknown>)) {
+            if (!(CONDITIONS as readonly string[]).includes(name)) return { error: `There is no condition called "${name}"` };
+            if (typeof on !== 'boolean') return { error: `${name} must be true or false` };
+            conditions[name as ConditionName] = on;
+        }
+        request.conditions = conditions;
+    }
+    if (b.exhaustion !== undefined) {
+        const n = b.exhaustion;
+        if (typeof n !== 'number' || !Number.isInteger(n) || n < 0 || n > MAX_EXHAUSTION) return { error: `exhaustion must be a whole number from 0 to ${MAX_EXHAUSTION}` };
+        request.exhaustion = n;
+    }
+    if (request.conditions === undefined && request.exhaustion === undefined) return { error: 'Change a condition or exhaustion' };
+    return { request };
+}
+
+// The saved state after a change: named conditions are set, the others stay as they are
+export function applyConditions(current: { conditions: Record<string, boolean>; exhaustion: number }, request: ConditionsRequest) {
+    return {
+        conditions: { ...current.conditions, ...request.conditions },
+        exhaustion: request.exhaustion ?? current.exhaustion,
+    };
+}

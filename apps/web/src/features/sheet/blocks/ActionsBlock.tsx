@@ -7,21 +7,15 @@ import type { WeaponAction } from '@tenebris/rules/creature';
 import styles from '../Sheet.module.css';
 import type { BlockProps } from './types.ts';
 
-type Props = BlockProps & { onState: (patch: Record<string, unknown>) => void };
-
-export default function ActionsBlock({ creature, canEdit, onAct, onNote, onState }: Props) {
+export default function ActionsBlock({ creature, canEdit, onAct }: BlockProps) {
     // Runic Strike is once per turn; there's no turn tracker yet, so it locks until "New turn"
     const [runicUsed, setRunicUsed] = useState(false);
-    // An on-hit feature such as Sigil Strike (spends embers, adds radiant dice to a sigil weapon's damage)
+    // An on-hit feature such as Sigil Strike (adds radiant dice to a sigil weapon's damage). Embers are gone from the game.
     const hitFeature = creature.features.find((f) => f.on_weapon_hit);
-    const hitFeatureCost = hitFeature?.ember_cost == null ? 0
-        : scaledAt(hitFeature.cost_scaling as ScalingStep[] | null, 'cost', creature.level, Number(hitFeature.ember_cost));
     const hitFeatureDice = hitFeature ? String(scaledAt(hitFeature.dice_scaling as ScalingStep[] | null, 'dice', creature.level, hitFeature.dice as number) ?? '') : '';
 
-    function useHitFeature(a: WeaponAction) {
+    function rollHitFeature(a: WeaponAction) {
         if (!hitFeature) return;
-        if (hitFeatureCost > creature.embers.current) return onNote(`Not enough embers for ${hitFeature.name}: need ${hitFeatureCost}, have ${creature.embers.current}.`);
-        if (hitFeatureCost) onState({ embers_spent: creature.embers.max - creature.embers.current + hitFeatureCost });
         onAct({ actionKey: a.key, kind: 'damage', featureKey: `${hitFeature.source}-${hitFeature.id}` }, `${a.name}: `);
     }
 
@@ -50,8 +44,8 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onState
                     </>
                 )}
                 {a.sigil && hitFeature && (
-                    <button type="button" className={styles.button} disabled={!canEdit} onClick={() => useHitFeature(a)}>
-                        +{hitFeatureDice} {hitFeature.name}{hitFeatureCost ? ` (${hitFeatureCost} embers)` : ''}
+                    <button type="button" className={styles.button} disabled={!canEdit} onClick={() => rollHitFeature(a)}>
+                        +{hitFeatureDice} {hitFeature.name}
                     </button>
                 )}
             </div>
@@ -68,7 +62,6 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onState
                     {creature.bonusActions.map(row)}
                 </>
             )}
-            {creature.embers.max > 0 && <span className={styles.muted}>Embers {creature.embers.current} / {creature.embers.max}</span>}
         </section>
     );
 }

@@ -79,8 +79,7 @@ export default function CharacterSheetPage() {
 
     const { creature, canEdit } = sheet.data;
     const blockProps = { creature, canEdit, onAct, onNote: note };
-    const onState = (patch: Record<string, unknown>) => change.state.mutate(patch);
-    const changeError = [change.hp.error, change.tempHp.error, change.state.error].find(Boolean);
+    const changeError = [change.hp.error, change.tempHp.error, change.conditions.error].find(Boolean);
 
     return (
         <div className={styles.page}>
@@ -98,7 +97,7 @@ export default function CharacterSheetPage() {
                         error={changeError ? messageOf(changeError) : undefined} />
                     <CoreStatsBlock {...blockProps} />
                     <StatsBlock {...blockProps} />
-                    <ConditionsBlock creature={creature} canEdit={canEdit} onChange={onState} />
+                    <ConditionsBlock creature={creature} canEdit={canEdit} onChange={(body) => change.conditions.mutate(body)} />
                     <RestBlock canEdit={canEdit} busy={sheetDo.isPending} onRest={(type) => onDo({ path: 'rest', body: { type } })} />
                 </div>
                 <div className={styles.stack}>
@@ -108,7 +107,7 @@ export default function CharacterSheetPage() {
                                 aria-current={tab === t.id ? 'page' : undefined} onClick={() => setTab(t.id)}>{t.label}</button>
                         ))}
                     </nav>
-                    {tab === 'actions' && <ActionsBlock {...blockProps} onState={onState} />}
+                    {tab === 'actions' && <ActionsBlock {...blockProps} />}
                     {tab === 'spells' && (
                         <>
                             <SpellsBlock {...blockProps} onCast={(actionKey, castLevel) => onDo({ path: 'cast', body: { actionKey, castLevel } })} />

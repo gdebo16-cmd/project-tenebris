@@ -105,3 +105,40 @@ test('new sheet: purse adds and spends coins through the server', async ({ page 
   const end = (await (await page.request.get(`/api/sheets/character/${id}`)).json()).creature.purse;
   expect(end).toEqual(start);
 });
+// Conditions and exhaustion change through the sheet's own route (owner or DM). Each change is undone (net zero).
+test('new sheet: conditions and exhaustion change through the server', async ({ page }) => {
+  await login(page);
+  const home = await (await page.request.get('/api/home')).json();
+  test.skip(!home.characters?.length, 'The test account has no finished character');
+  const id = home.characters[0].id;
+  const base = `/api/sheets/character/${id}`;
+  const read = async () => {
+    const { creature } = await (await page.request.get(base)).json();
+    return { conditions: creature.conditions, exhaustion: creature.exhaustion };
+  };
+  const start = await read();
+
+  // Refusals answer 400 and change nothing
+  expect((await page.request.post(`${base}/conditions`, { data: { conditions: { flying: true } } })).status()).toBe(400);
+  expect((await page.request.post(`${base}/conditions`, { data: { exhaustion: 11 } })).status()).toBe(400);
+  expect((await page.request.post(`${base}/conditions`, { data: {} })).status()).toBe(400);
+
+  await page.goto(`/characters/${id}?new=1`);
+  const block = page.getByRole('region', { name: 'Conditions' });
+  const bleed = block.getByRole('button', { name: 'Bleed' });
+  const wasBleeding = !!start.conditions.bleed;
+  await bleed.click();
+  await expect(bleed).toHaveAttribute('aria-pressed', String(!wasBleeding));
+  await bleed.click();
+  await expect(bleed).toHaveAttribute('aria-pressed', String(wasBleeding));
+
+  const up = start.exhaustion < 10;
+  await block.getByRole('button', { name: up ? 'More exhaustion' : 'Less exhaustion' }).click();
+  await expect(block).toContainText(`Exhaustion ${start.exhaustion + (up ? 1 : -1)}`);
+  await block.getByRole('button', { name: up ? 'Less exhaustion' : 'More exhaustion' }).click();
+  await expect(block).toContainText(`Exhaustion ${start.exhaustion}`);
+
+  const end = await read();
+  expect(end.exhaustion).toBe(start.exhaustion);
+  expect(!!end.conditions.bleed).toBe(wasBleeding);
+});

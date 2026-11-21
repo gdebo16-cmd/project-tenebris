@@ -2,8 +2,8 @@
 import styles from '../Sheet.module.css';
 import type { BlockProps } from './types.ts';
 
-// The same 12 conditions the old sheet tracks (characters.conditions keys)
-export const CONDITIONS = ['blind', 'charm', 'deaf', 'lock', 'mad', 'disease', 'panic', 'out', 'bleed', 'ground', 'weak', 'sleep'];
+// The 12 conditions (characters.conditions keys) and the exhaustion cap come from the rules, which the server checks too
+import { CONDITIONS, MAX_EXHAUSTION } from '@tenebris/rules/sheetState';
 const label = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 type Props = Pick<BlockProps, 'creature' | 'canEdit'> & {
@@ -21,7 +21,7 @@ export default function ConditionsBlock({ creature, canEdit, onChange }: Props) 
                 {shown.map((name) => (
                     <button key={name} type="button" disabled={!canEdit} aria-pressed={!!on[name]}
                         className={`${styles.chip} ${on[name] ? styles.chipOn : ''}`}
-                        onClick={() => onChange({ conditions: { ...on, [name]: !on[name] } })}>
+                        onClick={() => onChange({ conditions: { [name]: !on[name] } })}>
                         {label(name)}
                     </button>
                 ))}
@@ -32,7 +32,7 @@ export default function ConditionsBlock({ creature, canEdit, onChange }: Props) 
                     <>
                         <button type="button" className={styles.chip} aria-label="Less exhaustion" disabled={creature.exhaustion <= 0}
                             onClick={() => onChange({ exhaustion: creature.exhaustion - 1 })}>−</button>
-                        <button type="button" className={styles.chip} aria-label="More exhaustion" disabled={creature.exhaustion >= 10}
+                        <button type="button" className={styles.chip} aria-label="More exhaustion" disabled={creature.exhaustion >= MAX_EXHAUSTION}
                             onClick={() => onChange({ exhaustion: creature.exhaustion + 1 })}>+</button>
                     </>
                 )}

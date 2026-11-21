@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { characterToCreature, type SheetData } from '../src/creature.ts';
-import { spendFeatureUse, takeRest, checkRestRequest, spendSlot, castSpell, checkCastRequest, type RestInput } from '../src/sheetState.ts';
+import { spendFeatureUse, takeRest, checkRestRequest, spendSlot, castSpell, checkCastRequest, checkConditionsRequest, applyConditions, type RestInput } from '../src/sheetState.ts';
 import { fixedDice } from './helpers.ts';
 
 // Real feature rows from the content pack: Reseal (2 per short rest, 3 from level 13, 1d6) and
@@ -115,4 +115,21 @@ test('a refused cast spends nothing', () => {
 test('the cast request carries names and a level only', () => {
     assert.deepEqual(checkCastRequest({ actionKey: 's8', castLevel: 2 }), { request: { actionKey: 's8', castLevel: 2 } });
     for (const bad of [null, {}, { actionKey: '' }, { actionKey: 's8', castLevel: 12 }, { actionKey: 's8', castLevel: 1.5 }]) assert.ok('error' in checkCastRequest(bad));
+});
+
+test('conditions: only known names, true or false; exhaustion 0 to 10', () => {
+    assert.deepEqual(checkConditionsRequest({ conditions: { blind: true } }), { request: { conditions: { blind: true } } });
+    assert.deepEqual(checkConditionsRequest({ exhaustion: 3 }), { request: { exhaustion: 3 } });
+    assert.deepEqual(checkConditionsRequest({ conditions: { sleep: false }, exhaustion: 0 }), { request: { conditions: { sleep: false }, exhaustion: 0 } });
+    assert.deepEqual(checkConditionsRequest({}), { error: 'Change a condition or exhaustion' });
+    assert.deepEqual(checkConditionsRequest({ conditions: { flying: true } }), { error: 'There is no condition called "flying"' });
+    assert.deepEqual(checkConditionsRequest({ conditions: { blind: 'yes' } }), { error: 'blind must be true or false' });
+    assert.ok('error' in checkConditionsRequest({ conditions: ['blind'] }));
+    for (const bad of [-1, 11, 2.5, '3']) assert.ok('error' in checkConditionsRequest({ exhaustion: bad }), String(bad));
+});
+
+test('conditions: a change keeps the conditions it does not name', () => {
+    const now = { conditions: { blind: true, deaf: true }, exhaustion: 2 };
+    assert.deepEqual(applyConditions(now, { conditions: { deaf: false, bleed: true } }), { conditions: { blind: true, deaf: false, bleed: true }, exhaustion: 2 });
+    assert.deepEqual(applyConditions(now, { exhaustion: 5 }), { conditions: { blind: true, deaf: true }, exhaustion: 5 });
 });
