@@ -132,7 +132,7 @@ export async function listCharactersForUser(userId) {
     const { rows } = await pool.query(
         `SELECT ch.id, ch.name, ch.portrait_url, ch.species_id, ch.role_id, ch.calling_id
         FROM characters ch
-        WHERE ch.user_id = $1
+        WHERE ch.user_id = $1 AND NOT ch.is_draft
         ORDER BY ch.name`,
         [userId]
     );

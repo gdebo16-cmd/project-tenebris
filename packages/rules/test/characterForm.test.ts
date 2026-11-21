@@ -1,0 +1,74 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { checkHeader, checkSpeciesTab, missingForFinish, startingHp, type Options } from '../src/characterForm.ts';
+
+// Only the parts of the options the species check reads
+const options = {
+    eyeColors: ['Brown', 'Green'],
+    species: [
+        { id: 1, key: 'igni', name: 'Igni', image: null, sizes: [{ id: 2, name: 'Small' }, { id: 3, name: 'Medium' }], subspecies: [], variants: ['Ember', 'Ash'] },
+        { id: 2, key: 'elf', name: 'Elf', image: null, sizes: [{ id: 3, name: 'Medium' }], subspecies: [{ id: 20, name: 'Dawn Elf', image: null }], variants: [] },
+    ],
+} as unknown as Options;
+
+test('header: good bodies pass and come back clean', () => {
+    assert.deepEqual(checkHeader({ name: '  Ash  ', level: 3 }), { values: { name: 'Ash', level: 3, portrait_url: null } });
+    assert.deepEqual(checkHeader({ name: 'Ash', level: '5', portrait_url: '/portraits/a.png' }),
+        { values: { name: 'Ash', level: 5, portrait_url: '/portraits/a.png' } });
+    assert.deepEqual(checkHeader({ name: 'Ash' }), { values: { name: 'Ash', level: 1, portrait_url: null } });   // level defaults to 1
+});
+
+test('header: bad bodies get an error', () => {
+    const bad = [
+        null,
+        { name: '' },
+        { name: '   ' },
+        { name: 'x'.repeat(61) },
+        { name: 'Ash', level: 0 },
+        { name: 'Ash', level: 31 },
+        { name: 'Ash', level: 2.5 },
+        { name: 'Ash', portrait_url: 'https://evil.example/x.png' },
+    ];
+    for (const body of bad) assert.ok('error' in checkHeader(body), JSON.stringify(body));
+});
+
+test('species: a species with variants saves its own id and the variant', () => {
+    assert.deepEqual(checkSpeciesTab(options, { species_id: 1, size_id: 2, variant: 'Ash', eye_color: 'Green' }),
+        { values: { species_id: 1, size_id: 2, variant: 'Ash', eye_color: 'Green', look_description: null } });
+});
+
+test('species: a species with sub-species saves the sub-species id', () => {
+    const result = checkSpeciesTab(options, { species_id: 2, subspecies_id: 20, size_id: 3, eye_color: 'Brown', look_description: ' tall ' });
+    assert.deepEqual(result, { values: { species_id: 20, size_id: 3, variant: null, eye_color: 'Brown', look_description: 'tall' } });
+});
+
+test('species: bad bodies get an error', () => {
+    const bad = [
+        {},
+        { species_id: 99, size_id: 3, eye_color: 'Brown' },                          // no such species
+        { species_id: 1, size_id: 4, variant: 'Ash', eye_color: 'Brown' },           // size not allowed (Large for Igni)
+        { species_id: 1, size_id: 2, variant: 'Gold', eye_color: 'Brown' },          // variant not in the list
+        { species_id: 1, size_id: 2, eye_color: 'Brown' },                           // variant missing
+        { species_id: 2, size_id: 3, eye_color: 'Brown' },                           // sub-species missing
+        { species_id: 2, subspecies_id: 99, size_id: 3, eye_color: 'Brown' },        // sub-species of another species
+        { species_id: 1, size_id: 2, variant: 'Ash', eye_color: 'Plaid' },           // eye color not in the list
+        { species_id: 1, size_id: 2, variant: 'Ash', eye_color: 'Brown', look_description: 'x'.repeat(1001) },
+    ];
+    for (const body of bad) assert.ok('error' in checkSpeciesTab(options, body), JSON.stringify(body));
+});
+
+test('missingForFinish lists what each tab still needs', () => {
+    assert.deepEqual(missingForFinish({ name: 'Ash' }), [
+        'Species & look: species, size and eye color',
+        'Role & calling: a role',
+        'Traits & gifts: place all 8 stat rolls',
+    ]);
+    const done = { name: 'Ash', species_id: 1, size_id: 3, eye_color: 'Brown', role_id: 1, str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, luc: 10, spd: 10 };
+    assert.deepEqual(missingForFinish(done), []);
+});
+
+test('startingHp matches the old creator', () => {
+    assert.equal(startingHp(12, 14, 1, 7), 9);             // 7 + CON mod 2
+    assert.equal(startingHp(12, 14, 3, 7), 9 + 2 * 9);      // + (6 + 1 + 2) per level after the first
+    assert.equal(startingHp(6, 3, 1, 1), 1);               // never below 1 (1 - 4)
+});

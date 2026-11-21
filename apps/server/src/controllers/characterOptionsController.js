@@ -1,11 +1,7 @@
 // GET /api/character-options?level=3&species_id=1&role_id=1&calling_id=3
 // Answers "what can this character pick?" for the character form. The rules live in @tenebris/rules.
-import content from '../models/content.js';
-import looks from '../models/looks.js';
+import pack from '../models/formPack.js';   // the content pack + looks.json, joined once at startup
 import { characterOptions } from '@tenebris/rules/characterOptions';
-
-// The rules function wants one pack with the looks inside it. Built once, not per request.
-const pack = { ...content, looks };
 
 // Query values always arrive as text: "5" -> 5, missing or "" -> undefined (not picked yet)
 const optionalNumber = (value) => (value === undefined || value === '' ? undefined : Number(value));

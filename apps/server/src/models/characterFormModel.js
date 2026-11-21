@@ -1,0 +1,59 @@
+// Database reads and writes for the unified character form (R4).
+// Controllers call these; they never write SQL themselves.
+import pool from '../db.js';
+import { legacyRaceIdForSpecies, legacySubraceIdForSpecies, legacyClassIdForRole, legacySubclassIdForCalling } from './idMap.js';
+
+// The columns the form is allowed to change. Anything else a tab check returns is a bug, so it throws.
+const FORM_COLUMNS = new Set([
+    'name', 'level', 'portrait_url',
+    'species_id', 'size_id', 'variant', 'eye_color', 'look_description',
+]);
+
+// A new, empty character marked as a draft. Answers its id.
+export async function createDraft(userId, { name, level, portrait_url }) {
+    const { rows } = await pool.query(
+        `INSERT INTO characters (user_id, name, level, portrait_url, is_draft)
+         VALUES ($1, $2, $3, $4, true)
+         RETURNING id`,
+        [userId, name, level, portrait_url]
+    );
+    return rows[0].id;
+}
+
+// Everything the form shows for one character, plus user_id for the ownership check
+export async function getFormCharacter(charId) {
+    const { rows } = await pool.query(
+        `SELECT id, user_id, is_draft, name, level, portrait_url,
+                species_id, size_id, variant, eye_color, look_description,
+                role_id, calling_id,
+                str, dex, con, "int", wis, cha, luc, spd, stat_rolls, money
+         FROM characters WHERE id = $1`,
+        [charId]
+    );
+    return rows[0];
+}
+
+// Saves the clean values a tab check returned: { name: 'Ash', level: 3 } -> UPDATE ... SET name = $1, level = $2
+export async function updateCharacterFields(charId, values) {
+    const columns = Object.keys(values);
+    if (columns.length === 0) return;
+    for (const column of columns) {
+        if (!FORM_COLUMNS.has(column)) throw new Error(`The form can't change characters.${column}`);
+    }
+    const sets = columns.map((column, i) => `${column} = $${i + 2}`).join(', ');
+    await pool.query(`UPDATE characters SET ${sets} WHERE id = $1`, [charId, ...columns.map((c) => values[c])]);
+}
+
+// Marks a draft as finished with its starting HP.
+// Also fills the old race/class ids, because the current sheet still reads them (they go away in R7).
+export async function finishCharacter(ch, maxHp) {
+    await pool.query(
+        `UPDATE characters
+         SET is_draft = false, max_hp = $2, current_hp = $2,
+             race_id = $3, subrace_id = $4, class_id = $5, subclass_id = $6, last_swap_level = level
+         WHERE id = $1`,
+        [ch.id, maxHp,
+         await legacyRaceIdForSpecies(ch.species_id), await legacySubraceIdForSpecies(ch.species_id),
+         await legacyClassIdForRole(ch.role_id), await legacySubclassIdForCalling(ch.calling_id)]
+    );
+}
