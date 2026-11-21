@@ -41,11 +41,17 @@ export type SheetCharacter = {
     has_embers?: boolean; embers_spent?: number | null; cracks?: number | null; crack_max?: number | null;
     breach_dc?: number | null; breach_dc_scaling?: ScalingStep[] | null;
 };
+// Items and features aren't calculated here; blocks show them as they come (typed loosely until R7 types the server)
+export type SheetItem = { id: number; name: string; is_equipped?: boolean; [field: string]: unknown };
+export type SheetFeature = { id: number | string; name: string; source?: string; action_type?: string | null; [field: string]: unknown };
+
 export type SheetData = {
     character: SheetCharacter;
     ownedArmor?: SheetArmor[];
     ownedWeapons?: SheetWeapon[];
+    ownedItems?: SheetItem[];
     learnedSpells?: SheetSpell[];
+    actionFeatures?: SheetFeature[];
 };
 
 // ---- The Creature ----
@@ -85,6 +91,9 @@ export type Creature = {
     bonusActions: WeaponAction[];     // dual-wielded off-hand weapons
     spells: SpellAction[];            // prepared action spells, with their numbers worked out
     strikes: { soulStrikeDice: string; runicStrikeDice: string };
+    gear: { armor: SheetArmor[]; weapons: SheetWeapon[]; items: SheetItem[] };
+    allSpells: SheetSpell[];          // every learned spell (the spell book), prepared or not
+    features: SheetFeature[];
 };
 
 // Dual wield: the off-hand attack is a bonus action and loses the ability modifier on DAMAGE (5e).
@@ -220,6 +229,9 @@ export function characterToCreature(data: SheetData): Creature {
         bonusActions: weapons.filter((a) => a.dual),
         spells,
         strikes: { soulStrikeDice: level >= 23 ? '3d8' : level >= 11 ? '2d8' : '1d8', runicStrikeDice: runicStrikeDice(level) },
+        gear: { armor: ownedArmor, weapons: ownedWeapons, items: data.ownedItems ?? [] },
+        allSpells: data.learnedSpells ?? [],
+        features: data.actionFeatures ?? [],
     };
 }
 

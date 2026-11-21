@@ -13,6 +13,7 @@ import { getContent, getSpells } from '../controllers/contentController.js';
 import { roll } from '../controllers/apiRollController.js';
 import { getCatalog, listCampaignMonsters, addMonster, getMonsterSheet, updateMonster, deleteMonster } from '../controllers/apiMonsterController.js';
 import characterFormRouter from './characterForm.js';
+import sheetsRouter from './sheets.js';
 
 
 
@@ -34,6 +35,7 @@ router.post('/register', loginLimiter, register);
 router.get('/me', me);
 router.post('/roll', roll);
 router.use(characterFormRouter);
+router.use(sheetsRouter);
 router.post('/logout', logout);
 router.get('/home', home);
 router.get('/settings', getSettings);
