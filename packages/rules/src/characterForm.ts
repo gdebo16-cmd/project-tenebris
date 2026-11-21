@@ -1,12 +1,14 @@
 // The character form's save rules: one check per tab.
 // Each check takes what the browser sent (body) and answers either { error } or { values },
 // where values are the clean, safe column values to save. The server never saves the body itself.
-import type { characterOptions } from './characterOptions.ts';
+import { CALLING_LEVEL, checkChoicePicks, type characterOptions, type ChoiceFeature } from './characterOptions.ts';
 
 // What characterOptions() answers: the choices a check compares the body against
 export type Options = ReturnType<typeof characterOptions>;
 
-export type TabResult = { error: string } | { values: Record<string, string | number | null> };
+// A column value the form is allowed to save. Arrays are skill lists; the object is feature picks.
+type ColumnValue = string | number | null | string[] | Record<string, string[]>;
+export type TabResult = { error: string } | { values: Record<string, ColumnValue> };
 
 export const MAX_LEVEL = 30;
 export const MAX_NAME_LENGTH = 60;
@@ -67,6 +69,73 @@ export function checkSpeciesTab(options: Options, body: Body): TabResult {
     if (look.length > MAX_LOOK_LENGTH) return { error: `The look description can be at most ${MAX_LOOK_LENGTH} characters` };
 
     return { values: { species_id: speciesId, size_id: sizeId, variant, eye_color: eyeColor, look_description: look || null } };
+}
+
+// ---- Role & calling ----
+
+// Below level 3 a character has no calling, and its calling picks are dropped. Role picks stay.
+export function clearedCalling(featureChoices: unknown): { calling_id: null; feature_choices: Record<string, string[]> } {
+    const kept: Record<string, string[]> = {};
+    if (featureChoices && typeof featureChoices === 'object' && !Array.isArray(featureChoices)) {
+        for (const [key, value] of Object.entries(featureChoices)) {
+            if (key.startsWith('subclass:')) continue;
+            if (!Array.isArray(value)) continue;
+            const texts = value.filter((item): item is string => typeof item === 'string');
+            if (texts.length > 0) kept[key] = texts;
+        }
+    }
+    return { calling_id: null, feature_choices: kept };
+}
+
+// A role-tab save replaces this role's pickers. Picks that belong to something else (a Divine Blessing
+// on the same role) stay. Changing role drops the old role's picks.
+export function keepUnrelatedChoices(saved: unknown, next: Record<string, string[]>, features: ChoiceFeature[], roleChanged: boolean): Record<string, string[]> {
+    if (roleChanged) return next;
+    const owned = new Set(features.map((feature) => feature.key));
+    const out: Record<string, string[]> = { ...next };
+    if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return out;
+    for (const [key, value] of Object.entries(saved)) {
+        if (owned.has(key) || key.startsWith('subclass:')) continue;
+        if (!Array.isArray(value) || key in out) continue;
+        const texts = value.filter((item): item is string => typeof item === 'string');
+        if (texts.length > 0) out[key] = texts;
+    }
+    return out;
+}
+
+export function checkRoleTab(options: Options, body: Body): TabResult {
+    const role = options.roles.find((item) => item.id === Number(body?.role_id));
+    if (!role) return { error: 'Pick a role' };
+
+    const rawCalling = body?.calling_id;
+    const sentCalling = rawCalling == null || rawCalling === '' ? null : Number(rawCalling);
+    if (sentCalling != null && !Number.isInteger(sentCalling)) return { error: 'Pick a calling from the list' };
+    if (sentCalling != null && !options.callings.some((item) => item.id === sentCalling)) {
+        // No callings in the list means the level is too low. A wrong id means it isn't this role's.
+        return { error: options.callings.length === 0 ? `Callings unlock at level ${CALLING_LEVEL}` : 'That calling is not part of this role' };
+    }
+
+    const skills = options.skills;
+    if (!skills) return { error: 'Pick a role' };
+    const chosen = Array.isArray(body?.skills) ? body.skills : [];
+    if (chosen.length !== skills.choose) return { error: `Pick exactly ${skills.choose} skill${skills.choose === 1 ? '' : 's'}` };
+    if (!chosen.every((skill) => typeof skill === 'string' && skills.from.includes(skill))) {
+        return { error: 'One of those skills is not an option for this role' };
+    }
+    if (new Set(chosen).size !== chosen.length) return { error: 'Each skill can only be picked once' };
+    if (chosen.some((skill) => skills.fixed.includes(skill))) return { error: 'That skill is already given by your role' };
+
+    const picked = checkChoicePicks(options.features, body?.feature_choices);
+    if ('error' in picked) return { error: picked.error };
+
+    return {
+        values: {
+            role_id: role.id,
+            calling_id: sentCalling,
+            skill_proficiencies: [...skills.fixed, ...chosen],
+            feature_choices: picked.choices,
+        },
+    };
 }
 
 // ---- Finishing ----

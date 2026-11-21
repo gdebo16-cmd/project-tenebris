@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkHeader, checkSpeciesTab, missingForFinish, startingHp, type Options } from '../src/characterForm.ts';
+import { checkHeader, checkRoleTab, checkSpeciesTab, clearedCalling, keepUnrelatedChoices, missingForFinish, startingHp, type Options } from '../src/characterForm.ts';
 
 // Only the parts of the options the species check reads
 const options = {
@@ -65,6 +65,73 @@ test('missingForFinish lists what each tab still needs', () => {
     ]);
     const done = { name: 'Ash', species_id: 1, size_id: 3, eye_color: 'Brown', role_id: 1, str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, luc: 10, spd: 10 };
     assert.deepEqual(missingForFinish(done), []);
+});
+
+const arms = { key: 'class:warrior:Preferred Arms:1', name: 'Preferred Arms', level: 1, choose: 2, options: ['Minor', 'Great', 'Reach'], source: 'class' as const, optionInfo: {} };
+
+// Level 1: no callings. Skills choose 2. One feature picker.
+const roleOptions = {
+    roles: [{ id: 10, key: 'warrior', name: 'Warrior', hit_die: 'd12', primary_stat: 'Might', image: null }],
+    callings: [],
+    skills: { choose: 2, from: ['Balance', 'Presence', 'Awareness'], fixed: ['Athletics'] },
+    features: [arms],
+} as unknown as Options;
+
+const roleAt3 = {
+    ...roleOptions,
+    callings: [{ id: 100, key: 'reaper', name: 'Path of the Reaper', description: null, image: null }],
+} as unknown as Options;
+
+const goodRole = { role_id: 10, skills: ['Balance', 'Presence'], feature_choices: { [arms.key]: ['Minor', 'Great'] } };
+
+test('role: a good body passes, and fixed skills are saved with the picks', () => {
+    const saved = checkRoleTab(roleOptions, goodRole);
+    assert.ok('values' in saved);
+    if (!('values' in saved)) return;
+    assert.equal(saved.values.role_id, 10);
+    assert.equal(saved.values.calling_id, null);
+    assert.deepEqual(saved.values.skill_proficiencies, ['Athletics', 'Balance', 'Presence']);
+    assert.deepEqual(saved.values.feature_choices, { [arms.key]: ['Minor', 'Great'] });
+    const withCalling = checkRoleTab(roleAt3, { ...goodRole, calling_id: 100 });
+    assert.ok('values' in withCalling && withCalling.values.calling_id === 100);
+});
+
+test('role: a calling below level 3, or a skill that is not offered, gets an error', () => {
+    const bad = [
+        { ...goodRole, calling_id: 100 },                         // callings are closed at this level
+        { ...goodRole, skills: ['Balance', 'Stealth'] },          // Stealth is not in the list
+        { ...goodRole, skills: ['Balance'] },                     // not enough
+        { ...goodRole, skills: ['Balance', 'Athletics'] },        // already given
+        { ...goodRole, skills: ['Balance', 'Balance'] },
+        { role_id: 99, skills: ['Balance', 'Presence'] },
+        { ...goodRole, feature_choices: { [arms.key]: ['Bow', 'Great'] } },
+    ];
+    for (const body of bad) assert.ok('error' in checkRoleTab(roleOptions, body), JSON.stringify(body));
+    const wrongCalling = checkRoleTab(roleAt3, { ...goodRole, calling_id: 999 });
+    assert.ok('error' in wrongCalling && wrongCalling.error.includes('not part of this role'));
+});
+
+test('dropping below level 3 clears the calling and its picks, and keeps the role picks', () => {
+    const cleared = clearedCalling({
+        [arms.key]: ['Minor', 'Great'],
+        'subclass:reaper:Reap:3': ['Hook'],
+        'class:warrior:Divine Blessing:4': ['+2 STR'],
+    });
+    assert.equal(cleared.calling_id, null);
+    assert.deepEqual(cleared.feature_choices, {
+        [arms.key]: ['Minor', 'Great'],
+        'class:warrior:Divine Blessing:4': ['+2 STR'],
+    });
+    const kept = keepUnrelatedChoices(
+        { 'class:warrior:Divine Blessing:4': ['+2 STR'], 'subclass:reaper:Reap:3': ['Hook'] },
+        { [arms.key]: ['Minor', 'Great'] },
+        [arms],
+        false,
+    );
+    assert.deepEqual(kept['class:warrior:Divine Blessing:4'], ['+2 STR']);
+    assert.equal(kept['subclass:reaper:Reap:3'], undefined);
+    const swapped = keepUnrelatedChoices({ 'class:mage:Old:1': ['A'] }, {}, [], true);
+    assert.deepEqual(swapped, {});
 });
 
 test('startingHp matches the old creator', () => {

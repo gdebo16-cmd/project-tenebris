@@ -1,0 +1,101 @@
+/* Role, calling, skills and the role's create-time picks. */
+
+.role {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    max-width: 36rem;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.roleButton,
+.roleSelected {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.3rem 0.45rem;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.roleSelected {
+    background: color-mix(in srgb, var(--accent, #d4af37) 35%, var(--surface, #1a1030));
+}
+
+.icon {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.picked {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.artButton {
+    padding: 0;
+    border: 3px ridge var(--accent, #d4af37);
+    background: transparent;
+    cursor: pointer;
+}
+
+.thumb {
+    display: block;
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+}
+
+.fullArt {
+    display: block;
+    width: min(100%, 20rem);
+    height: auto;
+}
+
+.meta { margin: 0.15rem 0; }
+
+.choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.choices select {
+    font: inherit;
+    font-size: 1rem;
+    padding: 0.35rem 0.5rem;
+    color: inherit;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+}
+
+.choice {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.heading {
+    margin: 0;
+    font-size: 1rem;
+}

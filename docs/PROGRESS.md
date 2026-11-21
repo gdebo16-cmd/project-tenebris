@@ -9,13 +9,20 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Next
 
-- R4.5 Role & calling tab (checkRoleTab, skills, feature choices, calling cleared below level 3).
+- R4.6 Traits & gifts (server-rolled stats, placement, +2/+1, gifts).
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-20 — Cursor (R4.5)
+- Role & calling tab. `checkRoleTab` in `packages/rules`: a calling below level 3 is refused, skills must be exactly the role's list, feature picks are checked. Saving the header below level 3 clears the calling and its picks. The role's other picks stay.
+- Choice features moved into `choiceFeaturesFor` / `checkChoicePicks` (`packages/rules`). The server and the old creator call those instead of keeping a second copy. Divine Blessing rows are still added by the server before the check, because they are not create-time features.
+- Rune thumbnails: `node scripts/thumbs.js assets/glyphs/classes` (18 WebP files).
+- No new placeholder. Checked on ports 4003 / 5176: typecheck, `npm test` (45), `npm run test:e2e` (6 passed, smoke accounts in use). A role save survived reload. Level 3→2 hid the calling. A hand-edited calling and a skill outside the list were refused.
+- Next is R4.6.
 
 ### 2026-11-20 — Cursor (R4.4)
 - Species & look tab: species, sub-species or variant, eye color, that species' sizes, optional look. The picture is an 88px WebP thumbnail; a tap shows the full PNG and a second tap closes it. Picking a sub-species switches the picture.

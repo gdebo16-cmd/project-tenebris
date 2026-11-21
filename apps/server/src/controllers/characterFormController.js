@@ -7,7 +7,8 @@
 //
 // The rules live in @tenebris/rules (characterOptions + characterForm); this file is the glue.
 import { characterOptions } from '@tenebris/rules/characterOptions';
-import { checkHeader, checkSpeciesTab, missingForFinish, startingHp, FORM_TABS } from '@tenebris/rules/characterForm';
+import { checkHeader, checkRoleTab, checkSpeciesTab, clearedCalling, keepUnrelatedChoices, missingForFinish, startingHp, FORM_TABS } from '@tenebris/rules/characterForm';
+import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
 import { rollDice } from '@tenebris/rules/dice';
 import { rng } from '../dice.js';
 import formPack from '../models/formPack.js';
@@ -16,8 +17,9 @@ import * as Form from '../models/characterFormModel.js';
 
 // The tabs that can be saved so far. Each later slice (R4.5-R4.8) adds its check here.
 const TAB_CHECKS = {
-    header: (options, body) => checkHeader(body),
+    header: (_options, body) => checkHeader(body),
     species: (options, body) => checkSpeciesTab(options, body),
+    role: (options, body) => checkRoleTab(options, body),
 };
 
 // Sub-species are stored as the species id; the form wants the top-level species and the sub-species apart
@@ -36,6 +38,21 @@ function optionsFor(ch) {
         species_id: splitSpecies(ch.species_id).species_id ?? undefined,
         role_id: ch.role_id ?? undefined,
         calling_id: ch.calling_id ?? undefined,
+    });
+}
+
+// The role tab is checked against the role and calling in this save, not the ones already stored.
+// Otherwise the first save would see an empty calling list.
+function optionsForSave(ch, tab, body) {
+    if (tab !== 'role' || !body || typeof body !== 'object') return optionsFor(ch);
+    const roleId = Number(body.role_id);
+    const rawCalling = body.calling_id;
+    const callingId = rawCalling == null || rawCalling === '' ? undefined : Number(rawCalling);
+    return characterOptions(formPack, {
+        level: ch.level ?? 1,
+        species_id: splitSpecies(ch.species_id).species_id ?? undefined,
+        role_id: Number.isInteger(roleId) ? roleId : undefined,
+        calling_id: Number.isInteger(callingId) ? callingId : undefined,
     });
 }
 
@@ -66,7 +83,12 @@ function formView(ch) {
         is_draft: ch.is_draft,
         header: { name: ch.name, level: ch.level, portrait_url: ch.portrait_url },
         species: { ...splitSpecies(ch.species_id), size_id: ch.size_id, variant: ch.variant, eye_color: ch.eye_color, look_description: ch.look_description },
-        role: { role_id: ch.role_id, calling_id: ch.calling_id },
+        role: {
+            role_id: ch.role_id,
+            calling_id: ch.calling_id,
+            skill_proficiencies: ch.skill_proficiencies ?? [],
+            feature_choices: ch.feature_choices ?? {},
+        },
         missing: missingForFinish(ch),
         options: optionsFor(ch),
     };
@@ -95,12 +117,22 @@ export async function saveTab(req, res) {
     const check = TAB_CHECKS[tab];
     if (!check) return res.status(400).json({ error: `The ${tab} tab can't be saved yet` });
 
-    const checked = check(optionsFor(ch), req.body);
+    const options = optionsForSave(ch, tab, req.body);
+    const checked = check(options, req.body);
     if ('error' in checked) return res.status(400).json({ error: checked.error });
 
     // A finished character's level changes HP, which the old level editor still handles (until R4.9)
     if (!ch.is_draft && checked.values.level !== undefined && checked.values.level !== ch.level) {
         return res.status(400).json({ error: 'Change the level of a finished character with the level editor for now' });
+    }
+
+    // The server decides: below level 3 the calling is gone, even if the browser still sends one on the header.
+    if (tab === 'header' && Number(checked.values.level) < CALLING_LEVEL) {
+        Object.assign(checked.values, clearedCalling(ch.feature_choices));
+    }
+    if (tab === 'role') {
+        const roleChanged = Number(ch.role_id) !== Number(checked.values.role_id);
+        checked.values.feature_choices = keepUnrelatedChoices(ch.feature_choices, checked.values.feature_choices, options.features, roleChanged);
     }
 
     await Form.updateCharacterFields(ch.id, checked.values);

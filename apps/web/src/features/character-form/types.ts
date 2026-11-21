@@ -20,6 +20,8 @@ export type CharacterFormData = {
     role: {
         role_id: number | null;
         calling_id: number | null;
+        skill_proficiencies: string[];
+        feature_choices: Record<string, string[]>;
     };
     missing: string[];
     options: Options;

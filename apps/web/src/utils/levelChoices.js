@@ -1,52 +1,29 @@
 // Helpers for pages/LevelChoices.jsx (kept apart so that file only exports a component).
+import { choiceFeaturesFor, choiceKey } from '@tenebris/rules/characterOptions';
 
 // a pre-rework boost already counted in the scores (migration only; see utils/abilityBoosts.js)
 export const KEPT_BOOST = 'Kept boost (already in scores)';
 
 export const SUBCLASS_LEVEL = 3;
 
-// Stable feature_choices key (scheme A) — matches models/content.js choiceKey
+// Stable feature_choices key (scheme A). The text is decided in @tenebris/rules.
 export function packChoiceKey(source, ownerKey, featureName, level) {
-    return `${source}:${ownerKey}:${featureName}:${level}`;
+    return choiceKey(source, ownerKey, featureName, level);
 }
 
-// Create-time choice rows from the content pack (top-level options only; build.ts hoists those).
+// Create-time choice rows from the content pack. The list itself is built in @tenebris/rules.
 export function packChoiceFeatures(role, calling, level) {
-    const lvl = Number(level) || 1;
-    const out = [];
-    for (const row of role?.levels ?? []) {
-        if (Number(row.level) > lvl) continue;
-        for (const f of row.features ?? []) {
-            if (!Array.isArray(f.options) || f.options.length === 0) continue;
-            const key = packChoiceKey('class', role.key, f.name, row.level);
-            out.push({
-                ...f,
-                id: key,
-                key,
-                source: 'class',
-                level: Number(row.level),
-                label: f.name,
-                choice_count: f.choice_count ?? 1,
-            });
-        }
-    }
-    if (calling && lvl >= SUBCLASS_LEVEL) {
-        for (const f of calling.features ?? []) {
-            if (!Array.isArray(f.options) || f.options.length === 0) continue;
-            if (Number(f.level) > lvl) continue;
-            const key = packChoiceKey('subclass', calling.key, f.name, f.level);
-            out.push({
-                ...f,
-                id: key,
-                key,
-                source: 'subclass',
-                level: Number(f.level),
-                label: `${f.name} (${calling.name})`,
-                choice_count: f.choice_count ?? 1,
-            });
-        }
-    }
-    return out.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+    return choiceFeaturesFor(role, calling?.id, Number(level) || 1).map((feature) => ({
+        id: feature.key,
+        key: feature.key,
+        name: feature.name,
+        source: feature.source,
+        level: feature.level,
+        options: feature.options,
+        option_info: feature.optionInfo ?? {},
+        choice_count: feature.choose,
+        label: feature.source === 'subclass' && calling?.name ? `${feature.name} (${calling.name})` : feature.name,
+    }));
 }
 
 // the choice features that apply at this level, with their feature_choices key

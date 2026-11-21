@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { choiceFeaturesFor, choiceKey } from '@tenebris/rules/characterOptions';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const file = path.join(__dirname, '..', '..', '..', '..', 'packages', 'content', 'content.json');
@@ -51,69 +52,15 @@ export function scoreKey(stat) {
     return STAT_TO_KEY[String(stat).trim().toLowerCase()];
 }
 
-// Stable feature_choices key (scheme A)
-export function choiceKey(source, ownerKey, featureName, level) {
-    return `${source}:${ownerKey}:${featureName}:${level}`;
-}
+// Stable feature_choices key (scheme A). The text is decided in @tenebris/rules.
+export { choiceKey };
 
-function roleChoiceRows(role) {
-    if (!role?.key) return [];
-    const out = [];
-    for (const lvl of role.levels ?? []) {
-        for (const f of lvl.features ?? []) {
-            if (!Array.isArray(f.options) || f.options.length === 0) continue;
-            if (f.data?.choice_timing && f.data.choice_timing !== 'create') continue;
-            // Top-level options are only hoisted for create-time features by build.ts
-            out.push({
-                source: 'class',
-                ownerKey: role.key,
-                id: choiceKey('class', role.key, f.name, lvl.level),
-                key: choiceKey('class', role.key, f.name, lvl.level),
-                name: f.name,
-                level: Number(lvl.level),
-                options: f.options,
-                choice_count: f.choice_count ?? 1,
-                option_info: f.option_info ?? {},
-                description: f.description ?? '',
-            });
-        }
-    }
-    return out;
-}
-
-function callingChoiceRows(calling) {
-    if (!calling?.key) return [];
-    const out = [];
-    for (const f of calling.features ?? []) {
-        if (!Array.isArray(f.options) || f.options.length === 0) continue;
-        if (f.data?.choice_timing && f.data.choice_timing !== 'create') continue;
-        out.push({
-            source: 'subclass',
-            ownerKey: calling.key,
-            id: choiceKey('subclass', calling.key, f.name, f.level),
-            key: choiceKey('subclass', calling.key, f.name, f.level),
-            name: f.name,
-            level: Number(f.level),
-            options: f.options,
-            choice_count: f.choice_count ?? 1,
-            option_info: f.option_info ?? {},
-            description: f.description ?? '',
-        });
-    }
-    return out;
-}
-
-// Create-time choice features for a role (+ calling from SUBCLASS_LEVEL up), unlocked at level
+// Create-time choice features for a role (+ calling from level 3), unlocked at this level.
+// The rules live in @tenebris/rules; this only finds the role in the pack.
 export function choiceFeaturesForRole(roleId, callingId, level) {
     const role = getRole(roleId);
-    if (!role) return [];
-    const lvl = Number(level) || 1;
-    const rows = roleChoiceRows(role).filter((f) => f.level <= lvl);
-    if (callingId != null && callingId !== '' && lvl >= SUBCLASS_LEVEL) {
-        const calling = getCalling(role, callingId);
-        if (calling) rows.push(...callingChoiceRows(calling).filter((f) => f.level <= lvl));
-    }
-    return rows.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+    const id = callingId == null || callingId === '' ? undefined : Number(callingId);
+    return choiceFeaturesFor(role, Number.isInteger(id) ? id : undefined, Number(level) || 1);
 }
 
 
