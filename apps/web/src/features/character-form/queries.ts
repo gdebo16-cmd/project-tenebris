@@ -40,6 +40,16 @@ export function useSaveTab(id: string, tab: string) {
     });
 }
 
+// Rolls one stat, or clears placements / every roll. The server makes the dice.
+export function useStatRoll(id: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (body: { index: number } | { reset: 'placements' | 'rolls' }) =>
+            api<CharacterFormData>(`/api/characters/${id}/stat-rolls`, { method: 'POST', body }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['character-form', id] }),
+    });
+}
+
 export function useCreateCharacter() {
     return useMutation({
         mutationFn: (body: HeaderSave) => api<{ id: number }>('/api/characters', { method: 'POST', body }),

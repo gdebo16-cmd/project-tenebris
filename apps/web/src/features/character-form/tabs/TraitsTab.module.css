@@ -1,0 +1,79 @@
+/* The 8 rolls, where each one is placed, the two bonuses, and gifts. */
+
+.traits {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    max-width: 40rem;
+}
+
+.rolls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.roll {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.7rem;
+}
+
+.dice { display: flex; gap: 0.25rem; }
+
+.die,
+.dropped {
+    display: inline-block;
+    min-width: 1.4rem;
+    text-align: center;
+    padding: 0.1rem 0.25rem;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 3px;
+}
+
+.dropped { opacity: 0.45; text-decoration: line-through; }
+
+.total { min-width: 2rem; font-weight: 700; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.secondary {
+    padding: 0.4rem 0.7rem;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.place, .bonuses { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.place label, .bonuses label {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.place select, .bonuses select {
+    font: inherit;
+    font-size: 1rem;
+    padding: 0.3rem 0.4rem;
+    color: inherit;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+}
+
+.gifts { display: flex; flex-direction: column; gap: 0.25rem; margin: 0; padding: 0; border: 0; }
+
+.gift { display: flex; gap: 0.4rem; align-items: flex-start; }
+
+.heading { margin: 0; font-size: 1rem; }
+
+.note { margin: 0; font-size: 0.85rem; opacity: 0.85; }

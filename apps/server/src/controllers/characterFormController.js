@@ -7,9 +7,9 @@
 //
 // The rules live in @tenebris/rules (characterOptions + characterForm); this file is the glue.
 import { characterOptions } from '@tenebris/rules/characterOptions';
-import { checkHeader, checkRoleTab, checkSpeciesTab, clearedCalling, keepUnrelatedChoices, missingForFinish, startingHp, FORM_TABS } from '@tenebris/rules/characterForm';
+import { checkHeader, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, keepUnrelatedChoices, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
 import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
-import { rollDice } from '@tenebris/rules/dice';
+import { roll4d6DropLowest, rollDice } from '@tenebris/rules/dice';
 import { rng } from '../dice.js';
 import formPack from '../models/formPack.js';
 import { getRole, hitDieSides } from '../models/content.js';
@@ -20,6 +20,7 @@ const TAB_CHECKS = {
     header: (_options, body) => checkHeader(body),
     species: (options, body) => checkSpeciesTab(options, body),
     role: (options, body) => checkRoleTab(options, body),
+    traits: (options, body, ch) => checkTraitsTab(options, ch.stat_rolls, body),
 };
 
 // Sub-species are stored as the species id; the form wants the top-level species and the sub-species apart
@@ -76,6 +77,21 @@ async function loadOwnCharacter(req, res) {
     return ch;
 }
 
+// Rolls, where they were placed, and the bonuses. Scores are the columns the server wrote.
+function traitsView(ch) {
+    const state = readStatRolls(ch.stat_rolls);
+    const scores = {};
+    for (const stat of STAT_COLUMNS) scores[stat] = ch[stat] ?? null;
+    return {
+        rolls: state.rolls,
+        placement: state.placement,
+        gifts: state.gifts,
+        plus2: ch.plus2_stat ?? null,
+        plus1: ch.plus1_stat ?? null,
+        scores,
+    };
+}
+
 // What GET /form answers, grouped the way the form's tabs are
 function formView(ch) {
     return {
@@ -89,6 +105,7 @@ function formView(ch) {
             skill_proficiencies: ch.skill_proficiencies ?? [],
             feature_choices: ch.feature_choices ?? {},
         },
+        traits: traitsView(ch),
         missing: missingForFinish(ch),
         options: optionsFor(ch),
     };
@@ -118,7 +135,7 @@ export async function saveTab(req, res) {
     if (!check) return res.status(400).json({ error: `The ${tab} tab can't be saved yet` });
 
     const options = optionsForSave(ch, tab, req.body);
-    const checked = check(options, req.body);
+    const checked = check(options, req.body, ch);
     if ('error' in checked) return res.status(400).json({ error: checked.error });
 
     // A finished character's level changes HP, which the old level editor still handles (until R4.9)
@@ -136,6 +153,41 @@ export async function saveTab(req, res) {
     }
 
     await Form.updateCharacterFields(ch.id, checked.values);
+    res.json(formView(await Form.getFormCharacter(ch.id)));
+}
+
+// POST /api/characters/:id/stat-rolls
+// { index: 0..7 } rolls one 4d6-drop-lowest. { reset: 'placements' | 'rolls' } clears placement or every roll.
+export async function rollStat(req, res) {
+    const ch = await loadOwnCharacter(req, res);
+    if (!ch) return;
+
+    const request = checkStatRollBody(req.body);
+    if ('error' in request) return res.status(400).json({ error: request.error });
+
+    // Rolling again, and clearing the dice, are rerolls. Moving a roll to another stat is not.
+    const reroll = 'index' in request || request.reset === 'rolls';
+    if (reroll) {
+        const allowed = rerollAllowed(Boolean(ch.is_draft));
+        if ('error' in allowed) return res.status(400).json({ error: allowed.error });
+    }
+
+    let state = readStatRolls(ch.stat_rolls);
+    const values = {};
+    if ('index' in request) {
+        state = writeRoll(state, request.index, roll4d6DropLowest(rng));
+        for (const stat of STAT_COLUMNS) {
+            if (state.placement[stat] === request.index) values[stat] = scoreFromRolls(state, stat, ch.plus2_stat, ch.plus1_stat);
+        }
+    } else if (request.reset === 'placements') {
+        state = { ...state, placement: {} };
+        for (const stat of STAT_COLUMNS) values[stat] = null;
+    } else {
+        state = { ...emptyStatRolls(), gifts: state.gifts };
+        for (const stat of STAT_COLUMNS) values[stat] = null;
+    }
+    values.stat_rolls = state;
+    await Form.updateCharacterFields(ch.id, values);
     res.json(formView(await Form.getFormCharacter(ch.id)));
 }
 

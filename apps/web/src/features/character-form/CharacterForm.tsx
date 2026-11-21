@@ -34,7 +34,7 @@ export default function CharacterForm() {
             <div className={styles.panel} role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
                 {tab === 'species' && <SpeciesTab id={id} />}
                 {tab === 'role' && <RoleTab id={id} />}
-                {tab === 'traits' && <TraitsTab />}
+                {tab === 'traits' && <TraitsTab id={id} />}
                 {tab === 'personality' && <PersonalityTab />}
                 {tab === 'gear' && <GearTab />}
             </div>

@@ -9,13 +9,20 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Next
 
-- R4.6 Traits & gifts (server-rolled stats, placement, +2/+1, gifts).
+- R4.7 Personality tab (alignment chart, upbringing, lifestyle, outlook).
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-20 — Cursor (R4.6)
+- Traits tab. `POST /api/characters/:id/stat-rolls` rolls one 4d6-drop-lowest (or resets placements / all 8 rolls). The traits save sends roll indexes, the +2, the +1, and gift ids. The server looks up the dice and writes the scores. Same stat may take both bonuses.
+- Gift ids are stored inside `stat_rolls` (with the rolls and the placement). There is no gifts column, and this slice does not add one.
+- PLACEHOLDER until `docs/DECISIONS.md`: rerolls are unlimited while `is_draft`, and refused after finish.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (48), `npm run test:e2e` (7 passed, smoke accounts in use). A saved Might score was the stored roll + 3, not a number sent by the browser. A repeated index and too many gifts were refused. After finish, another roll was refused.
+- Next is R4.7.
 
 ### 2026-11-20 — Cursor (R4.5)
 - Role & calling tab. `checkRoleTab` in `packages/rules`: a calling below level 3 is refused, skills must be exactly the role's list, feature picks are checked. Saving the header below level 3 clears the calling and its picks. The role's other picks stay.

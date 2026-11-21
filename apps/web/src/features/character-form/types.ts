@@ -23,6 +23,14 @@ export type CharacterFormData = {
         skill_proficiencies: string[];
         feature_choices: Record<string, string[]>;
     };
+    traits: {
+        rolls: ({ rolls: number[]; dropped: number; total: number } | null)[];
+        placement: Partial<Record<string, number>>;
+        gifts: number[];
+        plus2: string | null;
+        plus1: string | null;
+        scores: Record<string, number | null>;
+    };
     missing: string[];
     options: Options;
 };
