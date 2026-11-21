@@ -7,7 +7,7 @@
 //
 // The rules live in @tenebris/rules (characterOptions + characterForm); this file is the glue.
 import { characterOptions } from '@tenebris/rules/characterOptions';
-import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, keepUnrelatedChoices, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
+import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, emptyStatRolls, keepUnrelatedChoices, leveledMaxHp, missingForFinish, readStatRolls, rerollAllowed, scoreFromRolls, startingHp, writeRoll, FORM_TABS, STAT_COLUMNS } from '@tenebris/rules/characterForm';
 import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
 import { checkGearTab, defaultGear, gearChoices, STARTING_MONEY } from '@tenebris/rules/gear';
 import { roll4d6DropLowest, rollDice } from '@tenebris/rules/dice';
@@ -15,6 +15,7 @@ import { rng } from '../dice.js';
 import formPack from '../models/formPack.js';
 import { getRole, hitDieSides } from '../models/content.js';
 import * as Form from '../models/characterFormModel.js';
+import * as Characters from '../models/characterModel.js';
 
 // The tabs that can be saved so far. Each later slice (R4.5-R4.8) adds its check here.
 const TAB_CHECKS = {
@@ -167,9 +168,19 @@ export async function saveTab(req, res) {
     const checked = check(options, req.body, ch);
     if ('error' in checked) return res.status(400).json({ error: checked.error });
 
-    // A finished character's level changes HP. That math is not in this form yet.
-    if (!ch.is_draft && checked.values.level !== undefined && checked.values.level !== ch.level) {
-        return res.status(400).json({ error: 'Changing the level of a finished character is not ready yet' });
+    // A finished character's level change recomputes the stored base max. Current HP is clamped, not refilled.
+    // Drafts have no HP until finish, so a draft's level is only a number.
+    if (!ch.is_draft && tab === 'header' && checked.values.level !== undefined && Number(checked.values.level) !== Number(ch.level)) {
+        const info = await Characters.getLevelInfo(ch.id, req.session.userId);
+        if (!info) return res.status(404).json({ error: 'Character not found' });
+        const newMax = leveledMaxHp(
+            Number(info.hitpoint_die) || 0,
+            Number(info.con),
+            Number(info.level) || 1,
+            Number(info.max_hp),
+            Number(checked.values.level),
+        );
+        await Characters.updateLevel(ch.id, req.session.userId, Number(checked.values.level), newMax);
     }
 
     // The server decides: below level 3 the calling is gone, even if the browser still sends one on the header.

@@ -335,10 +335,23 @@ export function missingForFinish(ch: FinishFields): string[] {
     return missing;
 }
 
-// Starting HP: the server's hit-die roll + CON mod, plus (hit die / 2 + 1 + CON mod, at least 1) per level after the first.
-// Same formula as the old creator. Never below 1.
+// Hit die / 2 + 1 + CON mod, and never less than 1. The old creator and the old level editor share this.
+function gainPerLevel(hitDieSides: number, con: number): number {
+    const conMod = Math.floor(Number(con) / 2) - 5;
+    return Math.max(1, Math.floor(Number(hitDieSides) / 2) + 1 + conMod);
+}
+
+// Starting HP: the server's hit-die roll + CON mod, plus one gain per level after the first. Never below 1.
 export function startingHp(hitDieSides: number, con: number, level: number, firstRoll: number): number {
-    const conMod = Math.floor(con / 2) - 5;
-    const perLevel = Math.max(1, Math.floor(hitDieSides / 2) + 1 + conMod);
-    return Math.max(1, firstRoll + conMod + (level - 1) * perLevel);
+    const conMod = Math.floor(Number(con) / 2) - 5;
+    return Math.max(1, firstRoll + conMod + (level - 1) * gainPerLevel(hitDieSides, con));
+}
+
+// Level change for a finished character. Peel the old gains off the stored base max, then apply the new level.
+// Level-down uses the same line. The stored max stays the base; calling and CON-boost HP are added when the sheet is read.
+export function leveledMaxHp(hitDieSides: number, con: number, oldLevel: number, oldMax: number, newLevel: number): number {
+    const perLevel = gainPerLevel(hitDieSides, con);
+    const from = Number(oldLevel) || 1;
+    const baseHp = Number(oldMax) - (from - 1) * perLevel;
+    return Math.max(1, baseHp + (Number(newLevel) - 1) * perLevel);
 }

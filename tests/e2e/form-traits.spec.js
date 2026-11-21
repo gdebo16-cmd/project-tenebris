@@ -62,6 +62,27 @@ test('traits scores follow the server rolls, and a finished character cannot rer
     })).ok()).toBeTruthy();
     expect((await page.request.post(`/api/characters/${id}/finish`)).ok()).toBeTruthy();
 
+    const sheetBefore = await (await page.request.get(`/api/characters/${id}`)).json();
+    const sides = Number(String(form.options.roles.find((role) => role.key === 'warrior').hit_die).match(/\d+/)[0]);
+    const conMod = Math.floor(Number(sheetBefore.character.con) / 2) - 5;
+    const perLevel = Math.max(1, Math.floor(sides / 2) + 1 + conMod);
+    const raised = await page.request.put(`/api/characters/${id}/form/header`, {
+        data: { name: sheetBefore.character.name, level: 2, portrait_url: null },
+    });
+    expect(raised.ok()).toBeTruthy();
+    const sheetAfter = await (await page.request.get(`/api/characters/${id}`)).json();
+    expect(sheetAfter.character.level).toBe(2);
+    expect(sheetAfter.character.max_hp).toBe(sheetBefore.character.max_hp + perLevel);
+    expect(sheetAfter.character.current_hp).toBe(sheetBefore.character.current_hp);
+
+    const lowered = await page.request.put(`/api/characters/${id}/form/header`, {
+        data: { name: sheetBefore.character.name, level: 1, portrait_url: null },
+    });
+    expect(lowered.ok()).toBeTruthy();
+    const sheetBack = await (await page.request.get(`/api/characters/${id}`)).json();
+    expect(sheetBack.character.level).toBe(1);
+    expect(sheetBack.character.max_hp).toBe(sheetBefore.character.max_hp);
+
     const locked = await page.request.post(`/api/characters/${id}/stat-rolls`, { data: { index: 0 } });
     expect(locked.status()).toBe(400);
     expect((await locked.json()).error).toMatch(/finished/i);

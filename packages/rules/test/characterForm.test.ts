@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, keepUnrelatedChoices, levelChoices, missingForFinish, rerollAllowed, startingHp, MAX_LEVEL, type Options } from '../src/characterForm.ts';
+import { checkHeader, checkPersonalityTab, checkRoleTab, checkSpeciesTab, checkStatRollBody, checkTraitsTab, clearedCalling, keepUnrelatedChoices, leveledMaxHp, levelChoices, missingForFinish, rerollAllowed, startingHp, MAX_LEVEL, type Options } from '../src/characterForm.ts';
 
 // Only the parts of the options the species check reads
 const options = {
@@ -234,4 +234,17 @@ test('startingHp matches the old creator', () => {
     assert.equal(startingHp(12, 14, 1, 7), 9);             // 7 + CON mod 2
     assert.equal(startingHp(12, 14, 3, 7), 9 + 2 * 9);      // + (6 + 1 + 2) per level after the first
     assert.equal(startingHp(6, 3, 1, 1), 1);               // never below 1 (1 - 4)
+});
+
+test('leveledMaxHp matches startingHp and the old level editor, up and down', () => {
+    const level1 = startingHp(12, 14, 1, 7);
+    assert.equal(leveledMaxHp(12, 14, 1, level1, 3), startingHp(12, 14, 3, 7));
+    assert.equal(leveledMaxHp(12, 14, 3, startingHp(12, 14, 3, 7), 1), level1);
+    // A level-1 max that was already floored at 1 still gains a full step. A fresh starting roll stays floored.
+    assert.equal(startingHp(6, 3, 1, 1), 1);
+    assert.equal(leveledMaxHp(6, 3, 1, 1, 2), 2);
+    assert.equal(startingHp(6, 3, 2, 1), 1);
+    // A max that was not rolled still moves by the same gain per level.
+    assert.equal(leveledMaxHp(12, 14, 3, 30, 5), 30 + 2 * 9);
+    assert.equal(leveledMaxHp(12, 14, 3, 30, 1), 30 - 2 * 9);
 });

@@ -17,6 +17,11 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
+### 2026-11-20 — Cursor (R4 review: level-up)
+- A finished character can change level from the header, up to 20, and down. The gain is the old editor's: hit die / 2 + 1 + CON mod, at least 1. `leveledMaxHp` matches `startingHp`. Stored max stays the base; current HP is clamped and not refilled. Drafts still get HP only when they finish.
+- Checked on ports 4003 / 5176: typecheck, `npm test` (54), form e2e (7 passed, smoke accounts in use). A finished warrior gained one hit-die step at level 2 and lost it again at level 1.
+- R5 is not started.
+
 ### 2026-11-20 — Cursor (R4 review: max level 20)
 - Owner's decision: maximum level is 20. Recorded in `docs/DECISIONS.md` and `docs/PLAN.md`. One constant, `MAX_LEVEL` in `packages/rules/src/characterForm.ts`. The model, the options check, and the header dropdown use it.
 - Level 21 is refused. A character already above 20 keeps that level (it stays in the dropdown as one extra option) and can be saved or lowered. It cannot be raised. The two characters on `rework` above 20 were not changed.
