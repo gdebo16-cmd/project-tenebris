@@ -1,18 +1,16 @@
-/* RegisterPage styles (was styles/register.css, added by the old usePageStyle hook).
-   Scoped to this page: RegisterPage puts styles.page on its <main>, and every rule below
-   only applies while that element is on screen (html:has(.page)).
-   :where(...) adds no specificity, so each rule weighs exactly what it did before.
-   Class and id names stay global (:global) because shared parts such as SiteNav use them;
-   .page (written :local(.page)) is the only name this module makes local. */
+/* RegisterPage styles (was styles/register.css).
+   Class and id names are local to this module (RegisterPage.jsx uses styles.x).
+   Rules that only name elements (html, body, header, main, a, ...) stay limited to this page
+   with :where(html:has(.page)); :where() adds no specificity. */
 
-:global :where(html:has(:local(.page))) input[type="text"],
-:global :where(html:has(:local(.page))) input[type="email"],
-:global :where(html:has(:local(.page))) input[type="password"] {
+:where(html:has(.page)) input[type="text"],
+:where(html:has(.page)) input[type="email"],
+:where(html:has(.page)) input[type="password"] {
   font-size: 2rem; 
 }
 
-:global html:where(:has(:local(.page))),
-:global body:where(:has(:local(.page))) {
+html:where(:has(.page)),
+body:where(:has(.page)) {
     margin: 0 ! important;
     padding: 0 ! important;
     width: 100vw;
@@ -31,7 +29,7 @@
     
 }
 
-:global body:where(:has(:local(.page))) {
+body:where(:has(.page)) {
     content: '';
     position: absolute;
     top: 0;
@@ -41,7 +39,7 @@
     background-color: var(--bgc-theme);
     z-index: -3 ! important;
 }
-:global :where(html:has(:local(.page))) .fixed-bg {
+:where(html:has(.page)) :global(.fixed-bg) {
     position: absolute;
     top: 0;
     left: 0;
@@ -58,7 +56,7 @@
     flex-direction: column;
 }
 
-:global :where(html:has(:local(.page))) footer {
+:where(html:has(.page)) footer {
     width: 100vw;
     height: 100svh;
     overflow: hidden ! important;
@@ -70,22 +68,22 @@
 
 
 
-:global :where(html:has(:local(.page))),
-:global :where(html:has(:local(.page))) * {
+:where(html:has(.page)),
+:where(html:has(.page)) * {
    font-family: var(--fontfam);
    font-weight: var(--fontweight);
    font-style: var(--fontstyle);
 }
 
-:global :where(html:has(:local(.page))) ul,
-:global :where(html:has(:local(.page))) li,
-:global :where(html:has(:local(.page))) a {
+:where(html:has(.page)) ul,
+:where(html:has(.page)) li,
+:where(html:has(.page)) a {
     list-style: none;
     text-decoration: none;
     color: var(--txt-color-1);
 }
 
-:global :where(html:has(:local(.page))) option {
+:where(html:has(.page)) option {
     background-color: var(--drop-down-bg);
     color: var(--drop-down-txt);
     border: var(--tileBorder);
@@ -101,7 +99,7 @@
 
 @media (max-width: 768px) {
 
-    :global :where(html:has(:local(.page))) header {
+    :where(html:has(.page)) header {
         display: flex;
         height: 8vh;
         width: 100vw;
@@ -109,7 +107,7 @@
     }
 
 
-    :global :where(html:has(:local(.page))) main {
+    :where(html:has(.page)) main {
         height: calc(100svh - 12vh);
         width: 100%;
         overflow: hidden ! important;
@@ -125,7 +123,7 @@
         background-color: rgba(var(--bgc-theme), 0.7);
     }
 
-    :global :where(html:has(:local(.page))) .title-logo {
+    .titleLogo {
         max-width: 50px;
         max-height: 50px;
         margin: 0;
@@ -134,7 +132,7 @@
         box-shadow: none;
     }
     
-    :global :where(html:has(:local(.page))) #site-title {
+    #siteTitle {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -154,7 +152,7 @@
         height: 10vh;
     }
     
-    :global :where(html:has(:local(.page))) .form-container {
+    .formContainer {
         position: relative;
         top: -1vh;
         margin-top: 8vh;
@@ -164,10 +162,10 @@
         align-self: center;
        }
 
-   :global :where(html:has(:local(.page))) .user-name-container,
-   :global :where(html:has(:local(.page))) .password-container,
-   :global :where(html:has(:local(.page))) .email-container,
-   :global :where(html:has(:local(.page))) .name-container {
+   .userNameContainer,
+   .passwordContainer,
+   .emailContainer,
+   .nameContainer {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -178,7 +176,7 @@
     box-shadow: var(--bs2);
    }
 
-   :global :where(html:has(:local(.page))) .signin-label {
+   .signinLabel {
     text-align: center;
     display: flex;
     align-items: center;
@@ -190,7 +188,7 @@
     margin: 0;
    }
 
-   :global :where(html:has(:local(.page))) .signin-value {
+   .signinValue {
     text-align: center;
     display: flex;
     align-items: center;
@@ -203,7 +201,7 @@
 
 
 
-   :global :where(html:has(:local(.page))) .form-title {
+   .formTitle {
     padding: 2%;
     width: 90%;
     display: flex;
@@ -216,7 +214,7 @@
     color: var(--txt-color-1);
    }
 
-   :global :where(html:has(:local(.page))) .button-container {
+   .buttonContainer {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -225,7 +223,7 @@
 
    }
 
-   :global :where(html:has(:local(.page))) .btn-form {
+   .btnForm {
     padding: 4%;
     text-align: center;
     display: flex;
@@ -241,7 +239,7 @@
     
 
 
-   :global :where(html:has(:local(.page))) footer {
+   :where(html:has(.page)) footer {
     display: flex;
     position: fixed;
     top: calc(100svh - 2vh);
@@ -255,18 +253,18 @@
     overflow: hidden;
    }
 
-   :global :where(html:has(:local(.page))) .footer-text {
+   .footerText {
     display: none;
     
    }
 }
 
 @media (min-width: 769px) {
-    :global :where(html:has(:local(.page))) #site-title h1 {
+    #siteTitle h1 {
         display: none;
     }
 
-    :global :where(html:has(:local(.page))) .title-logo {
+    .titleLogo {
         content: url('/logo_banner.png');
         height: auto;
         width: auto;
@@ -275,14 +273,14 @@
         object-fit: contain;
     }
 
-    :global :where(html:has(:local(.page))) header {
+    :where(html:has(.page)) header {
         display: flex;
         height: 8vh;
         width: 100vw;
         border-radius: 0 0 15% 15%;
     }
 
-    :global :where(html:has(:local(.page))) #site-title {
+    #siteTitle {
         background-color: var(--bgc-theme);
         color: var(--txt-color-1);
         position: relative;
@@ -298,7 +296,7 @@
         box-shadow: var(--bs2);
     }
 
-    :global :where(html:has(:local(.page))) main {
+    :where(html:has(.page)) main {
         height: calc(100svh - 12vh);
         width: 100%;
         max-width: 1600px;
@@ -313,7 +311,7 @@
         align-items: flex-start;
     }
 
-    :global :where(html:has(:local(.page))) footer {
+    :where(html:has(.page)) footer {
         display: flex;
         position: fixed;
         left: 0;
@@ -336,7 +334,7 @@
         overflow: hidden;
     }
 
-    :global :where(html:has(:local(.page))) .form-container {
+    .formContainer {
         box-sizing: border-box;
         width: min(1100px, 90vw);
         margin: 0 auto;
@@ -353,7 +351,7 @@
         box-shadow: var(--bs2);
     }
 
-    :global :where(html:has(:local(.page))) .form-title {
+    .formTitle {
         box-sizing: border-box;
         margin: 0;
         padding: 3vh 2vw;
@@ -370,10 +368,10 @@
         text-align: center;
     }
 
-    :global :where(html:has(:local(.page))) .user-name-container,
-    :global :where(html:has(:local(.page))) .password-container,
-    :global :where(html:has(:local(.page))) .email-container,
-    :global :where(html:has(:local(.page))) .name-container {
+    .userNameContainer,
+    .passwordContainer,
+    .emailContainer,
+    .nameContainer {
         display: flex;
         flex-direction: column;
         margin: 0 0 2.5vh;
@@ -383,7 +381,7 @@
         box-shadow: var(--bs2);
     }
 
-    :global :where(html:has(:local(.page))) .button-container {
+    .buttonContainer {
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -393,7 +391,7 @@
         padding: 0;
     }
 
-    :global :where(html:has(:local(.page))) .signin-label {
+    .signinLabel {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -404,7 +402,7 @@
         font-size: 150%;
     }
 
-    :global :where(html:has(:local(.page))) .signin-value {
+    .signinValue {
         box-sizing: border-box;
         width: 100%;
         padding: 1vh 1vw;
@@ -415,7 +413,7 @@
         font-size: 150%;
     }
 
-    :global :where(html:has(:local(.page))) .btn-form {
+    .btnForm {
         display: inline-flex;
         justify-content: center;
         align-items: center;
@@ -432,14 +430,14 @@
         box-shadow: var(--bs2);
     }
 
-    :global :where(html:has(:local(.page))) footer .footer-text {
+    footer .footerText {
         background-image: var(--txt-gradient, linear-gradient(currentColor, currentColor));
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    :global :where(html:has(:local(.page))) .form-title h2 {
+    .formTitle h2 {
         background-image: var(--txt-gradient, linear-gradient(currentColor, currentColor));
         -webkit-background-clip: text;
         background-clip: text;

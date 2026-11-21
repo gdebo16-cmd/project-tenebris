@@ -33,48 +33,48 @@ function RegisterPage() {
 
     return (
         <>
-            <header id="site-title">
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className="title-logo" />
+            <header id={styles.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Eldrid Tales</h1>
             </header>
 
             <main className={styles.page}>
-                <section className="form-container">
-                    <article className="form-title">
-                        <h2 id="titleText">Create Your Legend</h2>
+                <section className={styles.formContainer}>
+                    <article className={styles.formTitle}>
+                        <h2>Create Your Legend</h2>
                     </article>
                     <form onSubmit={submit}>
-                        <article className=" form-section user-name-container">
-                            <label className="signin-label" htmlFor="userName">Username</label>
-                            <input className="signin-value" type="text" name="username" value={form.username} onChange={update} required />
+                        <article className={styles.userNameContainer}>
+                            <label className={styles.signinLabel} htmlFor="userName">Username</label>
+                            <input className={styles.signinValue} type="text" name="username" value={form.username} onChange={update} required />
                         </article>
 
-                        <article className="form-section password-container">
-                            <label id="passwordLabel" className="signin-label" htmlFor="password">Password</label>
-                            <input className="signin-value" type="password" name="password" value={form.password} onChange={update} required />
+                        <article className={styles.passwordContainer}>
+                            <label className={styles.signinLabel} htmlFor="password">Password</label>
+                            <input className={styles.signinValue} type="password" name="password" value={form.password} onChange={update} required />
                         </article>
 
-                        <article className="form-section email-container">
-                            <label id="emailLabel" className="signin-label" htmlFor="email">Email</label>
-                            <input className="signin-value" id="emailValue" type="email" name="email" value={form.email} onChange={update} />
+                        <article className={styles.emailContainer}>
+                            <label className={styles.signinLabel} htmlFor="email">Email</label>
+                            <input className={styles.signinValue} type="email" name="email" value={form.email} onChange={update} />
                         </article>
 
-                        <article className="form-section name-container">
-                            <label className="signin-label" id="nameLabel" htmlFor="name">Display Name</label>
-                            <input className="signin-value" id="nameValue" type="text" name="name" value={form.name} onChange={update} />
+                        <article className={styles.nameContainer}>
+                            <label className={styles.signinLabel} htmlFor="name">Display Name</label>
+                            <input className={styles.signinValue} type="text" name="name" value={form.name} onChange={update} />
                         </article>
         
                         {error && <p>{error}</p>}
 
-                        <article className="form-section button-container">
-                            <button className="btn btn-form" type="submit" disabled={busy}>Create Account</button>
-                            <Link className="btn btn-form" id="login-link" to="/login">Back to login</Link>
+                        <article className={styles.buttonContainer}>
+                            <button className={styles.btnForm} type="submit" disabled={busy}>Create Account</button>
+                            <Link className={styles.btnForm} to="/login">Back to login</Link>
                         </article>
                     </form>
                 </section>
             </main>
             <footer>
-                <p className="footer-text" id="footer-text">© 2026 Eldrid Tales. All rights reserved.</p>
+                <p className={styles.footerText}>© 2026 Eldrid Tales. All rights reserved.</p>
                 
             </footer>
         </>
