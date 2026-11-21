@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
-import usePageStyle from '../hooks/usePageStyle';
-import signinCss from '../styles/signin.css?inline';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys } from '../queries.ts';
+import styles from './LoginPage.module.css';
 
 // Replaces Public/signin.html
 function LoginPage() {
-    usePageStyle(signinCss);
     const navigate = useNavigate();
     const [params] = useSearchParams();
     const next = params.get('next');
@@ -37,7 +35,7 @@ function LoginPage() {
                 <h1>Eldrid Tales</h1>
             </header>
 
-            <main>
+            <main className={styles.page}>
                 <section className="form-container">
                     <article className="form-title">
                         
