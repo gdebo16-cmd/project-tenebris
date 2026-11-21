@@ -1057,6 +1057,54 @@
     --background: url('/images/themes/autumn-village.jpg');
     --background-desktop: url('/images/themes/autumn-village.jpg');
 }
+[data-background="teal"] {
+    --background: url('/eldrid-bg-teal-3840.webp');
+    --background-desktop: url('/eldrid-bg-teal-3840.webp');
+}
+[data-background="rose"] {
+    --background: url('/eldrid-bg-rose-3840.webp');
+    --background-desktop: url('/eldrid-bg-rose-3840.webp');
+}
+[data-background="amber-dusk"] {
+    --background: url('/eldrid-bg-amber-dusk-3840.webp');
+    --background-desktop: url('/eldrid-bg-amber-dusk-3840.webp');
+}
+[data-background="moonlit"] {
+    --background: url('/eldrid-bg-moonlit-3840.webp');
+    --background-desktop: url('/eldrid-bg-moonlit-3840.webp');
+}
+[data-background="emerald-mist"] {
+    --background: url('/eldrid-bg-emerald-mist-3840.webp');
+    --background-desktop: url('/eldrid-bg-emerald-mist-3840.webp');
+}
+[data-background="twilight"] {
+    --background: url('/eldrid-bg-twilight-3840.webp');
+    --background-desktop: url('/eldrid-bg-twilight-3840.webp');
+}
+[data-background="ash"] {
+    --background: url('/eldrid-bg-ash-3840.webp');
+    --background-desktop: url('/eldrid-bg-ash-3840.webp');
+}
+[data-background="copper"] {
+    --background: url('/eldrid-bg-copper-3840.webp');
+    --background-desktop: url('/eldrid-bg-copper-3840.webp');
+}
+[data-background="ocean"] {
+    --background: url('/eldrid-bg-ocean-3840.webp');
+    --background-desktop: url('/eldrid-bg-ocean-3840.webp');
+}
+[data-background="aurora"] {
+    --background: url('/eldrid-bg-aurora-3840.webp');
+    --background-desktop: url('/eldrid-bg-aurora-3840.webp');
+}
+[data-background="crimson-night"] {
+    --background: url('/eldrid-bg-crimson-night-3840.webp');
+    --background-desktop: url('/eldrid-bg-crimson-night-3840.webp');
+}
+[data-background="ivory-dawn"] {
+    --background: url('/eldrid-bg-ivory-dawn-3840.webp');
+    --background-desktop: url('/eldrid-bg-ivory-dawn-3840.webp');
+}
 /* #endregion */
 
 /* #region Mobile Crop Section */
@@ -1092,5 +1140,17 @@
     html[data-background="throne-hall"] { --background: url('/images/themes/throne-hall-mobile-1440x2560.jpg'); }
     html[data-background="arcane-observatory"] { --background: url('/images/themes/arcane-observatory-mobile-1440x2560.jpg'); }
     html[data-background="autumn-village"] { --background: url('/images/themes/autumn-village-mobile-1440x2560.jpg'); }
+    html[data-background="teal"] { --background: url('/eldrid-bg-teal-mobile-1440x2560.webp'); }
+    html[data-background="rose"] { --background: url('/eldrid-bg-rose-mobile-1440x2560.webp'); }
+    html[data-background="amber-dusk"] { --background: url('/eldrid-bg-amber-dusk-mobile-1440x2560.webp'); }
+    html[data-background="moonlit"] { --background: url('/eldrid-bg-moonlit-mobile-1440x2560.webp'); }
+    html[data-background="emerald-mist"] { --background: url('/eldrid-bg-emerald-mist-mobile-1440x2560.webp'); }
+    html[data-background="twilight"] { --background: url('/eldrid-bg-twilight-mobile-1440x2560.webp'); }
+    html[data-background="ash"] { --background: url('/eldrid-bg-ash-mobile-1440x2560.webp'); }
+    html[data-background="copper"] { --background: url('/eldrid-bg-copper-mobile-1440x2560.webp'); }
+    html[data-background="ocean"] { --background: url('/eldrid-bg-ocean-mobile-1440x2560.webp'); }
+    html[data-background="aurora"] { --background: url('/eldrid-bg-aurora-mobile-1440x2560.webp'); }
+    html[data-background="crimson-night"] { --background: url('/eldrid-bg-crimson-night-mobile-1440x2560.webp'); }
+    html[data-background="ivory-dawn"] { --background: url('/eldrid-bg-ivory-dawn-mobile-1440x2560.webp'); }
 }
 /* #endregion */
