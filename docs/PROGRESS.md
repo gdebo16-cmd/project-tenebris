@@ -18,6 +18,15 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
+### 2026-11-22 — Claude (R7.1, R7.3, R7.4 on bot/claude; Gabriel's names and OKs given in chat)
+- R7.1 `cd475a2`: names recorded in DECISIONS.md (Templar, Seer, Tome of Inscription). `RUNE_CALLING = 'Tome of Inscription'` replaces the Rune Weaver aliases (rules, rune model, sheet) — fixes the block sheet never giving Tome of Inscription characters their runed-weapon bonuses.
+- R7.3a `9ad1d05`: removed the old creator/editor server code nothing called (~1,300 lines: magicModel, raceModel, classModel, choiceRules, old create/edit functions, notes files).
+- R7.3 `8c5aec6`: server reads/writes species_id/role_id/calling_id only; idMap.js deleted; migration `1795360000000_drop-legacy-character-ids` drops race_id, subrace_id, class_id, subclass_id. Every finished character already had species_id/role_id.
+- R7.4: `docs/LEGACY-TABLES.md` lists the 61 tables nothing reads (server SQL touches only users, session, characters, character_*, item_runes, campaigns, campaign_members); migration `1795360000100_drop-legacy-tables` drops them (irreversible: `down = false`).
+- Neon: backup branch `rework-backup-pre-r7` (br-weathered-fire-ar6nblk0, no compute) made from rework before any migration. Both migrations' SQL tested on throwaway branch `scratch-r7-drop-test` (br-misty-field-arh1pph5): 11 tables left, character/sheet queries work. Delete the scratch branch when done.
+- RUN ORDER: merge bot/claude to main and let staging deploy FIRST, then `npm run migrate` on rework (old code still reads class_id).
+- Left in R7: R7.5 content single source + fresh-database check (needs a decision on how source/ and content.json relate). Other unused character columns (armor_id, shield_id, spell_slot_level, spell_slots, spell_slots_used, save_proficiencies, rest_locks, boost_*) could go in a later migration.
+
 ### 2026-11-22 — Claude (R7.2 one router per resource, bot/claude)
 - `routes/api.js` now only mounts one router per resource: auth, account, rolls, characterForm, sheets, characters, inventory, campaigns, content, monsters (+ the JSON error handler). Routes moved, not changed: checked old vs new route lists, 67 = 67, none missing. 101/101 rules tests, typecheck clean.
 - Controllers stay `.js` for now (converting them needs `@types/express`).
