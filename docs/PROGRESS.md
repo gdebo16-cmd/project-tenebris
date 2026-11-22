@@ -6,7 +6,7 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 - **Stage 1, native rebuild:** R1–R4 done; R5 up to R5.5 (Character layout) is on main; R6 and R6.1 (local class names) done (2026-11-21).
 - **Paused by Gabriel:** nothing (R5.6/R5.7 unpaused 2026-11-22).
-- **In progress:** Claude — R5.6 monsters + R5.7 DM page, on bot/claude (after R7). Migrations only with Gabriel's OK.
+- **In progress:** nothing (Claude: R5 + R7 waiting on Gabriel's e2e run and click-through before ticking).
 
 ## Next
 
@@ -17,6 +17,10 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-22 — Claude (staging deploy + migrations on rework, with Gabriel's OK)
+- Staging hadn't deployed since 2026-11-19 (auto-deploy not firing); deployed `6b47f10` by hand, live.
+- Ran the four new migrations on `rework` (same SQL node-pg-migrate generates, recorded in pgmigrations in file order): old id columns, 61 old tables, `campaign_monsters`, `campaigns.dm_notes`/`initiative`. `rework` now has the 11 app tables + pgmigrations; `npm run migrate` has nothing left to run. Backup of the old tables: Neon branch `rework-backup-pre-r7`.
 
 ### 2026-11-22 — Claude (R5.6 monsters + R5.7 DM page, bot/claude; Gabriel unpaused both)
 - Rules: `monster.ts` (`monsterToCreature` → the same Creature the sheet blocks read; `healthWord`, `monsterGlimpse` for players, monster HP/ward rules) and `initiative.ts` (server rolls d20 + initiative, sorts, next turn / round). 12 new tests (113 total).
