@@ -51,12 +51,26 @@
 /* The block's own box stretches to fill the space */
 .fit > * { flex: 1 0 auto; }
 
-/* Phone tabs: Stats / Combat / Condition (the buttons use the .tab / .tabActive look from Sheet.module.css) */
+/* Phone tabs: Stats / Combat / Condition (the buttons use the .tab / .tabActive look from Sheet.module.css).
+   A solid bar, so the labels read over the page's background picture; the chosen tab is lit up. */
 .phoneTabs {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 4px;
-    border-bottom: 1px solid var(--border, #b27f50);
+    padding: 4px;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 12px;
+}
+
+.phoneTabs > button {
+    border-radius: 8px;
+    color: var(--text, #facd8d);
+}
+
+.phoneTabs > button[aria-pressed="true"] {
+    color: var(--accent, #d4af37);
+    background: color-mix(in srgb, var(--accent, #d4af37) 18%, transparent);
 }
 
 .itemPhoneHidden { display: none; }
