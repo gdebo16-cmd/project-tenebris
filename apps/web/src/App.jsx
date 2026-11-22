@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import RequireLogin from './components/RequireLogin';
 import CharacterSheetPage from './features/sheet/CharacterSheetPage.tsx';
+import MonsterSheetPage from './features/sheet/MonsterSheetPage.tsx';
+import DmPage from './features/dm/DmPage.tsx';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
@@ -34,6 +36,8 @@ function App() {
                     <Route path='/profile' element={<ProfilePage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/campaign/:campId" element={<CampaignPage />} />
+                    <Route path="/campaign/:campId/dm" element={<DmPage />} />
+                    <Route path="/monsters/:id" element={<MonsterSheetPage />} />
                     <Route path="/campaign_list" element={<CampaignList />} />
                     <Route path="/join/:code" element={<JoinCampaign />} />
                     <Route path="/create_campaign" element={<CreateCampaign />} />

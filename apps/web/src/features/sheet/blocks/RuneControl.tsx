@@ -1,4 +1,4 @@
-// Inscribe runes on one owned weapon or armor (Rune Weaver), ported from the old sheet's rune control.
+// Inscribe runes on one owned weapon or armor (Tome of Inscription), ported from the old sheet's rune control.
 // The server enforces item types, prerequisites and the per-item / active limits; this only offers the likely picks.
 import { useState } from 'react';
 import { runeChoices, type ItemRune, type RuneInfo, type RuneItemType } from '@tenebris/rules/equipment';

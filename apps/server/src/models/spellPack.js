@@ -1,4 +1,4 @@
-// Spell catalog from db/content/spells.json (built from source/). In-memory Maps; hot-reloads in non-production.
+// Spell catalog from packages/content/spells.json (built from source/ by npm run content:build). In-memory Maps; hot-reloads in non-production.
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -97,14 +97,6 @@ export function getState(id) {
 export function getAlignment(id) {
     if (id == null || id === '') return undefined;
     return alignmentById.get(Number(id));
-}
-
-export function getBandByName(name) {
-    return bandByName.get(name);
-}
-
-export function getBandByOrd(ord) {
-    return bandByOrd.get(Number(ord));
 }
 
 export function allSpells() {

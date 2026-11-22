@@ -39,9 +39,9 @@ Write your answer after each **→**. Leave a question blank until you've decide
 ## Naming (C8)
 
 - One name per concept — confirm the final names:
-  - Paladin or Templar →
-  - Druid or Seer →
-  - Rune Weaver or Tome of Inscription →
+  - Paladin or Templar → **Templar** (Gabriel, 2026-11-22)
+  - Druid or Seer → **Seer** (Gabriel, 2026-11-22)
+  - Rune Weaver or Tome of Inscription → **Tome of Inscription** (Gabriel, 2026-11-22)
   - Any other renames →
 
 ## Later (Part 2)

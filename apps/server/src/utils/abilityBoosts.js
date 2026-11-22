@@ -2,10 +2,8 @@
 // Picks live in characters.feature_choices like any other choice; base scores stay in the str..cha columns.
 // Pack schedule is Divine Blessing at 4/6/10/12/16/18 — no Primordial Ascent in the pack.
 import content, { primordialBlessingsFromPack, roleProficiencyContext, boostRowsForRole, getRole } from '../models/content.js';
-import { roleIdForLegacyClass } from '../models/idMap.js';
 
 export const KEPT_BOOST = 'Kept boost (already in scores)';
-export const BOOST_ROWS = ['Divine Blessing'];
 const STATS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 
 function rowKey(r) {
@@ -34,14 +32,10 @@ export function parseBlessingPick(value) {
     return { name: v, stat: null };
 }
 
-// Pack Divine Blessing rows for a role id, or for a legacy class id (mapped via idMap).
-export async function getBoostRows(classOrRoleId) {
-    if (classOrRoleId == null || classOrRoleId === '') return [];
-    let role = getRole(classOrRoleId);
-    if (!role) {
-        const roleId = await roleIdForLegacyClass(classOrRoleId);
-        if (roleId != null) role = getRole(roleId);
-    }
+// The pack's Divine Blessing rows for a role
+export async function getBoostRows(roleId) {
+    if (roleId == null || roleId === '') return [];
+    const role = getRole(roleId);
     return role ? boostRowsForRole(role.id) : [];
 }
 
@@ -74,7 +68,7 @@ export function effectiveScores(base, rows, choices, level) {
 // Adds base_<stat> and overrides str..cha with effective scores (sheet). Mutates and returns ch.
 export async function withEffectiveScores(ch) {
     if (!ch) return ch;
-    const id = ch.role_id ?? ch.class_id;
+    const id = ch.role_id;
     if (id == null) return ch;
     const rows = await getBoostRows(id);
     const eff = effectiveScores(ch, rows, ch.feature_choices ?? {}, ch.level);
@@ -106,38 +100,6 @@ function meetsClause(clause, ctx, pickLevel, scores) {
     if (c.includes('heavy or versatile')) return /versatile|great|reach|ranged two-handed/i.test(ctx.weapons);
     if (c.includes('weapon')) return ctx.weapons.trim() !== '';
     return true; // unknown wording: not blocked
-}
-
-// Server rules for boost-row picks. choices = the full feature_choices being saved, prev = what was saved.
-// Returns { error } or { refund, usedRepick } (refund = stat to lower by 2 when a kept boost is re-picked).
-export async function checkBoostRules({ classId, subclassId, level, base, choices, prev = {}, repickAvailable = false, refundAbility = null }) {
-    const rows = await getBoostRows(classId);
-    const picks = boostPicks(rows, choices, level);
-    if (!picks.length && !Object.values(prev ?? {}).flat().includes(KEPT_BOOST)) return {};
-
-    // kept boosts: only from the migration; changing one uses the single free re-pick
-    let usedRepick = false;
-    for (const r of rows) {
-        const key = rowKey(r);
-        const was = prev?.[key]?.[0];
-        const now = choices?.[key]?.[0];
-        if (now === KEPT_BOOST && was !== KEPT_BOOST) return { error: `${KEPT_BOOST} can't be picked; choose a boost or a blessing` };
-        if (was === KEPT_BOOST && now !== KEPT_BOOST) {
-            if (!repickAvailable || usedRepick) return { error: 'You already used your free re-pick of a kept boost' };
-            usedRepick = true;
-        }
-    }
-    let refund = null;
-    if (usedRepick && refundAbility != null) {
-        const s = String(refundAbility).toLowerCase();
-        if (!STATS.includes(s)) return { error: 'refund_ability must be one of str, dex, con, int, wis, cha' };
-        refund = s;
-    }
-
-    const { ctx, byName } = await loadPrereqContext(classId, subclassId);
-    const scores = base ? Object.fromEntries(STATS.map((s) => [s, Number(base[s]) - (s === refund ? 2 : 0)])) : null;
-    const error = walkPicks(picks, { ctx, byName, cap: statCap(level), scores });
-    return error ? { error } : { refund, usedRepick };
 }
 
 // Class/subclass info for blessing prerequisites, and the blessings by name
@@ -203,49 +165,3 @@ function walkPicks(picks, { ctx, byName, cap, scores: base, taken = new Map() })
     return null;
 }
 
-// Which options each boost row may show, for the creator/editor dropdowns (the save still runs checkBoostRules).
-// Rows are walked in level order with the same rules as a save: an option is allowed when the picks kept so far
-// plus that option pass walkPicks, and it doesn't push a blessing past its repeat limit counting the later rows.
-// A current pick that is no longer allowed is dropped (not counted for later rows), so the client clears it.
-// Returns { [feature key]: [allowed options] }.
-export async function allowedBoostOptions({ classId, subclassId, level, base, choices }) {
-    const rows = (await getBoostRows(classId)).filter((r) => Number(r.level) <= Number(level));
-    if (!rows.length) return {};
-    const { ctx, byName } = await loadPrereqContext(classId, subclassId);
-    const cap = statCap(level);
-    const scores = base && STATS.every((s) => Number.isFinite(Number(base[s])))
-        ? Object.fromEntries(STATS.map((s) => [s, Number(base[s])])) : null;
-    const blessingOf = (v) => (parseScorePick(v) ? null : byName.get(parseBlessingPick(v).name)?.name);
-    const kept = [];
-    const out = {};
-    rows.forEach((r, i) => {
-        const key = rowKey(r);
-        const current = choices?.[key]?.[0];
-        // blessings picked on later rows count toward the repeat limit too
-        const later = new Map();
-        for (const lr of rows.slice(i + 1)) {
-            const name = blessingOf(choices?.[rowKey(lr)]?.[0]);
-            if (name) later.set(name, (later.get(name) ?? 0) + 1);
-        }
-        out[key] = (r.options ?? []).filter((o) => {
-            if (o === KEPT_BOOST) return current === KEPT_BOOST;
-            const name = blessingOf(o);
-            if (name && later.get(name) >= byName.get(name).repeatable_max) return false;
-            const candidate = [...kept, { key, level: Number(r.level), name: r.name, value: o }];
-            return !walkPicks(candidate, { ctx, byName, cap, scores });
-        });
-        if (current && out[key].includes(current)) kept.push({ key, level: Number(r.level), name: r.name, value: current });
-    });
-    return out;
-}
-
-// Short descriptions for the dropdowns: { optionName: description }
-export function scorePickDescriptions() {
-    const out = {};
-    for (const s of STATS) {
-        out[`+2 ${s.toUpperCase()}`] = `Raise ${s.toUpperCase()} by 2 (never above your cap).`;
-        out[`+1 ${s.toUpperCase()}`] = `Raise ${s.toUpperCase()} by 1 (never above your cap of 26).`;
-    }
-    out[KEPT_BOOST] = 'A boost you took before the 2026-10-16 rework. It is already counted in your scores. You can re-pick one kept boost for free.';
-    return out;
-}

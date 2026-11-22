@@ -104,12 +104,12 @@ test('mage: embers', () => {
     assert.equal(c.embers.current, 8);
 });
 
-// A level 10 Rune Weaver with a runed, Keen-runed spear and Guard + Warding runes on armor.
+// A level 10 Tome of Inscription Mage with a runed, Keen-runed spear and Guard + Warding runes on armor.
 const runeWeaver: SheetData = {
     character: {
         id: 3, name: 'Tamsin', level: 10, max_hp: 60, current_hp: 60,
         str: 10, dex: 12, con: 14, int: 16, wis: 10, cha: 10, spd: 10, luc: 10,
-        spell_stat: 'int', casting_stat: 'int', class_name: 'Mage', subclass_name: 'Rune Weaver', race_base_speed: 25,
+        spell_stat: 'int', casting_stat: 'int', class_name: 'Mage', subclass_name: 'Tome of Inscription', race_base_speed: 25,
     },
     ownedArmor: [
         { id: 5, name: 'Leather', is_equipped: true, armor_type: 'light', ac_bonus: 1, runes: [{ id: 1, name: 'Guard Rune' }, { id: 2, name: 'Warding Rune', choice_value: 'fire' }, { id: 3, name: 'Fleet Rune' }] },

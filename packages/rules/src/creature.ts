@@ -11,6 +11,8 @@ import { getSpellCaps } from './spellLimits.ts';
 import { purseOf, type Purse } from './money.ts';
 import { featureKey, perRestUses, featureDiceAt, type PerRest, type RestUses } from './features.ts';
 import { weaponRuneEffects, armorRuneEffects, runicStrikeDice, utilityRuneEffects, type Rider, type Rune } from './runes.ts';
+import { RUNE_CALLING } from './runeLimits.ts';
+import type { MonsterInfo } from './monster.ts';
 
 // ---- What the server sends (only the fields this file reads) ----
 
@@ -79,7 +81,7 @@ export type SpellAction = SheetSpell & {
 };
 
 export type Creature = {
-    kind: 'character';
+    kind: 'character' | 'monster';
     id: number;
     name: string;
     level: number;
@@ -112,6 +114,7 @@ export type Creature = {
     allSpells: SheetSpell[];          // every learned spell (the spell book), prepared or not
     features: CreatureFeature[];
     utilityRunes: ReturnType<typeof utilityRuneEffects>;
+    monster?: MonsterInfo;          // only on a monster (monsterToCreature)
 };
 
 // Dual wield: the off-hand attack is a bonus action and loses the ability modifier on DAMAGE (5e).
@@ -145,7 +148,7 @@ export function characterToCreature(data: SheetData): Creature {
     const meleeHit = init + primaryMod;
 
     const isReaver = ch.class_name === 'Reaver';
-    const isRuneWeaver = ch.subclass_name === 'Rune Weaver' && level >= 3;
+    const isRuneCaller = ch.subclass_name === RUNE_CALLING && level >= 3;   // Tome of Inscription
     const isWraith = ch.class_name === 'Wraith';
     const cracks = Number(ch.cracks ?? 0);
 
@@ -153,7 +156,7 @@ export function characterToCreature(data: SheetData): Creature {
         const properties = w.properties ?? [];
         const ranged = w.category === 'ranged';
         const branded = isReaver && !!w.soul_branded;      // Soul Brand: CHA for attack and damage
-        const runed = isRuneWeaver && !!w.is_runed;        // Rune Weaver: INT, Keen +1, element riders
+        const runed = isRuneCaller && !!w.is_runed;        // Tome of Inscription: INT, Keen +1, element riders
         const marked = isWraith && !!w.sigil_marked;       // Sigil mark: INT, counts as a sigil blade
         const sigil = marked || !!w.sigil_weapon;
         const runeFx = weaponRuneEffects(w);

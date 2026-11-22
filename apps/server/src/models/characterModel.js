@@ -1,10 +1,9 @@
 // Character database reads and writes: sheet data, hp, levels, stats, create/delete.
 import pool from '../db.js';
-import { withEffectiveScores, effectiveScores, getBoostRows, statCap } from '../utils/abilityBoosts.js';
-import { getSpellCaps } from '@tenebris/rules/spellLimits'; /*prep-done*/
-import { checkChoicePicks } from '@tenebris/rules/characterOptions';
-import { resolveSpeciesWrite, resolveRoleWrite } from './idMap.js';
-import content, { choiceFeaturesForRole, getRole, getCalling, scoreKey, hitDieSides } from './content.js';
+import { withEffectiveScores, effectiveScores, getBoostRows } from '../utils/abilityBoosts.js';
+import { getSpellCaps } from '@tenebris/rules/spellLimits';
+
+import content, { getRole, getCalling, scoreKey, hitDieSides } from './content.js';
 import { MAX_LEVEL } from '@tenebris/rules/characterForm';
 
 // a character can only have a subclass from this level up (creator + editor check this too)
@@ -37,10 +36,8 @@ function enrichSheetFields(ch) {
     const parent = sp?.parent_id != null ? speciesById(sp.parent_id) : null;
     const role = getRole(ch.role_id);
     const calling = getCalling(role, ch.calling_id);
-    const legacyRace = (content.legacy_races ?? []).find((r) => Number(r.id) === Number(ch.race_id));
-    const legacySub = (content.legacy_subraces ?? []).find((r) => Number(r.id) === Number(ch.subrace_id));
-    ch.race_name = parent?.name ?? sp?.name ?? legacyRace?.name ?? null;
-    ch.subrace_name = sp?.parent_id != null ? sp.name : (legacySub?.name ?? null);
+    ch.race_name = parent?.name ?? sp?.name ?? null;
+    ch.subrace_name = sp?.parent_id != null ? sp.name : null;
     ch.class_name = role?.name ?? null;
     ch.hitpoint_die = hitDieSides(role?.hit_die);
     ch.subclass_spellcasting_stat = calling?.spellcasting_stat || null;
@@ -60,8 +57,8 @@ function enrichSheetFields(ch) {
     ch.weapon_proficiencies = weaponParts.length ? weaponParts.join(', ') : null;
     ch.tool_proficiencies = toolParts.length ? toolParts.join(', ') : null;
     ch.subclass_name = calling?.name ?? null;
-    ch.race_base_speed = sp?.speed ?? parent?.speed ?? legacyRace?.base_speed ?? null;
-    ch.race_darkvision = !!(sp?.darkvision ?? parent?.darkvision ?? legacyRace?.darkvision);
+    ch.race_base_speed = sp?.speed ?? parent?.speed ?? null;
+    ch.race_darkvision = !!(sp?.darkvision ?? parent?.darkvision);
     for (const cat of ['upbringing', 'lifestyle', 'outlook']) {
         const p = personalityById(ch[`${cat}_id`]);
         ch[`${cat}_name`] = p?.name ?? null;
@@ -72,22 +69,16 @@ function enrichSheetFields(ch) {
     return ch;
 }
 
-
-// ---------- effective max HP (one place for the sheet, healing and level changes) ----------
-// Stored max_hp stays the base (level-up math). Effective max = base + calling hp_per_level x level + CON boost HP.
-// alias = characters table alias; level / calling = SQL expressions (default: the row's own level and calling)
-// Legacy SQL helpers retained as no-ops for importers; runtime uses hpBonusFromPack + JS effective max.
-export function hpBonusSql() { return '0'; }
 export function effMaxSql(base, _alias, conBonus) {
     return `(${base} + ${conBonus})`;
 }
 const scoreMod = (s) => Math.floor((Number(s) || 0) / 2) - 5;
 // Extra HP from Ability Boost / Primordial Ascent CON picks, retroactive like 5e: (effective CON mod - base CON mod) x level
-// ch needs class_id, con (base), feature_choices, level
+// ch needs role_id, con (base), feature_choices, level
 export async function conHpBonus(ch, level = ch?.level) {
-    if (!ch?.class_id) return 0;
+    if (!ch?.role_id) return 0;
     const lvl = Number(level) || 1;
-    const eff = effectiveScores(ch, await getBoostRows(ch.class_id), ch.feature_choices ?? {}, lvl);
+    const eff = effectiveScores(ch, await getBoostRows(ch.role_id), ch.feature_choices ?? {}, lvl);
     return Math.max(0, (scoreMod(eff.con) - scoreMod(ch.con)) * lvl);
 }
 
@@ -114,8 +105,7 @@ export async function getSheetCharacter(charId, userId) {
     if (rows[0]) {
         enrichSheetFields(rows[0]);
         rows[0].hp_bonus = hpBonusFromPack(rows[0].calling_id, rows[0].level);
-        rows[0].legacy_subclass_id = rows[0].subclass_id;
-        rows[0].subclass_id = rows[0].calling_id;
+        rows[0].subclass_id = rows[0].calling_id;   // the sheet's older name for the calling
         const role = getRole(rows[0].role_id);
         const primary = scoreKey(role?.primary_stat);
         rows[0].spell_stat = primary ?? 'str';
@@ -163,19 +153,11 @@ async function listCharacters(userId, drafts) {
     });
 }
 
-export async function getCharacterName(charId, userId) {
-    const { rows } = await pool.query(
-        `SELECT id, name FROM characters WHERE id = $1 AND user_id = $2`,
-        [charId, userId]
-    );
-    return rows[0];
-}
-
 // Heal (+) or damage (-), clamped to 0..effective max HP (see effMaxSql). Damage comes off temp_hp first; healing never touches temp_hp.
 // Returns { current_hp, temp_hp, max_hp } or undefined
 export async function changeHp(charId, userId, change) {
     const { rows: found } = await pool.query(
-        `SELECT id, class_id, calling_id, con, level, feature_choices, max_hp FROM characters WHERE id = $1 AND user_id = $2`,
+        `SELECT id, role_id, calling_id, con, level, feature_choices, max_hp FROM characters WHERE id = $1 AND user_id = $2`,
         [charId, userId]
     );
     if (!found[0]) return undefined;
@@ -215,204 +197,7 @@ export async function deleteCharacter(charId, userId) {
     return rowCount;
 }
 
-// Save a finished draft. Returns the new id
-export async function createCharacter(userId, draft, final, plus2, plus1, maxHp) {
-    const m = draft.magic ?? {}; // step 4: alignment, personality states, race element
-    const species = await resolveSpeciesWrite(draft.race_id, draft.subrace_id ?? null);
-    if (!species) throw new Error('Unknown species');
-    const role = await resolveRoleWrite(draft.class_id, draft.subclass_id ?? null);
-    if (!role) throw new Error('Unknown role');
-    const { rows } = await pool.query(
-        `INSERT INTO characters
-           (user_id, name, race_id, subrace_id, class_id, subclass_id, species_id, role_id, calling_id,
-            str, dex, con, "int", wis, cha, luc, spd, plus2_stat, plus1_stat, max_hp, current_hp,
-            skill_proficiencies, level, feature_choices, last_swap_level,
-            alignment_code, upbringing_id, lifestyle_id, outlook_id, upbringing_state, lifestyle_state, outlook_state, race_element_id, race_spell_id)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24::jsonb,$23,
-                 $25,$26,$27,$28,$29,$30,$31,$32,$33)
-         RETURNING id`,
-        [userId, draft.name, species.race_id, species.subrace_id, role.class_id, null,
-         species.species_id, role.role_id, role.calling_id,
-         final.str, final.dex, final.con, final.int, final.wis, final.cha, final.luc, final.spd,
-         plus2, plus1, maxHp, maxHp, draft.skill_proficiencies ?? [], draft.level ?? 1,
-         JSON.stringify(draft.feature_choices ?? {}),
-         m.alignment_code ?? null, m.upbringing_id ?? null, m.lifestyle_id ?? null, m.outlook_id ?? null,
-         m.upbringing_state ?? null, m.lifestyle_state ?? null, m.outlook_state ?? null, m.race_element_id ?? null, m.race_spell_id ?? null]
-    );
-    return rows[0].id;
-}
-
-
-
 // ---------- character editor ----------
-
-export async function getEditCharacter(charId, userId) {
-    const { rows } = await pool.query(
-        `SELECT ch.id, ch.name, ch.race_id, ch.subrace_id, ch.species_id, ch.role_id, ch.calling_id,
-                ch.class_id, ch.subclass_id,
-                ch.level, ch.str, ch.dex, ch.con, ch."int", ch.wis, ch.cha, ch.luc, ch.spd,
-                ch.skill_proficiencies, ch.feature_choices, ch.portrait_url, ch.boost_repick_available, ch.last_swap_level, ch.alignment_code
-         FROM characters ch
-         WHERE ch.id = $1 AND ch.user_id = $2`,
-        [charId, userId]
-    );
-    const ch = rows[0];
-    if (ch) {
-        const sp = speciesById(ch.species_id);
-        ch.race_id = sp?.parent_id ?? sp?.id ?? ch.race_id;
-        ch.subrace_id = sp?.parent_id != null ? sp.id : ch.subrace_id;
-        ch.class_id = ch.role_id ?? ch.class_id;
-        ch.subclass_id = ch.calling_id;
-        ch.legacy_class_id = ch.class_id;
-        ch.legacy_subclass_id = ch.subclass_id;
-        ch.effective_scores = effectiveScores(ch, await getBoostRows(ch.role_id ?? ch.legacy_class_id), ch.feature_choices ?? {}, ch.level);
-        ch.stat_cap = statCap(ch.level);
-    }
-    return ch;
-}
-
-export async function updateNameAndRace(charId, userId, name, raceId, subraceId = null) {
-    const species = await resolveSpeciesWrite(raceId, subraceId);
-    if (!species) throw new Error('Unknown species');
-    await pool.query(
-        `UPDATE characters SET name = $1, race_id = $2, subrace_id = $5, species_id = $6 WHERE id = $3 AND user_id = $4`,
-        [name, species.race_id, charId, userId, species.subrace_id, species.species_id]
-    );
-}
-
-// portraitUrl is null (default image) or a validated '/portraits/<file>.png' path
-// Alignment chart square (already checked by editAlignment)
-export async function updateAlignment(charId, userId, code) {
-    await pool.query(`UPDATE characters SET alignment_code = $1 WHERE id = $2 AND user_id = $3`, [code, charId, userId]);
-}
-
-export async function updatePortrait(charId, userId, portraitUrl) {
-    await pool.query(
-        `UPDATE characters SET portrait_url = $1 WHERE id = $2 AND user_id = $3`,
-        [portraitUrl, charId, userId]
-    );
-}
-
-// featureChoices (already checked by checkFeatureChoices) replaces the saved picks when given
-export async function updateClass(charId, userId, classId, subclassId, featureChoices) {
-    const role = await resolveRoleWrite(classId, subclassId);
-    if (!role) throw new Error('Unknown role');
-    const legacyClassId = role.class_id;
-    const skillFixed = getRole(role.role_id)?.skill_fixed ?? [];
-    // subclass_id column kept but no longer dual-written
-    if (featureChoices !== undefined) {
-        await pool.query(
-            `UPDATE characters
-                SET skill_proficiencies = CASE WHEN role_id IS DISTINCT FROM $5
-                        THEN $7::text[]
-                        ELSE skill_proficiencies END,
-                    feature_choices = $4::jsonb,
-                    class_id = $1, role_id = $5, calling_id = $6
-              WHERE id = $2 AND user_id = $3`,
-            [legacyClassId, charId, userId, JSON.stringify(featureChoices), role.role_id, role.calling_id, skillFixed]
-        );
-        return;
-    }
-    await pool.query(
-        `UPDATE characters
-            SET skill_proficiencies = CASE WHEN role_id IS DISTINCT FROM $4
-                    THEN $6::text[]
-                    ELSE skill_proficiencies END,
-                feature_choices = CASE
-                    WHEN role_id IS DISTINCT FROM $4 THEN '{}'::jsonb
-                    WHEN calling_id IS DISTINCT FROM $5 THEN
-                        (SELECT COALESCE(jsonb_object_agg(k, v), '{}'::jsonb)
-                           FROM jsonb_each(feature_choices) AS e(k, v) WHERE k NOT LIKE 'subclass:%')
-                    ELSE feature_choices END,
-                class_id = $1, role_id = $4, calling_id = $5
-          WHERE id = $2 AND user_id = $3`,
-        [legacyClassId, charId, userId, role.role_id, role.calling_id, skillFixed]
-    );
-}
-
-// One class/subclass feature as it applies to this character (only if it belongs to the
-// character's current class or subclass). source is 'class' or 'subclass'. Or undefined.
-export async function getCharacterFeature(charId, userId, source, featureId) {
-    const { rows: [ch] } = await pool.query(
-        `SELECT id, level, role_id, calling_id FROM characters WHERE id = $1 AND user_id = $2`,
-        [charId, userId]
-    );
-    if (!ch) return undefined;
-    if (source === 'class') {
-        const rf = (content.role_features ?? []).find(
-            (r) => Number(r.feature_id) === Number(featureId) && Number(r.role_id) === Number(ch.role_id)
-        );
-        if (!rf) return undefined;
-        return {
-            id: rf.feature_id,
-            name: rf.name,
-            level: rf.level,
-            options: rf.options,
-            choice_count: rf.choice_count,
-            char_level: ch.level,
-        };
-    }
-    const cf = (content.calling_features ?? []).find(
-        (r) => Number(r.feature_id) === Number(featureId) && Number(r.calling_id) === Number(ch.calling_id)
-    );
-    if (!cf) return undefined;
-    return {
-        id: cf.feature_id,
-        name: cf.name,
-        level: cf.level,
-        options: cf.options,
-        choice_count: cf.choice_count,
-        char_level: ch.level,
-    };
-}
-
-export async function checkFeatureChoices(roleId, callingId, level, picks, legacyClassId = null) {
-    // Create-time pickers come from the rules. Divine Blessing rows are added here because
-    // they are built from the pack's blessing list, not from a create-time feature.
-    const features = choiceFeaturesForRole(roleId, callingId, level).map((feature) => ({ ...feature }));
-    const boostId = roleId ?? legacyClassId;
-    if (boostId != null && boostId !== '') {
-        const boostRows = await getBoostRows(boostId);
-        for (const row of boostRows) {
-            if (Number(row.level) > Number(level)) continue;
-            const key = row.key || (String(row.id).includes(':') ? String(row.id) : `class:${row.id}`);
-            features.push({
-                key,
-                name: row.name,
-                level: Number(row.level),
-                choose: 1,
-                options: row.options,
-                source: 'class',
-                optionInfo: {},
-            });
-        }
-    }
-    return checkChoicePicks(features, picks, Number(level) || 1);
-}
-
-// Set one feature pick: feature_choices[key] = values (array)
-export async function setFeatureChoice(charId, userId, key, values) {
-    await pool.query(
-        `UPDATE characters SET feature_choices = feature_choices || jsonb_build_object($1::text, $2::jsonb)
-          WHERE id = $3 AND user_id = $4`,
-        [key, JSON.stringify(values), charId, userId]
-    );
-}
-
-// After checkBoostRules/checkSwapRules: lower the re-picked kept boost's score, use up the free re-pick,
-// and remember the level of a pool swap (one per level gained)
-export async function applyBoostResult(charId, userId, result) {
-    if (result?.swapped) {
-        await pool.query(`UPDATE characters SET last_swap_level = level WHERE id = $1 AND user_id = $2`, [charId, userId]);
-    }
-    if (!result?.usedRepick) return;
-    const col = { str: 'str', dex: 'dex', con: 'con', int: '"int"', wis: 'wis', cha: 'cha' }[result.refund];
-    await pool.query(
-        `UPDATE characters SET boost_repick_available = false${col ? `, ${col} = GREATEST(3, ${col} - 2)` : ''}
-          WHERE id = $1 AND user_id = $2`,
-        [charId, userId]
-    );
-}
 
 // level, con, max_hp and class hit die for the level-up math, or undefined
 export async function getLevelInfo(charId, userId) {
@@ -429,7 +214,7 @@ export async function getLevelInfo(charId, userId) {
 // Dropping below SUBCLASS_LEVEL clears the subclass and its feature picks
 export async function updateLevel(charId, userId, level, newMax) {
     const { rows: found } = await pool.query(
-        `SELECT id, class_id, calling_id, con, feature_choices FROM characters WHERE id = $1 AND user_id = $2`,
+        `SELECT id, role_id, calling_id, con, feature_choices FROM characters WHERE id = $1 AND user_id = $2`,
         [charId, userId]
     );
     const ch = found[0];
@@ -534,14 +319,6 @@ export async function getActionFeatures(roleId, callingId, level, speciesId) {
     }
     out.sort((a, b) => Number(a.level) - Number(b.level) || String(a.name).localeCompare(String(b.name)));
     return out;
-}
-
-export async function updateAbilities(charId, userId, vals) {
-    await pool.query(
-        `UPDATE characters SET str = $1, dex = $2, con = $3, "int" = $4, wis = $5, cha = $6, luc = $7, spd = $8
-         WHERE id = $9 AND user_id = $10`,
-        [...vals, charId, userId]
-    );
 }
 
 // Saved sheet state (slots used, embers, Seal Cracks, uses per rest, conditions, exhaustion). Only the fields in `patch` change.

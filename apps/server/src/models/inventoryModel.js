@@ -31,37 +31,11 @@ function profRows(roleId, callingId, level, kind) {
     );
 }
 
-export async function listArmor() {
-    return (content.armor ?? [])
-        .map((a) => ({
-            id: a.id,
-            name: a.name,
-            armor_type: a.armor_type,
-            armor_category: a.armor_type,
-            ac_bonus: a.ac_bonus,
-            rarity: a.rarity,
-        }))
-        .sort((x, y) => String(x.name).localeCompare(String(y.name)));
-}
-
 export async function listArmorForCharacter(roleId, callingId, level) {
     const allowed = new Set(profRows(roleId, callingId, level, 'armor').map((p) => String(p.match_value).toLowerCase()));
     return (content.armor ?? [])
         .filter((a) => allowed.has(String(a.armor_type).toLowerCase()))
         .map((a) => ({ ...a, armor_category: a.armor_type }));
-}
-
-export async function listWeapons() {
-    return (content.weapons ?? [])
-        .map((w) => ({
-            id: w.id,
-            name: w.name,
-            category: w.category,
-            damage_dice: w.damage_dice,
-            rarity: w.rarity,
-            attack_bonus: w.attack_bonus,
-        }))
-        .sort((x, y) => String(x.name).localeCompare(String(y.name)));
 }
 
 export async function listWeaponsForCharacter(roleId, callingId, level) {

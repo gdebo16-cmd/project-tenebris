@@ -18,11 +18,11 @@ export default function FeaturesBlock({ creature, canEdit, onUse }: Props) {
                     <div key={f.key} className={styles.row}>
                         <div className={styles.rowText}>
                             <span className={styles.rowName}>{f.name}</span>
-                            <span className={styles.muted}>
+                            <div className={styles.muted}>
                                 {[f.action_type, f.diceNow,
                                   uses ? `${uses.left}/${uses.max} uses left · back on a ${uses.rest} rest` : null].filter(Boolean).join(' · ')}
-                            </span>
-                            {typeof f.description === 'string' && <span className={styles.muted}>{f.description}</span>}
+                            </div>
+                            {typeof f.description === 'string' && <div className={styles.muted}>{f.description}</div>}
                         </div>
                         {canUse && (
                             <div className={styles.rowButtons}>

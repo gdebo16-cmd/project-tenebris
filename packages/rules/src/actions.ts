@@ -6,10 +6,13 @@ import { spellDiceAt, spellHealAt, type Creature, type WeaponAction, type SpellA
 
 // check = a plain d20 check: actionKey 'initiative', 'stat:<str|dex|…>' or 'skill:<skill id>'
 export type ActKind = 'hit' | 'damage' | 'heal' | 'check';
-// Extra dice added to a weapon hit: Soul Strike (Reaver), Runic Strike (Rune Weaver), or an on-hit feature (Sigil Strike)
+// Extra dice added to a weapon hit: Soul Strike (Reaver), Runic Strike (Tome of Inscription), or an on-hit feature (Sigil Strike)
 export type ActRequest = { actionKey: string; kind: ActKind; castLevel?: number; extra?: 'soulStrike' | 'runicStrike'; featureKey?: string };
 
 const KINDS: ActKind[] = ['hit', 'damage', 'heal', 'check'];
+
+// "this character's" or "this monster's", for error messages
+const whose = (c: Creature) => (c.kind === 'monster' ? "this monster's" : "this character's");
 
 // Checks the request body. Only names and small numbers are accepted; no dice, no bonuses.
 export function checkActRequest(body: unknown): { error: string } | { request: ActRequest } {
@@ -33,7 +36,7 @@ export function resolveAct(creature: Creature, request: ActRequest, lastCritKey:
     if (weapon) return resolveWeapon(creature, weapon, request, lastCritKey, rng);
     const spell = creature.spells.find((s) => s.key === request.actionKey);
     if (spell) return resolveSpell(creature, spell, request, lastCritKey, rng);
-    return { error: "That isn't one of this character's actions" };
+    return { error: `That isn't one of ${whose(creature)} actions` };
 }
 
 function resolveWeapon(creature: Creature, a: WeaponAction, request: ActRequest, lastCritKey: string | null, rng: Rng): ActResult {
@@ -116,6 +119,6 @@ function resolveCheck(creature: Creature, key: string, rng: Rng): ActResult {
     if (stat) { label = `${stat.label} roll`; bonus = stat.mod; }
     const skill = key.startsWith('skill:') ? creature.skills.find((s) => s.id === key.slice(6)) : undefined;
     if (skill) { label = `${skill.name} check`; bonus = skill.value; }
-    if (!label) return { error: "That isn't a check this character can roll" };
+    if (!label) return { error: `That isn't a check ${whose(creature).replace("'s", "")} can roll` };
     return { text: `${label}: ${rollToHit(bonus, rng).total}`, critKey: null };
 }

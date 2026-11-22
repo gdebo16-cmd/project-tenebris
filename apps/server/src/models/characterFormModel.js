@@ -1,7 +1,6 @@
 // Database reads and writes for the unified character form (R4).
 // Controllers call these; they never write SQL themselves.
 import pool from '../db.js';
-import { legacyRaceIdForSpecies, legacySubraceIdForSpecies, legacyClassIdForRole, legacySubclassIdForCalling } from './idMap.js';
 
 // The columns the form is allowed to change. Anything else a tab check returns is a bug, so it throws.
 const FORM_COLUMNS = new Set([
@@ -107,25 +106,10 @@ export async function replaceFormGear(charId, { weapon_id, armor_id, item_ids })
     }
 }
 
-// The sheet still reads class_id and subclass_id. A finished character's role save keeps them in step.
-// Drafts wait until finish. These columns go away in R7.
-export async function syncLegacyClass(charId, roleId, callingId) {
-    await pool.query(
-        `UPDATE characters SET class_id = $2, subclass_id = $3 WHERE id = $1`,
-        [charId, await legacyClassIdForRole(roleId), await legacySubclassIdForCalling(callingId)]
-    );
-}
-
-// Marks a draft as finished with its starting HP.
-// Also fills the old race/class ids, because the current sheet still reads them (they go away in R7).
+// Marks a draft as finished with its starting HP
 export async function finishCharacter(ch, maxHp) {
     await pool.query(
-        `UPDATE characters
-         SET is_draft = false, max_hp = $2, current_hp = $2,
-             race_id = $3, subrace_id = $4, class_id = $5, subclass_id = $6, last_swap_level = level
-         WHERE id = $1`,
-        [ch.id, maxHp,
-         await legacyRaceIdForSpecies(ch.species_id), await legacySubraceIdForSpecies(ch.species_id),
-         await legacyClassIdForRole(ch.role_id), await legacySubclassIdForCalling(ch.calling_id)]
+        `UPDATE characters SET is_draft = false, max_hp = $2, current_hp = $2, last_swap_level = level WHERE id = $1`,
+        [ch.id, maxHp]
     );
 }

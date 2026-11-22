@@ -139,7 +139,7 @@ test('useMendingRune rolls 1d6 plus Intellect and spends the long-rest use', () 
         character: {
             id: 3, name: 'Tamsin', level: 10, max_hp: 60, current_hp: 60,
             str: 10, dex: 12, con: 14, int: 16, wis: 10, cha: 10, spd: 10, luc: 10,
-            spell_stat: 'int', casting_stat: 'int', class_name: 'Mage', subclass_name: 'Rune Weaver',
+            spell_stat: 'int', casting_stat: 'int', class_name: 'Mage', subclass_name: 'Tome of Inscription',
         },
         ownedArmor: [{ id: 5, name: 'Leather', is_equipped: true, armor_type: 'light', ac_bonus: 1, runes: [{ id: 9, name: 'Mending Rune' }] }],
     };

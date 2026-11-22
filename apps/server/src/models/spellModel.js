@@ -1,13 +1,7 @@
 // Spell reads use the JSON pack (models/spellPack.js). character_spells stays in the DB (ids + flags only).
 import pool from '../db.js';
 import content from './content.js';
-import {
-    getSpell,
-    enrichSpell,
-    allSpells,
-    getBonusGrants,
-    getClassSlotsFromPack,
-} from './spellPack.js';
+import { getSpell, enrichSpell, allSpells, getBonusGrants, getClassSlotsFromPack } from './spellPack.js';
 
 // Feature-only spells: granted by class features, never learnable from the book.
 // Single source of truth - used by getLearnableSpells and learnSpell reject.
@@ -25,7 +19,7 @@ function sortSpellRows(rows) {
 // Orphan spell_ids (not in the pack) are skipped, not errors.
 export async function getLearnedSpells(charId) {
     const { rows: [ch] } = await pool.query(
-        `SELECT c.id, c.role_id, c.calling_id, c.level, c.alignment_code, c.race_id, c.species_id, c.race_spell_id
+        `SELECT c.id, c.role_id, c.calling_id, c.level, c.alignment_code, c.species_id, c.race_spell_id
          FROM characters c
          WHERE c.id = $1`,
         [charId]
@@ -94,11 +88,6 @@ export async function getLearnedSpells(charId) {
     return sortSpellRows(out);
 }
 
-// Every spell (Spell Book list), with the same detail fields + names as getLearnedSpells
-export async function getAllSpells() {
-    return sortSpellRows(allSpells().map((s) => enrichSpell(s)).filter(Boolean));
-}
-
 // Spell Book learn catalog: every spell except the feature-only denylist.
 // alignmentCode (optional): adds chart_band for the character's colour square.
 export async function getLearnableSpells(alignmentCode = null) {
@@ -109,29 +98,6 @@ export async function getLearnableSpells(alignmentCode = null) {
             .map((s) => enrichSpell(s, alignmentCode))
             .filter(Boolean)
     );
-}
-
-// Legacy role_spells list (still used rarely): ids from DB, details from pack. Bonus grants excluded.
-export async function getSpellsForCharacter(roleId, callingId, level, alignmentCode = null) {
-    const { rows } = await pool.query(
-        `SELECT spell_id, MIN(min_level) AS unlock_level
-         FROM role_spells
-         WHERE role_id = $1 AND (calling_id IS NULL OR calling_id = $2) AND min_level <= $3
-           AND NOT EXISTS (
-             SELECT 1 FROM role_spells b
-             WHERE b.is_bonus AND b.spell_id = role_spells.spell_id
-               AND b.role_id = $1 AND (b.calling_id IS NULL OR b.calling_id = $2)
-           )
-         GROUP BY spell_id`,
-        [roleId, callingId, level]
-    );
-    const out = [];
-    for (const r of rows) {
-        const detail = enrichSpell(r.spell_id, alignmentCode);
-        if (!detail) continue;
-        out.push({ ...detail, unlock_level: r.unlock_level });
-    }
-    return sortSpellRows(out);
 }
 
 // Slot counts for a role (and calling) at a level from pack role_spell_slots: [1st, 2nd, ...].

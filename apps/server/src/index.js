@@ -52,6 +52,7 @@ app.get(/^(?!\/api).*/, (req, res) => {
 
 const server = createServer(app);
 const io = new Server(server);
+app.set('io', io); // controllers send server-made rolls to a room (monster rolls -> campaign:<id>:dm)
 
 io.engine.use(sessionMiddleware);
 
@@ -72,6 +73,17 @@ io.on('connection', (socket) => {
 		rows.forEach((r) => socket.join(`campaign:${r.campaign_id}`));
 		console.log(`character ${characterId} joined`, rows.map((r) => r.campaign_id));
 	});
+	// The DM page and the monster sheet: join a campaign's room (any member) and, for the DM, its DM room,
+	// where the server sends monster rolls. Players never join the DM room.
+	socket.on('join-campaign', async (campaignId) => {
+		const campId = Number(campaignId);
+		if (!Number.isInteger(campId)) return;
+		const { rows } = await pool.query(
+			`SELECT role FROM campaign_members WHERE campaign_id = $1 AND user_id = $2`, [campId, userId]);
+		if (!rows[0]) return;
+		socket.join(`campaign:${campId}`);
+		if (rows[0].role === 'dm') socket.join(`campaign:${campId}:dm`);
+	});
 	socket.on('roll', (label) => {
 		if (!socket.data.characterId || typeof label !== 'string') return;
 		const roll = {
@@ -81,7 +93,7 @@ io.on('connection', (socket) => {
 			at: Date.now(),
 		};
 		for (const room of socket.rooms) {
-			if (room.startsWith('campaign:')) socket.to(room).emit('roll', roll);
+			if (room.startsWith('campaign:') && !room.endsWith(':dm')) socket.to(room).emit('roll', roll);
 		}
 	});
 });

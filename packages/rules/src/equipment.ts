@@ -1,7 +1,7 @@
 // Equipping and runes on the sheet's Gear tab (ported from the old sheet's Inventory tab, weapon options and rune control).
 // The server checks each request with these functions and the models enforce ownership, slots and rune limits;
 // the sheet uses the same functions to decide which controls to show.
-import { RUNE_WEAVER_NAMES, runeFitsItem } from './runeLimits.ts';
+import { RUNE_CALLING, runeFitsItem } from './runeLimits.ts';
 import type { SheetWeapon } from './creature.ts';
 
 // Magical items (every rarity, Object of Power included) can be equipped, up to this many at once
@@ -11,12 +11,12 @@ export const ITEM_SLOTS = 3;
 
 export type Wielder = { role: string | null; calling: string | null; level: number };
 
-// Reaver: Soul Brand. Wraith: sigil mark. Rune Weaver (or the pack's Tome of Inscription) from level 3: runes.
+// Reaver: Soul Brand. Wraith: sigil mark. Tome of Inscription from level 3: runes.
 export function wielderPowers(w: Wielder) {
     return {
         soulBrand: w.role === 'Reaver',
         sigilMark: w.role === 'Wraith',
-        runes: !!w.calling && RUNE_WEAVER_NAMES.includes(w.calling) && w.level >= 3,
+        runes: w.calling === RUNE_CALLING && w.level >= 3,
     };
 }
 
@@ -27,7 +27,7 @@ export type WeaponOptions = {
     twoHands: boolean | null;    // versatile weapons: use the versatile die
     soulBrand: boolean | null;   // Reaver
     sigilMark: boolean | null;   // Wraith
-    runes: boolean;              // Rune Weaver: inscribe runes and pick the runed weapon
+    runes: boolean;              // Tome of Inscription: inscribe runes and pick the runed weapon
 };
 
 export function weaponOptions(wielder: Wielder, weapon: SheetWeapon): WeaponOptions {
@@ -74,7 +74,7 @@ export function checkWeaponToggle(toggle: WeaponToggle, body: unknown): { error:
 // ---- Runes ----
 
 export type RuneCatalogEntry = { id: number | string; name: string; min_level: number | string; item_types: string[]; choice_param?: string | null; effect?: string };
-export type RuneInfo = { isRuneWeaver: boolean; level: number; perItem: number; active: number; used: number; wardingTypes: string[]; runes: RuneCatalogEntry[] };
+export type RuneInfo = { isRuneCaller: boolean; level: number; perItem: number; active: number; used: number; wardingTypes: string[]; runes: RuneCatalogEntry[] };
 export type ItemRune = { id: number; rune_id: number | string; name: string; choice_value?: string | null; effect?: string };
 export type RuneItemType = 'weapon' | 'armor' | 'shield';
 

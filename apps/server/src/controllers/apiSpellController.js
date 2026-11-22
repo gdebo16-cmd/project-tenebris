@@ -4,7 +4,7 @@ import * as Spells from '../models/spellModel.js';
 import { getSheetCharacter } from '../models/characterModel.js';
 import { getSpell } from '../models/spellPack.js';
 import { getSpellSlots } from '@tenebris/rules/spellSlots';
-import { getSpellCaps, bodyMaxLevel } from '@tenebris/rules/spellLimits'; /*prep-done*/
+import { getSpellCaps, bodyMaxLevel } from '@tenebris/rules/spellLimits';
 import { learnRefusal, prepareRefusal } from '@tenebris/rules/spellbook';
 
 // Highest spell level a character can cast (number of slot tiers). Cantrips (0) are always allowed.

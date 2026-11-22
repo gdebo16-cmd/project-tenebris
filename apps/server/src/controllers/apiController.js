@@ -5,7 +5,6 @@ import { getLearnedSpells, getClassSlots } from '../models/spellModel.js';
 import { checkEquipRequest, checkWeaponToggle, ITEM_SLOTS } from '@tenebris/rules/equipment';
 import { editorOf } from './sheetController.js';
 
-
 // ---------- character sheet ----------
 
 // GET /api/characters/:id

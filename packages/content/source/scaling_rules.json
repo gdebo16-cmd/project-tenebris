@@ -1,0 +1,186 @@
+[
+  {
+    "name": "Cantrip d8",
+    "dice_count": 1,
+    "dice_size": 8,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Adds 1d8 every 5 levels starting at level 5 (L5, 10, 15, 20)."
+  },
+  {
+    "name": "Cantrip d10",
+    "dice_count": 1,
+    "dice_size": 10,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Adds 1d10 every 5 levels starting at level 5."
+  },
+  {
+    "name": "Cantrip d12",
+    "dice_count": 1,
+    "dice_size": 12,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Adds 1d12 every 5 levels starting at level 5."
+  },
+  {
+    "name": "Strike d6 every 3",
+    "dice_count": 1,
+    "dice_size": 6,
+    "every_levels": 3,
+    "start_level": 3,
+    "description": "Adds 1d6 every 3 levels starting at level 3."
+  },
+  {
+    "name": "Strike d6 every 4",
+    "dice_count": 1,
+    "dice_size": 6,
+    "every_levels": 4,
+    "start_level": 5,
+    "description": "Adds 1d6 every 4 levels starting at level 5."
+  },
+  {
+    "name": "Strike d8 every 4",
+    "dice_count": 1,
+    "dice_size": 8,
+    "every_levels": 4,
+    "start_level": 5,
+    "description": "Adds 1d8 every 4 levels starting at level 5."
+  },
+  {
+    "name": "Brand d6 every 5",
+    "dice_count": 1,
+    "dice_size": 6,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Adds 1d6 every 5 levels starting at level 5 (marks, smites, brands)."
+  },
+  {
+    "name": "Brand d8 every 5",
+    "dice_count": 1,
+    "dice_size": 8,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Adds 1d8 every 5 levels starting at level 5."
+  },
+  {
+    "name": "Healing d4 every 3",
+    "dice_count": 1,
+    "dice_size": 4,
+    "every_levels": 3,
+    "start_level": 3,
+    "description": "Restores 1d4 more every 3 levels starting at level 3."
+  },
+  {
+    "name": "Healing d8 every 5",
+    "dice_count": 1,
+    "dice_size": 8,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Restores 1d8 more every 5 levels starting at level 5."
+  },
+  {
+    "name": "Healing 2d8 every 10",
+    "dice_count": 2,
+    "dice_size": 8,
+    "every_levels": 10,
+    "start_level": 10,
+    "description": "Restores 2d8 more every 10 levels starting at level 10."
+  },
+  {
+    "name": "Burst 2d6 every 5",
+    "dice_count": 2,
+    "dice_size": 6,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Adds 2d6 every 5 levels starting at level 5."
+  },
+  {
+    "name": "Burst 2d8 every 6",
+    "dice_count": 2,
+    "dice_size": 8,
+    "every_levels": 6,
+    "start_level": 6,
+    "description": "Adds 2d8 every 6 levels starting at level 6."
+  },
+  {
+    "name": "Ongoing d4 every 5",
+    "dice_count": 1,
+    "dice_size": 4,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Ongoing or aura damage adds 1d4 every 5 levels starting at level 5."
+  },
+  {
+    "name": "Ongoing d6 every 5",
+    "dice_count": 1,
+    "dice_size": 6,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Ongoing or aura damage adds 1d6 every 5 levels starting at level 5."
+  },
+  {
+    "name": "Ward d6 every 4",
+    "dice_count": 1,
+    "dice_size": 6,
+    "every_levels": 4,
+    "start_level": 4,
+    "description": "Ward or temporary hit points add 1d6 every 4 levels starting at level 4."
+  },
+  {
+    "name": "Ward d10 every 5",
+    "dice_count": 1,
+    "dice_size": 10,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Ward or temporary hit points add 1d10 every 5 levels starting at level 5."
+  },
+  {
+    "name": "Flat +1 every 4",
+    "dice_count": 1,
+    "dice_size": 1,
+    "every_levels": 4,
+    "start_level": 4,
+    "description": "Adds +1 every 4 levels starting at level 4."
+  },
+  {
+    "name": "Flat +1 every 5",
+    "dice_count": 1,
+    "dice_size": 1,
+    "every_levels": 5,
+    "start_level": 5,
+    "description": "Adds +1 every 5 levels starting at level 5."
+  },
+  {
+    "name": "Flat +1 every 10",
+    "dice_count": 1,
+    "dice_size": 1,
+    "every_levels": 10,
+    "start_level": 10,
+    "description": "Adds +1 every 10 levels starting at level 10."
+  },
+  {
+    "name": "1d4 every 4 from 2",
+    "dice_count": 1,
+    "dice_size": 4,
+    "every_levels": 4,
+    "start_level": 2,
+    "description": "Adds 1d4 every 4 levels starting at level 2."
+  },
+  {
+    "name": "1d6 every 4 from 3",
+    "dice_count": 1,
+    "dice_size": 6,
+    "every_levels": 4,
+    "start_level": 3,
+    "description": "Adds 1d6 every 4 levels starting at level 3."
+  },
+  {
+    "name": "Sneak d6 every 2",
+    "dice_count": 1,
+    "dice_size": 6,
+    "every_levels": 2,
+    "start_level": 1,
+    "description": "Adds 1d6 every 2 levels starting at level 1 (Hidden Blade style)."
+  }
+]

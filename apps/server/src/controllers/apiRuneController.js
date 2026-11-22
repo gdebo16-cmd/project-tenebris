@@ -1,4 +1,4 @@
-// Rune Weaver rune routes (Inscribe Runes). Owner or campaign DM, the same check as the /api/sheets routes.
+// Tome of Inscription rune routes (Inscribe Runes). Owner or campaign DM, the same check as the /api/sheets routes.
 // The rules check the body (@tenebris/rules/equipment); models/runeModel.js enforces item types, prerequisites and limits.
 import * as Inventory from '../models/inventoryModel.js';
 import * as Runes from '../models/runeModel.js';

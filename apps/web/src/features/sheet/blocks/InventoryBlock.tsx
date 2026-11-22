@@ -1,6 +1,6 @@
 // The Gear tab's equipment: armor, weapons and magical items, each with Equip / Unequip (owner or DM).
 // An equipped weapon also offers its options (dual wield, two hands, Soul Brand for a Reaver, sigil mark for a Wraith)
-// and a Rune Weaver can inscribe runes, as on the old sheet. The server checks every change; after each one the
+// and a Tome of Inscription Mage can inscribe runes, as on the old sheet. The server checks every change; after each one the
 // sheet reloads, so Armor Class and the Actions tab follow. Buying and selling stay on the inventory page.
 import { useState } from 'react';
 import { Link } from 'react-router';
@@ -44,7 +44,7 @@ export default function InventoryBlock({ creature, canEdit, id, onNote }: Props)
     const gear = useGear(id);
     const powers = wielderPowers(creature);
     const runeInfo = useRuneInfo(id, canEdit && powers.runes);
-    const info: RuneInfo | undefined = runeInfo.data?.isRuneWeaver ? runeInfo.data : undefined;
+    const info: RuneInfo | undefined = runeInfo.data?.isRuneCaller ? runeInfo.data : undefined;
     const [error, setError] = useState('');
     const [weaponFilter, setWeaponFilter] = useState<WeaponFilter>(EMPTY_WEAPON_FILTER);
     const busy = gear.isPending;
