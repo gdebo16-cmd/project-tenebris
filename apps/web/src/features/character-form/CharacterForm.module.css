@@ -4,19 +4,23 @@
     box-sizing: border-box;
     min-height: 100vh;
     padding: 1rem;
-    background: var(--bg, #0d042c);
+    background: var(--background, rgb(23, 24, 25));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: var(--text, #facd8d);
     font-family: var(--fontfam, Georgia, serif);
 }
 
 .page * { box-sizing: border-box; }
 
-.back { margin: 0 0 0.5rem; }
+.back { margin: 0; }
 
 .back a { color: var(--accent, #d4af37); }
 
 .title {
-    margin: 0 0 0.75rem;
+    margin: 0;
     font-size: 1.4rem;
 }
 
@@ -26,6 +30,10 @@
     gap: 0.75rem 1rem;
     align-items: start;
     margin-bottom: 1rem;
+    border: 2px solid var(--border, #b27f50);
+    border-radius: 1.5rem;
+    padding: 1rem;
+    background: var(--bg);
 }
 
 .portraitButton {
@@ -33,6 +41,10 @@
     border: 3px ridge var(--accent, #d4af37);
     background: transparent;
     cursor: pointer;
+    width: 4.75rem;
+    height: 4.85rem;
+    border-radius: 1rem;
+    overflow: hidden;
 }
 
 .portrait {
@@ -53,6 +65,7 @@
     display: flex;
     flex-wrap: nowrap;
     gap: 0.5rem;
+    
 }
 
 .field {
@@ -61,6 +74,7 @@
     flex-direction: column;
     gap: 0.15rem;
     min-width: 0;
+    
 }
 
 /* Name uses the free space. Level stays a short box so it doesn't stretch across the row. */
@@ -80,12 +94,14 @@
     background: var(--surface, #1a1030);
     border: 1px solid var(--border, #b27f50);
     border-radius: 4px;
+    
 }
 
 .summary {
     margin: 0;
     font-size: 0.9rem;
     opacity: 0.85;
+    
 }
 
 .save {
@@ -113,6 +129,8 @@
     padding: 0.5rem;
     border: 1px solid var(--border, #b27f50);
     border-radius: 4px;
+    scrollbar-width: none;
+    border-radius: 1rem;
 }
 
 .portraitGroup {
@@ -146,6 +164,8 @@
     width: 3rem;
     height: 3rem;
     object-fit: cover;
+    border-radius: 0.5rem;
+    border: 2px ridge var(--border, #b27f50);
 }
 
 .portraitPickSelected { border-color: var(--accent, #d4af37); }
@@ -154,9 +174,13 @@
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.25rem;
-    margin: 0 0 0.75rem;
+    margin: 0;
 }
 
+.tab {
+    height: 4rem;
+    margin-bottom: 0;
+}
 .tab,
 .tabSelected {
     min-width: 0;
@@ -166,19 +190,26 @@
     color: inherit;
     background: var(--surface, #1a1030);
     border: 1px solid var(--border, #b27f50);
-    border-radius: 4px 4px 0 0;
+    border-radius: 1rem 1rem 0 0;
     cursor: pointer;
+    margin-bottom: 0;
 }
 
 .tabSelected {
+    height: 4rem;
     background: color-mix(in srgb, var(--accent, #d4af37) 35%, var(--surface, #1a1030));
-    border-bottom-color: transparent;
+    border-bottom: 4px ridge var(--border, #b27f50);
 }
 
 .shortName { display: none; }
 
 .panel {
-    padding: 0.75rem 0;
+    border: 2px ridge var(--border, #b27f50);
+    border-radius: 0 0 1rem 1rem;
+    padding: 0.75rem;
+    height: 100%;
+    margin-top: 0;
+    backdrop-filter: blur(10px);
 }
 
 @media (max-width: 640px) {
@@ -198,4 +229,27 @@
 
     .tab,
     .tabSelected { font-size: 0.75rem; padding: 0.4rem 0.1rem; }
+}
+
+/* Phones: portrait, name and level on one row with the summary under them; tabs stay on one line. */
+@media (max-width: 720px) {
+    .page { padding: 0.6rem; }
+
+    .header {
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 0.5rem 0.75rem;
+        padding: 0.75rem;
+        border-radius: 1rem;
+    }
+
+    .tab,
+    .tabSelected {
+        height: auto;
+        min-height: 3rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .panel { padding: 0.5rem; }
 }

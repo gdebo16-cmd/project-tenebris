@@ -40,6 +40,8 @@ function GearFields({ id }: { id: string }) {
     const gear = form.data.gear;
     if (!form.data.role.role_id) return <p>Pick a role first. Then you can choose gear.</p>;
 
+    const roleId = form.data.role.role_id;
+    const roleName = form.data.options.roles.find((item) => item.id === roleId)?.name ?? 'Your role';
     const weapon = gear.weapons.find((item) => String(item.id) === weaponId);
     const armor = gear.armor.find((item) => String(item.id) === armorId);
 
@@ -81,89 +83,106 @@ function GearFields({ id }: { id: string }) {
         }
     }
 
-    function addItem(value: string) {
-        const itemId = Number(value);
-        if (!itemId || itemIds.includes(itemId)) return;
-        setItemIds((current) => [...current, itemId]);
+    // Items are chips: tap to add, tap again to take it back out.
+    function toggleItem(itemId: number) {
+        setItemIds((current) => current.includes(itemId) ? current.filter((id) => id !== itemId) : [...current, itemId]);
     }
 
     return (
         <form className={styles.gear} onSubmit={(event) => { event.preventDefault(); onSave(); }}>
-            <section className={styles.prof}>
-                <h2 className={styles.note}>Proficiencies</h2>
-                <p>Armor: {list(gear.proficiencies.armor)}</p>
-                <p>Weapons: {list(gear.proficiencies.weapons)}</p>
-                <p>Tools: {list(gear.proficiencies.tools)}</p>
+            <section className={styles.profCard}>
+                <div className={styles.cardHead}>
+                    <h2 className={styles.cardTitle}>Proficiencies</h2>
+                    <span className={styles.canUse}>{roleName} can use:</span>
+                </div>
+                <div className={styles.profGroups}>
+                    <ChipGroup title="Armor" names={gear.proficiencies.armor} />
+                    <ChipGroup title="Weapons" names={gear.proficiencies.weapons} />
+                    <ChipGroup title="Tools" names={gear.proficiencies.tools} />
+                </div>
                 <p className={styles.note}>Callings do not add proficiencies yet.</p>
             </section>
-            <label className={styles.field}>
-                Weapon
-                <select aria-label="Weapon" value={weaponId} onChange={(event) => setWeaponId(event.target.value)}>
-                    <option value="">Choose a weapon</option>
-                    {gear.weapons.map((item) => (
-                        <option key={item.id} value={item.id}>{item.name} {item.proficient ? '✓' : '✗'}</option>
-                    ))}
-                </select>
-                {weapon && <span className={styles.note}>{weapon.proficient ? '✓ Proficient with this weapon' : '✗ Not proficient with this weapon'}</span>}
-            </label>
-            <label className={styles.field}>
-                Armor
-                <select aria-label="Armor" value={armorId} onChange={(event) => setArmorId(event.target.value)}>
-                    <option value="">No armor</option>
-                    {gear.armor.map((item) => (
-                        <option key={item.id} value={item.id}>{item.name} {item.proficient ? '✓' : '✗'}</option>
-                    ))}
-                </select>
-                {armor && <span className={styles.note}>{armor.proficient ? '✓ Proficient with this armor' : '✗ Not proficient with this armor'}</span>}
-            </label>
-            <label className={styles.field}>
-                Item
-                <select aria-label="Item" value="" onChange={(event) => addItem(event.target.value)}>
-                    <option value="">Add an item</option>
-                    {gear.items.filter((item) => !itemIds.includes(item.id)).map((item) => (
-                        <option key={item.id} value={item.id}>{item.name}</option>
-                    ))}
-                </select>
-            </label>
-            {itemIds.length > 0 && (
-                <ul className={styles.chosen}>
-                    {itemIds.map((itemId) => (
-                        <li key={itemId}>
-                            {gear.items.find((item) => item.id === itemId)?.name ?? 'Item'}
-                            <button type="button" className={styles.secondary} onClick={() => setItemIds((current) => current.filter((id) => id !== itemId))}>Remove</button>
-                        </li>
-                    ))}
-                </ul>
-            )}
-            {gear.can_pick_money ? (
-                <fieldset className={styles.money}>
-                    <legend className={styles.note}>Default money</legend>
-                    <div className={styles.presets}>
-                        {MONEY_PRESET_KEYS.map((key) => (
-                            <button key={key} type="button" aria-pressed={moneyPreset === key}
-                                className={`${styles.preset} ${moneyPreset === key ? styles.presetOn : ''}`}
-                                onClick={() => setMoneyPreset(key)}>
-                                <span className={styles.presetName}>{MONEY_PRESETS[key].label}</span>
-                                <span className={styles.note}>{coinText(MONEY_PRESETS[key].purse)}</span>
-                            </button>
+            <section className={styles.gearCard}>
+                <div className={styles.cardHead}>
+                    <h2 className={styles.cardTitle}>Gear</h2>
+                    <button type="button" className={styles.accentButton} disabled={fill.isPending} onClick={onDefault}>Auto default</button>
+                </div>
+                <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Weapon</span>
+                    <select className={styles.select} aria-label="Weapon" value={weaponId} onChange={(event) => setWeaponId(event.target.value)}>
+                        <option value="">Choose a weapon</option>
+                        {gear.weapons.map((item) => (
+                            <option key={item.id} value={item.id}>{item.name} {item.proficient ? '✓' : '✗'}</option>
                         ))}
-                    </div>
-                </fieldset>
-            ) : (
-                <p>Money: {coinText(gear.purse)}. Change it on the sheet.</p>
-            )}
+                    </select>
+                    {weapon && <span className={weapon.proficient ? styles.proficient : styles.notProficient}>{weapon.proficient ? 'Proficient' : 'Not proficient'}</span>}
+                </label>
+                <label className={styles.field}>
+                    <span className={styles.fieldLabel}>Armor</span>
+                    <select className={styles.select} aria-label="Armor" value={armorId} onChange={(event) => setArmorId(event.target.value)}>
+                        <option value="">No armor</option>
+                        {gear.armor.map((item) => (
+                            <option key={item.id} value={item.id}>{item.name} {item.proficient ? '✓' : '✗'}</option>
+                        ))}
+                    </select>
+                    {armor && <span className={armor.proficient ? styles.proficient : styles.notProficient}>{armor.proficient ? 'Proficient' : 'Not proficient'}</span>}
+                </label>
+                {gear.can_pick_money ? (
+                    <fieldset className={styles.money}>
+                        <legend className={styles.fieldLabel}>Default money</legend>
+                        <div className={styles.presets}>
+                            {MONEY_PRESET_KEYS.map((key) => (
+                                <button key={key} type="button" aria-pressed={moneyPreset === key}
+                                    className={moneyPreset === key ? styles.presetOn : styles.preset}
+                                    onClick={() => setMoneyPreset(key)}>
+                                    <span className={styles.presetName}>{MONEY_PRESETS[key].label}</span>
+                                    <span className={styles.note}>{coinText(MONEY_PRESETS[key].purse)}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </fieldset>
+                ) : (
+                    <p className={styles.note}>Money: {coinText(gear.purse)}. Change it on the sheet.</p>
+                )}
+            </section>
+            <section className={styles.itemsCard}>
+                <h2 className={styles.cardTitle}>Items</h2>
+                <div className={styles.itemChips} role="group" aria-label="Items">
+                    {gear.items.map((item) => {
+                        const on = itemIds.includes(item.id);
+                        return (
+                            <button key={item.id} type="button" className={on ? styles.itemOn : styles.item} aria-pressed={on} onClick={() => toggleItem(item.id)}>
+                                {item.name}
+                            </button>
+                        );
+                    })}
+                </div>
+                <p className={styles.note}>Auto default fills this tab only, with the role and calling starting kit.</p>
+            </section>
             <div className={styles.actions}>
-                <button type="button" className={styles.secondary} disabled={fill.isPending} onClick={onDefault}>Auto default</button>
-                <button type="submit" className={formStyles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
-                <button type="button" className={styles.secondary} disabled={finish.isPending} onClick={onFinish}>Finish</button>
+                {error && <p className={formStyles.error} role="alert">{error}</p>}
+                {missing.length > 0 && (
+                    <ul className={styles.missing}>
+                        {missing.map((line) => <li key={line}>{line}</li>)}
+                    </ul>
+                )}
+                <div className={styles.actionButtons}>
+                    <button type="submit" className={styles.secondary} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
+                    <button type="button" className={styles.finish} disabled={finish.isPending} onClick={onFinish}>Create character</button>
+                </div>
             </div>
-            {error && <p className={formStyles.error} role="alert">{error}</p>}
-            {missing.length > 0 && (
-                <ul className={styles.missing}>
-                    {missing.map((line) => <li key={line}>{line}</li>)}
-                </ul>
-            )}
         </form>
+    );
+}
+
+function ChipGroup({ title, names }: { title: string; names: string[] }) {
+    return (
+        <div className={styles.profGroup}>
+            <h3 className={styles.groupTitle}>{title}</h3>
+            <ul className={styles.chips}>
+                {names.length ? names.map((name) => <li key={name} className={styles.chip}>{name}</li>) : <li className={styles.chip}>None</li>}
+            </ul>
+        </div>
     );
 }
 
@@ -171,10 +190,6 @@ function GearFields({ id }: { id: string }) {
 function coinText(purse: Purse): string {
     const parts = COINS.filter((c) => purse[c] > 0).map((c) => `${purse[c]} ${c}`);
     return parts.length ? parts.join(', ') : 'none';
-}
-
-function list(names: string[]): string {
-    return names.length ? names.join(', ') : 'None';
 }
 
 function messageOf(err: unknown): string {

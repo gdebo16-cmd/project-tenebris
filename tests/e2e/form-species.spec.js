@@ -19,18 +19,19 @@ test('species tab keeps a save and refuses a size above Large', async ({ page })
     const species = page.getByRole('combobox', { name: 'Species', exact: true });
     await species.selectOption(String(withVariant.id));
     await page.getByRole('combobox', { name: 'Variant', exact: true }).selectOption(withVariant.variants[0]);
-    await page.getByRole('combobox', { name: 'Size', exact: true }).selectOption(String(withVariant.sizes[0].id));
+    const sizeGroup = page.getByRole('group', { name: 'Size', exact: true });
+    const sizeButton = sizeGroup.getByRole('button', { name: withVariant.sizes[0].name, exact: true });
+    await sizeButton.click();
+    await expect(sizeButton).toHaveAttribute('aria-pressed', 'true');
     await page.getByRole('combobox', { name: 'Eye color', exact: true }).selectOption(eye);
     await page.getByRole('textbox', { name: 'Look', exact: true }).fill('A scar over one eye');
 
     const art = page.getByRole('button', { name: 'Show the full picture' });
-    await expect(art.locator('img')).toHaveAttribute('src', /\/thumbs\/.+\.webp$/);
-    const sizeNames = await page.getByRole('combobox', { name: 'Size', exact: true }).locator('option').allTextContents();
+    // always the full picture (no thumbnail)
+    await expect(art.locator('img')).toHaveAttribute('src', /\.png$/);
+    const sizeNames = await sizeGroup.getByRole('button').allTextContents();
     expect(sizeNames.join(' ')).not.toMatch(/Enormous|Titanic/);
 
-    await art.click();
-    await expect(page.getByRole('button', { name: 'Hide the full picture' }).locator('img')).toHaveAttribute('src', /\.png$/);
-    await page.getByRole('button', { name: 'Hide the full picture' }).click();
 
     const saveResponse = page.waitForResponse((res) => res.url().includes('/form/species') && res.request().method() === 'PUT');
     await page.getByRole('tabpanel').getByRole('button', { name: 'Save' }).click();
@@ -39,14 +40,13 @@ test('species tab keeps a save and refuses a size above Large', async ({ page })
     await page.reload();
     await expect(species).toHaveValue(String(withVariant.id));
     await expect(page.getByRole('combobox', { name: 'Variant', exact: true })).toHaveValue(withVariant.variants[0]);
-    await expect(page.getByRole('combobox', { name: 'Size', exact: true })).toHaveValue(String(withVariant.sizes[0].id));
+    await expect(sizeButton).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('combobox', { name: 'Eye color', exact: true })).toHaveValue(eye);
     await expect(page.getByRole('textbox', { name: 'Look', exact: true })).toHaveValue('A scar over one eye');
 
     await species.selectOption(String(withSub.id));
     await page.getByRole('combobox', { name: 'Sub-species', exact: true }).selectOption(String(withSub.subspecies[0].id));
-    const subThumb = withSub.subspecies[0].image.replace(/\/([^/]+)\.png$/, '/thumbs/$1.webp');
-    await expect(page.getByRole('button', { name: 'Show the full picture' }).locator('img')).toHaveAttribute('src', subThumb);
+    await expect(page.getByRole('button', { name: 'Show the full picture' }).locator('img')).toHaveAttribute('src', withSub.subspecies[0].image);
 
     const bad = await page.request.put(`/api/characters/${id}/form/species`, {
         data: {

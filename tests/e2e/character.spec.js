@@ -15,10 +15,10 @@ test('creates a character on the new form, opens its sheet and rolls', async ({ 
     await expect(page).toHaveURL(/\/characters\/\d+\/edit\?tab=species/);
     const id = page.url().match(/\/characters\/(\d+)/)[1];
     await expect(page.getByRole('textbox', { name: 'Name' })).toHaveValue('One with no name');
+    // the header saves itself when the name box loses focus
     await page.getByRole('textbox', { name: 'Name' }).fill(name);
-    await page.getByRole('combobox', { name: 'Level', exact: true }).selectOption('1');
     const headerSaved = page.waitForResponse((r) => r.url().endsWith(`/api/characters/${id}/form/header`));
-    await page.locator('form').filter({ has: page.getByRole('textbox', { name: 'Name' }) }).getByRole('button', { name: 'Save', exact: true }).click();
+    await page.getByRole('textbox', { name: 'Name' }).blur();
     expect((await headerSaved).ok()).toBeTruthy();
 
     await page.goto('/home');
@@ -32,7 +32,7 @@ test('creates a character on the new form, opens its sheet and rolls', async ({ 
     await page.getByRole('tab', { name: 'Species & look' }).click();
     await page.getByRole('combobox', { name: 'Species', exact: true }).selectOption(String(species.id));
     await page.getByRole('combobox', { name: 'Variant', exact: true }).selectOption(species.variants[0]);
-    await page.getByRole('combobox', { name: 'Size', exact: true }).selectOption(String(species.sizes[0].id));
+    await page.getByRole('group', { name: 'Size', exact: true }).getByRole('button', { name: species.sizes[0].name, exact: true }).click();
     await page.getByRole('combobox', { name: 'Eye color', exact: true }).selectOption(form.options.eyeColors[0]);
     let saved = page.waitForResponse((res) => res.url().includes('/form/species') && res.request().method() === 'PUT');
     await page.getByRole('tabpanel').getByRole('button', { name: 'Save' }).click();
@@ -77,9 +77,9 @@ test('creates a character on the new form, opens its sheet and rolls', async ({ 
     const filled = page.waitForResponse((res) => res.url().includes('/form/gear/default') && res.request().method() === 'POST');
     await page.getByRole('button', { name: 'Auto default' }).click();
     expect((await filled).ok()).toBeTruthy();
-    // Default money is required: pick one (Finish saves it)
+    // Default money is required: pick one (Create character saves it)
     await page.getByRole('button', { name: /^Average/ }).click();
-    await page.getByRole('tabpanel', { name: 'Inventory' }).getByRole('button', { name: 'Finish' }).click();
+    await page.getByRole('tabpanel', { name: 'Inventory' }).getByRole('button', { name: 'Create character' }).click();
     await expect(page).toHaveURL(new RegExp(`/characters/${id}$`));
     await expect(page.getByText(name).first()).toBeVisible();
 

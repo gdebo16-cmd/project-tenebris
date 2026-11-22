@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { characterOptions, choiceFeaturesFor, checkChoicePicks, giftsAllowed, sizeOptions, CALLING_LEVEL, type OptionsPack } from '../src/characterOptions.ts';
+import { characterOptions, choiceFeaturesFor, checkChoicePicks, giftsAllowed, sizeOptions, CALLING_LEVEL, roleGuideFor, callingGuideFor, DIVINE_BLESSING_DESCRIPTION, type OptionsPack } from '../src/characterOptions.ts';
 
 // A tiny fake pack: 2 species (one with a sub-species), 1 role with 2 callings, 3 gifts.
 // Small on purpose, so every expected answer is easy to check by eye.
@@ -18,18 +18,24 @@ const pack: OptionsPack = {
         { id: 5, key: 'enormous', name: 'Enormous' },
     ],
     roles: [{
-        id: 10, key: 'warrior', name: 'Warrior', hit_die: 'd12', primary_stat: 'Might', img_url: '/classes/warrior.png',
+        id: 10, key: 'warrior', name: 'Warrior', hit_die: 'd12', primary_stat: 'Might', description: 'A mighty fighter.', img_url: '/classes/warrior.png',
         skill_count: 2, skill_options: ['Balance', 'Presence', 'Awareness'], skill_fixed: ['Athletics'],
         levels: [
             { level: 1, features: [
-                { name: 'Preferred Arms', options: ['Minor', 'Great', 'Reach'], choice_count: 2, data: { choice_timing: 'create' } },
-                { name: 'Not a picker', options: ['Nope'], data: { choice_timing: 'level' } },
+                { name: 'Preferred Arms', description: 'Pick two groups.', options: ['Minor', 'Great', 'Reach'], choice_count: 2, data: { choice_timing: 'create' } },
+                { name: 'Not a picker', description: 'Always on.', options: ['Nope'], data: { choice_timing: 'level' } },
             ] },
-            { level: 5, features: [{ name: 'Later', options: ['A', 'B'], choice_count: 1, data: { choice_timing: 'create' } }] },
+            { level: 3, features: [{ name: 'Choose Subclass', marker: 'choose_calling' }] },
+            { level: 5, features: [
+                { name: 'Later', description: 'A later pick.', options: ['A', 'B'], choice_count: 1, data: { choice_timing: 'create' } },
+                { name: 'Subclass Feature', marker: 'calling_feature' },
+                { name: 'Divine Blessing', marker: 'divine_blessing' },
+            ] },
         ],
         callings: [
-            { id: 100, key: 'reaper', name: 'Path of the Reaper', features: [
-                { name: 'Reap', level: 3, options: ['Hook', 'Scythe'], choice_count: 1, data: { choice_timing: 'create' } },
+            { id: 100, key: 'reaper', name: 'Path of the Reaper', description: 'A grim path.', features: [
+                { name: 'Reap', level: 3, description: 'Extra damage.', options: ['Hook', 'Scythe'], choice_count: 1, data: { choice_timing: 'create' } },
+                { name: 'Harvest', level: 7, description: 'More reaping.' },
             ] },
             { id: 101, key: 'hero', name: 'Path of the Hero' },
         ],
@@ -154,4 +160,32 @@ test('alignments sorted, personality split by category', () => {
     assert.deepEqual(options.lifestyles.map((p) => p.name), ['Wanderer']);
     assert.deepEqual(options.outlooks.map((p) => p.name), ['Hopeful']);
     assert.deepEqual(options.eyeColors, ['Brown', 'Green']);
+});
+
+test('role and calling guides list the full progression and skip schedule markers', () => {
+    assert.equal(roleGuideFor(undefined), null);
+    assert.equal(characterOptions(pack, { level: 1 }).roleGuide, null);
+    assert.equal(characterOptions(pack, { level: 1 }).callingGuide, null);
+
+    const guide = characterOptions(pack, { level: 1, role_id: 10 }).roleGuide;
+    assert.ok(guide);
+    assert.equal(guide.name, 'Warrior');
+    assert.equal(guide.description, 'A mighty fighter.');
+    assert.deepEqual(guide.levels.map((step) => step.level), [1, 5]);
+    assert.deepEqual(guide.levels[0].features.map((f) => f.name), ['Preferred Arms', 'Not a picker']);
+    assert.deepEqual(guide.levels[1].features.map((f) => f.name), ['Later', 'Divine Blessing']);
+    assert.equal(guide.levels[1].features[1].description, DIVINE_BLESSING_DESCRIPTION);
+    // The same guide is returned at level 1 and level 20: players can read the whole path
+    assert.deepEqual(characterOptions(pack, { level: 20, role_id: 10 }).roleGuide, guide);
+
+    assert.equal(callingGuideFor(pack.roles[0], undefined), null);
+    assert.equal(characterOptions(pack, { level: 3, role_id: 10 }).callingGuide, null);
+    const reaper = characterOptions(pack, { level: 3, role_id: 10, calling_id: 100 }).callingGuide;
+    assert.ok(reaper);
+    assert.equal(reaper.name, 'Path of the Reaper');
+    assert.equal(reaper.description, 'A grim path.');
+    assert.deepEqual(reaper.levels, [
+        { level: 3, features: [{ name: 'Reap', description: 'Extra damage.' }] },
+        { level: 7, features: [{ name: 'Harvest', description: 'More reaping.' }] },
+    ]);
 });

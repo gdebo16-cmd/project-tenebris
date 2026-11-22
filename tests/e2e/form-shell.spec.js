@@ -13,21 +13,24 @@ test('form shell keeps the header and the tab across a reload', async ({ page })
     await expect(page.getByLabel('Name')).toHaveValue('One with no name');
     await expect(page.getByText('Save the header first')).toHaveCount(0);
 
+    // there is no header Save button: the name saves when its box loses focus, the level as soon as it changes
+    await expect(page.locator('form').filter({ has: page.getByLabel('Name') }).getByRole('button', { name: 'Save', exact: true })).toHaveCount(0);
     // a blank name saves as the default name
-    const headerSave = page.locator('form').filter({ has: page.getByLabel('Name') }).getByRole('button', { name: 'Save', exact: true });
     await page.getByLabel('Name').fill('   ');
     let saved = page.waitForResponse((r) => r.url().endsWith(`/api/characters/${id}/form/header`));
-    await headerSave.click();
+    await page.getByLabel('Name').blur();
     expect((await saved).status(), 'header save').toBe(200);
     const blank = await (await page.request.get(`/api/characters/${id}/form`)).json();
     expect(blank.header.name).toBe('One with no name');
 
     const name = `Form ${Date.now()}`;
     await page.getByLabel('Name').fill(name);
-    await page.getByLabel('Level').selectOption('4');
     saved = page.waitForResponse((r) => r.url().endsWith(`/api/characters/${id}/form/header`));
-    await headerSave.click();
-    expect((await saved).status(), 'header save').toBe(200);
+    await page.getByLabel('Name').blur();
+    expect((await saved).status(), 'name save').toBe(200);
+    saved = page.waitForResponse((r) => r.url().endsWith(`/api/characters/${id}/form/header`));
+    await page.getByLabel('Level').selectOption('4');
+    expect((await saved).status(), 'level save').toBe(200);
     await page.reload();
     await expect(page.getByLabel('Name')).toHaveValue(name);
     await expect(page.getByLabel('Level')).toHaveValue('4');

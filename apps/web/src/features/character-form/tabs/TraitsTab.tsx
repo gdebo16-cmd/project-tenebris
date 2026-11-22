@@ -16,6 +16,10 @@ type Roll = { rolls: number[]; dropped: number; total: number } | null;
 
 type Props = { id: string };
 
+type Stat = {
+    stat: number;
+    index: number;
+}
 export default function TraitsTab({ id }: Props) {
     return <TraitsFields id={id} />;
 }
@@ -30,6 +34,7 @@ function TraitsFields({ id }: { id: string }) {
     const [gifts, setGifts] = useState<number[]>([]);
     const [filled, setFilled] = useState(false);
     const [error, setError] = useState('');
+    const [armed, setArmed] = useState<number | null>(null);
 
     useEffect(() => {
         if (!form.data || filled) return;
@@ -60,6 +65,27 @@ function TraitsFields({ id }: { id: string }) {
         catch (err) { setError(messageOf(err)); }
     }
 
+    function pickRoll(index: number) {
+        if (!rolls[index]) return;                       // not rolled yet
+        setArmed((current) => current === index ? null : index);   // click again to cancel
+    }
+    function placeOn(stat: string) {
+        if (armed == null) {
+            // Nothing picked: clicking a filled stat clears it
+            setPlacement((current) => ({ ...current, [stat]: '' }));
+            return;
+        }
+        setPlacement((current) => {
+            const next = { ...current };
+            for (const key of Object.keys(next)) {
+                if (next[key] === String(armed)) next[key] = '';   // a roll can only sit on one stat
+            }
+            next[stat] = String(armed);
+            return next;
+        });
+        setArmed(null);
+    }
+
     async function reset(which: 'placements' | 'rolls') {
         setError('');
         try {
@@ -85,63 +111,107 @@ function TraitsFields({ id }: { id: string }) {
     }
 
     return (
-        <form className={styles.traits} onSubmit={(event) => { event.preventDefault(); onSave(); }}>
-            <ol className={styles.rolls}>
-                {rolls.map((made, index) => (
-                    <li key={index} className={styles.roll}>
-                        <span>Roll {index + 1}</span>
-                        {made ? <Dice roll={made} /> : <span>Not rolled</span>}
-                        <button type="button" className={styles.secondary} disabled={locked || roller.isPending} onClick={() => rollOne(index)}>
-                            {made ? 'Roll again' : 'Roll'}
-                        </button>
-                    </li>
-                ))}
-            </ol>
-            <div className={styles.actions}>
-                <button type="button" className={styles.secondary} disabled={roller.isPending} onClick={() => reset('placements')}>Reset placements</button>
-                <button type="button" className={styles.secondary} disabled={locked || roller.isPending} onClick={() => reset('rolls')}>Reset rolls</button>
+        <form className={styles.stat} onSubmit={(event) => { event.preventDefault(); onSave(); }}>
+            <section className={styles.traits}>
+            <div className={styles.rollsContainer}>
+                <div className={styles.actions}>
+                    <span className={styles.rollsTitle}>Stat Rolls</span>
+                    <div className={styles.actionsButtons}>
+                        <button type="button" className={styles.secondary} disabled={roller.isPending} onClick={() => reset('placements')}>Reset placements</button>
+                        <button type="button" className={styles.secondary} disabled={locked || roller.isPending} onClick={() => reset('rolls')}>Reset rolls</button>
+                    </div>
+                </div>
+                <div className={styles.rollTiles}>
+                <ol className={styles.rolls}>
+                    {rolls.map((made, index) => {
+                        const placedOn = STAT_COLUMNS.find((stat) => placement[stat] === String(index));
+                        const tileClass = !made
+                            ? styles.rollEmpty
+                            : armed === index
+                                ? styles.rollArmed      // selected, waiting for a stat
+                                : placedOn
+                                    ? styles.rollPlaced // already on a stat
+                                    : styles.rollPick;  // rolled, tap to place
+                        return (
+                            <li key={index} className={styles.roll}>
+                                <button
+                                    type="button"
+                                    className={tileClass}
+                                    disabled={!made && (locked || roller.isPending)}
+                                    onClick={() => (made ? pickRoll(index) : rollOne(index))}
+                                >
+                                    {made ? (
+                                        <>
+                                            <Dice roll={made} />
+                                            <span className={styles.total}>{made.total}</span>
+                                            <span>{placedOn ? `→ ${STAT_LABELS[placedOn]}` : armed === index ? 'Now pick a stat' : 'Tap to place'}</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className={styles.rollTotal}>Roll</span>
+                                        </>
+                                    )}
+                                </button>
+                            </li>
+                        );
+                    })}
+                </ol>
+                </div>
+                <div className={styles.place}>
+                    {STAT_COLUMNS.map((stat) => {
+                        const raw = placement[stat];
+                        const roll = raw == null || raw === '' ? null : rolls[Number(raw)];
+                        return (
+                            <button key={stat} type="button" className={roll ? styles.statFilled : styles.statEmpty} onClick={() => placeOn(stat)}>
+                                <span>{STAT_LABELS[stat]}</span>
+                                <span className={styles.statTotal}>{roll ? roll.total : '—'}</span>
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
-            <p className={styles.note}>The server keeps the dice. You only choose which roll goes to which stat.</p>
-            <div className={styles.place}>
-                {STAT_COLUMNS.map((stat) => (
-                    <label key={stat}>
-                        {STAT_LABELS[stat]}
-                        <select aria-label={STAT_LABELS[stat]} value={placement[stat] ?? ''} onChange={(event) => setPlacement((current) => ({ ...current, [stat]: event.target.value }))}>
-                            <option value="">Choose a roll</option>
-                            {rolls.map((roll, index) => (
-                                <option key={index} value={index} disabled={!roll || taken(placement, stat, index)}>
-                                    {roll ? `Roll ${index + 1} — ${roll.total}` : `Roll ${index + 1} — not rolled`}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-                ))}
-            </div>
-            <div className={styles.bonuses}>
-                <label>
-                    +2
-                    <StatPick label="+2 bonus" value={plus2} onChange={setPlus2} />
-                </label>
-                <label>
-                    +1
-                    <StatPick label="+1 bonus" value={plus1} onChange={setPlus1} />
-                </label>
-            </div>
-            <p className={styles.note}>The +2 and the +1 may be the same stat.</p>
-            <fieldset className={styles.gifts}>
-                <legend className={styles.heading}>Choose {giftRule.choose} · {gifts.length} chosen</legend>
-                {giftRule.from.map((gift) => {
-                    const on = gifts.includes(gift.id);
-                    return (
-                        <label key={gift.id} className={styles.gift}>
-                            <input type="checkbox" checked={on} disabled={!on && gifts.length >= giftRule.choose} onChange={() => toggleGift(gift.id)} />
-                            {gift.name}
-                        </label>
-                    );
-                })}
-            </fieldset>
-            <button type="submit" className={formStyles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
-            {error && <p className={formStyles.error} role="alert">{error}</p>}
+            </section>
+            <section className={styles.plusContainer}>
+            
+                <div className={styles.bonusContainer}>
+                    <span className={styles.bonusesTitle}>Bonuses</span>
+                    <div className={styles.bonusTiles}>
+                    <div className={styles.bonusTile}>
+                        <span className={styles.bonusLabel}>+2 Bonus: </span>
+                        <StatPick label="+2 bonus" value={plus2} onChange={setPlus2} />
+                    </div>
+                    <div className={styles.bonusTile}>
+                            <span className={styles.bonusLabel}>+1 Bonus: </span>
+                            <StatPick label="+1 bonus" value={plus1} onChange={setPlus1} />
+                    </div>
+                </div>
+                </div>
+                <div className={styles.giftsContainer}>
+                    <span className={styles.giftsTitle}>Gifts</span>
+                    <p className={styles.heading}>Choose {giftRule.choose} · {gifts.length} chosen</p>
+                    <fieldset className={styles.gifts}>
+                        
+                        {giftRule.from.map((gift) => {
+                            const on = gifts.includes(gift.id);
+                            return (
+                                <ul className={styles.giftList}>
+                                    <li key={gift.id} className={styles.gift}>
+                                        <button type="button" className={styles.giftButton} disabled={!on && gifts.length >= giftRule.choose} onClick={() => toggleGift(gift.id)}>
+                                            <p  className={styles.giftTitle}>{gift.name} · {gift.tree}</p>
+                                            <p className={styles.giftDescription}><strong>Description:</strong> {gift.description}</p>
+                                        </button>
+                                    </li>
+                                </ul>
+                            );
+                        })}
+                    </fieldset>
+                 </div>
+            
+            </section>
+            <section className={styles.saveContainer}>
+                <button type="submit" className={styles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
+                {error && <p className={formStyles.error} role="alert">{error}</p>}
+            </section>
         </form>
     );
 }
@@ -155,14 +225,13 @@ function Dice({ roll }: { roll: Exclude<Roll, null> }) {
                 if (drop) marked = true;
                 return <span key={i} className={drop ? styles.dropped : styles.die}>{die}</span>;
             })}
-            <span className={styles.total}>{roll.total}</span>
         </span>
     );
 }
 
 function StatPick({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
     return (
-        <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
+        <select className={styles.bonusSelect} aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
             <option value="">Choose</option>
             {STAT_COLUMNS.map((stat) => <option key={stat} value={stat}>{STAT_LABELS[stat]}</option>)}
         </select>

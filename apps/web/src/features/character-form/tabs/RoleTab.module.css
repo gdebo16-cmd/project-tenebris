@@ -1,65 +1,259 @@
 /* Role, calling, skills and the role's create-time picks. */
 
 .role {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 16fr 1fr;
+    grid-template-areas:
+    "a b"
+    "c c";
+    gap: 0.9rem;
+}
+
+.choicesContainer {
+    grid-area: b;
     display: flex;
     flex-direction: column;
     gap: 0.9rem;
-    max-width: 36rem;
+}
+
+.roleContainer {
+    grid-area: a;
+    background: var(--surface, #1a1030);
+    padding: 1rem;
+    border: 2px ridge var(--border, #b27f50);
+    border-radius: 1.5rem;
+}
+
+.callingContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    background: var(--surface, #1a1030);
+    padding: 1rem;
+    border: 2px ridge var(--border, #b27f50);
+    border-radius: 1.5rem;
+}
+
+.skillsContainer {
+    flex: 1;
+    background: var(--surface, #1a1030);
+    padding: 1rem;
+    border: 2px ridge var(--border, #b27f50);
+    border-radius: 1.5rem;
+}
+
+.featuresContainer {
+    flex: 1;
+    background: var(--surface, #1a1030);
+    padding: 1rem;
+    border: 2px ridge var(--border, #b27f50);
+    border-radius: 1.5rem;
+}
+
+.buttonsContainer {
+    grid-area: c;
+}
+
+.roletitle,
+.callingTitle,
+.skillsTitle,
+.featuresTitle {
+    display: flex;
+    font-size: 1.9rem;
+    font-weight: bold;
+    margin: 0;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding: 0;
+    border-bottom: 2px solid var(--border, #b27f50);
+    
 }
 
 .list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
     gap: 0.3rem;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
+.CallList {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    gap: 0.3rem;
+    list-style: none;
+}
+
+
+.roleTile {
+    width: 100%;
+    height: 100%;
+}
+
+.callTile {
+    width: 100%;
+    height: 100%;
+}
+
+.callButton,
+.callSelected {
+    background: color-mix(in srgb, var(--bg, #d4af37) 35%, var(--surface, #1a1030));
+    width: 100%;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 0.5rem;
+}
+
+.callSelected {
+    background: color-mix(in srgb, var(--accent, #b89317) 35%, var(--surface, #1a1030));
+    border: 1px solid var(--accent, #b89317);
+}
+
 .roleButton,
 .roleSelected {
     display: flex;
+    flex-direction: row;
+    justify-content: space-around;
     align-items: center;
-    gap: 0.5rem;
     width: 100%;
-    padding: 0.3rem 0.45rem;
-    font: inherit;
-    color: inherit;
-    text-align: left;
-    background: var(--surface, #1a1030);
+    height: 10vh;
+    text-align: center;
     border: 1px solid var(--border, #b27f50);
-    border-radius: 4px;
-    cursor: pointer;
+    border-radius: 1rem;
+    padding: 0.5rem;
+    background: var(--surface, #1a1030);
 }
 
 .roleSelected {
     background: color-mix(in srgb, var(--accent, #d4af37) 35%, var(--surface, #1a1030));
+    border: 1px solid var(--accent, #d4af37);
 }
 
+.roleInfo {
+    text-align: left;
+}
+
+.roleName {
+    font-size: 1.2rem;
+    border-bottom: 2px solid var(--border, #b27f50);
+    padding-bottom: 0.5rem;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+}
+
+.callName {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.skillList {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    gap: 0.3rem;
+    list-style: none;
+}
+
+.skillTile {
+    width: 100%;
+    height: 100%;
+}
+
+.skillButton {
+    padding: 0.5rem;
+}
+
+.skillButton,
+.skillSelected {
+    background: color-mix(in srgb, var(--bg, #d4af37) 35%, var(--surface, #1a1030));
+    width: 100%;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+.skillSelected {
+    background: color-mix(in srgb, var(--accent, #b89317) 35%, var(--surface, #1a1030));
+    border: 1px solid var(--accent, #b89317);
+    
+}
+
+.skillName {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+}
+
+.skillButtonDisabled,
+.skillSelectedDisabled {
+    background: color-mix(in srgb, var(--bg, #d4af37) 35%, var(--surface, #1a1030));
+    width: 100%;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+.skillButtonDisabled {
+    background: color-mix(in srgb, var(--bg, #d4af37) 35%, var(--surface, #1a1030));
+    width: 100%;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 0.5rem;
+}
 .icon {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
+    width: 88px;
+    height: 88px;
+    object-fit: cover;
+    grid-area: a;
+}
+
+.save {
+    width: 100%;
+    padding: 10px;
+    margin: 0;
+    background: var(--accent, #3a2e1c);
+    border: none;
+    border-radius: .5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    &:hover {
+        background: var(--accent, #3a2e1c);
+    }
 }
 
 .picked {
     display: flex;
+    justify-content: center;
     gap: 0.75rem;
     align-items: center;
+    border: 2px ridge var(--border, #b27f50);
+    border-radius: 1.5rem;
+    padding: 5px 20px;
+    justify-self: center;
+    margin: 10px 0;
+    width: 20vw;
+
 }
 
 .artButton {
-    padding: 0;
-    border: 3px ridge var(--accent, #d4af37);
+    overflow: hidden;
     background: transparent;
     cursor: pointer;
+    border: none;
 }
 
 .thumb {
     display: block;
-    width: 88px;
-    height: 88px;
-    object-fit: contain;
+    width: 108px;
+    height: 108px;
+    object-fit: cover;
+    border-radius: 0.5rem;
 }
 
 .fullArt {
@@ -98,4 +292,172 @@
 .heading {
     margin: 0;
     font-size: 1rem;
+}
+
+
+.guideButton,
+.guideOpen {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0 0;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    font-weight: bold;
+    color: inherit;
+    cursor: pointer;
+    background: color-mix(in srgb, var(--bg, #d4af37) 35%, var(--surface, #1a1030));
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 0.5rem;
+}
+
+.guideOpen {
+    background: color-mix(in srgb, var(--accent, #b89317) 35%, var(--surface, #1a1030));
+    border: 1px solid var(--accent, #b89317);
+}
+
+.guidePanel {
+    max-height: 22rem;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+    padding: 0.75rem 0.85rem;
+    background: var(--surface, #1a1030);
+    border: 2px ridge var(--border, #b27f50);
+    border-radius: 1rem;
+}
+
+.guideBlurb,
+.guideEmpty {
+    margin: 0 0 0.75rem;
+    font-size: 0.95rem;
+}
+
+.guideEmpty { margin-bottom: 0; }
+
+.guideList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.guideLevel,
+.guideLevelReached {
+    margin: 0;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 0.5rem;
+}
+
+.guideLevelReached {
+    background: color-mix(in srgb, var(--accent, #d4af37) 20%, var(--surface, #1a1030));
+    border: 1px solid var(--accent, #d4af37);
+}
+
+.guideLevelLabel {
+    margin: 0 0 0.35rem;
+    padding: 0 0 0.25rem;
+    font-weight: bold;
+    border-bottom: 1px solid var(--border, #b27f50);
+}
+
+.guideFeature { margin-top: 0.4rem; }
+
+.guideFeatureName {
+    margin: 0;
+    font-weight: bold;
+}
+
+.guideFeatureText {
+    margin: 0.15rem 0 0;
+    font-size: 0.95rem;
+}
+
+/* Phones: one column. Picked-role card, a 2-column role grid, then calling, skills and features. */
+@media (max-width: 720px) {
+    .role {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: none;
+        grid-template-areas: "a" "b" "c";
+    }
+
+    .roleContainer,
+    .callingContainer,
+    .skillsContainer,
+    .featuresContainer {
+        padding: 0.85rem;
+        border-radius: 1rem;
+    }
+
+    .roletitle,
+    .callingTitle,
+    .skillsTitle,
+    .featuresTitle { font-size: 1.5rem; }
+
+    .picked {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 0.5rem 0.75rem;
+        border-radius: 1rem;
+    }
+
+    .thumb {
+        width: 4.5rem;
+        height: 4.5rem;
+    }
+
+    .list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .roleTile { min-width: 0; }
+
+    .roleButton,
+    .roleSelected {
+        height: auto;
+        min-height: 3.5rem;
+        justify-content: flex-start;
+        gap: 0.5rem;
+        padding: 0.45rem;
+        border-radius: 0.6rem;
+    }
+
+    .icon {
+        flex: 0 0 auto;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 0.35rem;
+    }
+
+    .roleInfo { min-width: 0; }
+
+    .roleName {
+        font-size: 0.95rem;
+        border-bottom: none;
+    }
+
+    .roleHitDie,
+    .rolePrimaryStat {
+        margin: 0;
+        font-size: 0.72rem;
+        opacity: 0.8;
+    }
+
+    .callName,
+    .skillName { font-size: 1rem; }
+
+    .guideButton,
+    .guideOpen { font-size: 0.95rem; }
+
+    .guidePanel {
+        max-height: 16rem;
+        padding: 0.65rem 0.7rem;
+        border-radius: 0.75rem;
+    }
+
+    .guideBlurb,
+    .guideEmpty,
+    .guideFeatureText { font-size: 0.88rem; }
+
+    .guideLevelLabel,
+    .guideFeatureName { font-size: 0.95rem; }
 }

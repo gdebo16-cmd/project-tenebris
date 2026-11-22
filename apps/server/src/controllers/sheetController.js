@@ -3,7 +3,7 @@
 // canEdit: the owner and the campaign's DM may change the sheet; other players in the campaign only look.
 import { characterToCreature } from '@tenebris/rules/creature';
 import { checkActRequest, resolveAct } from '@tenebris/rules/actions';
-import { spendFeatureUse, takeRest, checkRestRequest, castSpell, checkCastRequest, checkConditionsRequest, applyConditions } from '@tenebris/rules/sheetState';
+import { spendFeatureUse, takeRest, checkRestRequest, castSpell, checkCastRequest, checkConditionsRequest, applyConditions, checkRuneRequest, useMendingRune } from '@tenebris/rules/sheetState';
 import { checkSpellbookRequest } from '@tenebris/rules/spellbook';
 import { checkMoneyRequest, shortCoinMessage, purseOf } from '@tenebris/rules/money';
 import { checkHpRequest, checkTempHpRequest, hpChange } from '@tenebris/rules/health';
@@ -107,6 +107,22 @@ export async function useFeature(req, res) {
     const creature = await creatureOf(res, who.charId, who.ownerId);
     if (!creature) return;
     const result = spendFeatureUse(creature, key, rng);
+    if ('error' in result) return res.status(400).json({ error: result.error });
+    if (result.restUses !== creature.restUses) await Characters.updateSheetState(who.charId, who.ownerId, { rest_uses: result.restUses });
+    res.json({ text: result.text });
+}
+
+
+// POST /api/sheets/character/:id/rune   body: { runeKey }   e.g. "rune-9"
+// Mending Rune: roll 1d6 + INT and spend the 1/long rest use. The key is saved in rest_uses.
+export async function useRune(req, res) {
+    const who = await editorOf(req, res);
+    if (!who) return;
+    const checked = checkRuneRequest(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const creature = await creatureOf(res, who.charId, who.ownerId);
+    if (!creature) return;
+    const result = useMendingRune(creature, checked.runeKey, rng);
     if ('error' in result) return res.status(400).json({ error: result.error });
     if (result.restUses !== creature.restUses) await Characters.updateSheetState(who.charId, who.ownerId, { rest_uses: result.restUses });
     res.json({ text: result.text });

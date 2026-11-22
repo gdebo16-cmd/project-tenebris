@@ -1,0 +1,154 @@
+/* The floating roll orb. Colors come from the site theme (same variables the old sheet used).
+   Open / flip / drag are exclusive state classes so two classes never fight over the same property.
+   After a drag, --orb-left / --orb-top / --orb-right are set on the element (no React style=). */
+
+.orb {
+    position: fixed;
+    left: var(--orb-left, auto);
+    top: var(--orb-top, calc(6.5vh - 3.75rem));
+    right: var(--orb-right, 5%);
+    z-index: 1000;
+    background-color: var(--bgc-orb);
+    border: var(--tileBorder);
+    user-select: none;
+    touch-action: none;
+    border-radius: var(--orb, 50%);
+    box-shadow: var(--shadowInner, none);
+}
+
+.orbClosed {
+    width: 4rem;
+    height: 4rem;
+    cursor: grab;
+}
+
+.orbClosedDragging {
+    width: 4rem;
+    height: 4rem;
+    cursor: grabbing;
+}
+
+.orbOpen,
+.orbOpenLeft,
+.orbOpenUp,
+.orbOpenLeftUp {
+    width: 25rem;
+    height: 28rem;
+    max-width: calc(100vw - 2rem);
+    max-height: calc(100vh - 2rem);
+    border-radius: var(--open-orb, 10px);
+    cursor: default;
+}
+
+.orbOpenLeft { translate: calc(-100% + 3rem) 0; }
+.orbOpenUp { translate: 0 calc(-100% + 3rem); }
+.orbOpenLeftUp { translate: calc(-100% + 3rem) calc(-100% + 3rem); }
+
+.orbFace { width: 100%; height: 100%; }
+.orbFaceHidden { display: none; }
+
+.orbPanel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.feed {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+}
+
+.feed::-webkit-scrollbar { display: none; }
+
+.bubbleSent,
+.bubbleReceived {
+    width: 65%;
+    padding: 0.5rem 0.65rem;
+    border-radius: 1rem;
+    box-shadow: var(--bs-bubble), var(--shadowInner, none);
+    font-size: 1.35rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.bubbleSent {
+    align-self: flex-end;
+    background-color: var(--bgc-bubble-send);
+    border-bottom-right-radius: 0.25rem;
+}
+
+.bubbleReceived {
+    align-self: flex-start;
+    background-color: var(--bgc-bubble-receive);
+    border-bottom-left-radius: 0.25rem;
+}
+
+.bubbleName {
+    display: block;
+    font-size: 1rem;
+    font-weight: bold;
+    opacity: 0.75;
+    margin-bottom: 0.15rem;
+}
+
+.jump {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    translate: -50% 0;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: var(--tileBorder);
+    border-radius: 50%;
+    background-color: var(--bgc-bubble-receive);
+    color: var(--txt-color-1, inherit);
+    box-shadow: var(--bs2, none);
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .orb { top: var(--orb-top, calc(6.5vh - 1.5rem)); }
+
+    .orbClosed,
+    .orbClosedDragging {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .orbOpen,
+    .orbOpenLeft,
+    .orbOpenUp,
+    .orbOpenLeftUp {
+        width: 18rem;
+        height: 16rem;
+    }
+
+    .bubbleSent,
+    .bubbleReceived {
+        width: auto;
+        max-width: 85%;
+        padding: 0.4rem 0.65rem;
+        font-size: 0.85rem;
+        color: var(--txt-color-1, inherit);
+        box-shadow: var(--bs-bubble);
+    }
+
+    .bubbleName { font-size: 0.7rem; }
+}

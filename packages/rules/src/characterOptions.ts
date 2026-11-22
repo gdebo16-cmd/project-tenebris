@@ -10,6 +10,8 @@ export type PackSize = { id: number; key: string; name: string };
 export type PackChoiceFeature = {
     name: string;
     level?: number;
+    description?: string | null;
+    marker?: string | null;
     options?: string[];
     choice_count?: number;
     option_info?: Record<string, string>;
@@ -20,7 +22,7 @@ export type PackCalling = {
     features?: PackChoiceFeature[];
 };
 export type PackRole = {
-    id: number; key: string; name: string; hit_die: string; primary_stat: string; img_url?: string | null;
+    id: number; key: string; name: string; hit_die: string; primary_stat: string; description?: string | null; img_url?: string | null;
     skill_count: number; skill_options: string[]; skill_fixed: string[]; callings?: PackCalling[];
     levels?: { level: number; features?: PackChoiceFeature[] }[];
 };
@@ -140,6 +142,60 @@ export function choiceFeaturesFor(role: PackRole | null | undefined, callingId: 
     return rows.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
 }
 
+// ---- Role / calling guides (the Learn about… panels: every level, not just unlocked picks) ----
+
+export type GuideFeature = { name: string; description: string };
+export type GuideLevel = { level: number; features: GuideFeature[] };
+export type FeatureGuide = { name: string; description: string | null; levels: GuideLevel[] };
+
+// Schedule placeholders. The real calling features live on the calling; Divine Blessing is kept.
+export const DIVINE_BLESSING_DESCRIPTION = 'Gain a Gift (a primordial blessing from Ochre, Umber or Sable). Choose it in the Traits tab.';
+
+function guideDescription(feature: PackChoiceFeature): string {
+    if (feature.description) return feature.description;
+    if (feature.name === 'Divine Blessing' || feature.marker === 'divine_blessing') return DIVINE_BLESSING_DESCRIPTION;
+    return '';
+}
+
+function skipGuideFeature(feature: PackChoiceFeature): boolean {
+    const marker = feature.marker;
+    if (marker === 'choose_calling' || marker === 'calling_feature') return true;
+    return feature.name === 'Choose Subclass' || feature.name === 'Subclass Feature';
+}
+
+function levelsFrom(rows: PackChoiceFeature[], fallbackLevel = 1): GuideLevel[] {
+    const byLevel = new Map<number, GuideFeature[]>();
+    for (const feature of rows) {
+        if (skipGuideFeature(feature)) continue;
+        const level = feature.level ?? fallbackLevel;
+        const list = byLevel.get(level) ?? [];
+        list.push({ name: feature.name, description: guideDescription(feature) });
+        byLevel.set(level, list);
+    }
+    return [...byLevel.entries()]
+        .sort((a, b) => a[0] - b[0])
+        .map(([level, features]) => ({ level, features }));
+}
+
+export function roleGuideFor(role: PackRole | null | undefined): FeatureGuide | null {
+    if (!role) return null;
+    const rows: PackChoiceFeature[] = [];
+    for (const step of role.levels ?? []) {
+        for (const feature of step.features ?? []) {
+            rows.push({ ...feature, level: step.level });
+        }
+    }
+    return { name: role.name, description: role.description ?? null, levels: levelsFrom(rows) };
+}
+
+export function callingGuideFor(role: PackRole | null | undefined, callingId: number | undefined): FeatureGuide | null {
+    if (!role || callingId == null) return null;
+    const calling = role.callings?.find((item) => item.id === callingId);
+    if (!calling) return null;
+    const rows = (calling.features ?? []).map((feature) => ({ ...feature, level: feature.level ?? 1 }));
+    return { name: calling.name, description: calling.description ?? null, levels: levelsFrom(rows) };
+}
+
 // These rows share a pool of options, so picking the same option twice is fine.
 const REPEATABLE = new Set(['Divine Blessing', 'Ability Boost', 'Primordial Ascent']);
 
@@ -218,6 +274,10 @@ export function characterOptions(pack: OptionsPack, picks: Picks) {
 
         // Pickers unlocked at this level, for this role and calling
         features: choiceFeaturesFor(role, picks.calling_id, picks.level),
+
+        // Full progression for the Learn about your role / calling panels (all levels, not just current)
+        roleGuide: roleGuideFor(role),
+        callingGuide: callingGuideFor(role, picks.calling_id),
 
         gifts: {
             choose: giftsAllowed(picks.level),

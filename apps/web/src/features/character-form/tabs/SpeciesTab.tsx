@@ -84,6 +84,7 @@ function SpeciesFields({ id }: { id: string }) {
     return (
         <form className={styles.species} onSubmit={(event) => { event.preventDefault(); onSave(); }}>
             <div className={styles.artRow}>
+            <label className={styles.art}>
                 {image && (
                     <button
                         type="button"
@@ -92,9 +93,10 @@ function SpeciesFields({ id }: { id: string }) {
                         aria-label={artOpen ? 'Hide the full picture' : 'Show the full picture'}
                         onClick={() => setArtOpen((open) => !open)}
                     >
-                        <img className={artOpen ? styles.fullArt : styles.thumb} src={artOpen ? image : thumbnail(image)} alt="" onError={() => { if (image === variantArt) setBrokenArt(image); }} />
+                        <img className={styles.fullArt} src={image} alt="" onError={() => { if (image === variantArt) setBrokenArt(image); }} />
                     </button>
                 )}
+                </label>
                 <label className={styles.field}>
                     <span className={styles.label}>Species</span>
                     <select className={styles.select} aria-label="Species" value={speciesId} onChange={(event) => pickSpecies(event.target.value)}>
@@ -103,24 +105,41 @@ function SpeciesFields({ id }: { id: string }) {
                             <option key={item.id} value={item.id}>{item.name}</option>
                         ))}
                     </select>
+                    {species && species.subspecies.length > 0 && (
+                        <Choice label="Sub-species" value={subspeciesId} onChange={(value) => { setSubspeciesId(value); setArtOpen(false); }} options={species.subspecies.map((item) => ({ value: String(item.id), label: item.name }))} />
+                    )}
+                    {species && species.subspecies.length === 0 && species.variants.length > 0 && (
+                        <Choice label="Variant" value={variant} onChange={(value) => { setVariant(value); setArtOpen(false); }} options={species.variants.map((name) => ({ value: name, label: name }))} />
+                    )}
+                </label>
+
+            </div>
+            <div className={styles.lookRow}>
+                {species && (
+                    <div className={styles.field} role="group" aria-label="Size">
+                        <span className={styles.label}>Size</span>
+                        <div className={styles.sizeButtons}>
+                            {species.sizes.map((item) => {
+                                const on = String(item.id) === sizeId;
+                                return (
+                                    <button key={item.id} type="button" className={on ? styles.sizeSelected : styles.sizeButton} aria-pressed={on} onClick={() => setSizeId(String(item.id))}>
+                                        {item.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+                <Choice label="Eye color" value={eyeColor} onChange={setEyeColor} options={options.eyeColors.map((name) => ({ value: name, label: name }))} />
+                <label className={styles.field}>
+                    <span className={styles.label}>Look</span>
+                    <textarea className={styles.look} aria-label="Look" value={look} onChange={(event) => setLook(event.target.value)} placeholder="Optional" />
                 </label>
             </div>
-            {species && species.subspecies.length > 0 && (
-                <Choice label="Sub-species" value={subspeciesId} onChange={(value) => { setSubspeciesId(value); setArtOpen(false); }} options={species.subspecies.map((item) => ({ value: String(item.id), label: item.name }))} />
-            )}
-            {species && species.subspecies.length === 0 && species.variants.length > 0 && (
-                <Choice label="Variant" value={variant} onChange={(value) => { setVariant(value); setArtOpen(false); }} options={species.variants.map((name) => ({ value: name, label: name }))} />
-            )}
-            {species && (
-                <Choice label="Size" value={sizeId} onChange={setSizeId} options={species.sizes.map((item) => ({ value: String(item.id), label: item.name }))} />
-            )}
-            <Choice label="Eye color" value={eyeColor} onChange={setEyeColor} options={options.eyeColors.map((name) => ({ value: name, label: name }))} />
-            <label className={styles.field}>
-                <span className={styles.label}>Look</span>
-                <textarea className={styles.look} aria-label="Look" value={look} onChange={(event) => setLook(event.target.value)} placeholder="Optional" />
-            </label>
-            <button type="submit" className={formStyles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
-            {error && <p className={formStyles.error} role="alert">{error}</p>}
+            <div className={styles.saveRow}>
+                <button type="submit" className={styles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
+                {error && <p className={formStyles.error} role="alert">{error}</p>}
+            </div>
         </form>
     );
 }

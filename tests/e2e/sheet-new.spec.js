@@ -12,13 +12,14 @@ test('new sheet: loads and rolls through the server', async ({ page }) => {
   await page.goto(`/characters/${id}`);
   await expect(page.getByRole('heading', { name: home.characters[0].name })).toBeVisible();
 
-  // Fists are on every character: roll to hit and expect the server's answer in the roll feed
+  // Fists are on every character: roll to hit and expect the server's answer in the roll orb
   await page.getByRole('button', { name: 'Fists to hit' }).click();
-  await expect(page.getByRole('region', { name: 'Rolls' })).toContainText('Fists: Chance to hit');
+  const orb = page.getByRole('button', { name: 'Open Roll Panel' });
+  await expect(orb).toContainText('Fists: Chance to hit');
 
   // A stat check, also rolled by the server
   await page.getByRole('button', { name: 'Roll Might' }).click();
-  await expect(page.getByRole('region', { name: 'Rolls' })).toContainText('Might roll');
+  await expect(orb).toContainText('Might roll');
 });
 
 // Rests, feature uses, casting and the spell book are server actions on the new sheet (R5).
@@ -50,11 +51,11 @@ test('new sheet: rest, features, casting and the spell book go through the serve
   expect(book.status()).toBe(200);
   expect(Array.isArray((await book.json()).learnedSpells)).toBe(true);
 
-  // A long rest from the sheet: the server's answer lands in the roll feed
+  // A long rest from the sheet: the server's answer lands in the roll orb
   await page.goto(`/characters/${id}`);
   await page.getByRole('button', { name: 'Rest', exact: true }).click();
   await page.getByRole('button', { name: 'Long Rest' }).click();
-  await expect(page.getByRole('region', { name: 'Rolls' })).toContainText('Long Rest: fully restored!');
+  await expect(page.getByRole('button', { name: 'Open Roll Panel' })).toContainText('Long Rest: fully restored!');
 
   // The Features and Spells tabs render
   await page.getByRole('button', { name: 'Features' }).click();

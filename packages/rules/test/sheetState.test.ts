@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { characterToCreature, type SheetData } from '../src/creature.ts';
-import { spendFeatureUse, takeRest, checkRestRequest, spendSlot, castSpell, checkCastRequest, checkConditionsRequest, applyConditions, type RestInput } from '../src/sheetState.ts';
+import { spendFeatureUse, takeRest, checkRestRequest, spendSlot, castSpell, checkCastRequest, checkConditionsRequest, applyConditions, checkRuneRequest, useMendingRune, type RestInput } from '../src/sheetState.ts';
 import { fixedDice } from './helpers.ts';
 
 // Real feature rows from the content pack: Reseal (2 per short rest, 3 from level 13, 1d6) and
@@ -132,4 +132,23 @@ test('conditions: a change keeps the conditions it does not name', () => {
     const now = { conditions: { blind: true, deaf: true }, exhaustion: 2 };
     assert.deepEqual(applyConditions(now, { conditions: { deaf: false, bleed: true } }), { conditions: { blind: true, deaf: false, bleed: true }, exhaustion: 2 });
     assert.deepEqual(applyConditions(now, { exhaustion: 5 }), { conditions: { blind: true, deaf: true }, exhaustion: 5 });
+});
+
+test('useMendingRune rolls 1d6 plus Intellect and spends the long-rest use', () => {
+    const data: SheetData = {
+        character: {
+            id: 3, name: 'Tamsin', level: 10, max_hp: 60, current_hp: 60,
+            str: 10, dex: 12, con: 14, int: 16, wis: 10, cha: 10, spd: 10, luc: 10,
+            spell_stat: 'int', casting_stat: 'int', class_name: 'Mage', subclass_name: 'Rune Weaver',
+        },
+        ownedArmor: [{ id: 5, name: 'Leather', is_equipped: true, armor_type: 'light', ac_bonus: 1, runes: [{ id: 9, name: 'Mending Rune' }] }],
+    };
+    const c = characterToCreature(data);
+    assert.deepEqual(checkRuneRequest({ runeKey: 'rune-9' }), { runeKey: 'rune-9' });
+    assert.ok('error' in checkRuneRequest({}));
+    const out = useMendingRune(c, 'rune-9', fixedDice(4));
+    assert.deepEqual(out, { text: "Mending Rune (Leather): reduce the hit's damage by 7 (reaction, 1/long rest).", restUses: { 'rune-9': 1 } });
+    const used = characterToCreature({ ...data, character: { ...data.character, rest_uses: { 'rune-9': 1 } } });
+    assert.deepEqual(useMendingRune(used, 'rune-9', fixedDice(4)), { error: 'Mending Rune: used until your next long rest.' });
+    assert.deepEqual(useMendingRune(c, 'rune-8', fixedDice(4)), { error: 'No Mending Rune on an equipped item' });
 });

@@ -11,8 +11,11 @@ test('traits scores follow the server rolls, and a finished character cannot rer
     const { id } = await created.json();
 
     await page.goto(`/characters/${id}/edit?tab=traits`);
+    // Roll 1 on the page, and wait for the server before rolling the rest, so the eight rolls don't race
+    const firstRoll = page.waitForResponse((res) => res.url().includes('/stat-rolls') && res.request().method() === 'POST');
     await page.getByRole('button', { name: 'Roll', exact: true }).first().click();
-    await expect(page.locator('ol li').first()).not.toContainText('Not rolled');
+    expect((await firstRoll).ok()).toBeTruthy();
+    await expect(page.locator('ol li').first()).toContainText('Tap to place');
 
     for (let index = 1; index < 8; index++) {
         const rolled = await page.request.post(`/api/characters/${id}/stat-rolls`, { data: { index } });
@@ -20,8 +23,10 @@ test('traits scores follow the server rolls, and a finished character cannot rer
     }
 
     const form = await (await page.request.get(`/api/characters/${id}/form`)).json();
+    // Every one of the eight rolls must be made (an unrolled one is null) before scores can follow them
+    expect(form.traits.rolls).toHaveLength(8);
+    for (const roll of form.traits.rolls) expect(roll).not.toBeNull();
     const totals = form.traits.rolls.map((roll) => roll.total);
-    expect(totals).toHaveLength(8);
 
     const placement = { str: 0, dex: 1, con: 2, int: 3, wis: 4, cha: 5, luc: 6, spd: 7 };
     const saved = await page.request.put(`/api/characters/${id}/form/traits`, {
@@ -34,7 +39,8 @@ test('traits scores follow the server rolls, and a finished character cannot rer
     expect(body.traits.scores.str).not.toBe(99);
 
     await page.reload();
-    await expect(page.getByLabel('Might')).not.toHaveValue('');
+    // Might is a stat tile now: after a reload it still shows roll 1's total
+    await expect(page.locator('form button').filter({ hasText: /^Might/ })).toContainText(String(totals[0]));
 
     const duplicate = await page.request.put(`/api/characters/${id}/form/traits`, {
         data: { placement: { ...placement, dex: 0 }, plus2: 'str', plus1: 'dex', gifts: [] },

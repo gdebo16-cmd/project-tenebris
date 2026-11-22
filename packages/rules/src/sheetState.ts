@@ -31,6 +31,29 @@ export function spendFeatureUse(creature: Creature, key: string, rng: Rng): Feat
     return { text: `${creature.name} uses ${f.name}${usesText}!${rolled}`, restUses };
 }
 
+
+// ---- Utility rune actions ----
+
+export function checkRuneRequest(body: unknown): { error: string } | { runeKey: string } {
+    const key = (body as { runeKey?: unknown } | null)?.runeKey;
+    if (typeof key !== 'string' || key.length === 0 || key.length > 60) return { error: 'Which rune?' };
+    return { runeKey: key };
+}
+
+// Mending Rune: 1/long rest reaction, reduce a hit by 1d6 + INT. The use is saved as rest_uses["rune-..."],
+// which takeRest already holds through a short rest and clears on a long rest.
+export function useMendingRune(creature: Creature, runeKey: string, rng: Rng): FeatureUseResult {
+    const rune = creature.utilityRunes.mending.find((m) => m.key === runeKey);
+    if (!rune) return { error: 'No Mending Rune on an equipped item' };
+    if (creature.restUses[runeKey]) return { error: 'Mending Rune: used until your next long rest.' };
+    const intMod = creature.stats.find((s) => s.key === 'int')?.mod ?? 0;
+    const n = Math.max(0, rollDice('1d6', rng).total + intMod);
+    return {
+        text: `Mending Rune (${rune.item}): reduce the hit's damage by ${n} (reaction, 1/long rest).`,
+        restUses: { ...creature.restUses, [runeKey]: 1 },
+    };
+}
+
 // ---- Rests ----
 
 export type RestInput = {

@@ -108,10 +108,20 @@ function SavedHeader({ id }: { id: string }) {
         setFilled(true);
     }, [form.data, filled]);
 
-    async function save() {
+    // Saves on its own: the name when the box loses focus (or Enter), level and portrait as soon as they change.
+    // Level and portrait pass the new value in, because the state hasn't updated yet when this runs.
+    type HeaderChange = { name?: string; level?: string; portrait_url?: string | null };
+    async function save(change: HeaderChange = {}) {
+        const next = {
+            name: change.name ?? name,
+            level: Number(change.level ?? level),
+            portrait_url: change.portrait_url !== undefined ? change.portrait_url : portraitUrl,
+        };
+        const saved = form.data?.header;
+        if (saved && next.name === (saved.name ?? '') && next.level === saved.level && next.portrait_url === saved.portrait_url) return;
         setError('');
         try {
-            await saveTab.mutateAsync({ name, level: Number(level), portrait_url: portraitUrl });
+            await saveTab.mutateAsync(next);
         } catch (err) {
             setError(messageOf(err));
         }
@@ -131,9 +141,9 @@ function SavedHeader({ id }: { id: string }) {
             saving={saveTab.isPending}
             error={error}
             onName={setName}
-            onLevel={setLevel}
-            onPortrait={setPortraitUrl}
-            onSave={save}
+            onLevel={(next) => { setLevel(next); void save({ level: next }); }}
+            onPortrait={(next) => { setPortraitUrl(next); void save({ portrait_url: next }); }}
+            onSave={() => void save()}
         />
     );
 }

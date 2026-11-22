@@ -1,5 +1,15 @@
 /* The 8 rolls, where each one is placed, the two bonuses, and gifts. */
 
+.stat {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 20fr 1fr;
+    grid-template-areas: 
+    "a b" "c c";
+
+    gap: 0.9rem;
+}
+
 .traits {
     display: flex;
     flex-direction: column;
@@ -7,21 +17,267 @@
     max-width: 40rem;
 }
 
-.rolls {
+.rollsContainer {
+    grid-area: a;
+    border: 2px solid var(--border, #b27f50);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.9rem;
+    background: var(--bg, #1a1030);
+}
+
+.plusContainer {
+    grid-area: b;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.saveContainer {
+    grid-area: c;
+
+
+
+}
+
+.save {
+    width: 100%;
+    padding: 10px;
+    margin: 0;
+    background: var(--accent, #3a2e1c);
+    border: none;
+    border-radius: .5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    &:hover {
+        background: var(--accent, #3a2e1c);
+    }
+}
+
+.bonusContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+    gap: 0.9rem;
+    border: 2px solid var(--border, #b27f50);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    background: var(--bg, #1a1030);
+}
+
+.giftsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    border: 2px solid var(--border, #b27f50);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    margin: 0;
+    background: var(--bg, #1a1030);
+}
+
+.bonusesTitle {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.bonusLabel {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.bonusTiles {
+    display: flex;
+    flex-direction: row;
+    gap: 0.9rem;
+    width: 100%;
+}
+
+.bonusTile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    width: 100%;
+    
+}
+
+.bonusSelect {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 1rem;
+    padding: 0.9rem;
+    background: var(--bg, #1a1030);
+}
+
+.rollTiles {
+    width: 100%;
+
+}
+
+.rolls {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+    margin: 0;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.roll {
+.actions {
     display: flex;
-    flex-wrap: wrap;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.4rem 0.7rem;
+    border-bottom: 2px solid var(--border, #b27f50);
+    padding-bottom: 0.9rem;
 }
+
+.rollsTitle {
+    font-size: 1.4rem;
+    font-weight: 700;
+
+}
+
+.roll {
+    border: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 1rem;
+}
+
+
+.gifts {             
+    max-height: 40vh;       
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding: 0;
+    list-style: none;
+    margin: 0;
+    border: 0;
+    width: 100%;
+
+}
+
+.giftButton {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-start;
+    width: calc(100% - 1rem);
+    margin: 0.5rem;
+    background: var(--bg, #1a1030);
+    border-radius: 1rem;
+    border: 2px solid var(--border, #b27f50);
+    padding: .5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    &:hover {
+        background: var(--accent, #3a2e1c);
+    }
+}
+.giftTitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border, #b27f50);
+    padding-bottom: 0.9rem;
+    width: 100%;
+    text-align: left;
+}
+.giftDescription {
+    font-size: 1rem;
+    font-weight: 400;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 0.9rem;
+    list-style: none;
+}
+.gift {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-start;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+
+.heading { margin: 0; font-size: 1rem; }
+
+.note { margin: 0; font-size: 0.85rem; opacity: 0.85; }
+
+.heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border, #b27f50);
+    padding-bottom: 0.9rem;
+}
+
+.rollEmpty,
+.rollPick,
+.rollArmed,
+.rollPlaced {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    border: 2px solid var(--border, #b27f50);
+    background: var(--border, #1a1030);
+}
+
+.rollPick {                
+    border: 1px solid var(--border, #b27f50);
+    background: var(--bg, #1a1030);
+}
+.rollArmed {                
+    border: 1px solid var(--accent-2, #c9974a);
+    background: var(--accent, #3a2e1c);
+}
+.rollPlaced {               
+    border: 1px solid var(--muted, #b27f50);
+    background: var(--muted, #1a1030);
+    opacity: 0.6;
+}
+
+.place {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+}
+.statEmpty,
+.statFilled {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #3a3346;
+    background: #221e2b;
+    color: inherit;
+    cursor: pointer;
+}
+.statFilled {
+    border-color: #c9974a;
+    background: #3a2e1c;
+}
+.statTotal {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
 
 .dice { display: flex; gap: 0.25rem; }
 
@@ -37,7 +293,8 @@
 
 .dropped { opacity: 0.45; text-decoration: line-through; }
 
-.total { min-width: 2rem; font-weight: 700; }
+.total {  font-size: 1.2rem; font-weight: 700; }
+.rollTotal { font-size: 1.2rem; font-weight: 400; }
 
 .actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
@@ -51,7 +308,8 @@
     cursor: pointer;
 }
 
-.place, .bonuses { display: flex; flex-direction: column; gap: 0.35rem; }
+/* .place is the 2-column stat grid above; only the old bonus list stacks */
+.bonuses { display: flex; flex-direction: column; gap: 0.35rem; }
 
 .place label, .bonuses label {
     display: grid;
@@ -70,10 +328,101 @@
     border-radius: 4px;
 }
 
-.gifts { display: flex; flex-direction: column; gap: 0.25rem; margin: 0; padding: 0; border: 0; }
+.giftsTitle {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
 
-.gift { display: flex; gap: 0.4rem; align-items: flex-start; }
+.giftList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 
-.heading { margin: 0; font-size: 1rem; }
 
-.note { margin: 0; font-size: 0.85rem; opacity: 0.85; }
+
+
+
+/* Phones: one column. Stat rolls card (4 roll tiles, 2-column stats), bonuses, gifts, then Save. */
+@media (max-width: 720px) {
+    .stat {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: none;
+        grid-template-areas: "a" "b" "c";
+    }
+
+    .traits { max-width: none; }
+
+    .rollsContainer,
+    .bonusContainer,
+    .giftsContainer {
+        padding: 0.85rem;
+        border-radius: 1rem;
+    }
+
+    .actions {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .actionsButtons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .rolls { gap: 0.4rem; }
+
+    .roll { min-width: 0; }
+
+    .rollEmpty,
+    .rollPick,
+    .rollArmed,
+    .rollPlaced {
+        min-width: 0;
+        min-height: 5.5rem;
+        padding: 0.5rem 0.25rem;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        border-radius: 0.75rem;
+    }
+
+    .dice {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.15rem;
+    }
+
+    .die,
+    .dropped {
+        min-width: 1.1rem;
+        padding: 0 0.15rem;
+        font-size: 0.75rem;
+    }
+
+    .total { font-size: 1.1rem; }
+
+    .place {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.4rem;
+    }
+
+    .statEmpty,
+    .statFilled {
+        min-width: 0;
+        padding: 0.7rem 0.8rem;
+    }
+
+    .bonusSelect { padding: 0.6rem; }
+
+    .gifts { max-height: 50vh; }
+
+    .giftButton {
+        width: 100%;
+        margin: 0.25rem 0;
+    }
+}

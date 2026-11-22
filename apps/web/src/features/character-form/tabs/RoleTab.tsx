@@ -9,6 +9,7 @@ import type { Options } from '@tenebris/rules/characterForm';
 
 type RoleChoice = Options['roles'][number];
 type FeatureChoice = Options['features'][number];
+type CallingChoice = Options['callings'][number];
 
 function runeThumb(key: string): string {
     return `/glyphs/classes/thumbs/${key}.webp`;
@@ -31,6 +32,8 @@ function RoleFields({ id }: { id: string }) {
     const [skills, setSkills] = useState<string[]>([]);
     const [picks, setPicks] = useState<Record<string, string[]>>({});
     const [artOpen, setArtOpen] = useState(false);
+    const [roleGuideOpen, setRoleGuideOpen] = useState(false);
+    const [callingGuideOpen, setCallingGuideOpen] = useState(false);
     const [filled, setFilled] = useState(false);
     const [error, setError] = useState('');
 
@@ -55,7 +58,10 @@ function RoleFields({ id }: { id: string }) {
 
     // The header save clears a calling once the level drops below 3. Hide it here too.
     useEffect(() => {
-        if (level < CALLING_LEVEL) setCallingId('');
+        if (level < CALLING_LEVEL) {
+            setCallingId('');
+            setCallingGuideOpen(false);
+        }
     }, [level]);
 
     if (form.error) return <p className={formStyles.error} role="alert">{messageOf(form.error)}</p>;
@@ -70,6 +76,16 @@ function RoleFields({ id }: { id: string }) {
         setSkills([]);
         setPicks({});
         setArtOpen(false);
+        setRoleGuideOpen(false);
+        setCallingGuideOpen(false);
+        setError('');
+    }
+
+    function pickCalling(next: CallingChoice) {
+        setCallingId(String(next.id));
+        setSkills([]);
+        setPicks((current) => dropCallingPicks(current))
+        setCallingGuideOpen(false);
         setError('');
     }
 
@@ -105,19 +121,8 @@ function RoleFields({ id }: { id: string }) {
 
     return (
         <form className={styles.role} onSubmit={(event) => { event.preventDefault(); onSave(); }}>
-            <ul className={styles.list}>
-                {options.roles.map((item) => {
-                    const selected = String(item.id) === roleId;
-                    return (
-                        <li key={item.id}>
-                            <button type="button" className={selected ? styles.roleSelected : styles.roleButton} aria-pressed={selected} onClick={() => pickRole(item)}>
-                                <img className={styles.icon} src={runeThumb(item.key)} alt="" />
-                                {item.name}
-                            </button>
-                        </li>
-                    );
-                })}
-            </ul>
+        <div className={styles.roleContainer}>
+            <span className={styles.roletitle}>Role</span>
             {role && (
                 <div className={styles.picked}>
                     <button type="button" className={styles.artButton} aria-expanded={artOpen} aria-label={artOpen ? 'Hide the full rune' : 'Show the full rune'} onClick={() => setArtOpen((open) => !open)}>
@@ -130,56 +135,136 @@ function RoleFields({ id }: { id: string }) {
                     </div>
                 </div>
             )}
-            {options.callings.length > 0 && (
-                <label className={styles.choices}>
-                    <span>Calling</span>
-                    <select aria-label="Calling" value={callingId} onChange={(event) => { setCallingId(event.target.value); setPicks((current) => dropCallingPicks(current)); }}>
-                        <option value="">Choose</option>
-                        {options.callings.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-                    </select>
-                </label>
+            {role && (
+                <>
+                    <button type="button" className={roleGuideOpen ? styles.guideOpen : styles.guideButton} aria-expanded={roleGuideOpen} aria-controls="role-guide" onClick={() => setRoleGuideOpen((open) => !open)}>
+                        Learn about your role
+                    </button>
+                    {roleGuideOpen && <GuideList id="role-guide" guide={options.roleGuide} level={level} empty="This role has no features listed yet." />}
+                </>
             )}
-            {skillRule && (
-                <fieldset className={styles.choices}>
-                    <legend className={styles.heading}>Choose {skillRule.choose} · {chosenCount} chosen</legend>
-                    {skillRule.fixed.map((name) => (
-                        <label key={name} className={styles.choice}>
-                            <input type="checkbox" checked disabled />
-                            {name} (given)
-                        </label>
-                    ))}
-                    {skillRule.from.map((name) => {
-                        const on = skills.includes(name);
-                        const full = !on && chosenCount >= skillRule.choose;
+            
+            <ul className={styles.list}>
+                {options.roles.map((item) => {
+                    const selected = String(item.id) === roleId;
+                    return (
+                        <li className={styles.roleTile} key={item.id}>
+                            <button type="button" className={selected ? styles.roleSelected : styles.roleButton} aria-pressed={selected} onClick={() => pickRole(item)}>
+                                <img className={styles.icon} src={runeThumb(item.key)} alt="" />
+                                <div className={styles.roleInfo}>
+                                    <p className={styles.roleName}>{item.name}</p>
+                                    <p className={styles.roleHitDie}>Hit die: {item.hit_die}</p>
+                                    <p className={styles.rolePrimaryStat}>Primary stat: {item.primary_stat}</p>
+                                </div>
+                            </button>
+                        </li>
+                    );
+                })}
+            </ul>
+            </div>
+            <div className={styles.choicesContainer}>
+                <div className={styles.callingContainer}>
+                    <span className={styles.callingTitle}>Calling</span>                  
+                    <ul className={styles.CallList}>
+                        {options.callings.map((call) => {
+                            const selected = String(call.id) === callingId;
+                            return (
+                            <li className={styles.callTile} key={call.id}>
+                                <button type="button" className={selected ? styles.callSelected : styles.callButton} aria-pressed={selected} onClick={() => pickCalling(call)}>
+                                    <p className={styles.callName}>{call.name}</p>
+                                </button>
+                                </li>
+                                );
+                            })}
+                    </ul>
+                    {callingId && (
+                        <>
+                            <button type="button" className={callingGuideOpen ? styles.guideOpen : styles.guideButton} aria-expanded={callingGuideOpen} aria-controls="calling-guide" onClick={() => setCallingGuideOpen((open) => !open)}>
+                                Learn about your calling
+                            </button>
+                            {callingGuideOpen && <GuideList id="calling-guide" guide={options.callingGuide} level={level} empty="This calling has no features listed yet." />}
+                        </>
+                    )}
+                </div>
+                <div className={styles.skillsContainer}>
+                    <span className={styles.skillsTitle}>Skills</span>
+                    <p className={styles.heading}>Choose {skillRule?.choose} · {chosenCount} chosen</p>
+                    {skillRule && (
+                        <ul className={styles.skillList}>
+                            
+                            {skillRule.fixed.map((name) => (
+                                <li key={name} className={styles.skillTile}>
+                                    <p className={styles.skillName}>{name}</p>
+                                </li>
+                            ))}
+                            {skillRule.from.map((name) => {
+                                const on = skills.includes(name);
+                                const full = !on && chosenCount >= skillRule.choose;
+                                return (
+                                    <li key={name} className={full ? styles.skillTileDisabled : styles.skillTile}>
+                                        <button type="button" className={full ? styles.skillButtonDisabled : on ? styles.skillSelected : styles.skillButton} disabled={full} aria-pressed={on} onClick={() => toggleSkill(name)}>
+                                            <p className={styles.skillName}>{name}</p>
+                                        </button>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        )}
+                    </div>
+
+                <div className={styles.featuresContainer}>
+                    <span className={styles.featuresTitle}>Features</span>
+                    {options.features.map((feature) => {
+                        const chosen = picks[feature.key] ?? [];
                         return (
-                            <label key={name} className={styles.choice}>
-                                <input type="checkbox" checked={on} disabled={full} onChange={() => toggleSkill(name)} />
-                                {name}
-                            </label>
+                            <fieldset key={feature.key} className={styles.choices}>
+                                <legend className={styles.heading}>{feature.name}: choose {feature.choose} · {chosen.length} chosen</legend>
+                                {feature.options.map((option) => {
+                                    const on = chosen.includes(option);
+                                    return (
+                                        <label key={option} className={styles.choice}>
+                                            <input type="checkbox" checked={on} disabled={!on && chosen.length >= feature.choose} onChange={() => togglePick(feature, option)} />
+                                            {option}
+                                        </label>
+                                    );
+                                })}
+                            </fieldset>
                         );
                     })}
-                </fieldset>
-            )}
-            {options.features.map((feature) => {
-                const chosen = picks[feature.key] ?? [];
-                return (
-                    <fieldset key={feature.key} className={styles.choices}>
-                        <legend className={styles.heading}>{feature.name}: choose {feature.choose} · {chosen.length} chosen</legend>
-                        {feature.options.map((option) => {
-                            const on = chosen.includes(option);
-                            return (
-                                <label key={option} className={styles.choice}>
-                                    <input type="checkbox" checked={on} disabled={!on && chosen.length >= feature.choose} onChange={() => togglePick(feature, option)} />
-                                    {option}
-                                </label>
-                            );
-                        })}
-                    </fieldset>
-                );
-            })}
-            <button type="submit" className={formStyles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
-            {error && <p className={formStyles.error} role="alert">{error}</p>}
+                </div>
+            </div>
+            <div className={styles.buttonsContainer}>
+                <button type="submit" className={styles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
+                {error && <p className={formStyles.error} role="alert">{error}</p>}
+            </div>
         </form>
+    );
+}
+
+
+type FeatureGuide = Options['roleGuide'];
+
+function GuideList({ id, guide, level, empty }: { id: string; guide: FeatureGuide; level: number; empty: string }) {
+    if (!guide || guide.levels.length === 0) {
+        return <div id={id} className={styles.guidePanel}><p className={styles.guideEmpty}>{empty}</p></div>;
+    }
+    return (
+        <div id={id} className={styles.guidePanel}>
+            {guide.description && <p className={styles.guideBlurb}>{guide.description}</p>}
+            <ol className={styles.guideList}>
+                {guide.levels.map((step) => (
+                    <li key={step.level} className={step.level <= level ? styles.guideLevelReached : styles.guideLevel}>
+                        <p className={styles.guideLevelLabel}>Level {step.level}</p>
+                        {step.features.map((feature, index) => (
+                            <div key={`${feature.name}-${index}`} className={styles.guideFeature}>
+                                <p className={styles.guideFeatureName}>{feature.name}</p>
+                                {feature.description ? <p className={styles.guideFeatureText}>{feature.description}</p> : null}
+                            </div>
+                        ))}
+                    </li>
+                ))}
+            </ol>
+        </div>
     );
 }
 

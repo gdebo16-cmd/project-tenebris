@@ -6,16 +6,9 @@ import styles from './PersonalityTab.module.css';
 import { useCharacterForm, useSaveTab } from '../queries.ts';
 import type { Options } from '@tenebris/rules/characterForm';
 
-const LAW = [
-    { axis: -1, label: 'Lawful' },
-    { axis: 0, label: 'Natural' },
-    { axis: 1, label: 'Chaotic' },
-];
-const GOOD = [
-    { axis: 1, label: 'Good' },
-    { axis: 0, label: 'Natural' },
-    { axis: -1, label: 'Evil' },
-];
+// Columns run Lawful, Natural, Chaotic; rows run Good, Natural, Evil.
+const LAW = [-1, 0, 1];
+const GOOD = [1, 0, -1];
 
 const PICKS = [
     { key: 'upbringing', list: 'upbringings', label: 'Upbringing' },
@@ -91,62 +84,66 @@ function PersonalityFields({ id }: { id: string }) {
 
     return (
         <form className={styles.personality} onSubmit={(event) => { event.preventDefault(); onSave(); }}>
-            <div className={styles.chart} role="radiogroup" aria-label="Alignment">
-                <span />
-                {LAW.map((col) => <span key={col.axis} className={styles.axis}>{col.label}</span>)}
-                {GOOD.map((row) => (
-                    <span key={row.axis} className={styles.contents}>
-                        <span className={styles.axis}>{row.label}</span>
-                        {LAW.map((col) => {
-                            const alignment = options.alignments.find((item) => item.law_axis === col.axis && item.good_axis === row.axis);
-                            if (!alignment) return <span key={col.axis} />;
-                            return (
-                                <button
-                                    key={alignment.code}
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={code === alignment.code}
-                                    className={styles.cell}
-                                    onClick={() => setCode(alignment.code)}
-                                >
-                                    {alignment.name}
-                                </button>
-                            );
-                        })}
-                    </span>
-                ))}
-            </div>
-            <div className={styles.picks}>
-                {PICKS.map((pick) => {
-                    const list = options[pick.list];
-                    const picked = optionOf(pick.key);
-                    const taken = takenBy(pick.key);
-                    const choices = list.filter((item) => String(item.id) === ids[pick.key] || item.any_state || !item.state || !taken.includes(item.state));
-                    return (
-                        <label key={pick.key}>
-                            {pick.label}
-                            <select aria-label={pick.label} value={ids[pick.key]} onChange={(event) => {
-                                setIds((current) => ({ ...current, [pick.key]: event.target.value }));
-                                setWild((current) => ({ ...current, [pick.key]: '' }));
-                            }}>
-                                <option value="">Choose</option>
-                                {choices.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-                            </select>
-                            {picked && !picked.any_state && <span className={styles.note}>{picked.flavor ?? `State: ${picked.state}`}</span>}
-                            {picked?.any_state && (
-                                <select aria-label={`${pick.label} state`} value={wild[pick.key]} onChange={(event) => setWild((current) => ({ ...current, [pick.key]: event.target.value }))}>
-                                    <option value="">Choose a state</option>
-                                    {options.states.filter((state) => state === wild[pick.key] || !taken.includes(state)).map((state) => (
-                                        <option key={state} value={state}>{state}</option>
-                                    ))}
+            <section className={styles.card}>
+                <h2 className={styles.cardTitle}>Alignment</h2>
+                <div className={styles.chart} role="radiogroup" aria-label="Alignment">
+                    {GOOD.map((good) => LAW.map((law) => {
+                        const alignment = options.alignments.find((item) => item.law_axis === law && item.good_axis === good);
+                        if (!alignment) return <span key={`${law}:${good}`} />;
+                        const on = code === alignment.code;
+                        return (
+                            <button
+                                key={alignment.code}
+                                type="button"
+                                role="radio"
+                                aria-checked={on}
+                                aria-label={alignment.name}
+                                className={on ? styles.cellSelected : styles.cell}
+                                onClick={() => setCode(alignment.code)}
+                            >
+                                <span className={styles.cellCode}>{alignment.code}</span>
+                                <span className={styles.cellName}>{alignment.name}</span>
+                            </button>
+                        );
+                    }))}
+                </div>
+            </section>
+            <section className={styles.card}>
+                <h2 className={styles.cardTitle}>Background</h2>
+                <div className={styles.picks}>
+                    {PICKS.map((pick) => {
+                        const list = options[pick.list];
+                        const picked = optionOf(pick.key);
+                        const taken = takenBy(pick.key);
+                        const choices = list.filter((item) => String(item.id) === ids[pick.key] || item.any_state || !item.state || !taken.includes(item.state));
+                        return (
+                            <label key={pick.key} className={styles.pick}>
+                                <span className={styles.pickLabel}>{pick.label}</span>
+                                <select className={styles.select} aria-label={pick.label} value={ids[pick.key]} onChange={(event) => {
+                                    setIds((current) => ({ ...current, [pick.key]: event.target.value }));
+                                    setWild((current) => ({ ...current, [pick.key]: '' }));
+                                }}>
+                                    <option value="">Choose</option>
+                                    {choices.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
                                 </select>
-                            )}
-                        </label>
-                    );
-                })}
+                                {picked && !picked.any_state && <span className={styles.note}>{picked.flavor ?? `State: ${picked.state}`}</span>}
+                                {picked?.any_state && (
+                                    <select className={styles.select} aria-label={`${pick.label} state`} value={wild[pick.key]} onChange={(event) => setWild((current) => ({ ...current, [pick.key]: event.target.value }))}>
+                                        <option value="">Choose a state</option>
+                                        {options.states.filter((state) => state === wild[pick.key] || !taken.includes(state)).map((state) => (
+                                            <option key={state} value={state}>{state}</option>
+                                        ))}
+                                    </select>
+                                )}
+                            </label>
+                        );
+                    })}
+                </div>
+            </section>
+            <div className={styles.actions}>
+                {error && <p className={formStyles.error} role="alert">{error}</p>}
+                <button type="submit" className={styles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
             </div>
-            <button type="submit" className={formStyles.save} disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save'}</button>
-            {error && <p className={formStyles.error} role="alert">{error}</p>}
         </form>
     );
 }

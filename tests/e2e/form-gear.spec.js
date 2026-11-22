@@ -1,5 +1,5 @@
 // R4.8: auto default fills the kit, default money is one of three presets (saved to the coin columns),
-// and Finish opens the sheet with the weapon equipped and the picked coins in the purse.
+// and Create character opens the sheet with the weapon equipped and the picked coins in the purse.
 import { test, expect } from '@playwright/test';
 import { login } from './helpers.js';
 
@@ -28,7 +28,7 @@ test('auto default equips gear and finish opens the sheet', async ({ page }) => 
     })).ok()).toBeTruthy();
 
     await page.goto(`/characters/${id}/edit?tab=gear`);
-    await page.getByRole('tabpanel', { name: 'Inventory' }).getByRole('button', { name: 'Finish' }).click();
+    await page.getByRole('tabpanel', { name: 'Inventory' }).getByRole('button', { name: 'Create character' }).click();
     await expect(page.getByRole('alert')).toContainText(/not done/i);
     await expect(page.getByText(/stat rolls/i)).toBeVisible();
     await expect(page.getByText(/pick default money/i)).toBeVisible();
@@ -74,12 +74,12 @@ test('auto default equips gear and finish opens the sheet', async ({ page }) => 
     expect(savedGear.money_preset).toBe('average');
     expect(savedGear.purse).toEqual({ copper: 10, silver: 10, gold: 0, crowns: 0, oracles: 0 });
 
-    // Pick Wealthy on the page; Finish saves the pick
+    // Pick Wealthy on the page; Create character saves the pick
     const wealthy = page.getByRole('button', { name: /^Wealthy/ });
     await wealthy.click();
     await expect(wealthy).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('button', { name: /^Average/ })).toHaveAttribute('aria-pressed', 'false');
-    await page.getByRole('tabpanel', { name: 'Inventory' }).getByRole('button', { name: 'Finish' }).click();
+    await page.getByRole('tabpanel', { name: 'Inventory' }).getByRole('button', { name: 'Create character' }).click();
     await expect(page).toHaveURL(new RegExp(`/characters/${id}$`));
     await expect(page.getByText(weapon.name).first()).toBeVisible();
 

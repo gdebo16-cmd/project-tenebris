@@ -129,10 +129,11 @@ button.tile { border-color: var(--border, #b27f50); cursor: pointer; }
     background: color-mix(in srgb, var(--accent, #d4af37) 25%, transparent);
 }
 
-/* Section tabs */
+/* Section tabs. .tab and .tabActive are exclusive (one class per state). */
 .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; border-bottom: 1px solid var(--border, #b27f50); }
 
-.tab {
+.tab,
+.tabActive {
     min-height: 44px;
     border: none;
     border-bottom: 3px solid transparent;
@@ -140,11 +141,14 @@ button.tile { border-color: var(--border, #b27f50); cursor: pointer; }
     color: inherit;
     font: inherit;
     font-weight: 600;
-    opacity: 0.7;
     cursor: pointer;
 }
 
-.tabActive { border-bottom-color: var(--accent, #d4af37); opacity: 1; }
+.tab { opacity: 0.7; }
+.tabActive {
+    border-bottom-color: var(--accent, #d4af37);
+    opacity: 1;
+}
 
 /* Rows: actions, spells, gear, features, rolls */
 .row {
@@ -211,3 +215,57 @@ button.tile { border-color: var(--border, #b27f50); cursor: pointer; }
 .optionBox { width: 18px; height: 18px; accent-color: var(--accent, #d4af37); }
 .runeLine { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; }
 .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; }
+
+/* Mobile-only Stats / Combat / Condition tabs. Wrappers are display: contents on desktop so
+   the two-column layout and block order stay the same. */
+.mobileTabs { display: none; }
+.mobilePanel,
+.mobilePanelHidden { display: contents; }
+
+@media (max-width: 720px) {
+    .mobileTabs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 4px;
+        border-bottom: 1px solid var(--border, #b27f50);
+    }
+
+    .mobilePanelHidden { display: none; }
+}
+
+/* Exclusive primary button (all of .button plus the gold fill, used alone). */
+.buttonPrimary {
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--accent, #d4af37);
+    background: var(--accent, #d4af37);
+    color: var(--bg, #0d042c);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+.buttonPrimary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.nameButton {
+    display: block;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.details {
+    flex: 1 1 100%;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--bg, #0d042c);
+    border: 1px solid var(--border, #b27f50);
+    font-size: 13px;
+}
+.details p { margin: 0 0 6px; }
+.details p:last-child { margin: 0; }

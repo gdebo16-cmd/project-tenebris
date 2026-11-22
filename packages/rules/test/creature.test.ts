@@ -145,3 +145,20 @@ test('reaver: soul-branded weapon uses Confidence', () => {
     assert.equal(c.strikes.soulStrikeDice, '2d8');
     assert.equal(c.classDc, 8 + 4 + 4);
 });
+
+test('utility runes: lanterns and mending appear on the creature', () => {
+    const c = characterToCreature({
+        ...runeWeaver,
+        ownedArmor: [{
+            id: 5, name: 'Leather', is_equipped: true, armor_type: 'light', ac_bonus: 1,
+            runes: [
+                { id: 1, name: 'Guard Rune' }, { id: 2, name: 'Warding Rune', choice_value: 'fire' },
+                { id: 3, name: 'Fleet Rune' }, { id: 8, name: 'Lantern Rune' }, { id: 9, name: 'Mending Rune' },
+            ],
+        }],
+    });
+    assert.equal(c.utilityRunes.fleet, true);
+    assert.deepEqual(c.utilityRunes.lanterns.map((l) => l.key), ['rune-8']);
+    assert.equal(c.utilityRunes.lanterns[0].item, 'Leather');
+    assert.deepEqual(c.utilityRunes.mending.map((m) => m.key), ['rune-9']);
+});

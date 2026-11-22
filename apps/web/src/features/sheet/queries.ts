@@ -47,7 +47,8 @@ export function useSheetChange(id: string) {
 export type SheetDo =
     | { path: 'feature'; body: { featureKey: string } }
     | { path: 'rest'; body: { type: 'short' | 'long' } }
-    | { path: 'cast'; body: { actionKey: string; castLevel?: number } };
+    | { path: 'cast'; body: { actionKey: string; castLevel?: number } }
+    | { path: 'rune'; body: { runeKey: string } };
 
 export function useSheetDo(id: string) {
     const queryClient = useQueryClient();

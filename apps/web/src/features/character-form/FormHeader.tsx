@@ -40,7 +40,7 @@ export default function FormHeader({ name, level, savedLevel, portraitUrl, summa
                 <div className={styles.nameLevel}>
                     <label className={styles.field}>
                         <span className={styles.label}>Name</span>
-                        <input className={styles.input} value={name} onChange={(event) => onName(event.target.value)} aria-label="Name" autoComplete="off" placeholder={DEFAULT_CHARACTER_NAME} />
+                        <input className={styles.input} value={name} onChange={(event) => onName(event.target.value)} aria-label="Name" autoComplete="off" onBlur={onSave} placeholder={DEFAULT_CHARACTER_NAME} />
                     </label>
                     <label className={styles.field}>
                         <span className={styles.label}>Level</span>
@@ -52,7 +52,7 @@ export default function FormHeader({ name, level, savedLevel, portraitUrl, summa
                     </label>
                 </div>
                 <p className={styles.summary}>{summary}</p>
-                <button type="submit" className={styles.save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
+                {saving && <p className={styles.summary} role="status">Saving…</p>}
                 {error && <p className={styles.error} role="alert">{error}</p>}
             </div>
             {open && (

@@ -28,6 +28,7 @@ export type SheetArmor = {
 };
 export type SheetSpell = {
     id: number; name: string; base_level: number; is_action?: boolean; is_prepared?: boolean; action_type?: string | null;
+    description?: string | null;
     attack_type?: string | null; opponent_save_roll?: string | null; base_to_hit_modifier?: number | null;
     base_damage_dice?: string | null; heal_dice?: string | null; heal_add_mod?: boolean; dmgMod?: number;
     beam_scaling?: ScalingStep[] | null;
@@ -110,6 +111,7 @@ export type Creature = {
     gear: { armor: SheetArmor[]; weapons: SheetWeapon[]; items: SheetItem[] };
     allSpells: SheetSpell[];          // every learned spell (the spell book), prepared or not
     features: CreatureFeature[];
+    utilityRunes: ReturnType<typeof utilityRuneEffects>;
 };
 
 // Dual wield: the off-hand attack is a bonus action and loses the ability modifier on DAMAGE (5e).
@@ -194,7 +196,8 @@ export function characterToCreature(data: SheetData): Creature {
     const armorRunes = armorRuneEffects(ownedArmor);
 
     // Distance: (species speed + Speed stat + Fleet Rune 5 ft) scaled by how healthy you are
-    const fleetFt = utilityRuneEffects(ownedArmor, ownedWeapons).fleet ? 5 : 0;
+    const utilityRunes = utilityRuneEffects(ownedArmor, ownedWeapons);
+    const fleetFt = utilityRunes.fleet ? 5 : 0;
     const speedFt = Math.round((Number(ch.race_base_speed ?? 0) + Number(ch.spd ?? 0) + fleetFt) * (hpMax ? hpNow / hpMax : 1));
 
     // Stolen Radiance (has_embers): ceil(level / 2) + INT mod (min 1), + CON mod from level 17
@@ -255,6 +258,7 @@ export function characterToCreature(data: SheetData): Creature {
         gear: { armor: ownedArmor, weapons: ownedWeapons, items: data.ownedItems ?? [] },
         allSpells: data.learnedSpells ?? [],
         features: (data.actionFeatures ?? []).map((f) => ({ ...f, key: featureKey(f), perRest: perRestUses(f, level, restUses), diceNow: featureDiceAt(f, level) })),
+        utilityRunes,
     };
 }
 
