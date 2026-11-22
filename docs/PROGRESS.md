@@ -6,6 +6,7 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 - **Stage 1, native rebuild:** R1–R4 done; R5 up to R5.5 (Character layout) is on main; R6 and R6.1 (local class names) done (2026-11-21).
 - **Paused by Gabriel:** R5.6 (monster sheet) and R5.7 (DM page). No migration until he says so.
+- **In progress:** Claude — R7 (server tidy-up), on bot/claude. Migrations only with Gabriel's OK.
 
 ## Next
 
@@ -16,6 +17,11 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-22 — Claude (R7.2 one router per resource, bot/claude)
+- `routes/api.js` now only mounts one router per resource: auth, account, rolls, characterForm, sheets, characters, inventory, campaigns, content, monsters (+ the JSON error handler). Routes moved, not changed: checked old vs new route lists, 67 = 67, none missing. 101/101 rules tests, typecheck clean.
+- Controllers stay `.js` for now (converting them needs `@types/express`).
+- R7 next: R7.1 needs Gabriel's names in DECISIONS.md (Paladin/Templar, Druid/Seer, Rune Weaver/Tome of Inscription); R7.3 idMap, R7.4 legacy tables and R7.5 seed involve migrations — ask first.
 
 ### 2026-11-21 - grokbot (R6.1 local class names, main `f1f54db`..`c4e2b2a`, not pushed)
 - Class and id names in the page modules are local now (camelCase, `styles.x` in the JSX). Page modules no longer use `:global` except `:global(.fixed-bg)` (that div is in index.html). Rules that name a local class need no page check; rules that only name elements keep `:where(html:has(.page))`, and html/body rules use `html:where(:has(.page))` / `body:where(:has(.page))`. Styled ids stay ids (`id={styles.siteTitle}`) so specificity is unchanged; unstyled class names and ids nothing refers to were removed from the JSX (ids used by labels, aria or tests stay). Each page's dead rules (old nav copies, old sheet leftovers) are gone; the stale char_create.css comment is gone.
