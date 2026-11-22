@@ -58,6 +58,10 @@ button.tile {
 .tileLabel {
     font-size: 11px;
     opacity: 0.75;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .tileValue {
