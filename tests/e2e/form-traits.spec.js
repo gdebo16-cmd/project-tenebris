@@ -61,7 +61,7 @@ test('traits scores follow the server rolls, and a finished character cannot rer
         },
     })).ok()).toBeTruthy();
     const draftSheet = await (await page.request.get(`/api/characters/${id}`)).json();
-    expect(draftSheet.character.class_id).toBeNull();
+    expect(draftSheet.character.role_id).toBe(roleOptions.roles.find((role) => role.key === 'warrior').id);
     expect((await page.request.post(`/api/characters/${id}/finish`, { data: { money_preset: 'impoverished' } })).ok()).toBeTruthy();
 
     const sheetBefore = await (await page.request.get(`/api/characters/${id}`)).json();
@@ -84,7 +84,7 @@ test('traits scores follow the server rolls, and a finished character cannot rer
     const sheetBack = await (await page.request.get(`/api/characters/${id}`)).json();
     expect(sheetBack.character.level).toBe(1);
     expect(sheetBack.character.max_hp).toBe(sheetBefore.character.max_hp);
-    expect(sheetBack.character.class_id).not.toBeNull();
+    expect(sheetBack.character.role_id).not.toBeNull();
 
     const oldMod = Math.floor(Number(sheetBack.character.con) / 2) - 5;
     const newCon = totals[0];
@@ -109,8 +109,8 @@ test('traits scores follow the server rolls, and a finished character cannot rer
     });
     expect(recastSave.ok()).toBeTruthy();
     const recast = await (await page.request.get(`/api/characters/${id}`)).json();
-    expect(recast.character.class_id).not.toBe(sheetBack.character.class_id);
-    expect(recast.character.subclass_id).toBeNull();
+    expect(recast.character.role_id).toBe(other.id);
+    expect(recast.character.calling_id).toBeNull();
 
     const locked = await page.request.post(`/api/characters/${id}/stat-rolls`, { data: { index: 0 } });
     expect(locked.status()).toBe(400);

@@ -212,9 +212,6 @@ export async function saveTab(req, res) {
     }
 
     await Form.updateCharacterFields(ch.id, checked.values);
-    if (!ch.is_draft && tab === 'role') {
-        await Form.syncLegacyClass(ch.id, checked.values.role_id, checked.values.calling_id ?? null);
-    }
     res.json(await formView(await Form.getFormCharacter(ch.id)));
 }
 

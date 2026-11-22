@@ -2,7 +2,6 @@
 // Picks live in characters.feature_choices like any other choice; base scores stay in the str..cha columns.
 // Pack schedule is Divine Blessing at 4/6/10/12/16/18 — no Primordial Ascent in the pack.
 import content, { primordialBlessingsFromPack, roleProficiencyContext, boostRowsForRole, getRole } from '../models/content.js';
-import { roleIdForLegacyClass } from '../models/idMap.js';
 
 export const KEPT_BOOST = 'Kept boost (already in scores)';
 const STATS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
@@ -33,14 +32,10 @@ export function parseBlessingPick(value) {
     return { name: v, stat: null };
 }
 
-// Pack Divine Blessing rows for a role id, or for a legacy class id (mapped via idMap).
-export async function getBoostRows(classOrRoleId) {
-    if (classOrRoleId == null || classOrRoleId === '') return [];
-    let role = getRole(classOrRoleId);
-    if (!role) {
-        const roleId = await roleIdForLegacyClass(classOrRoleId);
-        if (roleId != null) role = getRole(roleId);
-    }
+// The pack's Divine Blessing rows for a role
+export async function getBoostRows(roleId) {
+    if (roleId == null || roleId === '') return [];
+    const role = getRole(roleId);
     return role ? boostRowsForRole(role.id) : [];
 }
 
@@ -73,7 +68,7 @@ export function effectiveScores(base, rows, choices, level) {
 // Adds base_<stat> and overrides str..cha with effective scores (sheet). Mutates and returns ch.
 export async function withEffectiveScores(ch) {
     if (!ch) return ch;
-    const id = ch.role_id ?? ch.class_id;
+    const id = ch.role_id;
     if (id == null) return ch;
     const rows = await getBoostRows(id);
     const eff = effectiveScores(ch, rows, ch.feature_choices ?? {}, ch.level);

@@ -19,7 +19,7 @@ function sortSpellRows(rows) {
 // Orphan spell_ids (not in the pack) are skipped, not errors.
 export async function getLearnedSpells(charId) {
     const { rows: [ch] } = await pool.query(
-        `SELECT c.id, c.role_id, c.calling_id, c.level, c.alignment_code, c.race_id, c.species_id, c.race_spell_id
+        `SELECT c.id, c.role_id, c.calling_id, c.level, c.alignment_code, c.species_id, c.race_spell_id
          FROM characters c
          WHERE c.id = $1`,
         [charId]

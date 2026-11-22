@@ -36,10 +36,8 @@ function enrichSheetFields(ch) {
     const parent = sp?.parent_id != null ? speciesById(sp.parent_id) : null;
     const role = getRole(ch.role_id);
     const calling = getCalling(role, ch.calling_id);
-    const legacyRace = (content.legacy_races ?? []).find((r) => Number(r.id) === Number(ch.race_id));
-    const legacySub = (content.legacy_subraces ?? []).find((r) => Number(r.id) === Number(ch.subrace_id));
-    ch.race_name = parent?.name ?? sp?.name ?? legacyRace?.name ?? null;
-    ch.subrace_name = sp?.parent_id != null ? sp.name : (legacySub?.name ?? null);
+    ch.race_name = parent?.name ?? sp?.name ?? null;
+    ch.subrace_name = sp?.parent_id != null ? sp.name : null;
     ch.class_name = role?.name ?? null;
     ch.hitpoint_die = hitDieSides(role?.hit_die);
     ch.subclass_spellcasting_stat = calling?.spellcasting_stat || null;
@@ -59,8 +57,8 @@ function enrichSheetFields(ch) {
     ch.weapon_proficiencies = weaponParts.length ? weaponParts.join(', ') : null;
     ch.tool_proficiencies = toolParts.length ? toolParts.join(', ') : null;
     ch.subclass_name = calling?.name ?? null;
-    ch.race_base_speed = sp?.speed ?? parent?.speed ?? legacyRace?.base_speed ?? null;
-    ch.race_darkvision = !!(sp?.darkvision ?? parent?.darkvision ?? legacyRace?.darkvision);
+    ch.race_base_speed = sp?.speed ?? parent?.speed ?? null;
+    ch.race_darkvision = !!(sp?.darkvision ?? parent?.darkvision);
     for (const cat of ['upbringing', 'lifestyle', 'outlook']) {
         const p = personalityById(ch[`${cat}_id`]);
         ch[`${cat}_name`] = p?.name ?? null;
@@ -76,11 +74,11 @@ export function effMaxSql(base, _alias, conBonus) {
 }
 const scoreMod = (s) => Math.floor((Number(s) || 0) / 2) - 5;
 // Extra HP from Ability Boost / Primordial Ascent CON picks, retroactive like 5e: (effective CON mod - base CON mod) x level
-// ch needs class_id, con (base), feature_choices, level
+// ch needs role_id, con (base), feature_choices, level
 export async function conHpBonus(ch, level = ch?.level) {
-    if (!ch?.class_id) return 0;
+    if (!ch?.role_id) return 0;
     const lvl = Number(level) || 1;
-    const eff = effectiveScores(ch, await getBoostRows(ch.class_id), ch.feature_choices ?? {}, lvl);
+    const eff = effectiveScores(ch, await getBoostRows(ch.role_id), ch.feature_choices ?? {}, lvl);
     return Math.max(0, (scoreMod(eff.con) - scoreMod(ch.con)) * lvl);
 }
 
@@ -107,8 +105,7 @@ export async function getSheetCharacter(charId, userId) {
     if (rows[0]) {
         enrichSheetFields(rows[0]);
         rows[0].hp_bonus = hpBonusFromPack(rows[0].calling_id, rows[0].level);
-        rows[0].legacy_subclass_id = rows[0].subclass_id;
-        rows[0].subclass_id = rows[0].calling_id;
+        rows[0].subclass_id = rows[0].calling_id;   // the sheet's older name for the calling
         const role = getRole(rows[0].role_id);
         const primary = scoreKey(role?.primary_stat);
         rows[0].spell_stat = primary ?? 'str';
@@ -160,7 +157,7 @@ async function listCharacters(userId, drafts) {
 // Returns { current_hp, temp_hp, max_hp } or undefined
 export async function changeHp(charId, userId, change) {
     const { rows: found } = await pool.query(
-        `SELECT id, class_id, calling_id, con, level, feature_choices, max_hp FROM characters WHERE id = $1 AND user_id = $2`,
+        `SELECT id, role_id, calling_id, con, level, feature_choices, max_hp FROM characters WHERE id = $1 AND user_id = $2`,
         [charId, userId]
     );
     if (!found[0]) return undefined;
@@ -217,7 +214,7 @@ export async function getLevelInfo(charId, userId) {
 // Dropping below SUBCLASS_LEVEL clears the subclass and its feature picks
 export async function updateLevel(charId, userId, level, newMax) {
     const { rows: found } = await pool.query(
-        `SELECT id, class_id, calling_id, con, feature_choices FROM characters WHERE id = $1 AND user_id = $2`,
+        `SELECT id, role_id, calling_id, con, feature_choices FROM characters WHERE id = $1 AND user_id = $2`,
         [charId, userId]
     );
     const ch = found[0];
