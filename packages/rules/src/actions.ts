@@ -6,7 +6,7 @@ import { spellDiceAt, spellHealAt, type Creature, type WeaponAction, type SpellA
 
 // check = a plain d20 check: actionKey 'initiative', 'stat:<str|dex|…>' or 'skill:<skill id>'
 export type ActKind = 'hit' | 'damage' | 'heal' | 'check';
-// Extra dice added to a weapon hit: Soul Strike (Reaver), Runic Strike (Rune Weaver), or an on-hit feature (Sigil Strike)
+// Extra dice added to a weapon hit: Soul Strike (Reaver), Runic Strike (Tome of Inscription), or an on-hit feature (Sigil Strike)
 export type ActRequest = { actionKey: string; kind: ActKind; castLevel?: number; extra?: 'soulStrike' | 'runicStrike'; featureKey?: string };
 
 const KINDS: ActKind[] = ['hit', 'damage', 'heal', 'check'];

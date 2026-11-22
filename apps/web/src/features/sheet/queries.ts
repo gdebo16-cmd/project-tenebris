@@ -113,7 +113,7 @@ export function useGear(id: string) {
     });
 }
 
-// The rune catalog and limits, loaded only for a Rune Weaver
+// The rune catalog and limits, loaded only for a Tome of Inscription Mage
 export function useRuneInfo(id: string, enabled: boolean) {
     return useQuery({ queryKey: runesKey(id), queryFn: () => api<RuneInfo>(`/api/characters/${id}/runes`), enabled });
 }

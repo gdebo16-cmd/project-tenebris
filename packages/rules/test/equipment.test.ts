@@ -9,10 +9,10 @@ import type { SheetWeapon } from '../src/creature.ts';
 const fighter = { role: 'Warrior', calling: null, level: 5 };
 const reaver = { role: 'Reaver', calling: null, level: 5 };
 const wraith = { role: 'Wraith', calling: null, level: 5 };
-const weaver = (level: number) => ({ role: 'Mage', calling: 'Rune Weaver', level });
+const weaver = (level: number) => ({ role: 'Mage', calling: 'Tome of Inscription', level });
 const sword = (w: Partial<SheetWeapon> = {}): SheetWeapon => ({ id: 7, name: 'Longsword', is_equipped: true, properties: ['versatile'], versatile_dice: '1d10', ...w });
 
-test('powers: Reaver brands, Wraith marks, Rune Weaver (or Tome of Inscription) inscribes from level 3', () => {
+test('powers: Reaver brands, Wraith marks, Tome of Inscription inscribes from level 3', () => {
     assert.deepEqual(wielderPowers(fighter), { soulBrand: false, sigilMark: false, runes: false });
     assert.equal(wielderPowers(reaver).soulBrand, true);
     assert.equal(wielderPowers(wraith).sigilMark, true);
@@ -53,7 +53,7 @@ test('equip requests need a catalog id; toggles need true or false', () => {
 });
 
 const info: RuneInfo = {
-    isRuneWeaver: true, level: 5, perItem: 1, active: 3, used: 0, wardingTypes: ['fire'],
+    isRuneCaller: true, level: 5, perItem: 1, active: 3, used: 0, wardingTypes: ['fire'],
     runes: [
         { id: 1, name: 'Keen', min_level: 3, item_types: ['weapon'] },
         { id: 2, name: 'Guard', min_level: 3, item_types: ['armor', 'shield'] },

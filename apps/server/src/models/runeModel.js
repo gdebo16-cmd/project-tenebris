@@ -1,9 +1,9 @@
-// Rune Weaver: rune catalog, inscribing and removing runes on owned items, and the runed weapon.
+// Tome of Inscription: rune catalog, inscribing and removing runes on owned items, and the runed weapon.
 // Items are character_weapons rows (kind 'weapon') or character_armor rows (kind 'armor', which covers shields).
 // Rune / weapon / armor / calling catalogs come from the content pack (soft refs in DB).
 import pool from '../db.js';
 import content, { getRole, getCalling } from './content.js';
-import { RUNE_WEAVER_NAMES, runesPerItem, activeRunes, WARDING_TYPES, runeFitsItem } from '@tenebris/rules/runeLimits'; /*prep-done*/
+import { RUNE_CALLING, runesPerItem, activeRunes, WARDING_TYPES, runeFitsItem } from '@tenebris/rules/runeLimits'; /*prep-done*/
 
 function runeById(id) {
     return (content.runes ?? []).find((r) => Number(r.id) === Number(id)) ?? null;
@@ -15,7 +15,7 @@ function armorById(id) {
     return (content.armor ?? []).find((a) => Number(a.id) === Number(id)) ?? null;
 }
 
-// the inscriber: must be a Rune Weaver of level 3+
+// the inscriber: must be a Tome of Inscription Mage of level 3+
 async function getInscriber(db, charId) {
     const { rows: [ch] } = await db.query(
         `SELECT ch.id, ch.level, ch.runed_weapon_item_id, ch.role_id, ch.calling_id
@@ -27,8 +27,7 @@ async function getInscriber(db, charId) {
     }
     return ch;
 }
-// Pack renamed Rune Weaver -> Tome of Inscription; keep both names for leftover DB callings.
-const isRuneWeaver = (ch) => RUNE_WEAVER_NAMES.includes(ch?.calling_name) && ch.level >= 3;
+const isRuneCaller = (ch) => ch?.calling_name === RUNE_CALLING && ch.level >= 3;   // Tome of Inscription, level 3+
 
 export async function listRunes() {
     return (content.runes ?? []).slice().sort((a, b) =>
@@ -41,7 +40,7 @@ export async function getRuneInfo(charId) {
     const { rows: [{ used }] } = await pool.query(
         `SELECT COUNT(*)::int AS used FROM item_runes WHERE inscribed_by_character_id = $1`, [charId]);
     return {
-        isRuneWeaver: isRuneWeaver(ch),
+        isRuneCaller: isRuneCaller(ch),
         level: ch?.level ?? 1,
         perItem: runesPerItem(ch?.level),
         active: activeRunes(ch?.level),
@@ -95,7 +94,7 @@ export async function inscribeRune(charId, { kind, itemId, runeId, choiceValue }
         await db.query('BEGIN');
         const fail = async (status, error) => { await db.query('ROLLBACK'); return { status, error }; };
         const ch = await getInscriber(db, charId);
-        if (!isRuneWeaver(ch)) return fail(403, 'Only a Rune Weaver (level 3+) can inscribe runes');
+        if (!isRuneCaller(ch)) return fail(403, 'Only a Tome of Inscription Mage (level 3+) can inscribe runes');
         const rune = runeById(runeId);
         if (!rune) return fail(404, 'Unknown rune');
         const item = await getOwnedItem(db, charId, kind, itemId);
@@ -149,7 +148,7 @@ export async function removeRune(charId, itemRuneId) {
     try {
         await db.query('BEGIN');
         const ch = await getInscriber(db, charId);
-        if (!isRuneWeaver(ch)) { await db.query('ROLLBACK'); return { status: 403, error: 'Only a Rune Weaver can remove runes' }; }
+        if (!isRuneCaller(ch)) { await db.query('ROLLBACK'); return { status: 403, error: 'Only a Tome of Inscription Mage can remove runes' }; }
         const { rowCount } = await db.query(
             `DELETE FROM item_runes WHERE id = $1 AND inscribed_by_character_id = $2`, [itemRuneId, charId]);
         if (!rowCount) { await db.query('ROLLBACK'); return { status: 404, error: 'Rune not found' }; }
@@ -176,7 +175,7 @@ async function clearRunedWeaponIfBare(db, charId) {
 // weaponId = catalog id of an owned weapon, or null to clear
 export async function setRunedWeapon(charId, weaponId) {
     const ch = await getInscriber(pool, charId);
-    if (!isRuneWeaver(ch)) return { status: 403, error: 'Only a Rune Weaver can choose a runed weapon' };
+    if (!isRuneCaller(ch)) return { status: 403, error: 'Only a Tome of Inscription Mage can choose a runed weapon' };
     if (weaponId == null) {
         await pool.query(`UPDATE characters SET runed_weapon_item_id = NULL WHERE id = $1`, [charId]);
         return { ok: true };
