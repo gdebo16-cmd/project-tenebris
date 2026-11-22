@@ -3,7 +3,7 @@
 // Rune / weapon / armor / calling catalogs come from the content pack (soft refs in DB).
 import pool from '../db.js';
 import content, { getRole, getCalling } from './content.js';
-import { RUNE_CALLING, runesPerItem, activeRunes, WARDING_TYPES, runeFitsItem } from '@tenebris/rules/runeLimits'; /*prep-done*/
+import { RUNE_CALLING, runesPerItem, activeRunes, WARDING_TYPES, runeFitsItem } from '@tenebris/rules/runeLimits';
 
 function runeById(id) {
     return (content.runes ?? []).find((r) => Number(r.id) === Number(id)) ?? null;

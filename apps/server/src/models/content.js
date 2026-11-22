@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { choiceFeaturesFor, choiceKey } from '@tenebris/rules/characterOptions';
+import { choiceKey } from '@tenebris/rules/characterOptions';
 import { armorTypesFromProf, weaponCategoryNamesFromProf } from '@tenebris/rules/gear';
 
 export { armorTypesFromProf, weaponCategoryNamesFromProf };
@@ -36,7 +36,6 @@ export function getCalling(role, callingId) {
     return (role.callings ?? []).find((c) => Number(c.id) === id);
 }
 
-
 // Display names (pack primary_stat) and short codes (pack spell_stat / DB) -> characters table key
 const STAT_TO_KEY = {
     might: 'str', str: 'str',
@@ -58,15 +57,6 @@ export function scoreKey(stat) {
 // Stable feature_choices key (scheme A). The text is decided in @tenebris/rules.
 export { choiceKey };
 
-// Create-time choice features for a role (+ calling from level 3), unlocked at this level.
-// The rules live in @tenebris/rules; this only finds the role in the pack.
-export function choiceFeaturesForRole(roleId, callingId, level) {
-    const role = getRole(roleId);
-    const id = callingId == null || callingId === '' ? undefined : Number(callingId);
-    return choiceFeaturesFor(role, Number.isInteger(id) ? id : undefined, Number(level) || 1);
-}
-
-
 // ----- Starting gear from the pack (not class_item_proficiencies) -----
 // armorTypesFromProf and weaponCategoryNamesFromProf live in @tenebris/rules/gear.
 
@@ -75,60 +65,6 @@ function isCommonItem(row) {
 }
 
 /** Starting weapons + armor for a role (pack proficiencies + pack catalogs). Same shape as listStartingGear. */
-export function listStartingGearForRole(roleId, callingId = null, level = 1) {
-    const role = getRole(roleId);
-    if (!role) return { armor: [], weapons: [] };
-    const calling = getCalling(role, callingId);
-    const armorProf = calling?.armor_prof || role.armor_prof;
-    const weaponProf = calling?.weapon_prof || role.weapon_prof;
-    const armorTypes = new Set(armorTypesFromProf(armorProf));
-    const catNames = new Set(weaponCategoryNamesFromProf(weaponProf).map((n) => n.toLowerCase()));
-    const catById = new Map((content.weapon_category ?? []).map((c) => [Number(c.id), c]));
-    const allowedCatIds = new Set(
-        (content.weapon_category ?? [])
-            .filter((c) => catNames.has(String(c.name).toLowerCase()))
-            .map((c) => Number(c.id))
-    );
-
-    const armor = (content.armor ?? [])
-        .filter((a) => armorTypes.has(String(a.armor_type).toLowerCase()) && isCommonItem(a))
-        .map((a) => ({
-            id: a.id,
-            name: a.name,
-            armor_type: a.armor_type,
-            armor_category: a.armor_type,
-            ac_bonus: a.ac_bonus,
-            rarity: a.rarity,
-            con_cap: a.con_cap,
-            stealth_disadvantage: a.stealth_disadvantage,
-        }))
-        .sort((x, y) => x.name.localeCompare(y.name));
-
-    const weapons = (content.weapons ?? [])
-        .filter((w) => allowedCatIds.has(Number(w.category_id)) && isCommonItem(w) && !w.is_unique)
-        .map((w) => {
-            const cat = catById.get(Number(w.category_id));
-            return {
-                id: w.id,
-                name: w.name,
-                category: w.category,
-                category_id: w.category_id,
-                weapon_category: cat?.name ?? null,
-                damage_dice: w.damage_dice,
-                damage_type: w.damage_type,
-                rarity: w.rarity,
-                attack_bonus: w.attack_bonus,
-                is_unique: w.is_unique,
-                properties: w.properties,
-                range_normal: w.range_normal,
-                range_long: w.range_long,
-                versatile_dice: w.versatile_dice,
-            };
-        })
-        .sort((x, y) => x.name.localeCompare(y.name));
-
-    return { armor, weapons };
-}
 
 // ----- Divine Blessing (pack) schedule + options; replaces legacy Ability Boost / Primordial Ascent -----
 export const DIVINE_BLESSING_NAME = 'Divine Blessing';
@@ -216,39 +152,6 @@ export function roleProficiencyContext(roleId, callingId = null) {
 }
 
 /** Flatten role (+ calling) feature schedule for description lists (no legacy Fighting Style). */
-export function flattenFeaturesForRole(roleId, callingId = null, maxLevel = 30) {
-    const role = getRole(roleId);
-    if (!role) return [];
-    const lvlMax = Number(maxLevel) || 30;
-    const out = [];
-    for (const lvl of role.levels ?? []) {
-        if (Number(lvl.level) > lvlMax) continue;
-        for (const f of lvl.features ?? []) {
-            out.push({
-                level: Number(lvl.level),
-                name: f.name,
-                description: f.description || '',
-                source: 'class',
-                key: `pack:class:${role.key}:${f.name}:${lvl.level}`,
-            });
-        }
-    }
-    if (callingId != null && callingId !== '' && lvlMax >= SUBCLASS_LEVEL) {
-        const calling = getCalling(role, callingId);
-        for (const f of calling?.features ?? []) {
-            if (Number(f.level) > lvlMax) continue;
-            out.push({
-                level: Number(f.level),
-                name: `${f.name} (${calling.name})`,
-                description: f.description || '',
-                source: 'subclass',
-                key: `pack:subclass:${calling.key}:${f.name}:${f.level}`,
-            });
-        }
-    }
-    return out.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
-}
-
 
 /** Chart band name for an alignment vs a colour square (from pack alignment_bands). */
 export function getAlignmentBand(alignmentCode, colorSquare) {

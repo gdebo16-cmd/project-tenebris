@@ -2,7 +2,6 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getAlignmentBand } from './content.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MONSTERS_FILE = path.join(__dirname, '..', '..', '..', '..', 'packages', 'content', 'content.json');

@@ -99,14 +99,6 @@ export function getAlignment(id) {
     return alignmentById.get(Number(id));
 }
 
-export function getBandByName(name) {
-    return bandByName.get(name);
-}
-
-export function getBandByOrd(ord) {
-    return bandByOrd.get(Number(ord));
-}
-
 export function allSpells() {
     return allSpellRows;
 }

@@ -61,23 +61,6 @@ export async function legacyRaceIdForSpecies(speciesId) {
   return parent?.sort_order != null ? Number(parent.sort_order) : null;
 }
 
-export async function speciesIdForLegacyRace(raceId, subraceId = null) {
-  if (raceId == null) return null;
-  const parents = speciesAll().filter((s) => s.parent_id == null && Number(s.sort_order) === Number(raceId));
-  const parent = parents[0];
-  if (!parent) return null;
-  if (subraceId != null && subraceId !== '') {
-    const sr = legacySubraces().find((s) => Number(s.id) === Number(subraceId) && Number(s.race_id) === Number(raceId));
-    if (sr) {
-      const child = speciesAll().find(
-        (s) => Number(s.parent_id) === Number(parent.id) && String(s.name).toLowerCase() === String(sr.name).toLowerCase()
-      );
-      if (child) return child.id;
-    }
-  }
-  return parent.id;
-}
-
 export async function legacySubraceIdForSpecies(speciesId) {
   if (speciesId == null) return null;
   const child = speciesById(speciesId);
@@ -123,70 +106,6 @@ export async function legacySubclassIdForCalling(callingId) {
     return sc?.id ?? null;
   }
   return null;
-}
-
-export async function callingIdForLegacySubclass(subclassId) {
-  if (subclassId == null) return null;
-  const sc = legacySubClasses().find((s) => Number(s.id) === Number(subclassId));
-  if (!sc) return null;
-  const cl = legacyClasses().find((c) => Number(c.id) === Number(sc.class_id));
-  if (!cl) return null;
-  const roleName = roleNameForClass(cl.name);
-  const role = rolesAll().find((r) => String(r.name).toLowerCase() === String(roleName).toLowerCase());
-  if (!role) return null;
-  const ca = callingsOf(role).find((c) => String(c.name).toLowerCase() === String(sc.name).toLowerCase());
-  return ca?.id ?? null;
-}
-
-// Resolve create/edit race payload (species ids in race_id / subrace_id fields) to both stores.
-export async function resolveSpeciesWrite(raceId, subraceId) {
-  const speciesInput = subraceId != null && subraceId !== '' ? Number(subraceId) : Number(raceId);
-  const row = speciesById(speciesInput);
-  if (!row) return null;
-  // If client sent parent in race_id and child in subrace_id, prefer child when it belongs to parent
-  if (subraceId != null && subraceId !== '' && Number(raceId) !== Number(subraceId)) {
-    const child = speciesById(Number(subraceId));
-    if (!child || Number(child.parent_id) !== Number(raceId)) return false;
-    const parent = speciesById(child.parent_id);
-    const legacySubraceId = await legacySubraceIdForSpecies(child.id);
-    return {
-      species_id: child.id,
-      race_id: parent?.sort_order != null ? Number(parent.sort_order) : null,
-      subrace_id: legacySubraceId,
-    };
-  }
-  if (row.parent_id) {
-    const parent = speciesById(row.parent_id);
-    const legacySubraceId = await legacySubraceIdForSpecies(row.id);
-    return {
-      species_id: row.id,
-      race_id: parent?.sort_order != null ? Number(parent.sort_order) : null,
-      subrace_id: legacySubraceId,
-    };
-  }
-  return {
-    species_id: row.id,
-    race_id: row.sort_order != null ? Number(row.sort_order) : null,
-    subrace_id: null,
-  };
-}
-
-export async function resolveRoleWrite(roleId, callingId) {
-  const legacyClassId = await legacyClassIdForRole(roleId);
-  if (!legacyClassId) return null;
-  let legacySubclassId = null;
-  if (callingId != null && callingId !== '') {
-    const role = roleById(roleId);
-    const ca = callingsOf(role).find((c) => Number(c.id) === Number(callingId));
-    if (!ca) return false;
-    legacySubclassId = await legacySubclassIdForCalling(Number(callingId));
-  }
-  return {
-    role_id: Number(roleId),
-    calling_id: callingId != null && callingId !== '' ? Number(callingId) : null,
-    class_id: legacyClassId,
-    subclass_id: legacySubclassId,
-  };
 }
 
 export { roleNameForClass, classNameForRole };
