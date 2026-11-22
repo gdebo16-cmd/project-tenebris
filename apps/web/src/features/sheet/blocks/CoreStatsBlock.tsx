@@ -1,11 +1,12 @@
 // Armor, speed, initiative (tap to roll) and proficiency.
 import { signed } from '@tenebris/rules/math';
-import styles from '../Sheet.module.css';
+import styles from './CoreStatsBlock.module.css';
 import type { BlockProps } from './types.ts';
 
 export default function CoreStatsBlock({ creature, canEdit, onAct }: Pick<BlockProps, 'creature' | 'canEdit' | 'onAct'>) {
     return (
         <section className={styles.block} aria-label="Core stats">
+            <h2 className={styles.title}>Core Stats</h2>
             <div className={styles.grid4}>
                 <div className={styles.tile}>
                     <span className={styles.tileLabel}>Armor</span>

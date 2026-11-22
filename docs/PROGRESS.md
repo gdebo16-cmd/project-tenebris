@@ -4,9 +4,9 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Now
 
-- **Stage 1, native rebuild:** R1–R4 done; R5 up to R5.5 (Character layout) is on main; R6 and R6.1 (local class names) done (2026-11-21).
-- **Paused by Gabriel:** nothing (R5.6/R5.7 unpaused 2026-11-22).
-- **In progress:** nothing (Claude: R5 + R7 waiting on Gabriel's e2e run and click-through before ticking).
+- **Stage 1, native rebuild:** R1–R7 built; R5 (incl. R5.6 monsters, R5.7 DM page) and R7 waiting for Gabriel's e2e run before ticking.
+- **Paused by Gabriel:** nothing.
+- **In progress:** nothing claimed. Latest work (sidebar, layout grid, phone layouts) is on bot/claude for Gabriel to merge.
 
 ## Next
 
@@ -17,6 +17,15 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-22 — Claude (Gabriel's main-folder work + phone layouts, committed on bot/claude at his request)
+- Gabriel worked in the main folder with Claude; this commit carries all of it over to bot/claude (he merges to main).
+- Site menu: `Sidebar.jsx` (hamburger + panel) replaces SiteNav; Settings live in it (`components/settings/`); Profile/Settings pages removed. Sidebar sections: `SidebarCharacter` (edit links), `SidebarCampaign` (tale page, DM page), `SidebarSheetLayout` (Edit sheet layout, wide screens).
+- Sheet layout (L1–L6, grid v2): `packages/rules/src/layout.ts` (12×16 grid, checkLayout, place/nudge/add/remove; tests, 125 total), `blocks/registry.tsx`, `SheetLayout.tsx` (Fit zoom, drag/resize/keyboard editor), `LayoutEditor.tsx`, `layouts.ts` (defaults + saved per user). Server: `/api/layouts` (GET/PUT/DELETE). Migration `1795400000200_add-user-sheet-layouts` — already run on rework with Gabriel's OK.
+- Every sheet block has its own CSS module; ActionPanel is a real component; DetailsPanel (side panel / bottom sheet) back for weapons, armor, items, spells.
+- Phones: sheet header fixed with the status bar in the header color (`hooks/useHeaderStatusBar.ts`, base.css), only the sheet area scrolls, no footer. Phone tabs on character and monster sheets (Stats/Combat/Condition), DM page (Initiative/Party/Encounter/Notes/Rolls) and campaign page (tab classes fixed + restyled panels). Monster sheet and DM page got the sheet header/footer.
+- Checked: typecheck, 125 tests, build; browser run on a fresh PGlite database at 390×844 and 1366×900 (no page errors).
+- Left: Gabriel merges bot/claude → main (staging deploys); e2e on staging, then tick R5/R7. Layout decisions (12×16, phones follow one layout, drag + keyboard) are Gabriel's, not yet written in DECISIONS.md. Scratch Neon branch `scratch-r7-drop-test` still to delete.
 
 ### 2026-11-22 — Claude (staging deploy + migrations on rework, with Gabriel's OK)
 - Staging hadn't deployed since 2026-11-19 (auto-deploy not firing); deployed `6b47f10` by hand, live.

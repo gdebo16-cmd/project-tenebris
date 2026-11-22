@@ -7,9 +7,12 @@ import { Link } from 'react-router';
 import { ITEM_SLOTS, weaponOptions, wielderPowers, type ItemRune, type RuneInfo } from '@tenebris/rules/equipment';
 import { EMPTY_WEAPON_FILTER, RARITIES, WEAPON_CATEGORIES, filterSortWeapons, type WeaponFilter, type WeaponSort } from '@tenebris/rules/weapons';
 import type { SheetArmor, SheetItem, SheetWeapon } from '@tenebris/rules/creature';
-import styles from '../Sheet.module.css';
+import styles from './InventoryBlock.module.css';
+import panelCss from './ActionPanel.module.css';
 import { useGear, useRuneInfo } from '../queries.ts';
 import RuneControl from './RuneControl.tsx';
+import DetailsPanel from './DetailsPanel.tsx';
+import { ArmorInfo, ItemInfo, WeaponInfo } from './details.tsx';
 import type { BlockProps } from './types.ts';
 
 type Props = Pick<BlockProps, 'creature' | 'canEdit' | 'onNote'> & { id: string };
@@ -47,6 +50,8 @@ export default function InventoryBlock({ creature, canEdit, id, onNote }: Props)
     const info: RuneInfo | undefined = runeInfo.data?.isRuneCaller ? runeInfo.data : undefined;
     const [error, setError] = useState('');
     const [weaponFilter, setWeaponFilter] = useState<WeaponFilter>(EMPTY_WEAPON_FILTER);
+    // The armor, weapon or item whose name was clicked (shown in the details panel)
+    const [openGear, setOpenGear] = useState<{ kind: 'armor' | 'weapon' | 'item'; id: number } | null>(null);
     const busy = gear.isPending;
 
     async function send(path: string, body: Record<string, unknown>) {
@@ -80,19 +85,23 @@ export default function InventoryBlock({ creature, canEdit, id, onNote }: Props)
     const magicItems = items.filter((it) => it.item_category === 'magical_item');
     const slotsUsed = magicItems.filter((it) => it.is_equipped).length;
     const shownWeapons = filterSortWeapons(weapons, weaponFilter);
+    const openArmor = openGear?.kind === 'armor' ? armor.find((a) => a.id === openGear.id) : undefined;
+    const openWeapon = openGear?.kind === 'weapon' ? weapons.find((w) => w.id === openGear.id) : undefined;
+    const openItem = openGear?.kind === 'item' ? items.find((it) => it.id === openGear.id) : undefined;
+    const openName = openArmor?.name ?? openWeapon?.name ?? openItem?.name;
 
     return (
         <section className={styles.block} aria-label="Gear">
-            <h2 className={styles.heading}>Gear</h2>
+            <h2 className={`${styles.heading} ${panelCss.title}`}>Gear</h2>
             {error && <p className={styles.error} role="alert">{error}</p>}
 
             <h3 className={styles.subheading}>Armor</h3>
             {armor.length === 0 && <span className={styles.muted}>No armor yet.</span>}
             {armor.map((a) => (
-                <div key={`a${a.id}`} className={`${styles.row} ${styles.gearRow}`}>
+                <div key={`a${a.id}`} className={`${styles.row} ${styles.gearRow} ${panelCss.row}`}>
                     <div className={styles.gearLine}>
                         <div className={styles.rowText}>
-                            <span className={styles.rowName}>{a.name}</span>
+                            <button type="button" className={`${styles.nameButton} ${panelCss.name}`} onClick={() => setOpenGear({ kind: 'armor', id: a.id })}>{a.name}</button>
                             <span className={styles.muted}>{armorLabel(a)}{a.is_equipped ? ' · Equipped' : ''}</span>
                         </div>
                         {equipButton('armor', a.id, a.name, !!a.is_equipped)}
@@ -112,10 +121,10 @@ export default function InventoryBlock({ creature, canEdit, id, onNote }: Props)
                 const opts = weaponOptions(creature, w);
                 const dice = opts.twoHands ? w.versatile_dice : w.damage_dice;
                 return (
-                    <div key={`w${w.id}`} className={`${styles.row} ${styles.gearRow}`}>
+                    <div key={`w${w.id}`} className={`${styles.row} ${styles.gearRow} ${panelCss.row}`}>
                         <div className={styles.gearLine}>
                             <div className={styles.rowText}>
-                                <span className={styles.rowName}>{w.name}</span>
+                                <button type="button" className={`${styles.nameButton} ${panelCss.name}`} onClick={() => setOpenGear({ kind: 'weapon', id: w.id })}>{w.name}</button>
                                 <span className={styles.muted}>{weaponLabel(w)}{w.is_equipped ? ' · Equipped' : ''}</span>
                             </div>
                             {equipButton('weapon', w.id, w.name, !!w.is_equipped)}
@@ -158,9 +167,9 @@ export default function InventoryBlock({ creature, canEdit, id, onNote }: Props)
             <h3 className={styles.subheading}>Items: {slotsUsed}/{ITEM_SLOTS} slots</h3>
             {items.length === 0 && <span className={styles.muted}>No items yet.</span>}
             {items.map((it) => (
-                <div key={`i${it.id}`} className={styles.row}>
+                <div key={`i${it.id}`} className={`${styles.row} ${panelCss.row}`}>
                     <div className={styles.rowText}>
-                        <span className={styles.rowName}>{it.name}</span>
+                        <button type="button" className={`${styles.nameButton} ${panelCss.name}`} onClick={() => setOpenGear({ kind: 'item', id: it.id })}>{it.name}</button>
                         <span className={styles.muted}>{itemLabel(it)}{it.is_equipped ? `${itemLabel(it) ? ' · ' : ''}Equipped` : ''}</span>
                     </div>
                     {it.item_category === 'magical_item' && equipButton('item', it.id, it.name, !!it.is_equipped)}
@@ -168,6 +177,14 @@ export default function InventoryBlock({ creature, canEdit, id, onNote }: Props)
             ))}
 
             {canEdit && <Link to={`/characters/${creature.id}/inventory`}>Manage inventory</Link>}
+
+            {openName && (
+                <DetailsPanel title={openName} onClose={() => setOpenGear(null)}>
+                    {openArmor && <ArmorInfo armor={openArmor} />}
+                    {openWeapon && <WeaponInfo weapon={openWeapon} />}
+                    {openItem && <ItemInfo item={openItem} />}
+                </DetailsPanel>
+            )}
         </section>
     );
 }

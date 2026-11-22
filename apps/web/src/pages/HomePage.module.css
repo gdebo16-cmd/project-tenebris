@@ -215,7 +215,7 @@ body:where(:has(.page)) {
 
 .container {
     background-color: var(--panel-bg);
-    border-radius: var(--tile);
+    border-radius: 1.5rem;
     border: var(--tileBorder);
     box-shadow: var(--bs2);
 }
@@ -287,7 +287,7 @@ body:where(:has(.page)) {
     min-height: 0;
     margin-bottom: 3%;
     
-    border-radius: var(--tile);
+    border-radius: 1.5rem;
     border: var(--tileBorder);
 }
 
@@ -298,7 +298,7 @@ body:where(:has(.page)) {
     align-items: center;
     position: relative;
     padding: 4%;
-    border-radius: 10px 0 0 0;
+    border-radius: 1.5rem 0 0 0;
     margin-bottom: 0;
     margin-top: 0;
     background-color: var(--bgc-char-name);
@@ -311,8 +311,8 @@ body:where(:has(.page)) {
     max-height: none;
     object-fit: cover;
     align-self: stretch;
-    border: var(--tileBorder);
-    border-radius: var(--radCornerBL);
+    border: 3px ridge rgba(var(--tileBorder), 0.5);
+    border-radius: 0 0 0 1.5rem;
     z-index: 1;
 }
 
@@ -350,7 +350,7 @@ body:where(:has(.page)) {
     border: var(--tileBorder);
     background-color: var(--bgc-char-stat);
     backdrop-filter: var(--blur1);
-    border-radius: var(--radCornerBR);
+    border-radius: 0 0 1.5rem 0;
 }
 
 .characterDeleteButton {
@@ -358,6 +358,7 @@ body:where(:has(.page)) {
     text-align: center;
     margin: 0;
     padding: 2%;
+    border-radius: 0 1.5rem 0 0;
     border: var(--tileBorder);
     background-color: var(--bgc-char-delete);
     color: var(--delete-txt);
@@ -380,7 +381,7 @@ body:where(:has(.page)) {
     color: inherit;
     min-height: 0;
     margin-bottom: 3%;
-    border-radius: var(--tile);
+    border-radius: 1.5rem;
     border: var(--tileBorder);
 }
 
@@ -394,7 +395,7 @@ body:where(:has(.page)) {
     background-color: var(--bgc-char-name);
     margin: var(--mar1);
     padding: var(--pad1);
-    border-radius: var(--radCornerTL);
+    border-radius: 1.5rem 0 0 0;
     border: var(--tileBorder);
 }
 
@@ -414,7 +415,7 @@ body:where(:has(.page)) {
     background-image: var(--background-desktop, var(--background));
     background-size: cover;
     background-position: center;
-    border-radius: 10px 0 0 0;
+    border-radius: 1.5rem 0 0 0;
     overflow: hidden;
 }
 
@@ -424,7 +425,7 @@ body:where(:has(.page)) {
     justify-content: center;
     align-items: center;
     color: var(--txt-color-1);
-    border-radius: 0 0 var(--tile) var(--tile);
+    border-radius: 0 0 1.5rem 1.5rem;
     background-color: var(--bgc-char-stat);
     margin: 0;
     padding: 0;
@@ -441,7 +442,7 @@ body:where(:has(.page)) {
     transition: all 0.5s ease;
     font: inherit;
     overflow: hidden;
-    border-radius: 0 10px 0 0;
+    border-radius: 0 1.5rem 0 0;
 }
 
 .campaignDeleteButton:hover {
@@ -450,7 +451,7 @@ body:where(:has(.page)) {
     transform: scale(1.05);
 }
 .characterDeleteButton {
-    border-radius: 0 10px 0 0;
+    border-radius: 0 1.5rem 0 0;
 }
 
 .characterDeleteButton:hover {
@@ -471,12 +472,14 @@ body:where(:has(.page)) {
         width: 100%;
         max-width: 1600px;
         min-height: 0;
-        max-height: calc(100dvh - 26vh);
-        height: calc(100dvh - 26vh);
+        max-height: 82dvh;
+        height: 82dvh;
+        
         margin: 0 auto;
         padding: 2vh 2vw 4vh;
         overflow-x: hidden;
-        overflow-y: hidden;
+        overflow-y: auto;
+        scrollbar-width: none;
         overscroll-behavior: contain;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -493,10 +496,10 @@ body:where(:has(.page)) {
         position: fixed;
         left: 0;
         right: 0;
-        top: calc(100dvh - 8vh);
+        bottom: 0;
         z-index: 10;
-        height: 8vh;
-        width: 100%;
+        height: 5vh;
+        width: 100dvw;
         margin: 0;
         padding: 0;
         text-align: center;
@@ -507,7 +510,6 @@ body:where(:has(.page)) {
         border-top: var(--tileBorder);
         box-shadow: var(--bs2);
         background-color: var(--bgc-theme);
-        border-radius: 50% 50% 0 0;
         overflow: hidden;
     }
 
@@ -527,8 +529,7 @@ body:where(:has(.page)) {
     :where(html:has(.page)) header {
         display: flex;
         height: 8vh;
-        width: 100vw;
-        border-radius: 0 0 15% 15%;
+        width: 100dvw;
     }
 
     #siteTitle {
@@ -567,11 +568,11 @@ body:where(:has(.page)) {
         overflow: hidden;
         padding: 1vh 1vw;
         box-sizing: border-box;
-        background-color: color-mix(in srgb, var(--bgc-theme) 60%, transparent);
+        background-color: color-mix(in srgb, var(--bgc-theme) 80%, transparent);
         backdrop-filter: blur(6px);
         -webkit-backdrop-filter: blur(6px);
         border: var(--tileBorder);
-        border-radius: var(--tile);
+        border-radius: 1.5rem;
     }
 
     #currentCharacterContainer,
@@ -627,9 +628,13 @@ body:where(:has(.page)) {
 
     .title {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
+        align-items: center;
         width: 100%;
         margin: 0 0 1vh;
+        border-bottom: var(--tileBorder);
+        margin-bottom: 1vh;
+        padding-bottom: 1vh;
     }
 
     .titleText {

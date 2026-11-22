@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useCampaign, useCampaignMonsters, useHome, useMonsterCatalog } from '../queries.ts';
 import Loader from '../components/Loader';
-import SiteNav from '../components/SiteNav';
 import campaignImages from '../data/campaignImages';
 import styles from './CampaignPage.module.css';
 
@@ -25,6 +24,10 @@ function CampaignPage() {
     const monsters = useCampaignMonsters(campId, isDm); // DM only: nothing is requested for players
     const catalog = useMonsterCatalog(isDm);
     const [pickMonster, setPickMonster] = useState('');
+
+    // Every tab section gets "container" (phones hide the ones that aren't chosen), its own class,
+    // and isActive when it's the chosen tab
+    const tabClass = (name, own) => [styles.container, own, campTab === name && styles.isActive].filter(Boolean).join(' ');
 
     if (error) return <p className={styles.page}>Failure is upon us: {error.message}</p>;
     if (isPending) return <Loader className={styles.page} text='Summoning your stories...'/>;
@@ -96,7 +99,6 @@ function CampaignPage() {
                 <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Campaign</h1>
             </header>
-            <SiteNav className={styles.nav} />
             <main className={styles.page}>
                 <nav className={styles.homeTabs}>
                     <button type="button" className={campTab === 'campaign' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setCampTab('campaign')}>Campaign</button>
@@ -106,7 +108,7 @@ function CampaignPage() {
                     <button type="button" className={campTab === 'monsters' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setCampTab('monsters')}>Monsters</button>
                     )}
                 </nav>
-                <section className={campTab === 'campaign' ? `${styles.container} ${styles.campaignTile} ${styles.isActive}` : undefined}>
+                <section className={tabClass('campaign', styles.campaignTile)}>
                     {editing ? (
                     <>
                         <div className={styles.editContainer}>
@@ -154,7 +156,7 @@ function CampaignPage() {
                             <div className={styles.descriptionEdit}>
                                 <div>
                                     <p className={styles.editLabel}>Description</p>
-                                    <input className={styles.editInputDisplay} type="text" value={campaign.description} readOnly />
+                                    <p className={styles.editInputDisplay}>{campaign.description || 'No description yet.'}</p>
                                 </div>
                             </div>
                             {campaign.role === 'dm' && (
@@ -166,7 +168,7 @@ function CampaignPage() {
                         </>
                     )}
                 </section>
-                <section className={campTab === 'invite' ? `${styles.inviteContainer} ${styles.isActive}` : styles.inviteContainer}>
+                <section className={tabClass('invite', styles.inviteContainer)}>
                     <article className={styles.inviteTile}>
                         <h2 className={styles.campaignTitle}><strong>Invite / Join</strong></h2>
                         {campaign.role === 'dm' && (
@@ -189,7 +191,7 @@ function CampaignPage() {
                             </div>
                     </article>
                 </section>
-                <section className={campTab === 'players' ? styles.isActive : styles.playerContainer}>
+                <section className={tabClass('players', styles.playerContainer)}>
                     <h2 className={styles.playersTitle}><strong>Current Players</strong></h2>
                     <ul className={styles.playersList}>
                         {members.map((mem) => (
@@ -209,24 +211,27 @@ function CampaignPage() {
                     </ul>
                 </section>
                 {isDm && (
-                <section className={campTab === 'monsters' ? `${styles.campaignTile} ${styles.isActive}` : styles.monstersContainer}>
+                <section className={tabClass('monsters', styles.monstersContainer)}>
                     <article>
-                        <h2><strong>Monsters</strong></h2>
+                        <h2 className={styles.monstersTitle}><strong>Monsters</strong></h2>
                     </article>
-                    <article>
-                        <select value={pickMonster} onChange={(e) => setPickMonster(e.target.value)}>
+                    <article className={styles.monstersBody}>
+                        <div className={styles.monsterPick}>
+                        <select className={styles.monsterSelect} value={pickMonster} onChange={(e) => setPickMonster(e.target.value)}>
                             <option value="">Choose a monster…</option>
                                 {(catalog.data || []).map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                         </select>
                         <button type="button" className={styles.actionButton} onClick={addMonster} disabled={!pickMonster}>Add Monster</button>
-                        <ul>
+                        </div>
+                        <ul className={styles.monsterList}>
                             {(monsters.data || []).map((m) => (
-                                <li key={m.id}>
-                                    <Link to={`/monsters/${m.id}`}>{m.name}</Link> ({m.health}, HP {m.hp.current}/{m.hp.max})
+                                <li key={m.id} className={styles.monsterRow}>
+                                    <Link to={`/monsters/${m.id}`}>{m.name}</Link>
+                                    <span className={styles.monsterHp}>{m.health} · HP {m.hp.current}/{m.hp.max}</span>
                                 </li>
                             ))}
                         </ul>
-                        {monsters.data?.length === 0 && <p>No monsters yet.</p>}
+                        {monsters.data?.length === 0 && <p className={styles.monsterEmpty}>No monsters yet.</p>}
                     </article>
                 </section>
                 )}

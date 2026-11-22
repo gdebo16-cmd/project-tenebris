@@ -1,0 +1,67 @@
+/* RestBlock: Short and long rest.
+   This block's whole look lives here (moved from Sheet.module.css). Edit freely: it only changes this block. */
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    border-bottom: 1px solid var(--border, #b27f50);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+}
+
+.title {
+    margin: 0;
+    font-family: Almendra, Georgia, serif;
+    font-size: 24px;
+    line-height: 1.1;
+}
+
+.button {
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--accent, #d4af37);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.primary {
+    background: var(--accent, #d4af37);
+    color: var(--bg, #0d042c);
+    border-color: var(--accent, #d4af37);
+}
+
+.rowButtons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.restLine {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}

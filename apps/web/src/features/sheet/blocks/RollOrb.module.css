@@ -5,7 +5,7 @@
 .orb {
     position: fixed;
     left: var(--orb-left, auto);
-    top: var(--orb-top, calc(6.5vh - 3.75rem));
+    top: var(--orb-top, calc(6.5vh - 3.75rem + env(safe-area-inset-top)));
     right: var(--orb-right, 5%);
     z-index: 1000;
     background-color: var(--bgc-orb);
@@ -123,8 +123,10 @@
     cursor: pointer;
 }
 
+.orbPanel[hidden] { display: none; }
+
 @media (max-width: 768px) {
-    .orb { top: var(--orb-top, calc(6.5vh - 1.5rem)); }
+    .orb { top: var(--orb-top, calc(6.5vh - 1.5rem + env(safe-area-inset-top))); }
 
     .orbClosed,
     .orbClosedDragging {

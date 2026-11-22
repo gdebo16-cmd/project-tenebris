@@ -1,5 +1,5 @@
 // Condition chips: tap to toggle (when you may edit), plus exhaustion. Others only see the ones that are on.
-import styles from '../Sheet.module.css';
+import styles from './ConditionsBlock.module.css';
 import type { BlockProps } from './types.ts';
 
 // The 12 conditions (characters.conditions keys) and the exhaustion cap come from the rules, which the server checks too
@@ -15,8 +15,8 @@ export default function ConditionsBlock({ creature, canEdit, onChange }: Props) 
     const shown = canEdit ? CONDITIONS : CONDITIONS.filter((name) => on[name]);
     return (
         <section className={styles.block} aria-label="Conditions">
+            <h2 className={styles.title}>Afflictions</h2>
             <div className={styles.chips}>
-                <h2 className={styles.heading}>Conditions</h2>
                 {shown.length === 0 && <span className={styles.muted}>None</span>}
                 {shown.map((name) => (
                     <button key={name} type="button" disabled={!canEdit} aria-pressed={!!on[name]}

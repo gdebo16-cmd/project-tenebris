@@ -3,9 +3,12 @@
 // (the same rules as the old sheet) and answers an error when you're at a limit.
 import { useState } from 'react';
 import { ApiError } from '../../../api.ts';
-import styles from '../Sheet.module.css';
+import styles from './SpellBookBlock.module.css';
+import panelCss from './ActionPanel.module.css';
 import { useSpellbook, useSpellbookChange, type SpellbookOp } from '../queries.ts';
 import type { BlockProps } from './types.ts';
+import DetailsPanel from './DetailsPanel.tsx';
+import { SpellInfo } from './details.tsx';
 
 type Props = Pick<BlockProps, 'creature' | 'canEdit'> & { id: string };
 
@@ -16,6 +19,7 @@ const free = (s: { is_racial?: boolean; is_bonus?: boolean }) => !!(s.is_racial 
 export default function SpellBookBlock({ creature, canEdit, id }: Props) {
     const [open, setOpen] = useState(false);
     const [level, setLevel] = useState(0);
+    const [openId, setOpenId] = useState<number | null>(null);   // the spell shown in the details panel
     const book = useSpellbook(id, open && canEdit);
     const change = useSpellbookChange(id);
     if (!canEdit) return null;
@@ -35,11 +39,14 @@ export default function SpellBookBlock({ creature, canEdit, id }: Props) {
     const bookSpells = book.data?.spells ?? [];
     const levels = [...new Set(bookSpells.map((s) => Number(s.base_level)))].sort((a, b) => a - b);
     const shownLevel = levels.includes(level) ? level : (levels[0] ?? 0);
+    // A known spell carries its full details; a spell from the open book has what the book sends
+    const openSpell = openId == null ? undefined
+        : known.find((s) => Number(s.id) === openId) ?? bookSpells.find((s) => Number(s.id) === openId);
 
     return (
         <section className={styles.block} aria-label="Spell book">
             <div className={styles.restLine}>
-                <h2 className={styles.heading}>Spell book</h2>
+                <h2 className={`${styles.heading} ${panelCss.title}`}>Spell book</h2>
                 <button type="button" className={styles.button} onClick={() => setOpen(!open)}>{open ? 'Close the book' : 'Learn spells'}</button>
             </div>
             {limits && (
@@ -51,16 +58,16 @@ export default function SpellBookBlock({ creature, canEdit, id }: Props) {
 
             {!open && known.length === 0 && <span className={styles.muted}>No spells learned yet.</span>}
             {!open && known.map((s) => (
-                <div key={s.id} className={styles.row}>
+                <div key={s.id} className={`${styles.row} ${panelCss.row}`}>
                     <div className={styles.rowText}>
-                        <span className={styles.rowName}>{s.name}</span>
+                        <button type="button" className={`${styles.nameButton} ${panelCss.name}`} onClick={() => setOpenId(Number(s.id))}>{s.name}</button>
                         <span className={styles.muted}>
                             {[levelName(s.base_level), s.is_prepared ? 'prepared' : null, s.is_action ? 'action spell' : null,
                               s.is_racial ? 'race starter spell' : s.is_bonus ? 'bonus spell' : null].filter(Boolean).join(' · ')}
                         </span>
                     </div>
                     {!free(s) && (
-                        <div className={styles.rowButtons}>
+                        <div className={`${styles.rowButtons} ${panelCss.buttons}`}>
                             <button type="button" className={`${styles.button} ${s.is_prepared ? '' : styles.primary}`} disabled={change.isPending}
                                 onClick={() => run(s.is_prepared ? 'unprepare' : 'prepare', s.id)}>{s.is_prepared ? 'Unprepare' : 'Prepare'}</button>
                             <button type="button" className={styles.button} disabled={change.isPending}
@@ -84,12 +91,12 @@ export default function SpellBookBlock({ creature, canEdit, id }: Props) {
                     {bookSpells.filter((s) => Number(s.base_level) === shownLevel).map((s) => {
                         const learned = knownIds.has(Number(s.id));
                         return (
-                            <div key={s.id} className={styles.row}>
+                            <div key={s.id} className={`${styles.row} ${panelCss.row}`}>
                                 <div className={styles.rowText}>
-                                    <span className={styles.rowName}>{s.name}</span>
+                                    <button type="button" className={`${styles.nameButton} ${panelCss.name}`} onClick={() => setOpenId(Number(s.id))}>{s.name}</button>
                                     <span className={styles.muted}>{[s.alignment_name, s.element_name, s.state_name].filter(Boolean).join(' · ')}</span>
                                 </div>
-                                <div className={styles.rowButtons}>
+                                <div className={`${styles.rowButtons} ${panelCss.buttons}`}>
                                     <button type="button" className={`${styles.button} ${learned ? '' : styles.primary}`} disabled={change.isPending}
                                         onClick={() => run(learned ? 'unlearn' : 'learn', s.id)}>{learned ? 'Forget' : 'Learn'}</button>
                                 </div>
@@ -97,6 +104,11 @@ export default function SpellBookBlock({ creature, canEdit, id }: Props) {
                         );
                     })}
                 </>
+            )}
+            {openSpell && (
+                <DetailsPanel title={openSpell.name} onClose={() => setOpenId(null)}>
+                    <SpellInfo spell={openSpell} />
+                </DetailsPanel>
             )}
         </section>
     );

@@ -1,11 +1,12 @@
-// The 8 stats (tap to roll a check) and the skills (tap to roll; trained ones are highlighted).
+// The 8 stats (tap to roll a check). The skills are their own block (SkillsBlock).
 import { signed } from '@tenebris/rules/math';
-import styles from '../Sheet.module.css';
+import styles from './StatsBlock.module.css';
 import type { BlockProps } from './types.ts';
 
 export default function StatsBlock({ creature, canEdit, onAct }: Pick<BlockProps, 'creature' | 'canEdit' | 'onAct'>) {
     return (
-        <section className={styles.block} aria-label="Stats and skills">
+        <section className={styles.block} aria-label="Stats">
+            <h2 className={styles.title}>Primary Stats</h2>
             <div className={styles.grid4}>
                 {creature.stats.map((stat) => (
                     <button key={stat.key} type="button" className={styles.tile} disabled={!canEdit} aria-label={`Roll ${stat.label}`}
@@ -16,18 +17,6 @@ export default function StatsBlock({ creature, canEdit, onAct }: Pick<BlockProps
                     </button>
                 ))}
             </div>
-            <h2 className={styles.heading}>Skills</h2>
-            <div className={styles.chips}>
-                {creature.skills.map((skill) => (
-                    <button key={skill.id} type="button" disabled={!canEdit}
-                        className={`${styles.chip} ${skill.proficient ? styles.chipOn : ''}`}
-                        title={skill.proficient ? 'Trained' : undefined}
-                        onClick={() => onAct({ actionKey: `skill:${skill.id}`, kind: 'check' })}>
-                        {skill.name} {signed(skill.value)}
-                    </button>
-                ))}
-            </div>
-            <span className={styles.muted}>Tap a stat or skill to roll a check. The server rolls.</span>
         </section>
     );
 }

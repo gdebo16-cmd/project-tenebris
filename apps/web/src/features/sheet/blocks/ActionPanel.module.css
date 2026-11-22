@@ -1,0 +1,96 @@
+/* ActionPanel.tsx: the Actions · Spells · Gear · Features tabs and everything that shows under them.
+   This file is for the column as a whole and for what ALL its tabs share. Each block also has its own
+   module (blocks/<Name>.module.css) for changes to that one block. Order, lowest to highest:
+   Sheet.module.css (whole site's sheet look) → this file (every tab in the column) → the block's own file.
+   Empty rules change nothing; fill them in. */
+
+/* ===== The whole panel (the box around the tab bar and the tab's content) ===== */
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 1.5rem;
+    padding: 12px;
+}
+
+/* The area under the tab bar, where the open tab's blocks show */
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+/* Inside this panel the Actions tab sits flat on the panel (on a monster sheet it stands alone,
+   with its own block background from ActionsBlock.module.css) */
+.content > section[aria-label="Actions"] {
+    background: none;
+    border: none;
+}
+
+/* ===== The tab bar: Actions · Spells · Gear · Features ===== */
+.tabBar {
+    display: grid;
+    grid-template-columns: repeat(var(--tab-count, 4), minmax(0, 1fr));   /* --tab-count: how many tabs the layout gives the panel */
+    gap: 4px;
+    border-bottom: 1px solid var(--border, #b27f50);
+}
+
+/* One tab. .tab and .tabActive are used one at a time (never both on the same button). */
+.tab,
+.tabActive {
+    min-height: 44px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.tab { opacity: 0.7; }
+.tab:hover { opacity: 1; }
+
+.tabActive {
+    border-bottom-color: var(--accent, #d4af37);
+    opacity: 1;
+    background: var(--bg, #1a1030);
+    border-radius: .75rem .75rem 0 0;
+}
+
+.tab:focus-visible,
+.tabActive:focus-visible {
+    outline: 2px solid var(--accent, #d4af37);
+    outline-offset: 2px;
+}
+
+/* Each tab's own box is styled in that block's own file:
+   ActionsBlock / SpellsBlock / SpellBookBlock / PurseBlock / InventoryBlock / FeaturesBlock .module.css (their .block rule). */
+
+/* ===== Pieces used in every tab ===== */
+
+/* A box's main title: "Actions", "Spells", "Spell book", "Purse", "Gear", "Features"
+   (adds to the shared .title / .heading) */
+.title {
+}
+
+/* Section titles inside the Actions box: "Physical Actions", "Magical Actions", "Bonus Actions",
+   "Reactions", "Class Features" (adds to .subtitle) */
+.sectionTitle {
+}
+
+/* One line: a weapon, spell, feature, armor or item (adds to .row) */
+.row {
+}
+
+/* The name on a line, clickable or not (adds to .nameButton / .rowName) */
+.name {
+}
+
+/* The buttons on the right of a line: to hit, damage, Cast, Use, Equip… (adds to .rowButtons) */
+.buttons {
+}

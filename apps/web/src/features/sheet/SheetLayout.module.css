@@ -1,0 +1,220 @@
+/* The sheet's grid (SheetLayout.tsx) and the layout editor (LayoutEditor.tsx).
+   Desktop: a 12 × 16 grid that fills the screen between the page's title bar and footer: no page scrolling.
+   The page says how much room its own parts take with --sheet-chrome (title bar + footer + padding).
+   Each block's place comes from the layout as CSS variables: --col, --row and --row-span. */
+
+.root {
+    --gap: 8px;
+    --phone-row: calc((100dvh - var(--sheet-chrome, 0px)) / 16);   /* phone: one grid row, so blocks keep their proportions */
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+/* Phone first: one column, blocks in reading order, each as tall as its rows; the page scrolls */
+.grid {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: minmax(0, 1fr);
+}
+
+/* One placed block. Its content fills it; what doesn't fit scrolls inside. */
+.item,
+.itemPhoneHidden,
+.itemEditing {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    min-width: 0;
+    min-height: 0;
+    height: calc(var(--phone-row) * var(--row-span, 3) + var(--gap) * (var(--row-span, 3) - 1));
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;          /* no scrollbars: content that doesn't fit still scrolls (wheel, touch, keyboard) */
+    border-radius: 12px;
+}
+
+.item::-webkit-scrollbar,
+.itemPhoneHidden::-webkit-scrollbar { display: none; }
+
+/* Fit (SheetLayout.tsx): holds the block; scaled up with zoom when the content is smaller than the block */
+.fit {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+/* The block's own box stretches to fill the space */
+.fit > * { flex: 1 0 auto; }
+
+/* Phone tabs: Stats / Combat / Condition (the buttons use the .tab / .tabActive look from Sheet.module.css) */
+.phoneTabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    border-bottom: 1px solid var(--border, #b27f50);
+}
+
+.itemPhoneHidden { display: none; }
+
+/* ---- Arranging (wide screens only; started from the sidebar's "Edit sheet layout") ---- */
+
+.editor {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: var(--surface, #1a1030);
+    border: 2px solid var(--accent, #d4af37);
+}
+
+.editorRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.editorTitle { font-weight: 700; }
+.editorButtons { display: flex; gap: 6px; margin-left: auto; }
+
+.editorLabel {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+}
+
+.check { display: inline-flex; align-items: center; gap: 4px; margin-right: 6px; }
+
+.addButton {
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px dashed var(--accent, #d4af37);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+/* The grid's cells while arranging */
+.cell {
+    border: 1px dashed color-mix(in srgb, var(--border, #b27f50) 45%, transparent);
+    border-radius: 6px;
+    pointer-events: none;
+}
+
+.itemEditing {
+    overflow: hidden;
+    outline: 2px solid var(--accent, #d4af37);
+    background: color-mix(in srgb, var(--surface, #1a1030) 85%, transparent);
+    z-index: 1;
+}
+
+.itemEditing:focus-visible { outline: 3px solid var(--text, #facd8d); }
+.itemDragging { opacity: 0.5; }
+
+/* The bar on top of a block: drag it to move the block */
+.handle {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: color-mix(in srgb, var(--accent, #d4af37) 30%, var(--surface, #1a1030));
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+
+.handle:active { cursor: grabbing; }
+.handleName { flex: 1; font-weight: 700; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.handleSize { font-size: 12px; opacity: 0.8; }
+
+.hide {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.hide:hover { background: rgba(255, 255, 255, 0.12); }
+
+/* The block itself, as a preview that can't be clicked */
+.preview {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* The corner: drag it to resize */
+.resize {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 22px;
+    height: 22px;
+    cursor: nwse-resize;
+    touch-action: none;
+    background: linear-gradient(135deg, transparent 50%, var(--accent, #d4af37) 50%);
+    border-bottom-right-radius: 12px;
+    z-index: 2;
+}
+
+/* Where a dragged block will land */
+.ghost,
+.ghostBlocked {
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.ghost { border: 3px solid #5c9a52; background: rgba(92, 154, 82, 0.2); }
+.ghostBlocked { border: 3px solid #c4553f; background: rgba(196, 85, 63, 0.2); }
+
+/* Wide screens: the 12 × 16 grid fills the screen; every block shows at its place */
+@media (min-width: 721px) {
+    .root { height: calc(100dvh - var(--sheet-chrome, 0px)); }
+
+    .grid {
+        flex: 1;
+        min-height: 0;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        grid-template-rows: repeat(16, minmax(0, 1fr));
+    }
+
+    .item,
+    .itemPhoneHidden,
+    .itemEditing,
+    .cell,
+    .ghost,
+    .ghostBlocked {
+        display: flex;
+        height: auto;
+        grid-column: var(--col);
+        grid-row: var(--row);
+    }
+
+    .cell,
+    .ghost,
+    .ghostBlocked { display: block; }
+
+    .phoneTabs { display: none; }
+
+}

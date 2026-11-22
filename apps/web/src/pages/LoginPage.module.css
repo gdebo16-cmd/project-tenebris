@@ -77,7 +77,7 @@ body:where(:has(.page)) {
 
 :where(html:has(.page)) ul,
 :where(html:has(.page)) li,
-:where(html:has(.page)) a {
+:where(html:has(.page)) a { 
     list-style: none;
     text-decoration: none;
     color: var(--txt-color-1);
@@ -266,23 +266,20 @@ body:where(:has(.page)) {
         display: flex;
         height: 8vh;
         width: 100vw;
-        border-radius: 0 0 15% 15%;
     }
 
 
     :where(html:has(.page)) main {
-        height: calc(100svh - 12vh);
-        width: 100%;
+        width: 100dvw;
+        height: 87dvh;
         max-width: 1600px;
         box-sizing: border-box;
         margin: 0 auto;
         padding: 4vh 2vw 10vh;
-        overflow-x: hidden;
-        overflow-y: auto;
         overscroll-behavior: contain;
         display: flex;
         justify-content: center;
-        align-items: flex-start;
+        align-items: center;
         backdrop-filter: blur(2px) saturate(180%);
         -webkit-backdrop-filter: blur(3px);
         background-color: rgba(var(--bgc-theme), 0.7);
@@ -296,14 +293,14 @@ body:where(:has(.page)) {
         align-items: center;
         font-size: 150%;
         color: var(--txt-color-1);
-        top: calc(100dvh - 8vh);
+        bottom: 0;
         z-index: 10;
-        height: 10vh;
+        height: 5vh;
         width: 100%;
         border-top: var(--tileBorder);
         box-shadow: var(--bs2);
         background-color: var(--bgc-theme);
-        border-radius: 50% 50% 0 0;
+
         overflow: hidden;
     }
 
@@ -344,11 +341,10 @@ body:where(:has(.page)) {
         grid-template-columns: minmax(16rem, 1fr) minmax(20rem, 1.2fr);
         gap: 3vw;
         align-items: center;
-        background-color: color-mix(in srgb, var(--bgc-theme) 60%, transparent);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
+        background-color: color-mix(in srgb, var(--bgc-theme) 80%, transparent);
+
         border: var(--tileBorder);
-        border-radius: var(--tile);
+        border-radius: 1.5rem;
         box-shadow: var(--bs2);
     }
 
@@ -360,7 +356,7 @@ body:where(:has(.page)) {
         height: 100%;
         background-color: var(--bg);
         border: var(--tileBorder);
-        border-radius: var(--tile);
+        border-radius: 1.5rem;
         box-shadow: var(--bs2);
         color: var(--txt-color-1);
         font-size: 150%;
@@ -377,7 +373,7 @@ body:where(:has(.page)) {
         margin: 0 0 2.5vh;
         padding: 0;
         border: var(--tileBorder);
-        border-radius: var(--tile);
+        border-radius: 1rem;
         box-shadow: var(--bs2);
     }
        
@@ -399,7 +395,7 @@ body:where(:has(.page)) {
         align-items: center;
         padding: 0.8vh 1vw;
         background-color: var(--bg);
-        border-radius: var(--tile) var(--tile) 0 0;
+        border-radius: 1rem 1rem 0 0;
         font-size: 150%;
         border-bottom: var(--tileBorder);
     }
@@ -410,8 +406,8 @@ body:where(:has(.page)) {
         padding: 1vh 1vw;
         text-align: center;
         background-color: var(--surface);
-        border: none;
-        border-radius: 0 0 var(--tile) var(--tile);
+        border: none;   
+        border-radius: 0 0 1rem 1rem;
         font-size: 150%;
     }
 
@@ -430,7 +426,7 @@ body:where(:has(.page)) {
         background-color: var(--bgc-char-name);
         color: var(--txt-color-1);
         border: var(--tileBorder);
-        border-radius: var(--tile);
+        border-radius: 1rem;
         box-shadow: var(--bs2);
     }
 

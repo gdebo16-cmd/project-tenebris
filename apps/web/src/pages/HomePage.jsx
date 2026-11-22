@@ -3,7 +3,6 @@ import { Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useHome } from '../queries.ts';
-import SiteNav from '../components/SiteNav';
 import Loader from '../components/Loader';
 import styles from './HomePage.module.css';
 
@@ -41,7 +40,6 @@ function HomePage() {
                 <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Welcome {username}!</h1>
             </header>
-            <SiteNav className={styles.nav} />
             <main className={styles.page}>
                 <nav className={styles.homeTabs}>
                     <button type="button" className={homeTab === 'current' ? `${styles.homeTab} ${styles.isActive}` : styles.homeTab} onClick={() => setHomeTab('current')}>Current Characters</button>

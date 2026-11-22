@@ -11,7 +11,10 @@ import { statName } from '@tenebris/rules/stats';
 import { weaponOptions, wielderPowers } from '@tenebris/rules/equipment';
 import { useGear } from '../queries.ts';
 import type { UtilityRune } from '@tenebris/rules/runes';
-import styles from '../Sheet.module.css';
+import styles from './ActionsBlock.module.css';
+import panelCss from './ActionPanel.module.css';
+import DetailsPanel, { PanelExtras } from './DetailsPanel.tsx';
+import { FeatureInfo, SpellInfo, WeaponInfo } from './details.tsx';
 import type { BlockProps } from './types.ts';
 
 type Props = BlockProps & {
@@ -61,7 +64,6 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
     const intMod = creature.stats.find((s) => s.key === 'int')?.mod ?? 0;
 
     const toggleOpen = (item: OpenItem) => setOpen((now) => (now && now.kind === item.kind && now.key === item.key ? null : item));
-    const isOpen = (item: OpenItem) => !!open && open.kind === item.kind && open.key === item.key;
 
     const toggleLantern = (l: UtilityRune) => {
         const on = !litLanterns[l.key];
@@ -103,9 +105,9 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
         const opts = w ? weaponOptions(creature, w) : null;
         const dice = opts?.twoHands ? w?.versatile_dice : w?.damage_dice;
         return (
-            <div className={styles.details}>
-                <p>{[a.category, a.hands, a.range, a.stat, a.damageType, a.rarity].filter(Boolean).join(' · ')}</p>
-                {a.description && <p>{a.description}</p>}
+            <>
+                <WeaponInfo weapon={w} action={a} />
+                <PanelExtras>
                 {a.runed && <p>Runed weapon: Intellect for attack and damage; Runic Strike is on this weapon.</p>}
                 {opts && w && (opts.dualWield !== null || opts.soulBrand !== null || opts.sigilMark !== null) && (
                     <div className={styles.options} aria-label={`${a.name} options`}>
@@ -133,36 +135,22 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
                     </div>
                 )}
                 {gearError && <p className={styles.error} role="alert">{gearError}</p>}
-            </div>
+                </PanelExtras>
+            </>
         );
     };
 
-    const spellDetails = (s: SpellAction) => (
-        <div className={styles.details}>
-            <p>{[
-                s.base_level === 0 ? 'Cantrip' : `Level ${s.base_level}`,
-                s.tile === 'bonus' ? 'Bonus action' : s.tile === 'reaction' ? 'Reaction' : 'Action',
-                s.attack_type ? `to hit ${signed(s.toHit)}` : null,
-                s.opponent_save_roll ? `${statName(s.opponent_save_roll)} save DC ${s.saveDc}` : null,
-            ].filter(Boolean).join(' · ')}</p>
-            {typeof s.description === 'string' && s.description && <p>{s.description}</p>}
-        </div>
-    );
+    const spellDetails = (s: SpellAction) => <SpellInfo spell={s} numbers={{ toHit: s.toHit, saveDc: s.saveDc, tile: s.tile }} />;
 
-    const featureDetails = (f: CreatureFeature) => (
-        <div className={styles.details}>
-            <p>{[f.action_type, f.diceNow, f.perRest ? `${f.perRest.left}/${f.perRest.max} uses · ${f.perRest.rest} rest` : null].filter(Boolean).join(' · ')}</p>
-            {typeof f.description === 'string' && f.description && <p>{f.description}</p>}
-        </div>
-    );
+    const featureDetails = (f: CreatureFeature) => <FeatureInfo feature={f} />;
 
     const weaponRow = (a: WeaponAction) => (
-        <div key={a.key} className={styles.row}>
+        <div key={a.key} className={`${styles.row} ${panelCss.row}`}>
             <div className={styles.rowText}>
-                <button type="button" className={styles.nameButton} onClick={() => toggleOpen({ kind: 'weapon', key: a.key })}>{a.name}</button>
+                <button type="button" className={`${styles.nameButton} ${panelCss.name}`} onClick={() => toggleOpen({ kind: 'weapon', key: a.key })}>{a.name}</button>
                 <span className={styles.muted}>{[a.category, a.hands, a.range, a.stat].filter(Boolean).join(' · ')}</span>
             </div>
-            <div className={styles.rowButtons}>
+            <div className={`${styles.rowButtons} ${panelCss.buttons}`}>
                 <button type="button" className={styles.button} disabled={!canEdit} aria-label={`${a.name} to hit`}
                     onClick={() => onAct({ actionKey: a.key, kind: 'hit' }, `${a.name}: `)}>{signed(a.hit)}</button>
                 <button type="button" className={styles.buttonPrimary} disabled={!canEdit} aria-label={`${a.name} damage`}
@@ -186,7 +174,6 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
                     </button>
                 )}
             </div>
-            {isOpen({ kind: 'weapon', key: a.key }) && weaponDetails(a)}
         </div>
     );
 
@@ -203,9 +190,9 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
         );
         const castNow = () => onCast(s.key, level);
         return (
-            <div key={s.key} className={styles.row}>
+            <div key={s.key} className={`${styles.row} ${panelCss.row}`}>
                 <div className={styles.rowText}>
-                    <button type="button" className={styles.nameButton} onClick={() => toggleOpen({ kind: 'spell', key: s.key })}>{s.name}</button>
+                    <button type="button" className={`${styles.nameButton} ${panelCss.name}`} onClick={() => toggleOpen({ kind: 'spell', key: s.key })}>{s.name}</button>
                     <span className={styles.muted}>
                         {[s.base_level === 0 ? 'Cantrip' : `Level ${s.base_level}`,
                           s.attack_type ? `to hit ${signed(s.toHit)}` : null,
@@ -213,7 +200,7 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
                           dice ? `${dice}${s.beams > 1 ? ` ×${s.beams} beams` : ''}` : heal ? `heals ${heal}${s.healMod ? signed(s.healMod) : ''}` : null].filter(Boolean).join(' · ')}
                     </span>
                 </div>
-                <div className={styles.rowButtons}>
+                <div className={`${styles.rowButtons} ${panelCss.buttons}`}>
                     {upcast}
                     {s.attack_type ? (
                         <button type="button" className={styles.button} disabled={!canEdit} aria-label={`${s.name} to hit`}
@@ -236,7 +223,6 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
                         <button type="button" className={styles.buttonPrimary} disabled={!canEdit} onClick={castNow}>Cast</button>
                     )}
                 </div>
-                {isOpen({ kind: 'spell', key: s.key }) && spellDetails(s)}
             </div>
         );
     };
@@ -245,56 +231,65 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
         const uses = f.perRest;
         const canUse = canEdit && (uses != null || f.diceNow != null);
         return (
-            <div key={f.key} className={styles.row}>
+            <div key={f.key} className={`${styles.row} ${panelCss.row}`}>
                 <div className={styles.rowText}>
-                    <button type="button" className={styles.nameButton} onClick={() => toggleOpen({ kind: 'feature', key: f.key })}>{f.name}</button>
+                    <button type="button" className={`${styles.nameButton} ${panelCss.name}`} onClick={() => toggleOpen({ kind: 'feature', key: f.key })}>{f.name}</button>
                     <span className={styles.muted}>
                         {[f.diceNow, uses ? `${uses.left}/${uses.max} uses left · back on a ${uses.rest} rest` : null].filter(Boolean).join(' · ')}
                     </span>
                 </div>
                 {canUse && (
-                    <div className={styles.rowButtons}>
+                    <div className={`${styles.rowButtons} ${panelCss.buttons}`}>
                         <button type="button" className={styles.buttonPrimary} disabled={uses != null && uses.left <= 0}
                             aria-label={`Use ${f.name}`} onClick={() => onUse(f.key)}>
                             {uses != null && uses.left <= 0 ? `Used (${uses.rest} rest)` : 'Use'}
                         </button>
                     </div>
                 )}
-                {isOpen({ kind: 'feature', key: f.key }) && featureDetails(f)}
             </div>
         );
     };
 
     const empty = (text: string) => <span className={styles.muted}>{text}</span>;
 
+    // What the details panel shows: the weapon, spell or feature whose name was clicked
+    const openWeapon = open?.kind === 'weapon' ? [...creature.actions, ...creature.bonusActions].find((a) => a.key === open.key) : undefined;
+    const openSpell = open?.kind === 'spell' ? creature.spells.find((s) => s.key === open.key) : undefined;
+    const openFeature = open?.kind === 'feature' ? creature.features.find((f) => f.key === open.key) : undefined;
+    const openName = openWeapon?.name ?? openSpell?.name ?? openFeature?.name;
+
     return (
         <section className={styles.block} aria-label="Actions">
-            <h2 className={styles.heading}>Physical Actions</h2>
-            {creature.actions.map(weaponRow)}
-
-            <h2 className={styles.heading}>Magical Actions · to hit {signed(toHit)} · save DC {saveDc}</h2>
+            <div className={styles.physicalActionsBlock}>
+                <h2 className={`${styles.title} ${panelCss.title}`}>Actions</h2>
+                <h2 className={`${styles.subtitle} ${panelCss.sectionTitle}`}>Physical Actions</h2>
+                {creature.actions.map(weaponRow)}
+            </div>
+            <div className={styles.magicalActionsBlock}>
+            <h2 className={`${styles.subtitle} ${panelCss.sectionTitle}`}>Magical Actions</h2>
             {magicSpells.length === 0 ? empty('No spells set as actions yet.') : magicSpells.map(spellRow)}
-
-            <h2 className={styles.heading}>Bonus Actions</h2>
+            </div>
+            <div className={styles.bonusActionsBlock}>
+            <h2 className={`${styles.subtitle} ${panelCss.sectionTitle}`}>Bonus Actions</h2>
             {creature.bonusActions.map(weaponRow)}
             {hasCallTheBrand && brandedWeapon && (
-                <div className={styles.row}>
+                <div className={`${styles.row} ${panelCss.row}`}>
                     <div className={styles.rowText}>
-                        <span className={styles.rowName}>Call the Brand ({brandedWeapon.name})</span>
+                        <span className={`${styles.rowName} ${panelCss.name}`}>Call the Brand ({brandedWeapon.name})</span>
                         <span className={styles.muted}>The branded weapon returns to your hand · holder Might DC {creature.classDc}</span>
                     </div>
-                    <div className={styles.rowButtons}>
+                    <div className={`${styles.rowButtons} ${panelCss.buttons}`}>
                         <button type="button" className={styles.buttonPrimary} disabled={!canEdit} onClick={callTheBrand}>Call</button>
                     </div>
                 </div>
             )}
             {lanterns.map((l) => (
-                <div key={l.key} className={styles.row}>
+                <div key={l.key} className={`${styles.row} ${panelCss.row}`}>
                     <div className={styles.rowText}>
-                        <span className={styles.rowName}>Lantern Rune ({l.item})</span>
+                        <span className={`${styles.rowName} ${panelCss.name}`}>Lantern Rune ({l.item})</span>
                         <span className={styles.muted}>Bright light 20 ft and dim light 20 ft more</span>
                     </div>
-                    <div className={styles.rowButtons}>
+                    <div className={`${styles.rowButtons} ${panelCss.buttons}`}>
                         <button type="button" className={styles.button} disabled={!canEdit} onClick={() => toggleLantern(l)}>
                             {litLanterns[l.key] ? 'Light off' : 'Light on'}
                         </button>
@@ -304,17 +299,18 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
             {bonusSpells.map(spellRow)}
             {bonusFeatures.map(featureRow)}
             {creature.bonusActions.length === 0 && !hasCallTheBrand && lanterns.length === 0 && bonusSpells.length === 0 && bonusFeatures.length === 0 && empty('None.')}
-
-            <h2 className={styles.heading}>Reactions</h2>
+            </div>
+            <div className={styles.reactionsBlock}>
+            <h2 className={`${styles.subtitle} ${panelCss.sectionTitle}`}>Reactions</h2>
             {mendings.map((m) => {
                 const used = !!creature.restUses[m.key];
                 return (
-                    <div key={m.key} className={styles.row}>
+                    <div key={m.key} className={`${styles.row} ${panelCss.row}`}>
                         <div className={styles.rowText}>
-                            <span className={styles.rowName}>Mending Rune ({m.item})</span>
+                            <span className={`${styles.rowName} ${panelCss.name}`}>Mending Rune ({m.item})</span>
                             <span className={styles.muted}>Reduce a hit's damage · 1/long rest</span>
                         </div>
-                        <div className={styles.rowButtons}>
+                        <div className={`${styles.rowButtons} ${panelCss.buttons}`}>
                             <button type="button" className={styles.buttonPrimary} disabled={!canEdit || used}
                                 aria-label={`Mending Rune on ${m.item}`} onClick={() => onRune(m.key)}>
                                 {used ? 'Used (long rest)' : `1d6${intMod ? signed(intMod) : ''}`}
@@ -326,9 +322,18 @@ export default function ActionsBlock({ creature, canEdit, onAct, onNote, onCast,
             {reactionSpells.map(spellRow)}
             {reactionFeatures.map(featureRow)}
             {mendings.length === 0 && reactionSpells.length === 0 && reactionFeatures.length === 0 && empty('None.')}
-
-            <h2 className={styles.heading}>Class Features</h2>
+            </div>
+            <div className={styles.classFeaturesBlock}>
+            <h2 className={`${styles.subtitle} ${panelCss.sectionTitle}`}>Class Features</h2>
             {classFeatures.length === 0 ? empty('None.') : classFeatures.map(featureRow)}
+            </div>
+            {openName && (
+                <DetailsPanel title={openName} onClose={() => setOpen(null)}>
+                    {openWeapon && weaponDetails(openWeapon)}
+                    {openSpell && spellDetails(openSpell)}
+                    {openFeature && featureDetails(openFeature)}
+                </DetailsPanel>
+            )}
         </section>
     );
 }

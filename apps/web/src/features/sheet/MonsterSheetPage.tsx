@@ -1,6 +1,6 @@
-// The monster sheet (R5.6): the same blocks as the character sheet, plus Traits; no Spells or Gear.
-// The DM sees and changes everything. Other members of the campaign see a glimpse:
-// name, type, a health word and its conditions. Every roll happens on the server.
+// The monster sheet (R5.6, L1–L3): the same blocks as the character sheet plus Traits, drawn by SheetLayout
+// from the monster layout (layouts.ts). The DM sees and changes everything. Other members of the campaign see a
+// glimpse: name, type, a health word and its conditions. Every roll happens on the server.
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import type { ActRequest } from '@tenebris/rules/actions';
@@ -9,16 +9,12 @@ import { ApiError } from '../../api.ts';
 import Loader from '../../components/Loader.jsx';
 import socket from '../../utils/socket.js';
 import styles from './Sheet.module.css';
+import layout from './CharacterSheetPage.module.css'; // the sheet pages' header, footer and sheet area
+import useHeaderStatusBar from '../../hooks/useHeaderStatusBar.ts';
 import { useMonsterAct, useMonsterChange, useMonsterSheet } from './monsterQueries.ts';
-import SheetHeader from './blocks/SheetHeader.tsx';
-import HealthBlock from './blocks/HealthBlock.tsx';
-import CoreStatsBlock from './blocks/CoreStatsBlock.tsx';
-import StatsBlock from './blocks/StatsBlock.tsx';
-import ConditionsBlock from './blocks/ConditionsBlock.tsx';
-import ActionsBlock from './blocks/ActionsBlock.tsx';
-import FeaturesBlock from './blocks/FeaturesBlock.tsx';
-import TraitsBlock from './blocks/TraitsBlock.tsx';
-import RollFeed, { type FeedEntry } from './blocks/RollFeed.tsx';
+import type { FeedEntry } from './blocks/RollFeed.tsx';
+import SheetLayout from './SheetLayout.tsx';
+import { SheetContext, type SheetTools } from './blocks/SheetContext.tsx';
 
 const messageOf = (err: unknown) => (err instanceof ApiError || err instanceof Error ? err.message : 'Something went wrong');
 
@@ -56,6 +52,8 @@ export default function MonsterSheetPage() {
     const nextId = useRef(1);
     const campaignId = sheet.data && 'creature' in sheet.data ? sheet.data.creature.monster?.campaignId : undefined;
 
+    useHeaderStatusBar(); // the phone's status bar matches the header
+
     const addToFeed = (who: string, text: string) =>
         setFeed((old) => [{ id: nextId.current++, who, text }, ...old].slice(0, 20));
 
@@ -88,33 +86,41 @@ export default function MonsterSheetPage() {
     if (!('creature' in sheet.data)) return <Glimpse glimpse={sheet.data.glimpse} />;
 
     const { creature, canEdit } = sheet.data;
-    const blockProps = { creature, canEdit, onAct, onNote: (text: string) => addToFeed('You', text) };
     const changeError = [change.hp.error, change.tempHp.error, change.conditions.error, change.notes.error].find(Boolean);
 
+    // Everything the blocks may need (blocks/SheetContext.tsx). Monsters have no casting, features or rests to run.
+    const tools: SheetTools = {
+        kind: 'monster',
+        id,
+        creature,
+        canEdit,
+        access: 'dm',
+        act: onAct,
+        note: (text) => addToFeed('You', text),
+        run: () => {},
+        busy: false,
+        hp: (action, amount) => change.hp.mutate({ action, amount }),
+        ward: (amount) => change.tempHp.mutate(amount),
+        setConditions: (body) => change.conditions.mutate(body),
+        saveNotes: (notes) => change.notes.mutate(notes),
+        savingNotes: change.notes.isPending,
+        changeError: changeError ? messageOf(changeError) : undefined,
+        feed,
+    };
+
     return (
-        <div className={styles.page}>
-            <p className={styles.muted}>
-                <Link to="/home">Home</Link>
-                {creature.monster && <> · <Link to={`/campaign/${creature.monster.campaignId}/dm`}>DM page</Link></>}
-            </p>
-            <div className={styles.column}>
-                <div className={styles.stack}>
-                    <SheetHeader creature={creature} />
-                    <HealthBlock creature={creature} canEdit={canEdit}
-                        onHp={(action, amount) => change.hp.mutate({ action, amount })}
-                        onWard={(amount) => change.tempHp.mutate(amount)}
-                        error={changeError ? messageOf(changeError) : undefined} />
-                    <CoreStatsBlock {...blockProps} />
-                    <StatsBlock {...blockProps} />
-                    <ConditionsBlock creature={creature} canEdit={canEdit} onChange={(body) => change.conditions.mutate(body)} />
-                </div>
-                <div className={styles.stack}>
-                    <ActionsBlock {...blockProps} id={id} onCast={() => {}} onUse={() => {}} onRune={() => {}} />
-                    <TraitsBlock creature={creature} canEdit={canEdit} saving={change.notes.isPending} onSaveNotes={(notes) => change.notes.mutate(notes)} />
-                    <FeaturesBlock creature={creature} canEdit={false} onUse={() => {}} />
-                    <RollFeed entries={feed} />
-                </div>
+        <SheetContext.Provider value={tools}>
+            <header id={layout.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={layout.titleLogo} />
+            </header>
+
+            <div className={`${styles.page} ${layout.sheetArea}`}>
+                <SheetLayout />
             </div>
-        </div>
+
+            <footer className={layout.footer}>
+                <p>copyrite Eldrid Tales LLC</p>
+            </footer>
+        </SheetContext.Provider>
     );
 }

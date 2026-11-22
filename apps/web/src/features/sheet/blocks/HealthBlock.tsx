@@ -1,6 +1,6 @@
 // HP / max, temp HP, a health bar, and Damage / Heal / Ward with an amount (only when you may edit).
 import { useState } from 'react';
-import styles from '../Sheet.module.css';
+import styles from './HealthBlock.module.css';
 import type { BlockProps } from './types.ts';
 
 type Props = Pick<BlockProps, 'creature' | 'canEdit'> & {
@@ -27,8 +27,8 @@ export default function HealthBlock({ creature, canEdit, onHp, onWard, error }: 
 
     return (
         <section className={styles.block} aria-label="Health">
-            <div className={styles.hpLine}>
-                <h2 className={styles.heading}>Health</h2>
+            <div className={styles.healthblockTitle}>
+                <h2 className={styles.titleHealth}>Health</h2>
                 <span className={styles.hpValue}>
                     {current} <span className={styles.muted}>/ {max}</span>
                     {temp > 0 && <span className={styles.muted}> +{temp} ward</span>}

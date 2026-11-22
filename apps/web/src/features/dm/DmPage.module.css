@@ -32,6 +32,9 @@
 
 .memberBody { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 
+/* names link to their sheets: theme color, not the browser's blue/purple */
+.memberBody a { color: var(--accent, #d4af37); }
+
 .quick { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
 .quickInput { width: 64px; }
@@ -60,4 +63,60 @@
     min-width: 0;
     max-width: 100%;
     font-size: 14px;
+}
+
+/* ---- Page frame: the sheet pages' header and footer (CharacterSheetPage.module.css) around it ---- */
+
+/* each part of the page; wide screens: no box of its own, the parts sit in the columns as before */
+.pane { display: contents; }
+
+/* the phone tab bar: wide screens don't need it */
+.tabs { display: none; }
+
+/* room for the fixed footer at the bottom */
+.area { padding-bottom: calc(2rem + 5dvh); }
+
+.crumbs a { color: var(--accent, #d4af37); }
+
+/* Phones: the header stays put and only this area scrolls, one tab at a time,
+   with a border above the browser's bottom bar (same as the sheets) */
+@media (max-width: 720px) {
+    :global(body):has(.area) { overflow: hidden; }
+
+    div.area {
+        box-sizing: border-box;
+        height: calc(92dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        min-height: 0;
+        padding: 0 1rem 1.5rem;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: none;
+        border-bottom: 2px solid var(--border, #b27f50);
+    }
+    div.area::-webkit-scrollbar { display: none; }
+
+    .crumbs { margin: 0.75rem 0 0.25rem; }
+
+    /* stays at the top of the area while it scrolls */
+    .tabs {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        margin: 0 -1rem 0.75rem;
+        padding: 0 0.25rem;
+        background: var(--surface, #1a1030);
+        border-bottom: 1px solid var(--border, #b27f50);
+    }
+    .tabs button {
+        padding: 0 2px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .pane { display: block; }
+    .paneHidden { display: none; }
 }
