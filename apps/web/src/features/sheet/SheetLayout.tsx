@@ -25,7 +25,22 @@ const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n
 // Scales a block's content up to fill its box when the content is smaller than the box (never down: what doesn't fit
 // scrolls). Uses CSS zoom, so the content reflows at the larger size instead of being stretched. Re-fits when the box
 // changes size (window, layout) or the content changes (a roll, a new item).
+// "Fits" means two things: the content is no taller than the box, and nothing inside spills sideways
+// (a stat label wider than its tile, a row of buttons wider than the block). A tall, narrow block stops growing
+// as soon as its widest piece reaches the edge.
 const MAX_ZOOM = 1.6;
+
+// Pictures and form fields hold nothing that could spill (and images report odd widths), so they're skipped
+const NO_CONTENT = new Set(['IMG', 'INPUT', 'SELECT', 'TEXTAREA', 'VIDEO', 'CANVAS']);
+
+function spillsSideways(el: HTMLElement) {
+    if (el.scrollWidth > el.clientWidth + 1) return true;
+    for (const node of el.querySelectorAll<HTMLElement>('*')) {
+        if (NO_CONTENT.has(node.tagName)) continue;
+        if (node.clientWidth > 0 && node.scrollWidth > node.clientWidth + 1) return true;
+    }
+    return false;
+}
 
 function Fit({ children }: { children: ReactNode }) {
     const ref = useRef<HTMLDivElement>(null);
@@ -39,14 +54,15 @@ function Fit({ children }: { children: ReactNode }) {
             if (!room) return;
             el.style.zoom = '1';
             el.style.minHeight = '0px';
+            const fits = () => el.getBoundingClientRect().height <= room && !spillsSideways(el);
             let zoom = 1;
-            if (el.getBoundingClientRect().height < room - 1) {
+            if (el.getBoundingClientRect().height < room - 1 && fits()) {
                 // The largest zoom at which the content still fits (a few halving steps are plenty)
                 let lo = 1, hi = MAX_ZOOM;
                 for (let i = 0; i < 7; i++) {
                     const mid = (lo + hi) / 2;
                     el.style.zoom = String(mid);
-                    if (el.getBoundingClientRect().height <= room) lo = mid; else hi = mid;
+                    if (fits()) lo = mid; else hi = mid;
                 }
                 zoom = lo;
             }
