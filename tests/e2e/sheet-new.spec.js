@@ -59,7 +59,8 @@ test('new sheet: rest, features, casting and the spell book go through the serve
 
   // The Features and Spells tabs render
   await page.getByRole('button', { name: 'Features' }).click();
-  await expect(page.getByRole('region', { name: 'Features' })).toBeVisible();
+  // exact: the action panel itself is named "Actions, spells, gear and features"
+  await expect(page.getByRole('region', { name: 'Features', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Spells' }).click();
   await expect(page.getByRole('region', { name: 'Spell book' })).toBeVisible();
 });

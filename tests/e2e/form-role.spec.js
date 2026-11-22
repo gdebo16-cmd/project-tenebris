@@ -17,27 +17,29 @@ test('role tab clears a calling below level 3 and refuses a bad skill', async ({
     const skills = options.skills.from.slice(0, options.skills.choose);
 
     await page.goto(`/characters/${id}/edit?tab=role`);
-    await page.getByRole('button', { name: 'Warrior', exact: true }).click();
+    await page.getByRole('button', { name: /^Warrior\b/ }).click();
     await expect(page.getByText('Hit die d12')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Show the full rune' }).locator('img')).toHaveAttribute('src', /\/glyphs\/classes\/thumbs\/warrior\.webp$/);
 
-    await page.getByRole('combobox', { name: 'Calling' }).selectOption(String(calling.id));
-    for (const skill of skills) await page.getByRole('checkbox', { name: skill, exact: true }).check();
+    // callings and skills are buttons (aria-pressed shows which are picked)
+    const panel = page.getByRole('tabpanel');
+    await panel.getByRole('button', { name: calling.name, exact: true }).click();
+    for (const skill of skills) await panel.getByRole('button', { name: skill, exact: true }).click();
 
     const saved = page.waitForResponse((res) => res.url().includes('/form/role') && res.request().method() === 'PUT');
     await page.getByRole('tabpanel').getByRole('button', { name: 'Save' }).click();
     expect((await saved).ok()).toBeTruthy();
 
     await page.reload();
-    await expect(page.getByRole('button', { name: 'Warrior', exact: true })).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.getByRole('combobox', { name: 'Calling' })).toHaveValue(String(calling.id));
-    for (const skill of skills) await expect(page.getByRole('checkbox', { name: skill, exact: true })).toBeChecked();
+    await expect(page.getByRole('button', { name: /^Warrior\b/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(panel.getByRole('button', { name: calling.name, exact: true })).toHaveAttribute('aria-pressed', 'true');
+    for (const skill of skills) await expect(panel.getByRole('button', { name: skill, exact: true })).toHaveAttribute('aria-pressed', 'true');
 
     // changing the level saves the header straight away
     const headerSaved = page.waitForResponse((res) => res.url().includes('/form/header') && res.request().method() === 'PUT');
     await page.getByLabel('Level').selectOption('2');
     expect((await headerSaved).ok()).toBeTruthy();
-    await expect(page.getByRole('combobox', { name: 'Calling' })).toHaveCount(0);
+    await expect(panel.getByRole('button', { name: calling.name, exact: true })).toHaveCount(0);
 
     const after = await (await page.request.get(`/api/characters/${id}/form`)).json();
     expect(after.role.calling_id).toBeNull();

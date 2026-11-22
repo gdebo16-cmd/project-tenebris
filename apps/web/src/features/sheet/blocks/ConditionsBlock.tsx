@@ -33,7 +33,7 @@ export default function ConditionsBlock({ creature, canEdit, onChange }: Props) 
                         onClick={() => onChange({ exhaustion: creature.exhaustion - 1 })}>−</button>
                 )}
                 <span className={styles.exhaustionText}>
-                    <span className={styles.tileLabel}>Exhaustion</span>
+                    <span className={styles.tileLabel}>Exhaustion</span>{' '}
                     <span className={styles.tileValue}>{creature.exhaustion} / {MAX_EXHAUSTION}</span>
                 </span>
                 {canEdit && (

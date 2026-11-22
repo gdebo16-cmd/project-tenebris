@@ -2,7 +2,6 @@
 import { test, expect } from '@playwright/test';
 import { login } from './helpers.js';
 
-const STATS = ['Might', 'Precision', 'Endurance', 'Intellect', 'Judgment', 'Confidence', 'Luck', 'Speed'];
 
 test('creates a character on the new form, opens its sheet and rolls', async ({ page }) => {
     test.setTimeout(90000);
@@ -41,28 +40,27 @@ test('creates a character on the new form, opens its sheet and rolls', async ({ 
     const warrior = form.options.roles.find((role) => role.key === 'warrior');
     const roleOptions = await (await page.request.get(`/api/character-options?level=1&role_id=${warrior.id}`)).json();
     await page.getByRole('tab', { name: 'Role & calling' }).click();
-    await page.getByRole('button', { name: 'Warrior', exact: true }).click();
+    await page.getByRole('button', { name: /^Warrior\b/ }).click();
+    // skills are buttons (aria-pressed shows which are picked)
     for (const skill of roleOptions.skills.from.slice(0, roleOptions.skills.choose)) {
-        await page.getByRole('checkbox', { name: skill, exact: true }).check();
+        await page.getByRole('tabpanel').getByRole('button', { name: skill, exact: true }).click();
     }
     saved = page.waitForResponse((res) => res.url().includes('/form/role') && res.request().method() === 'PUT');
     await page.getByRole('tabpanel').getByRole('button', { name: 'Save' }).click();
     expect((await saved).ok()).toBeTruthy();
 
+    // Traits: the tab's tap-to-place screen has its own test (form-traits.spec.js); here the server rolls
+    // all eight and they're placed the same way that test does, so this test stays about the whole journey
     await page.getByRole('tab', { name: 'Traits & gifts' }).click();
-    for (let i = 0; i < 8; i++) {
-        const rolled = page.waitForResponse((res) => res.url().includes('/stat-rolls') && res.request().method() === 'POST');
-        await page.getByRole('listitem').filter({ hasText: `Roll ${i + 1}` }).getByRole('button', { name: 'Roll', exact: true }).click();
-        expect((await rolled).ok()).toBeTruthy();
+    for (let index = 0; index < 8; index++) {
+        const rolled = await page.request.post(`/api/characters/${id}/stat-rolls`, { data: { index } });
+        expect(rolled.ok()).toBeTruthy();
     }
-    for (let i = 0; i < STATS.length; i++) {
-        await page.getByRole('combobox', { name: STATS[i], exact: true }).selectOption(String(i));
-    }
-    await page.getByRole('combobox', { name: '+2 bonus' }).selectOption('str');
-    await page.getByRole('combobox', { name: '+1 bonus' }).selectOption('dex');
-    saved = page.waitForResponse((res) => res.url().includes('/form/traits') && res.request().method() === 'PUT');
-    await page.getByRole('tabpanel').getByRole('button', { name: 'Save' }).click();
-    expect((await saved).ok()).toBeTruthy();
+    const placed = await page.request.put(`/api/characters/${id}/form/traits`, {
+        data: { placement: { str: 0, dex: 1, con: 2, int: 3, wis: 4, cha: 5, luc: 6, spd: 7 }, plus2: 'str', plus1: 'dex', gifts: [] },
+    });
+    expect(placed.ok()).toBeTruthy();
+    await page.reload();
 
     await page.getByRole('tab', { name: 'Personality' }).click();
     await page.getByRole('radio', { name: 'Lawful Good' }).click();
@@ -81,11 +79,13 @@ test('creates a character on the new form, opens its sheet and rolls', async ({ 
     await page.getByRole('button', { name: /^Average/ }).click();
     await page.getByRole('tabpanel', { name: 'Inventory' }).getByRole('button', { name: 'Create character' }).click();
     await expect(page).toHaveURL(new RegExp(`/characters/${id}$`));
-    await expect(page.getByText(name).first()).toBeVisible();
+    // the sheet's own title (the closed sidebar also lists the character's name)
+    await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
 
     // The sheet (the block sheet is the default): roll Fists to hit through the server
     await page.getByRole('button', { name: 'Fists to hit' }).click();
-    await expect(page.getByRole('region', { name: 'Rolls' })).toContainText('Fists: Chance to hit');
+    // a player's own rolls show in the roll orb (the Rolls feed block is the DM's)
+    await expect(page.getByRole('button', { name: 'Open Roll Panel' })).toContainText('Fists: Chance to hit');
 
     expect((await page.request.delete(`/api/characters/${id}`)).ok()).toBeTruthy();
 });

@@ -42,10 +42,10 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 - [x] **2** Build the safety net (C10) — Done when: smoke tests pass three runs in a row
 - [x] **3** Take the quick wins (Wave 1: C3, C1, C2, C12) — Done when: content request under 600 KB and tests pass
 - [x] **4** Move into the skeleton — superseded by Stage 0
-- [ ] **5** Consolidate (Wave 2) — Done when: monster sheet runs on shared code and `migrate up` rebuilds a fresh database
+- [x] **5** Consolidate (Wave 2) — Done when: monster sheet runs on shared code and `migrate up` rebuilds a fresh database — ✓ 2026-11-22 · Claude · commit 75cad48 (monster sheet on the shared blocks; fresh-database rebuild checked in R7.5, 9d5b760)
   - note: C5 and C7 done; C11 done in R2; C4 WebP conversion → asset work (not done in R6); real monster sheet → R5; fresh-database seed data → R7
 - [x] **6** Share the rules (C6) — done as **R3** — ✓ 2026-11-20 · owner + Claude · commit 2d5c775
-- [ ] **7** Retire the legacy names (C8, C9) — done as **R7**
+- [x] **7** Retire the legacy names (C8, C9) — done as **R7** — ✓ 2026-11-22 · Claude · commit 9d5b760
 
 ### Native rebuild (before Gate 1)
 
@@ -54,9 +54,10 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 - [x] **R3** Rules to the server — Done when: the browser no longer rolls game dice or computes choices from the full pack — ✓ 2026-11-20 · owner + Claude · commit 2d5c775
   - note: the "what can this character pick?" endpoint moved to the start of R4 (agreed 2026-11-19).
 - [x] **R4** Unified character form — Done when: create and edit use the same components and one save per section (spec: `docs/specs/character-creator.md`) — ✓ 2026-11-20 · Cursor · commit 974afbf
-- [ ] **R5** Sheet blocks — Done when: Character, Monster and DM layouts render from the same blocks (spec: `docs/specs/sheet.md`)
+- [x] **R5** Sheet blocks — Done when: Character, Monster and DM layouts render from the same blocks (spec: `docs/specs/sheet.md`) — ✓ 2026-11-22 · Claude · commit 75cad48
+  - note: e2e 17/17, three runs in a row, on a fresh local database (staging can't be reached from Claude's machines); worth one run against staging from Gabriel's computer.
 - [x] **R6** CSS Modules — Done when: no legacy page stylesheet is left — ✓ 2026-11-21 · grokbot · commit 20a862c
-- [ ] **R7** Server tidy-up — Done when: `grep -r idMap` finds nothing and a fresh database seeds from the pack
+- [x] **R7** Server tidy-up — Done when: `grep -r idMap` finds nothing and a fresh database seeds from the pack — ✓ 2026-11-22 · Claude · commit 9d5b760
 
 - [ ] **Gate 1** (owner ticks) — tests green, server owns every roll, one name per concept, R1–R7 done
 
