@@ -1,57 +1,165 @@
+// Monsters (R5.6): the catalog, the monsters in a campaign, and the monster sheet.
+// The DM sees and changes everything. Other members of the campaign get a glimpse: name, type,
+// a health word and its conditions (rules: @tenebris/rules/monster). Only the server rolls.
+import { monsterToCreature, monsterGlimpse, applyMonsterHp, applyMonsterTempHp, checkAddMonster, checkNotes, healthWord } from '@tenebris/rules/monster';
+import { checkActRequest, resolveAct } from '@tenebris/rules/actions';
+import { checkHpRequest, checkTempHpRequest } from '@tenebris/rules/health';
+import { checkConditionsRequest, applyConditions } from '@tenebris/rules/sheetState';
 import * as Monsters from '../models/monsterModel.js';
 import { getMonster, listMonsters } from '../models/monsterPack.js';
+import { rng } from '../dice.js';
 
-// GET /api/monsters  -> short catalog for the "Add monster" picker
+const notLoggedIn = (res) => res.status(401).json({ error: 'Not logged in' });
+
+// A campaign_monsters row as a Creature, or null if its pack monster is gone
+export function creatureOfRow(row) {
+    const pack = getMonster(row.monster_id);
+    return pack ? monsterToCreature(pack, row) : null;
+}
+
+// What the DM's lists show of one monster
+export function monsterSummary(creature) {
+    return {
+        id: creature.id,
+        name: creature.name,
+        monsterName: creature.monster.packName,
+        portrait: creature.portrait,
+        hp: creature.hp,
+        armor: creature.armorClass.value,
+        initiative: creature.initiative,
+        health: healthWord(creature.hp.current, creature.hp.max),
+        conditions: Object.entries(creature.conditions).filter(([, on]) => on).map(([name]) => name),
+    };
+}
+
+// GET /api/monsters -> short catalog for the "Add monster" picker
 export function getCatalog(req, res) {
-    if (!req.session.userId) return res.status(401).json({ error: 'not logged in.' });
+    if (!req.session.userId) return notLoggedIn(res);
     res.json(listMonsters());
 }
 
-// GET /api/campaigns/:id/monsters
+// GET /api/campaigns/:id/monsters -> the DM gets summaries; other members get glimpses
 export async function listCampaignMonsters(req, res) {
-    if (!req.session.userId) return res.status(401).json({ error: 'not logged in.' });
-    if (!(await Monsters.isDm(req.params.id, req.session.userId))) return res.status(403).json({ error: 'DM only.' });
-    const rows = await Monsters.listForCampaign(req.params.id);
-    res.json(rows.map((r) => ({ ...r, name: getMonster(r.monster_id)?.name ?? 'Unknown monster' })));
+    if (!req.session.userId) return notLoggedIn(res);
+    const role = await Monsters.memberRole(req.params.id, req.session.userId);
+    if (!role) return res.status(404).json({ error: 'Campaign not found' });
+    const creatures = (await Monsters.listForCampaign(req.params.id)).map(creatureOfRow).filter(Boolean);
+    res.json(creatures.map(role === 'dm' ? monsterSummary : monsterGlimpse));
 }
 
-// POST /api/campaigns/:id/monsters   body: { monster_id, nickname }
+// POST /api/campaigns/:id/monsters   body: { monster_id, nickname? }   (DM)
 export async function addMonster(req, res) {
-    if (!req.session.userId) return res.status(401).json({ error: 'not logged in.' });
-    if (!(await Monsters.isDm(req.params.id, req.session.userId))) return res.status(403).json({ error: 'DM only.' });
-    const m = getMonster(req.body?.monster_id);
-    if (!m) return res.status(400).json({ error: 'Unknown monster.' });
-    const nickname = String(req.body.nickname ?? '').trim() || m.name;
-    res.json(await Monsters.add(req.params.id, m.id, nickname, m.max_hp));
+    if (!req.session.userId) return notLoggedIn(res);
+    if (!(await Monsters.isDm(req.params.id, req.session.userId))) return res.status(403).json({ error: 'Only the DM can add monsters' });
+    const checked = checkAddMonster(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const pack = getMonster(checked.monsterId);
+    if (!pack) return res.status(400).json({ error: 'Unknown monster' });
+    const row = await Monsters.add(req.params.id, pack.id, checked.nickname, pack.max_hp);
+    res.status(201).json(monsterSummary(monsterToCreature(pack, row)));
 }
 
-// Shared check for the one-monster routes: does it exist, and is this user its campaign's DM?
-async function loadOwned(req, res) {
-    if (!req.session.userId) { res.status(401).json({ error: 'not logged in.' }); return null; }
-    const row = await Monsters.getOne(req.params.id);
-    if (!row || !(await Monsters.isDm(row.campaign_id, req.session.userId))) {
-        res.status(404).json({ error: 'Monster not found.' }); return null;
-    }
-    return row;
+// Who is asking about this monster: answers { row, role } or null after sending 401/404
+async function access(req, res) {
+    if (!req.session.userId) { notLoggedIn(res); return null; }
+    const id = Number(req.params.id);
+    const row = Number.isInteger(id) ? await Monsters.getOne(id) : null;
+    const role = row ? await Monsters.memberRole(row.campaign_id, req.session.userId) : null;
+    if (!row || !role) { res.status(404).json({ error: 'Monster not found' }); return null; }
+    return { row, role };
 }
 
-// GET /api/campaign_monsters/:id  -> the sheet: saved row + full stat block from the pack
+// Like access(), but only the DM may go on (403 for players)
+async function dmOnly(req, res) {
+    const who = await access(req, res);
+    if (!who) return null;
+    if (who.role !== 'dm') { res.status(403).json({ error: 'Only the DM can do that' }); return null; }
+    const creature = creatureOfRow(who.row);
+    if (!creature) { res.status(404).json({ error: 'That monster is no longer in the content pack' }); return null; }
+    return { row: who.row, creature };
+}
+
+// GET /api/sheets/monster/:id -> DM: { creature, canEdit: true, access: 'dm' }; members: { glimpse, canEdit: false, access: 'viewer' }
 export async function getMonsterSheet(req, res) {
-    const row = await loadOwned(req, res); if (!row) return;
-    res.json({ ...getMonster(row.monster_id), ...row, monster_id: row.monster_id });
+    const who = await access(req, res);
+    if (!who) return;
+    const creature = creatureOfRow(who.row);
+    if (!creature) return res.status(404).json({ error: 'That monster is no longer in the content pack' });
+    if (who.role === 'dm') return res.json({ creature, canEdit: true, access: 'dm' });
+    res.json({ glimpse: monsterGlimpse(creature), canEdit: false, access: 'viewer' });
 }
 
-// PUT /api/campaign_monsters/:id   body: { current_hp, conditions, notes }
-export async function updateMonster(req, res) {
-    const row = await loadOwned(req, res); if (!row) return;
-    const { current_hp = row.current_hp, conditions = row.conditions, notes = row.notes } = req.body ?? {};
-    await Monsters.update(row.id, current_hp, conditions, notes);
-    res.json({ ok: true });
+// POST /api/sheets/monster/:id/act   body: { actionKey, kind }   (DM)
+// Same rules as a character's /act. The roll goes to the campaign's DM room only, so players don't see monster numbers.
+const lastCrit = new Map();   // campaign_monsters id -> action key
+
+export async function act(req, res) {
+    const who = await dmOnly(req, res);
+    if (!who) return;
+    const checked = checkActRequest(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const result = resolveAct(who.creature, checked.request, lastCrit.get(who.row.id) ?? null, rng);
+    if ('error' in result) return res.status(400).json({ error: result.error });
+    if (checked.request.kind === 'hit' || checked.request.kind === 'damage') {
+        if (result.critKey) lastCrit.set(who.row.id, result.critKey);
+        else lastCrit.delete(who.row.id);
+    }
+    const action = [...who.creature.actions, ...who.creature.bonusActions].find((a) => a.key === checked.request.actionKey);
+    const text = action ? `${action.name}: ${result.text}` : result.text;
+    req.app.get('io')?.to(`campaign:${who.row.campaign_id}:dm`).emit('roll', {
+        monsterId: who.row.id, name: who.creature.name, label: text, at: Date.now(),
+    });
+    res.json({ text });
 }
 
-// DELETE /api/campaign_monsters/:id
+// POST /api/sheets/monster/:id/hp   body: { action: 'heal' | 'damage', amount }   (DM)
+export async function hp(req, res) {
+    const who = await dmOnly(req, res);
+    if (!who) return;
+    const checked = checkHpRequest(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const next = applyMonsterHp({ current_hp: who.creature.hp.current, temp_hp: who.creature.hp.temp }, who.creature.hp.max, checked.request);
+    const row = await Monsters.saveState(who.row.id, next);
+    res.json({ current_hp: row.current_hp, temp_hp: row.temp_hp });
+}
+
+// POST /api/sheets/monster/:id/temp-hp   body: { amount } or { clear: true }   (DM)
+export async function tempHp(req, res) {
+    const who = await dmOnly(req, res);
+    if (!who) return;
+    const checked = checkTempHpRequest(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const row = await Monsters.saveState(who.row.id, applyMonsterTempHp({ current_hp: who.creature.hp.current, temp_hp: who.creature.hp.temp }, checked.request));
+    res.json({ temp_hp: row.temp_hp });
+}
+
+// POST /api/sheets/monster/:id/conditions   body: { conditions?, exhaustion? }   (DM)
+export async function conditions(req, res) {
+    const who = await dmOnly(req, res);
+    if (!who) return;
+    const checked = checkConditionsRequest(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const next = applyConditions({ conditions: who.creature.conditions, exhaustion: who.creature.exhaustion }, checked.request);
+    const row = await Monsters.saveState(who.row.id, next);
+    res.json({ conditions: row.conditions ?? {}, exhaustion: Number(row.exhaustion ?? 0) });
+}
+
+// PUT /api/sheets/monster/:id/notes   body: { notes }   (DM)
+export async function notes(req, res) {
+    const who = await dmOnly(req, res);
+    if (!who) return;
+    const checked = checkNotes(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const row = await Monsters.saveState(who.row.id, { notes: checked.notes });
+    res.json({ notes: row.notes });
+}
+
+// DELETE /api/sheets/monster/:id   (DM)
 export async function deleteMonster(req, res) {
-    const row = await loadOwned(req, res); if (!row) return;
-    await Monsters.remove(row.id);
+    const who = await access(req, res);
+    if (!who) return;
+    if (who.role !== 'dm') return res.status(403).json({ error: 'Only the DM can remove monsters' });
+    await Monsters.remove(who.row.id);
+    lastCrit.delete(who.row.id);
     res.json({ ok: true });
 }

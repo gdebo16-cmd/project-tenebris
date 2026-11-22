@@ -18,7 +18,8 @@ export type HomeData = { username: string; characters: CharacterCard[]; campaign
 export type Campaign = CampaignCard & { invite_code: string; character_id?: number | null; role: 'dm' | 'player' };
 export type Member = { username: string; role: 'dm' | 'player'; character_id?: number | null; character_name?: string | null; portrait_url?: string | null };
 export type CampaignData = { campaign: Campaign; members: Member[] };
-export type CampaignMonster = { id: number; monster_id: number; name: string; nickname?: string | null; current_hp?: number };
+// What the DM gets for each monster in a campaign (GET /api/campaigns/:id/monsters)
+export type CampaignMonster = { id: number; name: string; monsterName: string; health: string; armor: number; hp: { current: number; max: number; temp: number } };
 export type MonsterSummary = { id: number; name: string };
 export type Settings = { username: string; email: string };
 

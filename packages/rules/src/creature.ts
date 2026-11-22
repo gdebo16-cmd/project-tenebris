@@ -12,6 +12,7 @@ import { purseOf, type Purse } from './money.ts';
 import { featureKey, perRestUses, featureDiceAt, type PerRest, type RestUses } from './features.ts';
 import { weaponRuneEffects, armorRuneEffects, runicStrikeDice, utilityRuneEffects, type Rider, type Rune } from './runes.ts';
 import { RUNE_CALLING } from './runeLimits.ts';
+import type { MonsterInfo } from './monster.ts';
 
 // ---- What the server sends (only the fields this file reads) ----
 
@@ -79,7 +80,7 @@ export type SpellAction = SheetSpell & {
 };
 
 export type Creature = {
-    kind: 'character';
+    kind: 'character' | 'monster';
     id: number;
     name: string;
     level: number;
@@ -111,6 +112,7 @@ export type Creature = {
     gear: { armor: SheetArmor[]; weapons: SheetWeapon[]; items: SheetItem[] };
     allSpells: SheetSpell[];          // every learned spell (the spell book), prepared or not
     features: CreatureFeature[];
+    monster?: MonsterInfo;          // only on a monster (monsterToCreature)
 };
 
 // Dual wield: the off-hand attack is a bonus action and loses the ability modifier on DAMAGE (5e).

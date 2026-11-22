@@ -11,6 +11,7 @@ import inventoryRouter from './inventory.js';
 import campaignsRouter from './campaigns.js';
 import contentRouter from './content.js';
 import monstersRouter from './monsters.js';
+import dmRouter from './dm.js';
 
 const router = Router();
 
@@ -23,7 +24,8 @@ router.use(charactersRouter);     // /characters/:id, equipping, runes
 router.use(inventoryRouter);      // /characters/:id/inventory
 router.use(campaignsRouter);      // /campaigns
 router.use(contentRouter);        // /content
-router.use(monstersRouter);       // /monsters, /campaigns/:id/monsters, /campaign_monsters/:id
+router.use(monstersRouter);       // /monsters, /campaigns/:id/monsters, /sheets/monster/:id (+ /act, /hp, …)
+router.use(dmRouter);             // /campaigns/:id/dm, /initiative, /dm-notes
 
 // If any route above crashes, answer with JSON instead of an HTML error page.
 // eslint-disable-next-line no-unused-vars

@@ -160,6 +160,7 @@ function CampaignPage() {
                             {campaign.role === 'dm' && (
                                 <div className={styles.editActions}>
                                     <button type="button" className={styles.actionButton} onClick={startEdit}>Edit Tale</button>
+                                    <Link className={styles.actionButton} to={`/campaign/${campId}/dm`}>DM page</Link>
                                 </div>
                             )}
                         </>
@@ -221,7 +222,7 @@ function CampaignPage() {
                         <ul>
                             {(monsters.data || []).map((m) => (
                                 <li key={m.id}>
-                                    <Link to={`/monsters/${m.id}`}>{m.nickname || m.name}</Link> (HP {m.current_hp})
+                                    <Link to={`/monsters/${m.id}`}>{m.name}</Link> ({m.health}, HP {m.hp.current}/{m.hp.max})
                                 </li>
                             ))}
                         </ul>

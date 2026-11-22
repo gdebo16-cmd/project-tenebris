@@ -5,8 +5,8 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 ## Now
 
 - **Stage 1, native rebuild:** R1–R4 done; R5 up to R5.5 (Character layout) is on main; R6 and R6.1 (local class names) done (2026-11-21).
-- **Paused by Gabriel:** R5.6 (monster sheet) and R5.7 (DM page). No migration until he says so.
-- **In progress:** Claude — R7 (server tidy-up), on bot/claude. Migrations only with Gabriel's OK.
+- **Paused by Gabriel:** nothing (R5.6/R5.7 unpaused 2026-11-22).
+- **In progress:** Claude — R5.6 monsters + R5.7 DM page, on bot/claude (after R7). Migrations only with Gabriel's OK.
 
 ## Next
 
@@ -17,6 +17,13 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-22 — Claude (R5.6 monsters + R5.7 DM page, bot/claude; Gabriel unpaused both)
+- Rules: `monster.ts` (`monsterToCreature` → the same Creature the sheet blocks read; `healthWord`, `monsterGlimpse` for players, monster HP/ward rules) and `initiative.ts` (server rolls d20 + initiative, sorts, next turn / round). 12 new tests (113 total).
+- Migrations (NOT run on rework yet — run after R7's): `1795400000000_create-campaign-monsters` (HP, ward, conditions, exhaustion, notes; cascades with the campaign) and `1795400000100_add-campaign-dm-page` (`campaigns.dm_notes`, `campaigns.initiative`).
+- Server: `/api/sheets/monster/:id` (+ /act, /hp, /temp-hp, /conditions, /notes, DELETE). DM sees everything; other members get a glimpse (name, type, health word, conditions). Monster rolls go to a DM-only socket room `campaign:<id>:dm`. DM page: `/api/campaigns/:id/dm`, `/initiative`, `/dm-notes` (DM only).
+- Web: `/monsters/:id` (MonsterSheetPage + TraitsBlock, same blocks as the character sheet), `/campaign/:id/dm` (Initiative, Notes, Rolls | Party, Encounter with quick ±, add/remove monster). DM page link on the campaign page.
+- Checked on a brand-new empty database (PGlite): every migration up from nothing (= R7.5 fresh-database check, 11 tables + pgmigrations), then an API run as DM and player (permissions, rolls, HP, conditions, notes, initiative, cascade delete), migrations down and up again, and screenshots of both pages on desktop and phone (no page errors).
 
 ### 2026-11-22 — Claude (R7.5 content single source, bot/claude; Gabriel chose option A)
 - `packages/content/source/` now holds one file per section of `content.json` / `spells.json`, exactly as the server reads it (added `roles.json`, `scaling_rules.json`; four files refreshed from the built pack). `build.ts` just merges them and fails on a file it doesn't know. Rebuilt pack is byte-for-byte identical.
