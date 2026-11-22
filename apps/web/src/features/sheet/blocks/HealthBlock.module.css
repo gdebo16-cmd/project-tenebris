@@ -23,7 +23,7 @@
     flex-direction: column;
     gap: 8px;
     padding: 12px;
-    border-radius: 12px;
+    border-radius: 1.5rem;
     background: var(--surface, #1a1030);
     border: 1px solid var(--border, #b27f50);
 }
@@ -59,6 +59,7 @@
     display: flex;
     gap: 6px;
     align-items: flex-end;
+    flex-wrap: wrap;   /* too narrow for all four (a phone)? the buttons drop to a second line instead of squeezing */
 }
 
 .amount {
@@ -84,11 +85,8 @@
 
 .button {
     min-height: 44px;
-    min-width: 0;                 /* may shrink below its text width, so the row never runs off the block */
-    padding: 0 8px;
+    padding: 0 10px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     border-radius: 10px;
     border: 1px solid var(--accent, #d4af37);
     background: transparent;
@@ -104,21 +102,21 @@
 }
 
 .damage {
-    flex: 1;
+    flex: 1 1 auto;   /* share the row, starting from the text width (so they wrap rather than squeeze) */
     background: #8a3b2e;
     border-color: #8a3b2e;
     color: #fcefea;
 }
 
 .heal {
-    flex: 1;
+    flex: 1 1 auto;   /* share the row, starting from the text width (so they wrap rather than squeeze) */
     background: #3e6b3a;
     border-color: #3e6b3a;
     color: #eef8ea;
 }
 
 .ward {
-    flex: 1;
+    flex: 1 1 auto;   /* share the row, starting from the text width (so they wrap rather than squeeze) */
     background: #2e4f78;
     border-color: #2e4f78;
     color: #eaf2fc;

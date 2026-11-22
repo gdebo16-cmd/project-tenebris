@@ -1,4 +1,4 @@
-/* ConditionsBlock: Condition chips and exhaustion.
+/* ConditionsBlock: the affliction tiles (4 across, 3 rows for the 12) and the exhaustion tile.
    This block's whole look lives here (moved from Sheet.module.css). Edit freely: it only changes this block. */
 
 .title {
@@ -17,7 +17,7 @@
     flex-direction: column;
     gap: 8px;
     padding: 12px;
-    border-radius: 12px;
+    border-radius: 1.5rem;
     background: var(--surface, #1a1030);
     border: 1px solid var(--border, #b27f50);
 }
@@ -34,26 +34,83 @@
     line-height: 1.1;
 }
 
-.chips {
-    display: flex;
-    flex-wrap: wrap;
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));   /* minmax(0, …): a long name can't push its column wider */
     gap: 6px;
-    align-items: center;
+    text-align: center;
 }
 
-.chip {
-    min-height: 32px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font: inherit;
-    font-size: 12px;
-    color: inherit;
-    background: transparent;
+/* One affliction (same look as the stat and skill tiles) */
+.tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    min-height: 40px;
+    padding: 6px 2px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--border, #b27f50);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    container-type: inline-size;   /* lets the label size itself to this tile's width (cqi below) */
+}
+
+.tile:disabled { cursor: default; }
+
+/* an affliction that's on (and exhaustion above 0) */
+.tileOn {
+    border-color: var(--accent, #d4af37);
+    background: color-mix(in srgb, var(--accent, #d4af37) 25%, transparent);
+    color: var(--accent, #d4af37);
+}
+
+.tileLabel {
+    max-width: 100%;
+    font-size: clamp(9px, 17cqi, 13px);   /* 17% of the tile's width: shrinks on a narrow tile, never past 9–13px */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tileValue {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* Exhaustion: one wide tile, − and + on its ends */
+.exhaustion {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border, #b27f50);
+}
+
+.exhaustionText {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    container-type: inline-size;
+}
+
+.step {
+    flex: none;
+    width: 40px;
+    min-height: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #b27f50);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 20px;
     cursor: pointer;
 }
 
-.chipOn {
-    border-color: var(--accent, #d4af37);
-    background: color-mix(in srgb, var(--accent, #d4af37) 25%, transparent);
-}
+.step:disabled { opacity: 0.4; cursor: default; }
