@@ -6,8 +6,6 @@ import DmPage from './features/dm/DmPage.tsx';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
-import SettingsPage from './pages/SettingsPage';
-import ProfilePage from './pages/ProfilePage';
 import InventoryPage from './pages/InventoryPage';
 import CharacterForm from './features/character-form/CharacterForm.tsx';
 import usePageTheme from './hooks/usePageTheme';
@@ -16,6 +14,7 @@ import CreateCampaign from './pages/CreateCampaign';
 import CampaignList from './pages/CampaignList';
 import JoinCampaign from './pages/JoinCampaign';
 import { ContentProvider } from './hooks/ContentContext';
+import AppLayout from './components/AppLayout';
 
 function ThemeWatcher() {
     usePageTheme();
@@ -32,19 +31,19 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route element={<RequireLogin />}>
-                    <Route path="/home" element={<HomePage />} />
-                    <Route path='/profile' element={<ProfilePage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                    <Route path="/campaign/:campId" element={<CampaignPage />} />
-                    <Route path="/campaign/:campId/dm" element={<DmPage />} />
-                    <Route path="/monsters/:id" element={<MonsterSheetPage />} />
-                    <Route path="/campaign_list" element={<CampaignList />} />
-                    <Route path="/join/:code" element={<JoinCampaign />} />
-                    <Route path="/create_campaign" element={<CreateCampaign />} />
-                    <Route path="/characters/new" element={<CharacterForm />} />
-                    <Route path="/characters/:id" element={<CharacterSheetPage />} />
-                    <Route path="/characters/:id/inventory" element={<InventoryPage />} />
-                    <Route path="/characters/:id/edit" element={<CharacterForm />} />
+                    <Route element={<AppLayout />}>
+                        <Route path="/home" element={<HomePage />} />
+                        <Route path="/campaign/:campId" element={<CampaignPage />} />
+                        <Route path="/campaign/:campId/dm" element={<DmPage />} />
+                        <Route path="/monsters/:id" element={<MonsterSheetPage />} />
+                        <Route path="/campaign_list" element={<CampaignList />} />
+                        <Route path="/join/:code" element={<JoinCampaign />} />
+                        <Route path="/create_campaign" element={<CreateCampaign />} />
+                        <Route path="/characters/new" element={<CharacterForm />} />
+                        <Route path="/characters/:id" element={<CharacterSheetPage />} />
+                        <Route path="/characters/:id/inventory" element={<InventoryPage />} />
+                        <Route path="/characters/:id/edit" element={<CharacterForm />} />
+                    </Route>
                 </Route>
                 <Route path="*" element={<p>Page not found. <a href="/home">Go home</a></p>} />
             </Routes>

@@ -1,0 +1,66 @@
+/* CoreStatsBlock: Armor, speed, initiative and proficiency tiles.
+   This block's whole look lives here (moved from Sheet.module.css). Edit freely: it only changes this block. */
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    border-bottom: 1px solid var(--border, #b27f50);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+}
+
+.title {
+    margin: 0;
+    font-family: Almendra, Georgia, serif;
+    font-size: 24px;
+    line-height: 1.1;
+}
+
+.grid4 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    text-align: center;
+}
+
+.tile {
+    padding: 8px 2px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid transparent;
+    color: inherit;
+    font: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+}
+
+button.tile {
+    border-color: var(--border, #b27f50);
+    cursor: pointer;
+}
+
+.tileLabel {
+    font-size: 11px;
+    opacity: 0.75;
+}
+
+.tileValue {
+    font-size: 18px;
+    font-weight: 700;
+}

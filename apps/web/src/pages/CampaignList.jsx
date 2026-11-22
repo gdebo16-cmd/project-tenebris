@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useCampaigns } from '../queries.ts';
-import SiteNav from '../components/SiteNav';
 import Loader from '../components/Loader';
 import styles from './CampaignList.module.css';
 
@@ -53,7 +52,6 @@ function CampaignList() {
                 <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Your Tales</h1>
             </header>
-            <SiteNav />
             <main className={styles.page}>
                 <section className={styles.clPanel}>
                     <h2 className={styles.clHeader}><strong>Start or Join a Tale</strong></h2>

@@ -1,0 +1,74 @@
+/* The character sheet page: the title bar and the footer. */
+
+/* ---- Title bar and footer (an id and a class, so they only style this page) ---- */
+#siteTitle {
+    /* On phones the page runs under the status bar (viewport-fit=cover), so the header grows by the
+       status bar's height and pads its content below it. That way the status bar shows the header color. */
+    box-sizing: content-box;
+    height: 8dvh;
+    padding-top: env(safe-area-inset-top);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    box-shadow: var(--bs2);
+}
+
+.titleLogo {
+    height: 5dvh;
+    width: auto;
+    object-fit: contain;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 5dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text);
+    background: var(--surface);
+    border-top: 2px solid var(--border);
+    box-shadow: var(--bs2);
+}
+
+/* Where the blocks sit is no longer here: the layout is data (layouts.ts), drawn by SheetLayout.tsx /
+   SheetLayout.module.css. Each block's look is in its own module in blocks/. */
+
+/* The sheet area. --sheet-chrome tells the layout grid how much of the screen this page's own parts take
+   (title bar 8dvh + footer 5dvh + the page's 2rem padding top and bottom), so the grid fills exactly the rest. */
+.sheetArea {
+    --sheet-chrome: calc(13dvh + 4rem + env(safe-area-inset-top));
+}
+
+/* Phones: the header stays put and only the sheet area scrolls. No footer, just a border
+   above the browser's bottom bar. The sheet area is the screen minus the header (8dvh + status bar)
+   and the home bar, so the page itself has nothing to scroll.
+   --sheet-chrome follows it: header + home bar + the page's 4rem padding. */
+@media (max-width: 720px) {
+    .footer { display: none; }
+
+    :global(body):has(.sheetArea) { overflow: hidden; }
+
+    div.sheetArea {
+        height: calc(92dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        border-bottom: 2px solid var(--border);
+        --sheet-chrome: calc(8dvh + 4rem + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+    }
+}
+
+/* Wide screens: the grid fits the screen, so the page itself never scrolls
+   (div.sheetArea outranks the shared .page min-height of 100dvh) */
+@media (min-width: 721px) {
+    div.sheetArea {
+        min-height: 0;
+        overflow: hidden;
+    }
+}

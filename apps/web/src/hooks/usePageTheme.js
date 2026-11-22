@@ -5,9 +5,16 @@ import { useLocation } from 'react-router';
 // so drop its transparency and use the solid version of the same color.
 function syncStatusBarColor() {
     const css = getComputedStyle(document.documentElement);
-    // prefer the theme's solid title color, fall back to the see-through one
-    const raw = (css.getPropertyValue('--bgc-title') || css.getPropertyValue('--bg-color-1')).trim();
-    const nums = raw.match(/[\d.]+/g);
+    // a page can ask for its own color (--status-bar, see base.css), else the theme's title color,
+    // else the see-through one
+    const raw = (css.getPropertyValue('--status-bar') || css.getPropertyValue('--bgc-title')
+        || css.getPropertyValue('--bg-color-1')).trim();
+    // let the browser turn any color (#240303, color-mix(...)) into rgb(...)
+    const probe = document.createElement('i');
+    probe.style.color = raw;
+    document.body.appendChild(probe);
+    const nums = getComputedStyle(probe).color.match(/[\d.]+/g);
+    probe.remove();
     if (!nums || nums.length < 3) return;
     const solid = `rgb(${nums[0]}, ${nums[1]}, ${nums[2]})`;
     let tag = document.querySelector('meta[name="theme-color"]');
@@ -32,7 +39,7 @@ function usePageTheme() {
     useEffect(() => {
         // also follow live theme changes from the theme picker
         const watcher = new MutationObserver(syncStatusBarColor);
-        watcher.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        watcher.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-status-bar'] });
         return () => watcher.disconnect();
     }, []);
 }

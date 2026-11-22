@@ -17,3 +17,14 @@ select:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 1px;
 }
+
+body {
+  margin: 0;
+}
+
+/* A page can ask for the status bar to match its header: <html data-status-bar="surface">.
+   usePageTheme reads --status-bar for the theme-color tag, and the html background covers newer Safari. */
+html[data-status-bar="surface"] {
+  --status-bar: var(--surface);
+  background-color: var(--surface);
+}

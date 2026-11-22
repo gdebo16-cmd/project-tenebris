@@ -1,0 +1,118 @@
+/* HealthBlock: Health: HP / max, the bar, and Damage / Heal / Ward.
+   This block's whole look lives here (moved from Sheet.module.css). Edit freely: it only changes this block. */
+
+.healthblockTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border, #b27f50);
+    height: 2.25rem;
+}
+
+.titleHealth {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+}
+
+.muted {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.error {
+    color: #ffb4b4;
+    font-size: 13px;
+}
+
+.hpValue {
+    font-family: Almendra, Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.bar {
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+}
+
+.barFill {
+    height: 100%;
+}
+
+.hpControls {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+}
+
+.amount {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 11px;
+    width: 64px;
+}
+
+.input {
+    height: 40px;
+    padding: 0 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #b27f50);
+    background: var(--bg, #0d042c);
+    color: inherit;
+    font: inherit;
+}
+
+.button {
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--accent, #d4af37);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.damage {
+    flex: 1;
+    background: #8a3b2e;
+    border-color: #8a3b2e;
+    color: #fcefea;
+}
+
+.heal {
+    flex: 1;
+    background: #3e6b3a;
+    border-color: #3e6b3a;
+    color: #eef8ea;
+}
+
+.ward {
+    flex: 1;
+    background: #2e4f78;
+    border-color: #2e4f78;
+    color: #eaf2fc;
+}

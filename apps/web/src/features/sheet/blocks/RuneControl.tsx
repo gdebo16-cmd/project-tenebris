@@ -2,7 +2,7 @@
 // The server enforces item types, prerequisites and the per-item / active limits; this only offers the likely picks.
 import { useState } from 'react';
 import { runeChoices, type ItemRune, type RuneInfo, type RuneItemType } from '@tenebris/rules/equipment';
-import styles from '../Sheet.module.css';
+import styles from './RuneControl.module.css';
 
 type Props = {
     info: RuneInfo;

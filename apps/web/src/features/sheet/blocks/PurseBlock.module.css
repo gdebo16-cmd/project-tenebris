@@ -1,0 +1,167 @@
+/* PurseBlock: The Gear tab: money.
+   This block's whole look lives here (moved from Sheet.module.css). Edit freely: it only changes this block. */
+
+.block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+}
+
+.heading {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.error {
+    color: #ffb4b4;
+    font-size: 13px;
+}
+
+.input {
+    height: 40px;
+    padding: 0 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #b27f50);
+    background: var(--bg, #0d042c);
+    color: inherit;
+    font: inherit;
+}
+
+.button {
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--accent, #d4af37);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.damage {
+    flex: 1;
+    background: #8a3b2e;
+    border-color: #8a3b2e;
+    color: #fcefea;
+}
+
+.heal {
+    flex: 1;
+    background: #3e6b3a;
+    border-color: #3e6b3a;
+    color: #eef8ea;
+}
+
+.chip {
+    min-height: 32px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 12px;
+    color: inherit;
+    background: transparent;
+    border: 1px solid var(--border, #b27f50);
+    cursor: pointer;
+}
+
+.rowButtons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.purseLine {
+    display: flex;
+    align-items: center;
+    gap: 8px 12px;
+    flex-wrap: wrap;
+}
+
+.coins {
+    display: flex;
+    align-items: center;
+    gap: 6px 12px;
+    flex-wrap: wrap;
+    flex: 1 1 auto;
+}
+
+.coinAmount {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.coin {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex: none;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.coinCopper {
+    background: #b87333;
+}
+
+.coinSilver {
+    background: #c9cdd2;
+}
+
+.coinGold {
+    background: var(--accent, #d4af37);
+}
+
+.coinCrowns {
+    background: #8e6b12;
+    border-color: #5b2a86;
+}
+
+.coinOracles {
+    background: #eef3ff;
+    box-shadow: 0 0 6px rgba(200, 220, 255, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+.pursePanel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border, #b27f50);
+    background: var(--bg, #0d042c);
+}
+
+.purseInputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+    gap: 6px;
+}
+
+.purseField {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.coinInput {
+    width: 100%;
+    min-width: 0;
+}

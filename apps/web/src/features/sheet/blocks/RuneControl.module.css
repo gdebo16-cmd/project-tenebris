@@ -1,0 +1,58 @@
+/* RuneControl: The rune picker under a weapon or armor (Tome of Inscription).
+   This block's whole look lives here (moved from Sheet.module.css). Edit freely: it only changes this block. */
+
+.muted {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.input {
+    height: 40px;
+    padding: 0 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #b27f50);
+    background: var(--bg, #0d042c);
+    color: inherit;
+    font: inherit;
+}
+
+.chip {
+    min-height: 32px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 12px;
+    color: inherit;
+    background: transparent;
+    border: 1px solid var(--border, #b27f50);
+    cursor: pointer;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 8px;
+    border-left: 2px solid var(--border, #b27f50);
+}
+
+.option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.optionBox {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent, #d4af37);
+}
+
+.runeLine {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 13px;
+}

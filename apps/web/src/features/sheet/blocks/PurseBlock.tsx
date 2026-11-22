@@ -5,7 +5,8 @@
 import { useState } from 'react';
 import { COINS, type Coin } from '@tenebris/rules/money';
 import { ApiError } from '../../../api.ts';
-import styles from '../Sheet.module.css';
+import styles from './PurseBlock.module.css';
+import panelCss from './ActionPanel.module.css';
 import { useMoney } from '../queries.ts';
 import type { BlockProps } from './types.ts';
 
@@ -55,7 +56,7 @@ export default function PurseBlock({ creature, canEdit, id, onNote }: Props) {
     return (
         <section className={styles.block} aria-label="Purse">
             <div className={styles.purseLine}>
-                <h2 className={styles.heading}>Purse</h2>
+                <h2 className={`${styles.heading} ${panelCss.title}`}>Purse</h2>
                 <div className={styles.coins}>
                     {COINS.map((c) => (
                         <span key={c} className={styles.coinAmount} aria-label={`${purse[c]} ${NAMES[c]}`}>
@@ -82,7 +83,7 @@ export default function PurseBlock({ creature, canEdit, id, onNote }: Props) {
                             </label>
                         ))}
                     </div>
-                    <div className={styles.rowButtons}>
+                    <div className={`${styles.rowButtons} ${panelCss.buttons}`}>
                         <button type="button" className={`${styles.button} ${styles.heal}`} disabled={money.isPending || !valid || !any} onClick={() => send('add')}>Add</button>
                         <button type="button" className={`${styles.button} ${styles.damage}`} disabled={money.isPending || !valid || !any} onClick={() => send('spend')}>Spend</button>
                     </div>

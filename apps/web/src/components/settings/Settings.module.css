@@ -1,0 +1,88 @@
+/* Look and Account settings, shown inside the sidebar.
+   Field styles come from the old Settings and Profile pages, resized for a ~360px panel.
+   Only classes here: no html/body/header rules, so nothing leaks into the page behind. */
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-bottom: var(--tileBorder);
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}
+
+.heading {
+    margin: 8px 0 0;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--txt-color-1);
+}
+
+/* One field: a label on top, the input or dropdown underneath */
+.profileTile {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    border: var(--tileBorder);
+    border-radius: var(--tile);
+    box-shadow: var(--bs2);
+    color: var(--txt-color-1);
+    text-align: center;
+}
+
+/* Labels (Account uses profileLabel, Look uses tileLabel) */
+.profileLabel,
+.tileLabel {
+    margin: 0;
+    padding: 8px 12px;
+    background-color: var(--bg);
+    border-bottom: var(--tileBorder);
+    border-radius: var(--tile) var(--tile) 0 0;
+    color: var(--txt-color-1);
+    font: inherit;
+    font-size: 15px;
+}
+
+/* Inputs and dropdowns (Account uses profileValue, Look uses tileValue) */
+.profileValue,
+.tileValue {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+    padding: 8px 12px;
+    background-color: var(--surface);
+    border: none;
+    border-radius: 0 0 var(--tile) var(--tile);
+    box-shadow: var(--bs2), var(--shadowInner, none);
+    color: var(--txt-color-1);
+    font: inherit;
+    font-size: 16px;
+    text-align: center;
+}
+
+.tileValue option {
+    background-color: var(--drop-down-bg);
+    color: var(--drop-down-txt);
+}
+
+.profileButton {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 16px;
+    background-color: var(--bg);
+    color: var(--txt-color-1);
+    border: var(--tileBorder);
+    border-radius: var(--tile);
+    box-shadow: var(--bs2);
+    font: inherit;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+

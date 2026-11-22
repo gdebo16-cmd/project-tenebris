@@ -1,8 +1,7 @@
 // A monster's traits: resistances, immunities, weaknesses, senses, movement, languages, saves, and the DM's notes.
 import { useEffect, useState } from 'react';
 import type { Creature } from '@tenebris/rules/creature';
-import styles from '../Sheet.module.css';
-import own from './TraitsBlock.module.css';
+import styles from './TraitsBlock.module.css';
 
 type Props = { creature: Creature; canEdit: boolean; onSaveNotes: (notes: string) => void; saving?: boolean };
 
@@ -39,9 +38,9 @@ export default function TraitsBlock({ creature, canEdit, onSaveNotes, saving }: 
                 </div>
             ))}
             {canEdit && (
-                <label className={own.notes}>
+                <label className={styles.notes}>
                     DM notes (only you see these)
-                    <textarea className={`${styles.input} ${own.notesBox}`} rows={3} maxLength={20000} value={notes} onChange={(e) => setNotes(e.target.value)} />
+                    <textarea className={`${styles.input} ${styles.notesBox}`} rows={3} maxLength={20000} value={notes} onChange={(e) => setNotes(e.target.value)} />
                     <button type="button" className={styles.button} disabled={saving || notes === m.notes} onClick={() => onSaveNotes(notes)}>
                         {saving ? 'Saving…' : 'Save notes'}
                     </button>

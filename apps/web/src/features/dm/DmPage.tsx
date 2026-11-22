@@ -8,8 +8,20 @@ import Loader from '../../components/Loader.jsx';
 import socket from '../../utils/socket.js';
 import sheet from '../sheet/Sheet.module.css';
 import styles from './DmPage.module.css';
+import layout from '../sheet/CharacterSheetPage.module.css'; // the sheet pages' header and footer
+import useHeaderStatusBar from '../../hooks/useHeaderStatusBar.ts';
 import RollFeed, { type FeedEntry } from '../sheet/blocks/RollFeed.tsx';
 import { useDmChange, useDmPage, useMonsterCatalog, type DmPageData, type EncounterMonster, type PartyMember } from './dmQueries.ts';
+
+// Phones show one part of the page at a time; wide screens show everything side by side
+const DM_TABS = [
+    { id: 'turns', label: 'Initiative' },
+    { id: 'party', label: 'Party' },
+    { id: 'encounter', label: 'Encounter' },
+    { id: 'notes', label: 'Notes' },
+    { id: 'rolls', label: 'Rolls' },
+] as const;
+type DmTab = (typeof DM_TABS)[number]['id'];
 
 const messageOf = (err: unknown) => (err instanceof ApiError || err instanceof Error ? err.message : 'Something went wrong');
 
@@ -161,6 +173,11 @@ export default function DmPage() {
     const change = useDmChange(campId);
     const [feed, setFeed] = useState<FeedEntry[]>([]);
     const nextId = useRef(1);
+    const [tab, setTab] = useState<DmTab>('turns');
+    useHeaderStatusBar(); // the phone's status bar matches the header
+
+    // One part of the page; on phones only the chosen tab's part shows (DmPage.module.css)
+    const pane = (id: DmTab) => (tab === id ? styles.pane : `${styles.pane} ${styles.paneHidden}`);
 
     // The table's rolls: players' rolls and the server's monster rolls (the DM room)
     useEffect(() => {
@@ -186,25 +203,51 @@ export default function DmPage() {
     const error = [change.hp.error, change.initiative.error, change.notes.error, change.addMonster.error, change.removeMonster.error].find(Boolean);
 
     return (
-        <div className={sheet.page}>
-            <p className={sheet.muted}>
-                <Link to="/home">Home</Link> · <Link to={`/campaign/${data.campaign.id}`}>{data.campaign.name}</Link> · DM page
-            </p>
-            {error && <p className={sheet.error} role="alert">{messageOf(error)}</p>}
-            <div className={styles.layout}>
-                <div className={sheet.stack}>
-                    <InitiativeBlock data={data} busy={change.initiative.isPending} onOp={(op) => change.initiative.mutate(op)} />
-                    <NotesBlock saved={data.notes} saving={change.notes.isPending} onSave={(notes) => change.notes.mutate(notes)} />
-                    <RollFeed entries={feed} />
-                </div>
-                <div className={sheet.stack}>
-                    <PartyBlock party={data.party} onHp={(id, action, amount) => change.hp.mutate({ kind: 'character', id, action, amount })} />
-                    <EncounterBlock encounter={data.encounter} busy={change.addMonster.isPending}
-                        onHp={(id, action, amount) => change.hp.mutate({ kind: 'monster', id, action, amount })}
-                        onAdd={(monster_id, nickname) => change.addMonster.mutate({ monster_id, nickname: nickname.trim() || undefined })}
-                        onRemove={(id) => change.removeMonster.mutate(id)} />
+        <>
+            <header id={layout.siteTitle}>
+                <img src="/Logo.png" alt="Eldrid Tales Logo" className={layout.titleLogo} />
+            </header>
+
+            <div className={`${sheet.page} ${styles.area}`}>
+                <p className={`${sheet.muted} ${styles.crumbs}`}>
+                    <Link to={`/campaign/${data.campaign.id}`}>{data.campaign.name}</Link> · DM page
+                </p>
+                <nav className={styles.tabs} aria-label="DM page parts">
+                    {DM_TABS.map((t) => (
+                        <button key={t.id} type="button" className={tab === t.id ? sheet.tabActive : sheet.tab}
+                            aria-pressed={tab === t.id} onClick={() => setTab(t.id)}>{t.label}</button>
+                    ))}
+                </nav>
+                {error && <p className={sheet.error} role="alert">{messageOf(error)}</p>}
+                <div className={styles.layout}>
+                    <div className={sheet.stack}>
+                        <div className={pane('turns')}>
+                            <InitiativeBlock data={data} busy={change.initiative.isPending} onOp={(op) => change.initiative.mutate(op)} />
+                        </div>
+                        <div className={pane('notes')}>
+                            <NotesBlock saved={data.notes} saving={change.notes.isPending} onSave={(notes) => change.notes.mutate(notes)} />
+                        </div>
+                        <div className={pane('rolls')}>
+                            <RollFeed entries={feed} />
+                        </div>
+                    </div>
+                    <div className={sheet.stack}>
+                        <div className={pane('party')}>
+                            <PartyBlock party={data.party} onHp={(id, action, amount) => change.hp.mutate({ kind: 'character', id, action, amount })} />
+                        </div>
+                        <div className={pane('encounter')}>
+                            <EncounterBlock encounter={data.encounter} busy={change.addMonster.isPending}
+                                onHp={(id, action, amount) => change.hp.mutate({ kind: 'monster', id, action, amount })}
+                                onAdd={(monster_id, nickname) => change.addMonster.mutate({ monster_id, nickname: nickname.trim() || undefined })}
+                                onRemove={(id) => change.removeMonster.mutate(id)} />
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <footer className={layout.footer}>
+                <p>copyrite Eldrid Tales LLC</p>
+            </footer>
+        </>
     );
 }

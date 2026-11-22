@@ -1,3 +1,83 @@
-/* The DM's notes on a monster: full width, under the traits */
-.notes { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
-.notesBox { width: 100%; min-height: 90px; height: auto; padding: 8px; resize: vertical; }
+/* TraitsBlock: A monster's traits and the DM's notes.
+   This block's whole look lives here (moved from Sheet.module.css). Edit freely: it only changes this block. */
+
+.block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+}
+
+.heading {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.muted {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.input {
+    height: 40px;
+    padding: 0 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #b27f50);
+    background: var(--bg, #0d042c);
+    color: inherit;
+    font: inherit;
+}
+
+.button {
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--accent, #d4af37);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+}
+
+.rowName {
+    display: block;
+    font-weight: 600;
+}
+
+/* The DM's notes box */
+.notes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+}
+.notesBox {
+    width: 100%;
+    min-height: 90px;
+    height: auto;
+    padding: 8px;
+    resize: vertical;
+}

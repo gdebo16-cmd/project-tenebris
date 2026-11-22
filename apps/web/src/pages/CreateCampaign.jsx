@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys } from '../queries.ts';
-import SiteNav from '../components/SiteNav';
+
 import styles from './CreateCampaign.module.css';
 
 
@@ -34,7 +34,6 @@ function CreateCampaign() {
                 <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Create Tale</h1>
             </header>
-                <SiteNav />
             <main className={styles.page}>
                 <section className={styles.campaignContainer}>
                     <form onSubmit={submit}>
