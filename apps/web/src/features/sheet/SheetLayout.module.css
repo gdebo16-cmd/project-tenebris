@@ -34,7 +34,7 @@
     overflow: auto;
     overscroll-behavior: contain;
     scrollbar-width: none;          /* no scrollbars: content that doesn't fit still scrolls (wheel, touch, keyboard) */
-    border-radius: 12px;
+    border-radius: 1.5rem;          /* the blocks' own corners (clips them, so keep the two the same) */
 }
 
 .item::-webkit-scrollbar,
@@ -187,14 +187,14 @@
     cursor: nwse-resize;
     touch-action: none;
     background: linear-gradient(135deg, transparent 50%, var(--accent, #d4af37) 50%);
-    border-bottom-right-radius: 12px;
+    border-bottom-right-radius: 1.5rem;
     z-index: 2;
 }
 
 /* Where a dragged block will land */
 .ghost,
 .ghostBlocked {
-    border-radius: 12px;
+    border-radius: 1.5rem;
     pointer-events: none;
     z-index: 3;
 }

@@ -1,4 +1,5 @@
-// Condition chips: tap to toggle (when you may edit), plus exhaustion. Others only see the ones that are on.
+// Afflictions as tiles, 4 across (lit when on): tap to toggle when you may edit. Exhaustion is one wide tile below.
+// Others only see the ones that are on.
 import styles from './ConditionsBlock.module.css';
 import type { BlockProps } from './types.ts';
 
@@ -16,25 +17,28 @@ export default function ConditionsBlock({ creature, canEdit, onChange }: Props) 
     return (
         <section className={styles.block} aria-label="Conditions">
             <h2 className={styles.title}>Afflictions</h2>
-            <div className={styles.chips}>
-                {shown.length === 0 && <span className={styles.muted}>None</span>}
+            {shown.length === 0 && <span className={styles.muted}>None</span>}
+            <div className={styles.grid}>
                 {shown.map((name) => (
                     <button key={name} type="button" disabled={!canEdit} aria-pressed={!!on[name]}
-                        className={`${styles.chip} ${on[name] ? styles.chipOn : ''}`}
+                        className={`${styles.tile} ${on[name] ? styles.tileOn : ''}`}
                         onClick={() => onChange({ conditions: { [name]: !on[name] } })}>
-                        {label(name)}
+                        <span className={styles.tileLabel}>{label(name)}</span>
                     </button>
                 ))}
             </div>
-            <div className={styles.chips}>
-                <span className={styles.muted}>Exhaustion {creature.exhaustion}</span>
+            <div className={`${styles.exhaustion} ${creature.exhaustion > 0 ? styles.tileOn : ''}`}>
                 {canEdit && (
-                    <>
-                        <button type="button" className={styles.chip} aria-label="Less exhaustion" disabled={creature.exhaustion <= 0}
-                            onClick={() => onChange({ exhaustion: creature.exhaustion - 1 })}>−</button>
-                        <button type="button" className={styles.chip} aria-label="More exhaustion" disabled={creature.exhaustion >= MAX_EXHAUSTION}
-                            onClick={() => onChange({ exhaustion: creature.exhaustion + 1 })}>+</button>
-                    </>
+                    <button type="button" className={styles.step} aria-label="Less exhaustion" disabled={creature.exhaustion <= 0}
+                        onClick={() => onChange({ exhaustion: creature.exhaustion - 1 })}>−</button>
+                )}
+                <span className={styles.exhaustionText}>
+                    <span className={styles.tileLabel}>Exhaustion</span>
+                    <span className={styles.tileValue}>{creature.exhaustion} / {MAX_EXHAUSTION}</span>
+                </span>
+                {canEdit && (
+                    <button type="button" className={styles.step} aria-label="More exhaustion" disabled={creature.exhaustion >= MAX_EXHAUSTION}
+                        onClick={() => onChange({ exhaustion: creature.exhaustion + 1 })}>+</button>
                 )}
             </div>
         </section>
