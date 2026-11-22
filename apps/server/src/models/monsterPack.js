@@ -1,4 +1,4 @@
-// Spell catalog from db/content/spells.json (built from source/). In-memory Maps; hot-reloads in non-production.
+// Monster catalog from packages/content/content.json (built from source/ by npm run content:build). In-memory Maps; hot-reloads in non-production.
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

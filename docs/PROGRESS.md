@@ -18,6 +18,10 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
+### 2026-11-22 — Claude (R7.5 content single source, bot/claude; Gabriel chose option A)
+- `packages/content/source/` now holds one file per section of `content.json` / `spells.json`, exactly as the server reads it (added `roles.json`, `scaling_rules.json`; four files refreshed from the built pack). `build.ts` just merges them and fails on a file it doesn't know. Rebuilt pack is byte-for-byte identical.
+- `npm run content:build` added. Deleted `export.ts`, `type.ts`, `roles_info.json` (old DB-export pipeline). `docs/CONTENT_GUIDE.md` rewritten for the new layout.
+
 ### 2026-11-22 — Claude (R7.1, R7.3, R7.4 on bot/claude; Gabriel's names and OKs given in chat)
 - R7.1 `cd475a2`: names recorded in DECISIONS.md (Templar, Seer, Tome of Inscription). `RUNE_CALLING = 'Tome of Inscription'` replaces the Rune Weaver aliases (rules, rune model, sheet) — fixes the block sheet never giving Tome of Inscription characters their runed-weapon bonuses.
 - R7.3a `9ad1d05`: removed the old creator/editor server code nothing called (~1,300 lines: magicModel, raceModel, classModel, choiceRules, old create/edit functions, notes files).
