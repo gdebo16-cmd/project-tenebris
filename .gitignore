@@ -24,6 +24,7 @@ Thumbs.db
 
 # Playwright output
 test-results/
+playwright/.auth/
 playwright-report/
 
 # local content backups (e.g. before an elf sub-species update)
