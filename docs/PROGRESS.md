@@ -4,19 +4,28 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Now
 
-- **Stage 1, native rebuild:** R1–R7 built; R5 (incl. R5.6 monsters, R5.7 DM page) and R7 waiting for Gabriel's e2e run before ticking.
+- **Stage 1, native rebuild:** R1–R7 all done and ticked (R5, R7, steps 5 and 7 on 2026-11-22). **Gate 1 is ready for Gabriel to check and tick.**
 - **Paused by Gabriel:** nothing.
-- **In progress:** nothing claimed. Latest work (sidebar, layout grid, phone layouts) is on bot/claude for Gabriel to merge.
+- **In progress:** nothing claimed.
 
 ## Next
 
-- R7 (server tidy-up), or R5.6/R5.7 when Gabriel unpauses them. PNG→WebP is still open (asset work, not part of R6).
+- Gabriel: Gate 1. Then either the cutover (Stage 0, 0.11–0.14: backup, rehearsal on a copy of production, then the switch) or Stage 2 (2D hex table, steps 8–13).
+- Small: turn staging's auto-deploy back on in Render; delete Neon branch `scratch-r7-drop-test`; layout decisions into DECISIONS.md (Gabriel's). PNG→WebP still open.
 
 ## Status by step
 
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-22 — Claude (sheet polish PRs #2–#4, e2e tests updated and green, R5/R7 ticked)
+- PR #2: `Fit` (SheetLayout.tsx) stops scaling a block up when anything inside would spill sideways, not only at its height (Rest in a narrow column, Health buttons, stat labels).
+- PR #3: Skills as a 5×3 tile grid (name over bonus); solid phone tab bar; stat / core-stat / skill tile labels size to their tile (`container-type` + `cqi`).
+- PR #4: Afflictions as a 4×3 tile grid, exhaustion as one wide tile (− n / 10 +); every block's corners 1.5rem (block modules, Sheet.module.css, the layout grid's clip); Health buttons wrap instead of being cut. All three merged by Gabriel and deployed to staging.
+- This commit: e2e tests caught up with Gabriel's form and sheet redesign — role cards are named with their hit die (`/^Warrior\b/`), callings and skills are buttons (`aria-pressed`), the traits step in character.spec goes through the server like form-traits.spec does, the sheet title is `heading level 1` (the sidebar also lists the name), a player's rolls show in the roll orb, and the Features region is matched exactly (the action panel's name contains "features"). App fix: the exhaustion tile reads "Exhaustion 1 / 10" (a space between label and number).
+- Checked: typecheck, 125 unit tests; e2e 17/17 three runs in a row on a fresh local database (PGlite; smoketest + smoketest2 each with a finished character, smoketest's with a weapon). Staging couldn't be reached from Claude's machines, so one run there from Gabriel's computer is still worth doing.
+- Ticked R5, R7 and steps 5 and 7. Gate 1 left for Gabriel.
 
 ### 2026-11-22 — Claude (Gabriel's main-folder work + phone layouts, committed on bot/claude at his request)
 - Gabriel worked in the main folder with Claude; this commit carries all of it over to bot/claude (he merges to main).
