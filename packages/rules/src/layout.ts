@@ -24,7 +24,7 @@ export const SHEET_KINDS = ['character', 'monster'] as const;
 export type SheetKind = (typeof SHEET_KINDS)[number];
 export const SHEET_BLOCKS: Record<SheetKind, readonly string[]> = {
     character: ['header', 'health', 'core', 'stats', 'skills', 'conditions', 'rest', 'actionPanel', 'actions', 'spells', 'gear', 'features', 'rollFeed'],
-    monster: ['header', 'health', 'core', 'stats', 'skills', 'conditions', 'actions', 'features', 'traits', 'rollFeed'],
+    monster: ['header', 'health', 'core', 'stats', 'skills', 'conditions', 'actions', 'legendary', 'features', 'traits', 'rollFeed'],
 };
 export const isSheetKind = (v: unknown): v is SheetKind => SHEET_KINDS.includes(v as SheetKind);
 

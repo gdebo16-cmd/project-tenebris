@@ -37,7 +37,8 @@ export const DEFAULT_LAYOUTS: Record<SheetKind, SheetLayout> = {
         version: 2,
         items: [
             { block: 'header', col: 1, row: 1, colSpan: 8, rowSpan: 3 },
-            { block: 'actions', col: 9, row: 1, colSpan: 4, rowSpan: 9 },
+            { block: 'actions', col: 9, row: 1, colSpan: 4, rowSpan: 6 },
+            { block: 'legendary', col: 9, row: 7, colSpan: 4, rowSpan: 3 },
             { block: 'health', col: 1, row: 4, colSpan: 4, rowSpan: 4 },
             { block: 'core', col: 5, row: 4, colSpan: 4, rowSpan: 4 },
             { block: 'stats', col: 1, row: 8, colSpan: 4, rowSpan: 6 },
