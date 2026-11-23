@@ -188,12 +188,14 @@ function current(who: 'monster' | 'player', base: keyof typeof SHEET_BLOCK_DEFS)
     };
 }
 
-// The DM page's blocks: its own (dm/DmBlocks.tsx), then the current monster's and the current player's
+// The DM page's blocks: its own (dm/DmBlocks.tsx), then the current monster's and the current player's.
+// Its lists are `fills`: never zoomed, since they change all the time (a zoom would make the text jump at every
+// roll or new monster); they fill their cells at normal size and scroll when long.
 const DM_BLOCK_DEFS = {
-    initiative: { label: 'Initiative', scrolls: true, sheets: ['dm'], phoneTab: 'turns', Component: () => <InitiativeBlock /> },
-    tableRolls: { label: 'Rolls (the table)', scrolls: true, sheets: ['dm'], phoneTab: 'turns', Component: () => <TableRollsBlock /> },
-    party: { label: 'Party', scrolls: true, sheets: ['dm'], phoneTab: 'party', Component: () => <PartyBlock /> },
-    encounter: { label: 'Encounter', scrolls: true, sheets: ['dm'], phoneTab: 'encounter', Component: () => <EncounterBlock /> },
+    initiative: { label: 'Initiative', fills: true, sheets: ['dm'], phoneTab: 'turns', Component: () => <InitiativeBlock /> },
+    tableRolls: { label: 'Rolls (the table)', fills: true, sheets: ['dm'], phoneTab: 'turns', Component: () => <TableRollsBlock /> },
+    party: { label: 'Party', fills: true, sheets: ['dm'], phoneTab: 'party', Component: () => <PartyBlock /> },
+    encounter: { label: 'Encounter', fills: true, sheets: ['dm'], phoneTab: 'encounter', Component: () => <EncounterBlock /> },
     dmNotes: { label: 'Notes', fills: true, sheets: ['dm'], phoneTab: 'notes', Component: () => <NotesBlock /> },
     monHeader: current('monster', 'header'),
     monHealth: current('monster', 'health'),
