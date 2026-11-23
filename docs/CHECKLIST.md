@@ -30,7 +30,7 @@ One box per step of the Start to Vision Guide (same numbers). Full step wording:
 
 Switch over — **only after Gate 1, and ask the owner before each one (touches production):**
 
-- [ ] **0.11** Back up first (Neon branch `pre-cutover-<date>` from `production`)
+- [x] **0.11** Back up first (Neon branch `pre-cutover-<date>` from `production`) — ✓ 2026-11-22 · Claude · Neon branch `pre-cutover-20261122` (no commit: a database copy)
 - [ ] **0.12** Point the new service at production
   - note: move the `NODE_OPTIONS` IPv4 fix into the Dockerfile first; adopt migration baseline with `npm run migrate -- fake`
 - [ ] **0.13** Move the domain — Done when: the live domain runs the new code and smoke tests pass against it
