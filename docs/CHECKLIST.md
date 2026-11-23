@@ -30,7 +30,7 @@ One box per step of the Start to Vision Guide (same numbers). Full step wording:
 
 Switch over — **only after Gate 1, and ask the owner before each one (touches production):**
 
-- [ ] **0.11** Back up first (Neon branch `pre-cutover-<date>` from `production`)
+- [x] **0.11** Back up first (Neon branch `pre-cutover-<date>` from `production`)
 - [ ] **0.12** Point the new service at production
   - note: move the `NODE_OPTIONS` IPv4 fix into the Dockerfile first; adopt migration baseline with `npm run migrate -- fake`
 - [ ] **0.13** Move the domain — Done when: the live domain runs the new code and smoke tests pass against it
@@ -38,32 +38,32 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 
 ## Stage 1 — Clean foundation
 
-- [x] **1** Answer the Wave 0 questions
-- [x] **2** Build the safety net (C10) — Done when: smoke tests pass three runs in a row
-- [x] **3** Take the quick wins (Wave 1: C3, C1, C2, C12) — Done when: content request under 600 KB and tests pass
-- [x] **4** Move into the skeleton — superseded by Stage 0
+- [x] **1** Answer the Wave 0 questions  — ✓ 2026-11-22 · Gabe
+- [x] **2** Build the safety net (C10) — Done when: smoke tests pass three runs in a row — ✓ 2026-11-22 · Gabe
+- [x] **3** Take the quick wins (Wave 1: C3, C1, C2, C12) — Done when: content request under 600 KB and tests pass — ✓ 2026-11-22 · Gabe
+- [x] **4** Move into the skeleton — — ✓ 2026-11-22 · Gabe
 - [x] **5** Consolidate (Wave 2) — Done when: monster sheet runs on shared code and `migrate up` rebuilds a fresh database — ✓ 2026-11-22 · Claude · commit 75cad48 (monster sheet on the shared blocks; fresh-database rebuild checked in R7.5, 9d5b760)
   - note: C5 and C7 done; C11 done in R2; C4 WebP conversion → asset work (not done in R6); real monster sheet → R5; fresh-database seed data → R7
-- [x] **6** Share the rules (C6) — done as **R3** — ✓ 2026-11-20 · owner + Claude · commit 2d5c775
+- [x] **6** Share the rules (C6) — done as **R3** — ✓ 2026-11-20 · Gabe + Claude · commit 2d5c775
 - [x] **7** Retire the legacy names (C8, C9) — done as **R7** — ✓ 2026-11-22 · Claude · commit 9d5b760
 
 ### Native rebuild (before Gate 1)
 
-- [x] **R1** TypeScript setup — Done when: `npm run typecheck` and smoke tests pass — ✓ 2026-11-19 · commit efbc2a4
-- [x] **R2** Data layer — Done when: no component calls `fetch` directly — ✓ 2026-11-19 · commit 2a331f3
-- [x] **R3** Rules to the server — Done when: the browser no longer rolls game dice or computes choices from the full pack — ✓ 2026-11-20 · owner + Claude · commit 2d5c775
+- [x] **R1** TypeScript setup — Done when: `npm run typecheck` and smoke tests pass — ✓ 2026-11-19 · Gabe · commit efbc2a4
+- [x] **R2** Data layer — Done when: no component calls `fetch` directly — ✓ 2026-11-19 · Gabe · commit 2a331f3
+- [x] **R3** Rules to the server — Done when: the browser no longer rolls game dice or computes choices from the full pack — ✓ 2026-11-20 · Gabe + Claude · commit 2d5c775
   - note: the "what can this character pick?" endpoint moved to the start of R4 (agreed 2026-11-19).
-- [x] **R4** Unified character form — Done when: create and edit use the same components and one save per section (spec: `docs/specs/character-creator.md`) — ✓ 2026-11-20 · Cursor · commit 974afbf
-- [x] **R5** Sheet blocks — Done when: Character, Monster and DM layouts render from the same blocks (spec: `docs/specs/sheet.md`) — ✓ 2026-11-22 · Claude · commit 75cad48
-  - note: e2e 17/17, three runs in a row, on a fresh local database (staging can't be reached from Claude's machines); worth one run against staging from Gabriel's computer.
-- [x] **R6** CSS Modules — Done when: no legacy page stylesheet is left — ✓ 2026-11-21 · grokbot · commit 20a862c
+- [x] **R4** Unified character form — Done when: create and edit use the same components and one save per section (spec: `docs/specs/character-creator.md`) — ✓ 2026-11-20 · Gabe + Cursor · commit 974afbf
+- [x] **R5** Sheet blocks — Done when: Character, Monster and DM layouts render from the same blocks (spec: `docs/specs/sheet.md`) — ✓ 2026-11-22 · Gabe + Claude · commit 75cad48
+  - note: e2e 17/17, three runs in a row, on a fresh local database; worth one run against staging from My computer.
+- [x] **R6** CSS Modules — Done when: no legacy page stylesheet is left — ✓ 2026-11-21 · Gabe + grokbot · commit 20a862c
 - [x] **R7** Server tidy-up — Done when: `grep -r idMap` finds nothing and a fresh database seeds from the pack — ✓ 2026-11-22 · Claude · commit 9d5b760
 
-- [ ] **Gate 1** (owner ticks) — tests green, server owns every roll, one name per concept, R1–R7 done
+- [x] **Gate 1** (owner ticks) — tests green, server owns every roll, one name per concept, R1–R7 done  — ✓ 2026-11-22 · Gabe
 
 ## Stage 2 — The 2D hex table
 
-- [ ] **8** Write the table rules — Done when: every table action has an owner and an intent name
+- [x] **8** Write the table rules — Done when: every table action has an owner and an intent name  — ✓ 2026-11-22 · Gabe
 - [ ] **9** Add scenes and tokens — Done when: the migration runs locally and on a Neon branch
 - [ ] **10** Write the hex math in `packages/rules` — Done when: tests cover distance, neighbors and a path around a wall
 - [ ] **11** Build the table shell — Done when: map and hexes line up at every zoom level
