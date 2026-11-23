@@ -79,7 +79,7 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 
 - [x] **14** Sync the table — Done when: two browsers see the same moves without refreshing — ✓ 2026-11-23 · Claude · commit f181885
 - [ ] **15** Roll on the server, then show 3D dice — Done when: every player sees the same dice land on the same faces
-- [ ] **16** Add combat tracking — Done when: damage on the sheet shows on the token at once
+- [x] **16** Add combat tracking — Done when: damage on the sheet shows on the token at once — ✓ 2026-11-23 · Claude · commit a221b2b
 - [ ] **17** Resolve actions on the server — Done when: a hit and a miss both resolve with no manual math
 - [ ] **18** Add line of sight and fog — Done when: walking around a corner reveals the room beyond it
 

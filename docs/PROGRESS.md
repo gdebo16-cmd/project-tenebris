@@ -12,7 +12,7 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 ## Next
 
 - Gabriel: check and tick Gate 2 (open `/campaign/<id>/table` as DM and as a player). Confirm the *call* items in `docs/specs/table.md` (Tokens, "As built").
-- Then Stage 3 (live play, 14–18): socket sync is first, so moves show on everyone's screen without a reload.
+- Stage 3: 14 and 16 done (live table, HP and conditions on tokens). **Step 15 (3D dice) is left for Gabriel to build as a teaching session** (R3F is his focus). Then 17 (resolve attacks on the server against a target token) and 18 (line of sight + fog).
 - Cutover (0.12–0.14) whenever Gabriel picks a time.
 - Small: turn staging's auto-deploy back on in Render; delete Neon branch `scratch-r7-drop-test`; layout decisions into DECISIONS.md (Gabriel's). PNG→WebP still open.
 
@@ -21,6 +21,13 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-23 — Claude (Stage 3: steps 14 and 16; Gabriel asked "deploy, and keep going")
+- Staging deployed with PR #17 (Stage 2); the IPv4 Dockerfile build works. Gabriel's main folder: his uncommitted step 12 copies stashed (`stash@{0}`, with his OK) and `main` pulled.
+- Step 14 (PR #18): after every paint / place / move / remove the server sends `table` (terrain + tokens) to `campaign:<id>`; `useTableSync` puts it straight into the stored scene. `table-opened` tells waiting players the DM opened the table. Two-browser test: moves and paints show on the other board without a reload.
+- Step 16 (commit a221b2b): `controllers/tableNews.js` (tokenView + tellTable + tellTablesAbout). Tokens carry HP (characters) or the health word (monsters) and conditions; character hp / temp-hp / conditions / rest and monster hp / temp-hp / conditions tell every table the creature is on. Board label: name, then `13/20` or `Bloodied`, plus conditions; downed tokens are grey. Tested: DM-page damage shows on the player's and the DM's boards at once; a condition from the sheet shows too.
+- Step 15 deliberately not started: the 3D dice are the R3F piece Gabriel wants to learn on. The server already rolls (`/api/roll`, `crypto.randomInt`); 15 needs the results sent to the table and dice that land on the server's faces.
+- Note for step 18: everyone at the table gets the same token list (monsters only show health words); with fog each player will need a filtered copy (comments in tableNews.js / sceneController.js).
 
 ### 2026-11-23 — Claude (steps 11–13 finished, Gate 2 ready; Gabriel asked: "finish 11 and 12, then work through gate 2")
 - Gabriel built step 9 (scenes/tokens/overlays migration), step 10 (hex math: distance, neighbors, findPath with a step limit) and most of 11–12 himself (R3F board, terrain colours, scene model/controller/routes, scene queries). His uncommitted step 12 work was copied unchanged into `bot/claude` (commit 7409f88) before anything was added.
