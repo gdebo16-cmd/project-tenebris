@@ -12,9 +12,17 @@
     margin-bottom: 0.5rem;
 }
 
+/* The header fills its block (SheetLayout doesn't zoom it) and lays itself out to fit: a row when the block is
+   wide, stacked when it's tall (the @container rule at the bottom). It's a size container ("header"), so the
+   picture, name and rune size themselves to it: cqw / cqh are % of the block's width / height. */
 .headerBlock {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    box-sizing: border-box;
+    container: header / size;
+    overflow: hidden;
     padding: .75rem;
     border-radius: 1.5rem;
     background: var(--surface, #1a1030);
@@ -22,26 +30,28 @@
 }
 
 .muted {
-    font-size: 12px;
+    margin: 0.25em 0 0;
+    font-size: clamp(11px, min(9cqh, 3.2cqw), 22px);
     opacity: 0.7;
 }
 
 .title {
     margin: 0;
     font-family: Almendra, Georgia, serif;
-    font-size: 24px;
+    font-size: clamp(16px, min(20cqh, 7.5cqw), 56px);
     line-height: 1.1;
+    overflow-wrap: anywhere;
 }
 
 .header {
     display: flex;
-    gap: 12px;
+    gap: clamp(8px, 4cqw, 24px);
     align-items: center;
 }
 
 .portrait {
-    width: 64px;
-    height: 64px;
+    width: clamp(40px, min(70cqh, 26cqw), 220px);
+    height: clamp(40px, min(70cqh, 26cqw), 220px);
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--border, #b27f50);
@@ -54,8 +64,18 @@
 }
 
 .rune {
-    width: 40px;
-    height: 40px;
+    width: clamp(28px, min(40cqh, 13cqw), 120px);
+    height: clamp(28px, min(40cqh, 13cqw), 120px);
     border-radius: 8px;
     flex: none;
+}
+
+/* A tall block (narrower than it is tall): stack the picture, the name and details, and the rune, centred */
+@container header (aspect-ratio < 1.1) {
+    .header { flex-direction: column; justify-content: center; text-align: center; }
+    .headerText { flex: none; width: 100%; }
+    .portrait { width: clamp(40px, min(60cqw, 32cqh), 220px); height: clamp(40px, min(60cqw, 32cqh), 220px); }
+    .title { font-size: clamp(14px, min(13cqw, 7cqh), 48px); }
+    .muted { font-size: clamp(10px, min(6.5cqw, 3.6cqh), 20px); }
+    .rune { width: clamp(24px, min(30cqw, 14cqh), 100px); height: clamp(24px, min(30cqw, 14cqh), 100px); }
 }

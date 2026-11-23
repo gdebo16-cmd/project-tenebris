@@ -46,7 +46,7 @@ const featureUser = (t: SheetTools) => (featureKey: string) => t.run({ path: 'fe
 
 export const BLOCKS = {
     header: {
-        label: 'Header', sheets: ['character', 'monster'], phoneTab: null,
+        label: 'Header', fills: true, sheets: ['character', 'monster'], phoneTab: null,
         Component: () => <SheetHeader creature={useSheetTools().creature} />,
     },
     health: {
