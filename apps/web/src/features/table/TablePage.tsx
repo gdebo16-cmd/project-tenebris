@@ -63,7 +63,7 @@ function TopDownCamera({ on }: { on: boolean }) {
     const camera = useThree((s) => s.camera);
     useEffect(() => {
         if (!on) return;
-        camera.position.set(camera.position.x, 10, camera.position.z);   // straight above where you are
+        camera.position.set(camera.position.x, 100, camera.position.z);   // straight above where you are
         camera.lookAt(camera.position.x, 0, camera.position.z);
     }, [on, camera]);
     return null;
@@ -154,7 +154,7 @@ export default function TablePage() {
                 {view === 'top' ? 'Tilt view' : 'Top-down'}
             </button>
 
-            <Canvas orthographic camera={{ position: [0, 10, 0], zoom: startZoom() }}>
+            <Canvas orthographic camera={{ position: [0, 100, 0], zoom: startZoom() }}>
                 <ambientLight intensity={1.2} />
                 <directionalLight position={[5, 10, 5]} intensity={1} />
   {/*               <Suspense fallback={null}>
