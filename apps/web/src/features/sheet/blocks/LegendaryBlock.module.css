@@ -1,0 +1,38 @@
+/* LegendaryBlock: a monster's legendary actions. Same look as the Features block.
+   This block's whole look lives here. Edit freely: it only changes this block. */
+
+.block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 1.5rem;
+    background: var(--surface, #1a1030);
+    border: 1px solid var(--border, #b27f50);
+}
+
+.heading {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.muted {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* One legendary action: its name, then what it does */
+.row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.rowName { font-weight: 600; }

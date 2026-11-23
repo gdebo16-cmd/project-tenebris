@@ -19,6 +19,7 @@ import PurseBlock from './PurseBlock.tsx';
 import InventoryBlock from './InventoryBlock.tsx';
 import FeaturesBlock from './FeaturesBlock.tsx';
 import TraitsBlock from './TraitsBlock.tsx';
+import LegendaryBlock from './LegendaryBlock.tsx';
 import RollFeed from './RollFeed.tsx';
 
 // The phone tabs (decision A: phones follow the layout, grouped under these). null = always shown.
@@ -140,6 +141,10 @@ export const BLOCKS = {
             const t = useSheetTools();
             return <FeaturesBlock creature={t.creature} canEdit={t.kind === 'character' && t.canEdit} onUse={t.kind === 'character' ? featureUser(t) : noop} />;
         },
+    },
+    legendary: {
+        label: 'Legendary actions', scrolls: true, sheets: ['monster'], phoneTab: 'combat',
+        Component: () => <LegendaryBlock creature={useSheetTools().creature} />,
     },
     traits: {
         label: 'Traits and notes', scrolls: true, sheets: ['monster'], phoneTab: 'stats',
