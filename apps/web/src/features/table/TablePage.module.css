@@ -55,8 +55,11 @@
 .status { margin: 0; font-size: 13px; opacity: 0.85; }
 .error { color: #f08a7a; opacity: 1; }
 
-/* A token's name, drawn over the board */
+/* A token's name, drawn over the board. Neither it nor drei's box around it takes clicks: they go to the board. */
+.labelWrap { pointer-events: none; }
+
 .label {
+    pointer-events: none;
     padding: 1px 6px;
     border-radius: 6px;
     background: rgba(0, 0, 0, 0.65);

@@ -3,7 +3,7 @@
 // the board only asks and shows the answer.
 //
 // Tools: everyone can Move (click your token, then a hex). The DM also gets the terrain brushes, Place and Remove.
-import { Suspense, useState } from 'react'
+import { Suspense, useRef, useState, type RefObject } from 'react'
 import { useParams } from 'react-router'
 import { Canvas, type ThreeEvent } from '@react-three/fiber'
 import { Html, MapControls, useTexture } from '@react-three/drei'
@@ -16,6 +16,10 @@ import {
 import styles from './TablePage.module.css'
 
 const GRID_RADIUS = 8;      // how many rings of hexes around the centre (enough to cover a 20-wide map)
+
+// Starting zoom (pixels per world unit): about 17 units of map across the screen, so a phone shows as much map
+// as a laptop, just smaller. Scroll or pinch changes it after that.
+const startZoom = () => Math.max(20, Math.min(75, Math.round(window.innerWidth / 17)));
 
 function hexToWorld(hex: Hex, size: number): [number, number, number] {
     const x = 1.5 * size * hex.q
@@ -71,6 +75,9 @@ export default function TablePage() {
     const [summonName, setSummonName] = useState('');
     const [summonOwner, setSummonOwner] = useState('');               // a player's user id, or '' for the DM
     const [message, setMessage] = useState('');
+    // Token names are page elements drawn over the board. They go in the board's own box: without a box named
+    // here, drei puts them next to the canvas, and the first one can be made before that spot exists and get lost.
+    const boardRef = useRef<HTMLDivElement>(null);
 
     const isDm = data?.isDm ?? false;
     const tokens = data?.tokens ?? [];
@@ -117,7 +124,7 @@ export default function TablePage() {
     if (data && !data.scene) return <p className={styles.notice}>The DM hasn't opened the table yet.</p>;
 
     return (
-        <div className={styles.board}>
+        <div className={styles.board} ref={boardRef}>
             <Toolbar
                 data={data}
                 tool={tool}
@@ -129,7 +136,7 @@ export default function TablePage() {
                 onRemove={() => selectedToken && remove.mutate(selectedToken.id, { onSuccess: () => { setSelected(null); setMessage(''); }, onError: (err) => setMessage(messageOf(err)) })}
                 message={message}
             />
-            <Canvas orthographic camera={{ position: [0, 10, 0], zoom: 75 }}>
+            <Canvas orthographic camera={{ position: [0, 10, 0], zoom: startZoom() }}>
                 <ambientLight intensity={1.2} />
                 <directionalLight position={[5, 10, 5]} intensity={0.8} />
                 <Suspense fallback={null}>
@@ -146,7 +153,7 @@ export default function TablePage() {
                     </mesh>
                 ))}
                 {tokens.map((token) => (
-                    <TokenPiece key={token.id} token={token} mine={token.ownerId === data?.userId}
+                    <TokenPiece key={token.id} token={token} mine={token.ownerId === data?.userId} labels={boardRef}
                         selected={token.id === selected} onClick={(e) => clickToken(token, e)} />
                 ))}
                 <MapControls enableRotate={false} />
@@ -156,8 +163,9 @@ export default function TablePage() {
 }
 
 // One token: a round piece standing on its hex, its name above it, a gold ring when selected
-function TokenPiece({ token, mine, selected, onClick }: {
-    token: Token; mine: boolean; selected: boolean; onClick: (e: ThreeEvent<MouseEvent>) => void;
+function TokenPiece({ token, mine, selected, labels, onClick }: {
+    token: Token; mine: boolean; selected: boolean; labels: RefObject<HTMLDivElement | null>;
+    onClick: (e: ThreeEvent<MouseEvent>) => void;
 }) {
     const [x, , z] = hexToWorld(token, 1);
     const color = token.kind === 'monster' ? TOKEN_COLORS.monster
@@ -175,7 +183,9 @@ function TokenPiece({ token, mine, selected, onClick }: {
                 <cylinderGeometry args={[0.65, 0.65, 0.25, 32]} />
                 <meshStandardMaterial color={color} />
             </mesh>
-            <Html position={[0, 0.4, 0]} center className={styles.label} pointerEvents="none">
+            {/* the name sits just above the token on screen (towards -z), so the token itself stays clickable */}
+            <Html position={[0, 0.4, -0.85]} center className={styles.label} wrapperClass={styles.labelWrap}
+                pointerEvents="none" portal={labels as RefObject<HTMLElement>}>
                 {token.name}
             </Html>
         </group>
