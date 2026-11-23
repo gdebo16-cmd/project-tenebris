@@ -68,10 +68,10 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 
 - [x] **8** Write the table rules — Done when: every table action has an owner and an intent name  — ✓ 2026-11-22 · Gabe ab3164c
 - [x] **9** Add scenes and tokens — Done when: the migration runs locally and on a Neon branch  — ✓ 2026-11-22 · Gabe 95a7bd9
-- [x] **10** Write the hex math in `packages/rules` — Done when: tests cover distance, neighbors and a path around a wall ✓ 2026 - 11-23 · Gabe · commit b90c064
-- [ ] **11** Build the table shell — Done when: map and hexes line up at every zoom level
-- [ ] **12** Build the hex terrain editor — Done when: a painted map reloads exactly as painted
-- [ ] **13** Make tokens real — Done when: a move through a wall is refused by the server
+- [x] **10** Write the hex math in `packages/rules` — Done when: tests cover distance, neighbors and a path around a wall — ✓ 2026-11-23 · Gabe · commit b90c064
+- [x] **11** Build the table shell — Done when: map and hexes line up at every zoom level — ✓ 2026-11-23 · Gabe + Claude · commit 7759a59 (grid filled out in cfcc3a1)
+- [x] **12** Build the hex terrain editor — Done when: a painted map reloads exactly as painted — ✓ 2026-11-23 · Gabe + Claude · commit cfcc3a1
+- [x] **13** Make tokens real — Done when: a move through a wall is refused by the server — ✓ 2026-11-23 · Claude · commit fd557c0
 
 - [ ] **Gate 2** (owner ticks) — a DM prepares a scene with party tokens, reloads, nothing is lost
 

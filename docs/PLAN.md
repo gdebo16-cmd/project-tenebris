@@ -27,6 +27,7 @@ Source of truth for decisions. Change a decision here first. Full step wording i
 | AIs (Claude, grokbot, Cursor) share `AGENTS.md` + `docs/`; handoff via `docs/PROGRESS.md`; steps ticked in `docs/CHECKLIST.md` | Locked | 2026-11-20 |
 | Parallel AI work: one git worktree + `bot/<name>` branch + own ports per AI; **only the owner merges into `main`** | Locked | 2026-11-20 |
 | 3D engine (Unreal / Godot / stay R3F) | Open — decide at Gate 5 | — |
+| 2D table renderer | R3F, camera looking straight down (orthographic): same tool as the dice, spell creator and initiative pieces (Gabriel) | 2026-11-23 |
 | DM sheet final contents | Open (all suggested blocks for now) | — |
 | Final names: Paladin/Templar, Druid/Seer, Rune Weaver/Tome of Inscription | Open | — |
 | Spell creator: Discovery first, then Forge | Plan | 2026-11-18 |

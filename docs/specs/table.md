@@ -48,6 +48,18 @@ Written from Gabriel's answers on 2026-11-22. Anything not decided yet is under 
   (Stage 3 may let a summon ability place one by itself: that's just the server sending `token.place` for the player.)
 - A player's character token is owned by that player.
 - **Only the DM moves tokens that aren't theirs.**
+- **No owner = the DM's.** Monsters start with none; the DM can hand one to a player (a charm, a possession) with `token.update`, and take it back. (Gabriel, 2026-11-23)
+
+**As built in step 13** (Claude, 2026-11-23; the ones marked *call* are Claude's judgment, Gabriel to confirm or change):
+- Routes: `GET /api/campaigns/:id/scene` (the scene + its tokens; the DM also gets what can be placed),
+  `POST /api/scenes/:id/tokens` (place), `POST /api/tokens/:id/move`, `DELETE /api/tokens/:id`. `token.update` isn't built yet.
+- A move must have a walk around walls (`findPath`). A **player** may walk as far as the token's speed
+  (speed in feet / 5; a character's and a monster's come from their sheets, HP included).
+- *call:* the **DM** isn't held to a speed (they set up scenes), but walls still stop them; to put a token inside a closed room, remove it and place it there.
+- *call:* summons have no sheet yet, so they walk **30 ft (6 hexes)**.
+- *call:* other tokens **don't block the way**, only the hex you end on (one token per hex). Whether allies / enemies block is open.
+- *call:* a character or monster can only be on a scene **once**; summons can repeat.
+- Only `wall` blocks for now. Water, rough ground and ice are painted and shown, but don't cost extra movement yet (open).
 
 ## Measuring
 
