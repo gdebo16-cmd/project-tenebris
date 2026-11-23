@@ -19,6 +19,12 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
+### 2026-11-22 — Claude (step 8: table spec written from Gabriel's answers; DM page layout; cutover prep)
+- `docs/specs/table.md`: every table action with who can do it and its intent name (scenes, maps, tokens, measuring, overlays with turn counters). Decisions are Gabriel's (2026-11-22); undecided items listed under **Open**. Step 8 left unticked for Gabriel's review.
+- PR #14 (merged, on staging): the DM page is an editable layout (`dm` kind) with current-monster / current-player blocks.
+- Cutover prep (asked by Gabriel): **0.11 done** — Neon branch `pre-cutover-20261122` (copy of production). Rehearsal on `scratch-cutover-rehearsal` (a copy of production): baseline marked as run, the other 7 migrations applied cleanly; resulting schema identical to `rework`. Production itself untouched. **Not done:** Gate 1 (Gabriel), Dockerfile `NODE_OPTIONS` fix, new Render service, migrating production, moving the domain. Note: migrating production breaks the old site at once (it drops the old content tables), so migrate and move the domain together.
+- Delete `scratch-cutover-rehearsal` and `scratch-r7-drop-test` when Gabriel says.
+
 ### 2026-11-22 — Claude (roll speed: fewer database waits per roll, bot/claude; Gabriel asked for fixes 1–3)
 - `apps/server/src/timing.js` + `index.js`: every response carries `Server-Timing: total;dur=…` (DevTools → Network → a request → Timing). Mounted before the session middleware so the session read counts.
 - `sheetController.js` `loadSheetData`: after the character loads, armor, weapons, items, learned spells, slots and action features load together (`Promise.all`). Used by the sheet, `/act`, feature/rune/rest/cast/conditions and the DM page.
