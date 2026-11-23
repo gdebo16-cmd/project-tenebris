@@ -1,13 +1,17 @@
 /* HealthBlock: Health: HP / max, the bar, and Damage / Heal / Ward.
    This block's whole look lives here (moved from Sheet.module.css). Edit freely: it only changes this block. */
 
+/* "Health" and the HP side by side; when they don't fit, the HP wraps onto its own line under the title
+   (no fixed height, so it never spills outside the row) */
 .healthblockTitle {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
+    column-gap: 8px;
     margin-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
     border-bottom: 1px solid var(--border, #b27f50);
-    height: 2.25rem;
 }
 
 .titleHealth {
@@ -39,6 +43,7 @@
 }
 
 .hpValue {
+    white-space: nowrap;   /* "20 / 20" stays together */
     font-family: Almendra, Georgia, serif;
     font-size: 26px;
     font-weight: 700;

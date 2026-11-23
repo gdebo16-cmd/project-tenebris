@@ -40,7 +40,8 @@ export function useDmChange(campId: string) {
         hp: useMutation({
             mutationFn: ({ kind, id, action, amount }: { kind: 'character' | 'monster'; id: number; action: 'heal' | 'damage'; amount: number }) =>
                 api(`/api/sheets/${kind}/${id}/hp`, { method: 'POST', body: { action, amount } }),
-            onSuccess: refresh,
+            // the lists, and the "current" sheet blocks showing that creature
+            onSuccess: (_r, v) => Promise.all([refresh(), queryClient.invalidateQueries({ queryKey: ['sheet', v.kind, String(v.id)] })]),
         }),
         initiative: useMutation({
             mutationFn: (op: InitiativeOp) => api(`/api/campaigns/${campId}/initiative`, { method: 'POST', body: { op } }),

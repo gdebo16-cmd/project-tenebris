@@ -8,11 +8,13 @@ import type { BlockProps } from './types.ts';
 type Props = Pick<BlockProps, 'creature' | 'canEdit'> & { onUse: (featureKey: string) => void };
 
 export default function FeaturesBlock({ creature, canEdit, onUse }: Props) {
+    // a monster's legendary actions have their own block (LegendaryBlock)
+    const features = creature.features.filter((f) => f.action_type !== 'legendary');
     return (
         <section className={styles.block} aria-label="Features">
             <h2 className={`${styles.heading} ${panelCss.title}`}>Features</h2>
-            {creature.features.length === 0 && <span className={styles.muted}>No features with actions yet.</span>}
-            {creature.features.map((f) => {
+            {features.length === 0 && <span className={styles.muted}>No features with actions yet.</span>}
+            {features.map((f) => {
                 const uses = f.perRest;
                 const canUse = canEdit && (uses != null || f.diceNow != null);
                 return (

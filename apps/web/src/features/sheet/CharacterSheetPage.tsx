@@ -4,27 +4,19 @@
 // Rolls open the roll orb. The text roll feed is a block, shown to the campaign DM only.
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
-import type { ActRequest } from '@tenebris/rules/actions';
-import { ApiError } from '../../api.ts';
 import Loader from '../../components/Loader.jsx';
 import socket from '../../utils/socket.js';
 import styles from './Sheet.module.css';
-import { useAct, useSheet, useSheetChange, useSheetDo, type SheetDo } from './queries.ts';
+import { messageOf, useCharacterSheetTools, type Reporter } from './sheetTools.ts';
 import type { FeedEntry } from './blocks/RollFeed.tsx';
 import RollOrb from './blocks/RollOrb.tsx';
 import layout from './CharacterSheetPage.module.css';
 import useHeaderStatusBar from '../../hooks/useHeaderStatusBar.ts';
 import SheetLayout from './SheetLayout.tsx';
-import { SheetContext, type SheetTools } from './blocks/SheetContext.tsx';
-
-const messageOf = (err: unknown) => (err instanceof ApiError || err instanceof Error ? err.message : 'Something went wrong');
+import { SheetContext } from './blocks/SheetContext.tsx';
 
 export default function CharacterSheetPage() {
     const { id = '' } = useParams();
-    const sheet = useSheet(id);
-    const act = useAct(id);
-    const change = useSheetChange(id);
-    const sheetDo = useSheetDo(id);
     const [feed, setFeed] = useState<FeedEntry[]>([]);
     const [orbOpen, setOrbOpen] = useState(false);
     const nextId = useRef(1);
@@ -55,40 +47,14 @@ export default function CharacterSheetPage() {
         addToFeed('You', text, true);
     };
 
-    const onAct = (request: ActRequest, prefix = '') => {
-        act.mutateAsync(request).then((r) => note(`${prefix}${r.text}`), (err) => addToFeed('You', `Roll failed: ${messageOf(err)}`, true));
-    };
-
-    // Feature uses, rests and casting: the server decides and saves; its text goes to the roll orb (and the DM feed)
-    const onDo = (request: SheetDo, prefix = '') => {
-        sheetDo.mutateAsync(request).then((r) => note(`${prefix}${r.text}`), (err) => addToFeed('You', messageOf(err), true));
-    };
+    // Everything the blocks may need (sheetTools.ts). Rolls, casts and rests: their text goes to the roll orb
+    // (and the DM's feed); a failure opens the orb too.
+    const report: Reporter = { done: note, failed: (text) => addToFeed('You', text, true), note, feed };
+    const { tools, sheet } = useCharacterSheetTools(id, report);
 
     if (sheet.isPending) return <Loader />;
     if (sheet.error) return <p className={styles.error} role="alert">{messageOf(sheet.error)}</p>;
-
-    const { creature, canEdit, access } = sheet.data;
-    const changeError = [change.hp.error, change.tempHp.error, change.conditions.error].find(Boolean);
-
-    // Everything the blocks may need (blocks/SheetContext.tsx)
-    const tools: SheetTools = {
-        kind: 'character',
-        id,
-        creature,
-        canEdit,
-        access,
-        act: onAct,
-        note,
-        run: onDo,
-        busy: sheetDo.isPending,
-        hp: (action, amount) => change.hp.mutate({ action, amount }),
-        ward: (amount) => change.tempHp.mutate(amount),
-        setConditions: (body) => change.conditions.mutate(body),
-        saveNotes: () => {},
-        savingNotes: false,
-        changeError: changeError ? messageOf(changeError) : undefined,
-        feed,
-    };
+    if (!tools) return null;
 
     return (
         <SheetContext.Provider value={tools}>

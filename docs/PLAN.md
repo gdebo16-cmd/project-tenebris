@@ -66,7 +66,7 @@ Gate 1: tests green, server owns rolls, one name per concept, R1–R7 done.
 
 - **Rolls are server-made, but the browser still says what to roll:** the dice text, bonus and crit flag come from the sheet. Real authority is guide step 17, "Resolve actions on the server".
 - **Monsters:** fixed in R5.6 — migration `1795400000000_create-campaign-monsters` creates `campaign_monsters`; the monster sheet and the DM page (R5.7) run on the shared sheet blocks.
-- Staging needs `NODE_OPTIONS=--dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=2000` (Render free has no IPv6). Move into the `Dockerfile` as `ENV` before cutover (0.12).
+- Staging needs `NODE_OPTIONS=--dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=2000` (Render free has no IPv6). Now in the `Dockerfile` as `ENV` (2026-11-22); the dashboard setting can go.
 - Set Render health check path `/health` on staging (dashboard only).
 - Adopt the migration baseline on production at cutover with `npm run migrate -- fake` (needs `ALLOW_PRODUCTION=yes`; ask first).
 - Fresh databases need seed data (spells, roles, callings, spell lookups) — with R7.

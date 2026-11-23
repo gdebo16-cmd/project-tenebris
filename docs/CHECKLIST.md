@@ -6,11 +6,11 @@ One box per step of the Start to Vision Guide (same numbers). Full step wording:
 
 - Tick a step only when its **Done when** is true **and** `npm test` + `npm run typecheck` pass (smoke tests too, if the step touches the app).
 - Whoever finished it ticks it — the owner or the AI that did the work — and adds: `✓ YYYY-MM-DD · who · commit <sha>`.
-  Example: `- [x] **R1** TypeScript setup — ✓ 2026-11-19 · owner + Claude · commit efbc2a4`
+Example: `- [x] **R1** TypeScript setup — ✓ 2026-11-19 · owner + Claude · commit efbc2a4`
 - Work is **committed** before the box is ticked (no sha, no tick).
 - **Gates are ticked by the owner only.** An AI can say a gate looks ready; it never ticks one.
 - Never untick someone else's box. If something you think is done isn't, add a note under it and tell the owner.
-- Partly done? Leave it unticked and add a `  - note:` line saying what's left.
+- Partly done? Leave it unticked and add a   `- note:` line saying what's left.
 - Also add a line to the Log in `docs/PROGRESS.md`.
 
 ---
@@ -30,7 +30,9 @@ One box per step of the Start to Vision Guide (same numbers). Full step wording:
 
 Switch over — **only after Gate 1, and ask the owner before each one (touches production):**
 
-- [x] **0.11** Back up first (Neon branch `pre-cutover-<date>` from `production`)
+- [x] **0.11** Back up first (Neon branch `pre-cutover-<date>` from `production`) — ✓ 2026-11-22 · Claude · Neon branch `pre-cutover-20261122` (no commit: a database copy)
+> > > > > > > b460d628ef2e657b088eefd084acb6c6b0af54b4
+
 - [ ] **0.12** Point the new service at production
   - note: move the `NODE_OPTIONS` IPv4 fix into the Dockerfile first; adopt migration baseline with `npm run migrate -- fake`
 - [ ] **0.13** Move the domain — Done when: the live domain runs the new code and smoke tests pass against it

@@ -20,11 +20,15 @@ export type SheetLayout = {
 };
 
 // The kinds of sheet, and the blocks each one can place (the web app's block list must match: registry.tsx)
-export const SHEET_KINDS = ['character', 'monster'] as const;
+export const SHEET_KINDS = ['character', 'monster', 'dm'] as const;
 export type SheetKind = (typeof SHEET_KINDS)[number];
 export const SHEET_BLOCKS: Record<SheetKind, readonly string[]> = {
     character: ['header', 'health', 'core', 'stats', 'skills', 'conditions', 'rest', 'actionPanel', 'actions', 'spells', 'gear', 'features', 'rollFeed'],
-    monster: ['header', 'health', 'core', 'stats', 'skills', 'conditions', 'actions', 'features', 'traits', 'rollFeed'],
+    monster: ['header', 'health', 'core', 'stats', 'skills', 'conditions', 'actions', 'legendary', 'features', 'traits', 'rollFeed'],
+    // The DM page: its own blocks, then the current monster's and the current player's sheet blocks
+    dm: ['initiative', 'tableRolls', 'party', 'encounter', 'dmNotes',
+        'monHeader', 'monHealth', 'monCore', 'monStats', 'monSkills', 'monConditions', 'monActions', 'monLegendary', 'monFeatures', 'monTraits',
+        'pcHeader', 'pcHealth', 'pcCore', 'pcStats', 'pcSkills', 'pcConditions', 'pcActions', 'pcSpells', 'pcGear', 'pcFeatures'],
 };
 export const isSheetKind = (v: unknown): v is SheetKind => SHEET_KINDS.includes(v as SheetKind);
 

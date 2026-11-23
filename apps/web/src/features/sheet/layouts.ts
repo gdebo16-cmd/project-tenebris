@@ -2,10 +2,9 @@
 // with a copy in this browser so the sheet shows the right layout at once, before the server answers.
 import { useCallback, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { checkLayout, type SheetLayout } from '@tenebris/rules/layout';
+import { checkLayout, type SheetKind, type SheetLayout } from '@tenebris/rules/layout';
 import { api } from '../../api.ts';
 import { blocksFor } from './blocks/registry.tsx';
-import type { SheetKind } from './blocks/SheetContext.tsx';
 
 // The default layouts, on the 12 × 16 grid (GRID in @tenebris/rules/layout). Each block fills its cells; content that
 // doesn't fit scrolls inside the block. On a phone the same blocks stack in reading order (top row first, then left to right).
@@ -37,7 +36,8 @@ export const DEFAULT_LAYOUTS: Record<SheetKind, SheetLayout> = {
         version: 2,
         items: [
             { block: 'header', col: 1, row: 1, colSpan: 8, rowSpan: 3 },
-            { block: 'actions', col: 9, row: 1, colSpan: 4, rowSpan: 9 },
+            { block: 'actions', col: 9, row: 1, colSpan: 4, rowSpan: 6 },
+            { block: 'legendary', col: 9, row: 7, colSpan: 4, rowSpan: 3 },
             { block: 'health', col: 1, row: 4, colSpan: 4, rowSpan: 4 },
             { block: 'core', col: 5, row: 4, colSpan: 4, rowSpan: 4 },
             { block: 'stats', col: 1, row: 8, colSpan: 4, rowSpan: 6 },
@@ -48,10 +48,32 @@ export const DEFAULT_LAYOUTS: Record<SheetKind, SheetLayout> = {
             { block: 'rollFeed', col: 9, row: 13, colSpan: 4, rowSpan: 4 },
         ],
     },
+    //  columns 1–3             4–7                       8–12
+    //  initiative (1–7)        party (1–6)               encounter (1–6)
+    //  rolls (8–12)            player header (7–9)       monster header (7–9)
+    //  notes (13–16)           player health (10–12)     monster health (10–12)
+    //                          player afflictions (13–16) monster actions (13–16)
+    //  (the other current-monster / current-player blocks are hidden: add them in the editor)
+    dm: {
+        version: 2,
+        items: [
+            { block: 'initiative', col: 1, row: 1, colSpan: 3, rowSpan: 7 },
+            { block: 'tableRolls', col: 1, row: 8, colSpan: 3, rowSpan: 5 },
+            { block: 'dmNotes', col: 1, row: 13, colSpan: 3, rowSpan: 4 },
+            { block: 'party', col: 4, row: 1, colSpan: 4, rowSpan: 6 },
+            { block: 'pcHeader', col: 4, row: 7, colSpan: 4, rowSpan: 3 },
+            { block: 'pcHealth', col: 4, row: 10, colSpan: 4, rowSpan: 3 },
+            { block: 'pcConditions', col: 4, row: 13, colSpan: 4, rowSpan: 4 },
+            { block: 'encounter', col: 8, row: 1, colSpan: 5, rowSpan: 6 },
+            { block: 'monHeader', col: 8, row: 7, colSpan: 5, rowSpan: 3 },
+            { block: 'monHealth', col: 8, row: 10, colSpan: 5, rowSpan: 3 },
+            { block: 'monActions', col: 8, row: 13, colSpan: 5, rowSpan: 4 },
+        ],
+    },
 };
 
 // Whether a kind of sheet groups its blocks under phone tabs on a phone
-export const PHONE_TABS_ON: Record<SheetKind, boolean> = { character: true, monster: true };
+export const PHONE_TABS_ON: Record<SheetKind, boolean> = { character: true, monster: true, dm: true };
 
 type SavedLayouts = Partial<Record<SheetKind, SheetLayout>>;
 const layoutsKey = ['layouts'] as const;

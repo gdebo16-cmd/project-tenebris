@@ -1,27 +1,23 @@
-/* The DM page: the sheet's look (Sheet.module.css), plus a few pieces of its own. */
+/* The DM page's blocks (DmBlocks.tsx): the sheet's look (Sheet.module.css), plus a few pieces of their own.
+   Where the blocks go is the layout's job (SheetLayout), like on a sheet. */
 
-.layout {
-    max-width: 1280px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(300px, 2fr) minmax(340px, 3fr);
-    gap: 10px;
-    align-items: start;
-}
-
-@media (max-width: 760px) {
-    .layout { grid-template-columns: 1fr; }
-}
-
+/* One party member or monster: picture, then name, details, HP and quick buttons */
 .member {
     display: grid;
     grid-template-columns: 44px 1fr;
     gap: 10px;
-    padding: 8px 0;
+    padding: 8px 6px;
     border-top: 1px solid var(--border, #b27f50);
+    border-radius: 10px;
 }
 
 .member:first-of-type { border-top: none; }
+
+/* the current one (shown in the "current player" / "current monster" blocks) */
+.memberCurrent {
+    background: color-mix(in srgb, var(--accent, #d4af37) 14%, transparent);
+    outline: 1px solid var(--accent, #d4af37);
+}
 
 .thumb {
     width: 44px;
@@ -32,8 +28,31 @@
 
 .memberBody { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 
+/* the name and its Show button on one line */
+.memberTop { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
 /* names link to their sheets: theme color, not the browser's blue/purple */
 .memberBody a { color: var(--accent, #d4af37); }
+
+/* "Show": make this one the current one */
+.show {
+    flex: none;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border, #b27f50);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.showOn {
+    border-color: var(--accent, #d4af37);
+    background: var(--accent, #d4af37);
+    color: var(--bg, #0d042c);
+}
 
 .quick { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
@@ -53,7 +72,9 @@
     font-weight: 600;
 }
 
-.notes { width: 100%; min-height: 140px; resize: vertical; }
+/* Notes fills its block; the text box takes the room */
+.fillBlock { height: 100%; box-sizing: border-box; }
+.notes { flex: 1; width: 100%; min-height: 80px; resize: none; box-sizing: border-box; }
 
 /* Quick ± and the add-monster row: buttons keep their size, fields wrap on a phone */
 .quick > button { flex: 0 0 auto; min-width: 44px; }
@@ -63,60 +84,4 @@
     min-width: 0;
     max-width: 100%;
     font-size: 14px;
-}
-
-/* ---- Page frame: the sheet pages' header and footer (CharacterSheetPage.module.css) around it ---- */
-
-/* each part of the page; wide screens: no box of its own, the parts sit in the columns as before */
-.pane { display: contents; }
-
-/* the phone tab bar: wide screens don't need it */
-.tabs { display: none; }
-
-/* room for the fixed footer at the bottom */
-.area { padding-bottom: calc(2rem + 5dvh); }
-
-.crumbs a { color: var(--accent, #d4af37); }
-
-/* Phones: the header stays put and only this area scrolls, one tab at a time,
-   with a border above the browser's bottom bar (same as the sheets) */
-@media (max-width: 720px) {
-    :global(body):has(.area) { overflow: hidden; }
-
-    div.area {
-        box-sizing: border-box;
-        height: calc(92dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-        min-height: 0;
-        padding: 0 1rem 1.5rem;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        scrollbar-width: none;
-        border-bottom: 2px solid var(--border, #b27f50);
-    }
-    div.area::-webkit-scrollbar { display: none; }
-
-    .crumbs { margin: 0.75rem 0 0.25rem; }
-
-    /* stays at the top of the area while it scrolls */
-    .tabs {
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        margin: 0 -1rem 0.75rem;
-        padding: 0 0.25rem;
-        background: var(--surface, #1a1030);
-        border-bottom: 1px solid var(--border, #b27f50);
-    }
-    .tabs button {
-        padding: 0 2px;
-        font-size: 0.8rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .pane { display: block; }
-    .paneHidden { display: none; }
 }
