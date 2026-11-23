@@ -35,7 +35,9 @@ export async function listTokens(sceneId) {
     const { rows } = await pool.query(
         `SELECT t.id, t.kind, t.q, t.r, t.owner_id, t.character_id, t.campaign_monster_id, t.name,
                 ch.name AS character_name, ch.portrait_url AS character_portrait,
-                cm.nickname AS monster_nickname, cm.monster_id
+                ch.current_hp AS character_hp, ch.max_hp AS character_max_hp, ch.temp_hp AS character_temp_hp,
+                ch.conditions AS character_conditions,
+                to_jsonb(cm) AS monster_row
          FROM tokens t
          LEFT JOIN characters ch ON ch.id = t.character_id
          LEFT JOIN campaign_monsters cm ON cm.id = t.campaign_monster_id
@@ -80,5 +82,15 @@ export async function partyForTable(campId) {
          WHERE m.campaign_id = $1
          ORDER BY m.joined_at`,
         [campId]);
+    return rows;
+}
+
+// The scenes a character or a monster has a token on (with their campaign and terrain)
+export async function scenesWith({ characterId, campaignMonsterId }) {
+    const { rows } = await pool.query(
+        `SELECT DISTINCT s.id, s.campaign_id, s.terrain
+         FROM tokens t JOIN scenes s ON s.id = t.scene_id
+         WHERE ($1::int IS NOT NULL AND t.character_id = $1) OR ($2::int IS NOT NULL AND t.campaign_monster_id = $2)`,
+        [characterId ?? null, campaignMonsterId ?? null]);
     return rows;
 }

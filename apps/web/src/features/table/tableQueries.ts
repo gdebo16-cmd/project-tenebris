@@ -1,7 +1,9 @@
 // Server data for the table (steps 12–13). Every change answers with the new state, which goes straight into the
 // stored scene (setQueryData): one trip per click instead of two.
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api.ts';
+import socket from '../../utils/socket.js';
 
 export type Scene = {
     id: number;
@@ -17,6 +19,9 @@ export type Token = {
     ownerId: number | null;     // null = the DM's
     name: string;
     portrait: string | null;
+    hp: { current: number; max: number; temp: number } | null;   // characters only
+    health: string | null;      // 'Unhurt' | 'Wounded' | 'Bloodied' | 'Near death' | 'Down' (monsters show only this)
+    conditions: string[];
 }
 
 // What the DM can put on the table (only sent to the DM)
@@ -83,4 +88,38 @@ export function useMoveToken(campId: string) {
 export function useRemoveToken(campId: string) {
     return useTokenChange(campId, (tokenId: number) =>
         api<SceneData>(`/api/tokens/${tokenId}`, { method: 'DELETE' }));
+}
+
+// Step 14: live updates. Joins the campaign's room; when anyone paints or moves something, the server sends the new
+// terrain and tokens ('table'), which go straight into the stored scene. This page's own isDm / userId / placeable
+// stay as they are (they're about who's looking, not what's on the board).
+type TableUpdate = { sceneId: number; terrain: Record<string, string>; tokens: Token[] };
+
+export function useTableSync(campId: string) {
+    const queryClient = useQueryClient();
+    useEffect(() => {
+        if (!campId) return;
+        const join = () => socket.emit('join-campaign', campId);
+        const onTable = (update: TableUpdate) => {
+            queryClient.setQueryData<SceneData>(sceneKey(campId), (old) =>
+                old?.scene && old.scene.id === update.sceneId
+                    ? { ...old, scene: { ...old.scene, terrain: update.terrain }, tokens: update.tokens }
+                    : old,
+            );
+        };
+        // the DM opened the table for the first time: anyone waiting loads it
+        const onOpened = () => queryClient.invalidateQueries({ queryKey: sceneKey(campId) });
+
+        socket.connect();
+        if (socket.connected) join();
+        socket.on('connect', join);              // also after a dropped connection comes back
+        socket.on('table', onTable);
+        socket.on('table-opened', onOpened);
+        return () => {
+            socket.off('connect', join);
+            socket.off('table', onTable);
+            socket.off('table-opened', onOpened);
+            socket.disconnect();
+        };
+    }, [campId, queryClient]);
 }
