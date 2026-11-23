@@ -7,6 +7,7 @@ import { characterToCreature } from '@tenebris/rules/creature';
 import * as Scenes from '../models/sceneModel.js';
 import * as Monsters from '../models/monsterModel.js';   // for memberRole(campId, userId)
 import { getMonster } from '../models/monsterPack.js';
+import { tokenView, tellTable as sendTable } from './tableNews.js';
 import { loadSheetData } from './sheetController.js';
 import { creatureOfRow } from './apiMonsterController.js';
 
@@ -24,29 +25,8 @@ async function roleIn(req, res, campId) {
     return role;
 }
 
-// What the board needs about one token
-function tokenView(row) {
-    const monster = row.monster_id ? getMonster(row.monster_id) : null;
-    return {
-        id: row.id,
-        kind: row.kind,
-        q: row.q,
-        r: row.r,
-        ownerId: row.owner_id,
-        name: row.name ?? row.character_name ?? row.monster_nickname ?? monster?.name ?? 'Token',
-        portrait: row.character_portrait ?? null,
-    };
-}
-
-// Step 14: tell everyone at the table what changed, so their boards update without a reload. Goes to the campaign's
-// room (every member's table page joins it). Everyone gets the same picture for now; when line of sight arrives
-// (step 18) each player will need their own filtered copy instead.
-async function tellTable(req, campId, scene) {
-    const io = req.app.get('io');
-    if (!io || !scene) return;
-    const tokens = (await Scenes.listTokens(scene.id)).map(tokenView);
-    io.to(`campaign:${campId}`).emit('table', { sceneId: scene.id, terrain: scene.terrain, tokens });
-}
+// Step 14: tell everyone at the table what changed, so their boards update without a reload (tableNews.js).
+const tellTable = (req, campId, scene) => sendTable(req.app.get('io'), campId, scene);
 
 // The scene answer: the scene, its tokens, who's asking; for the DM also what they can place
 async function sceneAnswer(campId, role, userId, scene) {

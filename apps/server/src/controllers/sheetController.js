@@ -14,6 +14,7 @@ import * as Inventory from '../models/inventoryModel.js';
 import { getClassSlots, getLearnedSpells } from '../models/spellModel.js';
 import { sheetAccess } from '../models/sheetModel.js';
 import { loadSpellbook, changeSpellbook } from './apiSpellController.js';
+import { tellTablesAbout } from './tableNews.js';
 
 // Everything the old sheet request returned, read as the owner would see it.
 // The character comes first (it says who may see it and which role/level to use); the rest don't depend on
@@ -156,6 +157,7 @@ export async function rest(req, res) {
         used_slots: r.usedSlots, conditions: r.conditions, exhaustion: r.exhaustion, rest_uses: r.restUses,
     });
     res.json({ text: r.text, percent: r.percent });
+    await tellTablesAbout(req, { characterId: who.charId });
 }
 
 // POST /api/sheets/character/:id/cast   body: { actionKey, castLevel? }
@@ -235,6 +237,7 @@ export async function conditions(req, res) {
     const saved = await Characters.updateSheetState(who.charId, who.ownerId, next);
     if (!saved) return res.status(404).json({ error: 'Character not found' });
     res.json({ conditions: saved.conditions ?? {}, exhaustion: Number(saved.exhaustion ?? 0) });
+    await tellTablesAbout(req, { characterId: who.charId });
 }
 
 // POST /api/sheets/character/:id/hp   body: { action: 'heal' | 'damage', amount }
@@ -247,6 +250,7 @@ export async function hp(req, res) {
     const row = await Characters.changeHp(who.charId, who.ownerId, hpChange(checked.request));
     if (!row) return res.status(404).json({ error: 'Character not found' });
     res.json(row);
+    await tellTablesAbout(req, { characterId: who.charId });     // step 16: the token shows it at once
 }
 
 // POST /api/sheets/character/:id/temp-hp   body: { amount } (doesn't stack: keeps the higher) or { clear: true }
@@ -259,4 +263,5 @@ export async function tempHp(req, res) {
     const row = await Characters.setTempHp(who.charId, who.ownerId, checked.request.amount, checked.request.clear);
     if (!row) return res.status(404).json({ error: 'Character not found' });
     res.json(row);
+    await tellTablesAbout(req, { characterId: who.charId });
 }

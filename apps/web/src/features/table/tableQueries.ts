@@ -19,6 +19,9 @@ export type Token = {
     ownerId: number | null;     // null = the DM's
     name: string;
     portrait: string | null;
+    hp: { current: number; max: number; temp: number } | null;   // characters only
+    health: string | null;      // 'Unhurt' | 'Wounded' | 'Bloodied' | 'Near death' | 'Down' (monsters show only this)
+    conditions: string[];
 }
 
 // What the DM can put on the table (only sent to the DM)

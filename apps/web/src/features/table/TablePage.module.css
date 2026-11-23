@@ -60,6 +60,10 @@
 
 .label {
     pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.25;
     padding: 1px 6px;
     border-radius: 6px;
     background: rgba(0, 0, 0, 0.65);
@@ -67,5 +71,8 @@
     font-size: 12px;
     white-space: nowrap;
 }
+
+.labelName { font-size: 12px; }
+.labelDetails { font-size: 10px; opacity: 0.85; }
 
 .notice { padding: 24px; }
