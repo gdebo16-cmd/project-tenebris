@@ -20,10 +20,10 @@ export default function RestBlock({ canEdit, busy, onRest }: Props) {
             <h2 className={styles.title}>Rest</h2>
             <div className={styles.restLine}>
                 {!open ? (
-                    <button type="button" className={styles.button} disabled={busy} onClick={() => setOpen(true)}
-                    aria-label="Rest" title="Rest">
-                    <CampfireIcon size={28} />
-                </button>
+                    <button type="button" className={`${styles.button} ${styles.restButton}`} disabled={busy} onClick={() => setOpen(true)}
+                        aria-label="Rest" title="Rest">
+                        <CampfireIcon size={28} />
+                    </button>
                 ) : (
                     <div className={styles.rowButtons}>
                         <button type="button" className={`${styles.button} ${styles.primary}`} disabled={busy} onClick={() => rest('short')}>Short Rest</button>
