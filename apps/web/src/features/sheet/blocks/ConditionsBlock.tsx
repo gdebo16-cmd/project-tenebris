@@ -18,14 +18,17 @@ export default function ConditionsBlock({ creature, canEdit, onChange }: Props) 
         <section className={styles.block} aria-label="Conditions">
             <h2 className={styles.title}>Afflictions</h2>
             {shown.length === 0 && <span className={styles.muted}>None</span>}
-            <div className={styles.grid}>
-                {shown.map((name) => (
-                    <button key={name} type="button" disabled={!canEdit} aria-pressed={!!on[name]}
-                        className={`${styles.tile} ${on[name] ? styles.tileOn : ''}`}
-                        onClick={() => onChange({ conditions: { [name]: !on[name] } })}>
-                        <span className={styles.tileLabel}>{label(name)}</span>
-                    </button>
-                ))}
+            {/* the tile area: a size container, so the grid can pick its columns from the area's shape (CSS) */}
+            <div className={styles.gridArea}>
+                <div className={styles.grid}>
+                    {shown.map((name) => (
+                        <button key={name} type="button" disabled={!canEdit} aria-pressed={!!on[name]}
+                            className={`${styles.tile} ${on[name] ? styles.tileOn : ''}`}
+                            onClick={() => onChange({ conditions: { [name]: !on[name] } })}>
+                            <span className={styles.tileLabel}>{label(name)}</span>
+                        </button>
+                    ))}
+                </div>
             </div>
             <div className={`${styles.exhaustion} ${creature.exhaustion > 0 ? styles.tileOn : ''}`}>
                 {canEdit && (

@@ -38,10 +38,17 @@
     line-height: 1.1;
 }
 
-.grid {
-    display: grid;
+/* The tile area under the title: takes the rest of the block and is a size container ("tiles"), so the
+   grid below can choose its columns from the area's shape: aspect-ratio = width / height. */
+.gridArea {
     flex: 1;
     min-height: 0;
+    container: tiles / size;
+}
+
+.grid {
+    display: grid;
+    height: 100%;
     grid-auto-rows: minmax(0, 1fr);   /* the rows share the height evenly */
     grid-template-columns: repeat(4, minmax(0, 1fr));   /* minmax(0, …): a long name can't push its column wider */
     gap: 6px;
@@ -55,7 +62,7 @@
     align-items: center;
     min-width: 0;
     min-height: 40px;
-    padding: 6px 2px;
+    padding: 2px;   /* the tile stretches to fill, so its content just sits centred: no room lost to padding on a short tile */
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--border, #b27f50);
@@ -78,6 +85,7 @@
 }
 
 .tileLabel {
+    line-height: 1.15;
     max-width: 100%;
     font-size: clamp(9px, min(16cqw, 40cqh), 24px);
     white-space: nowrap;
@@ -86,7 +94,7 @@
 }
 
 .tileValue {
-    font-size: clamp(14px, min(30cqw, 36cqh), 56px);
+    font-size: clamp(12px, min(30cqw, 36cqh), 56px);
     line-height: 1.1;
     font-weight: 700;
 }
@@ -129,3 +137,11 @@
 }
 
 .step:disabled { opacity: 0.4; cursor: default; }
+
+/* Columns follow the tile area's shape, so the tiles stay a good shape (a bit wider than tall).
+   12 afflictions: 4 × 3 by default (above). Later rules win, so "very wide" comes after "wide". */
+@container tiles (aspect-ratio > 2.6) { .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }   /* wide: 6 × 2 */
+@container tiles (aspect-ratio > 7.8) { .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); } }   /* very wide: 12 × 1 */
+@container tiles (aspect-ratio < 1.3) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }   /* tall: 3 × 4 */
+@container tiles (aspect-ratio < 0.65) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }   /* taller: 2 × 6 */
+@container tiles (aspect-ratio < 0.22) { .grid { grid-template-columns: repeat(1, minmax(0, 1fr)); } }   /* very tall: 1 × 12 */
