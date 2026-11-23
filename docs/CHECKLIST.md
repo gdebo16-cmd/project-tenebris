@@ -31,6 +31,7 @@ Example: `- [x] **R1** TypeScript setup — ✓ 2026-11-19 · owner + Claude · 
 Switch over — **only after Gate 1, and ask the owner before each one (touches production):**
 
 - [x] **0.11** Back up first (Neon branch `pre-cutover-<date>` from `production`) — ✓ 2026-11-22 · Claude · Neon branch `pre-cutover-20261122` (no commit: a database copy)
+
 > > > > > > > b460d628ef2e657b088eefd084acb6c6b0af54b4
 
 - [ ] **0.12** Point the new service at production
@@ -66,7 +67,7 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 ## Stage 2 — The 2D hex table
 
 - [x] **8** Write the table rules — Done when: every table action has an owner and an intent name  — ✓ 2026-11-22 · Gabe
-- [ ] **9** Add scenes and tokens — Done when: the migration runs locally and on a Neon branch
+- [x] **9** Add scenes and tokens — Done when: the migration runs locally and on a Neon branch  — ✓ 2026-11-22 · Gabe
 - [ ] **10** Write the hex math in `packages/rules` — Done when: tests cover distance, neighbors and a path around a wall
 - [ ] **11** Build the table shell — Done when: map and hexes line up at every zoom level
 - [ ] **12** Build the hex terrain editor — Done when: a painted map reloads exactly as painted
