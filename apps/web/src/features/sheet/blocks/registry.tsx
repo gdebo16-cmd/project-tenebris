@@ -36,6 +36,7 @@ export type BlockDef = {
     show?: (tools: SheetTools) => boolean;   // e.g. the roll feed only for the DM on a character sheet
     note?: string;                           // shown in the layout editor
     scrolls?: true;                          // a growing list (actions, spells...): never shrunk to fit; what doesn't fit scrolls
+    fills?: true;                            // a grid of tiles that stretches to fill the block (its CSS does it): not zoomed
     Component: (props: { layout: SheetLayout }) => JSX.Element | null;
 };
 
@@ -56,28 +57,28 @@ export const BLOCKS = {
         },
     },
     core: {
-        label: 'Armor, speed, initiative', sheets: ['character', 'monster'], phoneTab: 'combat',
+        label: 'Armor, speed, initiative', fills: true, sheets: ['character', 'monster'], phoneTab: 'combat',
         Component: () => {
             const t = useSheetTools();
             return <CoreStatsBlock creature={t.creature} canEdit={t.canEdit} onAct={t.act} />;
         },
     },
     stats: {
-        label: 'Stats', sheets: ['character', 'monster'], phoneTab: 'stats',
+        label: 'Stats', fills: true, sheets: ['character', 'monster'], phoneTab: 'stats',
         Component: () => {
             const t = useSheetTools();
             return <StatsBlock creature={t.creature} canEdit={t.canEdit} onAct={t.act} />;
         },
     },
     skills: {
-        label: 'Skills', sheets: ['character', 'monster'], phoneTab: 'stats',
+        label: 'Skills', fills: true, sheets: ['character', 'monster'], phoneTab: 'stats',
         Component: () => {
             const t = useSheetTools();
             return <SkillsBlock creature={t.creature} canEdit={t.canEdit} onAct={t.act} />;
         },
     },
     conditions: {
-        label: 'Conditions', sheets: ['character', 'monster'], phoneTab: 'condition',
+        label: 'Conditions', fills: true, sheets: ['character', 'monster'], phoneTab: 'condition',
         Component: () => {
             const t = useSheetTools();
             return <ConditionsBlock creature={t.creature} canEdit={t.canEdit} onChange={t.setConditions} />;
