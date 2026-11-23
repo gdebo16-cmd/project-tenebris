@@ -1,0 +1,13 @@
+.rollButton {
+    position: fixed;
+    bottom: 2.5dvh;
+    right: 2.5dvw;
+    z-index: 1;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border, #b27f50);
+    background: color-mix(in srgb, var(--background-color, #141414) 88%, transparent);
+    color: var(--text, #eee);
+    font-size: 13px;
+    cursor: pointer;
+}
