@@ -66,8 +66,8 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 
 ## Stage 2 — The 2D hex table
 
-- [x] **8** Write the table rules — Done when: every table action has an owner and an intent name  — ✓ 2026-11-22 · Gabe
-- [x] **9** Add scenes and tokens — Done when: the migration runs locally and on a Neon branch  — ✓ 2026-11-22 · Gabe
+- [x] **8** Write the table rules — Done when: every table action has an owner and an intent name  — ✓ 2026-11-22 · Gabe ab3164c
+- [x] **9** Add scenes and tokens — Done when: the migration runs locally and on a Neon branch  — ✓ 2026-11-22 · Gabe 95a7bd9
 - [ ] **10** Write the hex math in `packages/rules` — Done when: tests cover distance, neighbors and a path around a wall
 - [ ] **11** Build the table shell — Done when: map and hexes line up at every zoom level
 - [ ] **12** Build the hex terrain editor — Done when: a painted map reloads exactly as painted
