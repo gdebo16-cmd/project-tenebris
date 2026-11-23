@@ -35,6 +35,7 @@ export type BlockDef = {
     phoneTab: PhoneTab | null;
     show?: (tools: SheetTools) => boolean;   // e.g. the roll feed only for the DM on a character sheet
     note?: string;                           // shown in the layout editor
+    scrolls?: true;                          // a growing list (actions, spells...): never shrunk to fit; what doesn't fit scrolls
     Component: (props: { layout: SheetLayout }) => JSX.Element | null;
 };
 
@@ -91,7 +92,7 @@ export const BLOCKS = {
     },
     // The tab group (L6): its tabs are chosen in the layout
     actionPanel: {
-        label: 'Action panel (tabs)', sheets: ['character'], phoneTab: 'combat',
+        label: 'Action panel (tabs)', scrolls: true, sheets: ['character'], phoneTab: 'combat',
         Component: ({ layout }) => {
             const t = useSheetTools();
             return <ActionPanel creature={t.creature} canEdit={t.canEdit} id={t.id} onAct={t.act} onNote={t.note} onDo={t.run} tabs={panelTabsOf(layout)} />;
@@ -99,7 +100,7 @@ export const BLOCKS = {
     },
     // The panel's tabs as blocks of their own, to place outside the panel (L6)
     actions: {
-        label: 'Actions', sheets: ['character', 'monster'], phoneTab: 'combat',
+        label: 'Actions', scrolls: true, sheets: ['character', 'monster'], phoneTab: 'combat',
         Component: () => {
             const t = useSheetTools();
             return t.kind === 'character'
@@ -109,7 +110,7 @@ export const BLOCKS = {
         },
     },
     spells: {
-        label: 'Spells and spell book', sheets: ['character'], phoneTab: 'combat',
+        label: 'Spells and spell book', scrolls: true, sheets: ['character'], phoneTab: 'combat',
         Component: () => {
             const t = useSheetTools();
             return (
@@ -121,7 +122,7 @@ export const BLOCKS = {
         },
     },
     gear: {
-        label: 'Money and gear', sheets: ['character'], phoneTab: 'combat',
+        label: 'Money and gear', scrolls: true, sheets: ['character'], phoneTab: 'combat',
         Component: () => {
             const t = useSheetTools();
             return (
@@ -133,21 +134,21 @@ export const BLOCKS = {
         },
     },
     features: {
-        label: 'Features', sheets: ['character', 'monster'], phoneTab: 'combat',
+        label: 'Features', scrolls: true, sheets: ['character', 'monster'], phoneTab: 'combat',
         Component: () => {
             const t = useSheetTools();
             return <FeaturesBlock creature={t.creature} canEdit={t.kind === 'character' && t.canEdit} onUse={t.kind === 'character' ? featureUser(t) : noop} />;
         },
     },
     traits: {
-        label: 'Traits and notes', sheets: ['monster'], phoneTab: 'stats',
+        label: 'Traits and notes', scrolls: true, sheets: ['monster'], phoneTab: 'stats',
         Component: () => {
             const t = useSheetTools();
             return <TraitsBlock creature={t.creature} canEdit={t.canEdit} saving={t.savingNotes} onSaveNotes={t.saveNotes} />;
         },
     },
     rollFeed: {
-        label: 'Roll feed', sheets: ['character', 'monster'], phoneTab: 'combat', note: 'on a character sheet only the DM sees it',
+        label: 'Roll feed', scrolls: true, sheets: ['character', 'monster'], phoneTab: 'combat', note: 'on a character sheet only the DM sees it',
         show: (t) => t.kind === 'monster' || t.access === 'dm',
         Component: () => <RollFeed entries={useSheetTools().feed} />,
     },

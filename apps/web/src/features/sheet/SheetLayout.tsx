@@ -22,13 +22,16 @@ type Result = { error: string } | { layout: Layout };
 const place = (s: Spot) => ({ '--col': `${s.col} / span ${s.colSpan}`, '--row': `${s.row} / span ${s.rowSpan}`, '--row-span': s.rowSpan }) as CSSProperties;
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 
-// Scales a block's content up to fill its box when the content is smaller than the box (never down: what doesn't fit
-// scrolls). Uses CSS zoom, so the content reflows at the larger size instead of being stretched. Re-fits when the box
-// changes size (window, layout) or the content changes (a roll, a new item).
+// Scales a block's content to fill its box: up when the content is smaller, down when it's bigger, so the block's
+// content grows and shrinks with the block. Uses CSS zoom, so the content reflows at the new size instead of being
+// stretched. Re-fits when the box changes size (window, layout, resizing in the editor) or the content changes.
+// Blocks marked `scrolls` (growing lists: actions, spells...) only scale up; what doesn't fit scrolls out of sight.
+// So do all blocks on a phone, where text shrunk to fit would be too small to read. Below MIN_ZOOM, a block scrolls too.
 // "Fits" means two things: the content is no taller than the box, and nothing inside spills sideways
 // (a stat label wider than its tile, a row of buttons wider than the block). A tall, narrow block stops growing
 // as soon as its widest piece reaches the edge.
 const MAX_ZOOM = 1.6;
+const MIN_ZOOM = 0.5;
 
 // Pictures and form fields hold nothing that could spill (and images report odd widths), so they're skipped
 const NO_CONTENT = new Set(['IMG', 'INPUT', 'SELECT', 'TEXTAREA', 'VIDEO', 'CANVAS']);
@@ -42,7 +45,7 @@ function spillsSideways(el: HTMLElement) {
     return false;
 }
 
-function Fit({ children }: { children: ReactNode }) {
+function Fit({ children, shrink }: { children: ReactNode; shrink: boolean }) {
     const ref = useRef<HTMLDivElement>(null);
     useLayoutEffect(() => {
         const el = ref.current;
@@ -65,6 +68,16 @@ function Fit({ children }: { children: ReactNode }) {
                     if (fits()) lo = mid; else hi = mid;
                 }
                 zoom = lo;
+            } else if (shrink && isWideScreen() && !fits()) {
+                // Too big at full size: the largest zoom, down to MIN_ZOOM, at which it fits
+                // (still too big at MIN_ZOOM? it stays there and the rest scrolls)
+                let lo = MIN_ZOOM, hi = 1;
+                for (let i = 0; i < 7; i++) {
+                    const mid = (lo + hi) / 2;
+                    el.style.zoom = String(mid);
+                    if (fits()) lo = mid; else hi = mid;
+                }
+                zoom = lo;
             }
             el.style.zoom = String(zoom);
             el.style.minHeight = `${room / zoom}px`;   // the block's own box still fills the whole cell area
@@ -76,7 +89,7 @@ function Fit({ children }: { children: ReactNode }) {
         const changed = new MutationObserver(later);
         changed.observe(el, { childList: true, subtree: true, characterData: true });
         return () => { resized.disconnect(); changed.disconnect(); cancelAnimationFrame(frame); };
-    }, []);
+    }, [shrink]);
     return <div ref={ref} className={css.fit}>{children}</div>;
 }
 
@@ -208,25 +221,28 @@ export default function SheetLayout() {
                             <Fragment key={id}>
                                 {i === tabBarAt && tabBar}
                                 <div className={hiddenOnPhone ? css.itemPhoneHidden : css.item} style={place(item)} data-block={id}>
-                                    <Fit><Block layout={layout} /></Fit>
+                                    <Fit shrink={!def.scrolls}><Block layout={layout} /></Fit>
                                 </div>
                             </Fragment>
                         );
                     }
                     const dragging = drag?.block === id;
                     return (
+                        // The whole block is the handle: drag it anywhere to move it. Its name, size and × float on top
+                        // (shown on hover or focus) without taking any room, so the preview looks like the real block.
                         <div key={id} className={dragging ? `${css.itemEditing} ${css.itemDragging}` : css.itemEditing} style={place(item)} data-block={id}
                             tabIndex={0} role="group" onKeyDown={(e) => onKey(e, id)}
+                            onPointerDown={(e) => startDrag(e, item, 'move')} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={() => setDrag(null)}
                             aria-label={`${def.label}. Drag or use the arrow keys to move it, Shift and arrows to resize it, Delete to hide it.`}>
-                            <div className={css.handle} onPointerDown={(e) => startDrag(e, item, 'move')} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={() => setDrag(null)}>
-                                <span className={css.handleName}>{def.label}</span>
-                                <span className={css.handleSize}>{item.colSpan}×{item.rowSpan}</span>
-                                <button type="button" className={css.hide} aria-label={`Hide ${def.label}`} title="Hide"
-                                    onPointerDown={(e) => e.stopPropagation()} onClick={() => change({ layout: removeBlock(layout, id) })}>×</button>
-                            </div>
                             {/* A preview: nothing inside can be clicked while arranging */}
                             <div className={css.preview} inert>
-                                <Fit>{visible ? <Block layout={layout} /> : <p className={shared.muted}>{def.label}: {def.note}</p>}</Fit>
+                                <Fit shrink={!def.scrolls}>{visible ? <Block layout={layout} /> : <p className={shared.muted}>{def.label}: {def.note}</p>}</Fit>
+                            </div>
+                            <div className={css.tag}>
+                                <span className={css.tagName}>{def.label}</span>
+                                <span className={css.tagSize}>{item.colSpan}×{item.rowSpan}</span>
+                                <button type="button" className={css.hide} aria-label={`Hide ${def.label}`} title="Hide"
+                                    onPointerDown={(e) => e.stopPropagation()} onClick={() => change({ layout: removeBlock(layout, id) })}>×</button>
                             </div>
                             <div className={css.resize} aria-hidden="true" title="Drag to resize"
                                 onPointerDown={(e) => startDrag(e, item, 'resize')} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={() => setDrag(null)} />
