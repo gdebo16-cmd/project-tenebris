@@ -8,6 +8,7 @@ import { checkConditionsRequest, applyConditions } from '@tenebris/rules/sheetSt
 import * as Monsters from '../models/monsterModel.js';
 import { getMonster, listMonsters } from '../models/monsterPack.js';
 import { rng } from '../dice.js';
+import { tellTablesAbout } from './tableNews.js';
 
 const notLoggedIn = (res) => res.status(401).json({ error: 'Not logged in' });
 
@@ -121,6 +122,7 @@ export async function hp(req, res) {
     const next = applyMonsterHp({ current_hp: who.creature.hp.current, temp_hp: who.creature.hp.temp }, who.creature.hp.max, checked.request);
     const row = await Monsters.saveState(who.row.id, next);
     res.json({ current_hp: row.current_hp, temp_hp: row.temp_hp });
+    await tellTablesAbout(req, { campaignMonsterId: who.row.id });     // step 16: the token shows it at once
 }
 
 // POST /api/sheets/monster/:id/temp-hp   body: { amount } or { clear: true }   (DM)
@@ -131,6 +133,7 @@ export async function tempHp(req, res) {
     if ('error' in checked) return res.status(400).json({ error: checked.error });
     const row = await Monsters.saveState(who.row.id, applyMonsterTempHp({ current_hp: who.creature.hp.current, temp_hp: who.creature.hp.temp }, checked.request));
     res.json({ temp_hp: row.temp_hp });
+    await tellTablesAbout(req, { campaignMonsterId: who.row.id });
 }
 
 // POST /api/sheets/monster/:id/conditions   body: { conditions?, exhaustion? }   (DM)
@@ -142,6 +145,7 @@ export async function conditions(req, res) {
     const next = applyConditions({ conditions: who.creature.conditions, exhaustion: who.creature.exhaustion }, checked.request);
     const row = await Monsters.saveState(who.row.id, next);
     res.json({ conditions: row.conditions ?? {}, exhaustion: Number(row.exhaustion ?? 0) });
+    await tellTablesAbout(req, { campaignMonsterId: who.row.id });
 }
 
 // PUT /api/sheets/monster/:id/notes   body: { notes }   (DM)

@@ -10,7 +10,7 @@ import { Html, MapControls, useTexture } from '@react-three/drei'
 import { type Hex, hexKey, hexesWithin, TERRAIN_KINDS, type TerrainKind } from '@tenebris/rules/hex'
 import { ApiError } from '../../api.ts'
 import {
-    useScene, usePaint, usePlaceToken, useMoveToken, useRemoveToken,
+    useScene, usePaint, usePlaceToken, useMoveToken, useRemoveToken, useTableSync,
     type PlaceRequest, type SceneData, type Token,
 } from './tableQueries.ts'
 import styles from './TablePage.module.css'
@@ -35,7 +35,7 @@ const TERRAIN_COLORS: Record<string, string> = {
 }
 
 // Token colours: yours, another player's, a monster (the DM's), a summon
-const TOKEN_COLORS = { mine: '#3fae6a', player: '#4d8fe0', monster: '#d0503c', summon: '#e0a63b' };
+const TOKEN_COLORS = { mine: '#3fae6a', player: '#4d8fe0', monster: '#d0503c', summon: '#e0a63b', down: '#5a5a5a' };
 
 function MapImage() {
     const texture = useTexture('/topdowncabin.webp');
@@ -68,6 +68,7 @@ export default function TablePage() {
     const place = usePlaceToken(campId);
     const move = useMoveToken(campId);
     const remove = useRemoveToken(campId);
+    useTableSync(campId);                       // other people's paints and moves appear here as they happen
 
     const [tool, setTool] = useState<Tool>({ type: 'move' });
     const [selected, setSelected] = useState<number | null>(null);    // the token about to move
@@ -168,9 +169,14 @@ function TokenPiece({ token, mine, selected, labels, onClick }: {
     onClick: (e: ThreeEvent<MouseEvent>) => void;
 }) {
     const [x, , z] = hexToWorld(token, 1);
-    const color = token.kind === 'monster' ? TOKEN_COLORS.monster
+    const down = token.health === 'Down';
+    const color = down ? TOKEN_COLORS.down
+        : token.kind === 'monster' ? TOKEN_COLORS.monster
         : token.kind === 'summon' ? TOKEN_COLORS.summon
         : mine ? TOKEN_COLORS.mine : TOKEN_COLORS.player;
+    // under the name: a character's HP, a monster's health word (players never see its numbers), and conditions
+    const health = token.hp ? `${token.hp.current}/${token.hp.max}${token.hp.temp > 0 ? ` +${token.hp.temp}` : ''}` : token.health;
+    const details = [health, ...token.conditions].filter(Boolean).join(' · ');
     return (
         <group position={[x, 0.1, z]}>
             {selected && (
@@ -186,7 +192,8 @@ function TokenPiece({ token, mine, selected, labels, onClick }: {
             {/* the name sits just above the token on screen (towards -z), so the token itself stays clickable */}
             <Html position={[0, 0.4, -0.85]} center className={styles.label} wrapperClass={styles.labelWrap}
                 pointerEvents="none" portal={labels as RefObject<HTMLElement>}>
-                {token.name}
+                <span className={styles.labelName}>{token.name}</span>
+                {details && <span className={styles.labelDetails}>{details}</span>}
             </Html>
         </group>
     );
