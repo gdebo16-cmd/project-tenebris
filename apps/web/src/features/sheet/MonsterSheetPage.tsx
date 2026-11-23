@@ -3,20 +3,16 @@
 // glimpse: name, type, a health word and its conditions. Every roll happens on the server.
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import type { ActRequest } from '@tenebris/rules/actions';
 import type { MonsterGlimpse } from '@tenebris/rules/monster';
-import { ApiError } from '../../api.ts';
 import Loader from '../../components/Loader.jsx';
 import socket from '../../utils/socket.js';
 import styles from './Sheet.module.css';
 import layout from './CharacterSheetPage.module.css'; // the sheet pages' header, footer and sheet area
 import useHeaderStatusBar from '../../hooks/useHeaderStatusBar.ts';
-import { useMonsterAct, useMonsterChange, useMonsterSheet } from './monsterQueries.ts';
+import { messageOf, useMonsterSheetTools, type Reporter } from './sheetTools.ts';
 import type { FeedEntry } from './blocks/RollFeed.tsx';
 import SheetLayout from './SheetLayout.tsx';
-import { SheetContext, type SheetTools } from './blocks/SheetContext.tsx';
-
-const messageOf = (err: unknown) => (err instanceof ApiError || err instanceof Error ? err.message : 'Something went wrong');
+import { SheetContext } from './blocks/SheetContext.tsx';
 
 // What a player sees of a monster
 function Glimpse({ glimpse }: { glimpse: MonsterGlimpse }) {
@@ -45,17 +41,17 @@ function Glimpse({ glimpse }: { glimpse: MonsterGlimpse }) {
 
 export default function MonsterSheetPage() {
     const { id = '' } = useParams();
-    const sheet = useMonsterSheet(id);
-    const act = useMonsterAct(id);
-    const change = useMonsterChange(id);
     const [feed, setFeed] = useState<FeedEntry[]>([]);
     const nextId = useRef(1);
+    const addToFeed = (who: string, text: string) =>
+        setFeed((old) => [{ id: nextId.current++, who, text }, ...old].slice(0, 20));
+
+    // Everything the blocks may need (sheetTools.ts); this monster's rolls go straight into its feed
+    const report: Reporter = { done: (text) => addToFeed('You', text), failed: (text) => addToFeed('You', text), note: (text) => addToFeed('You', text), feed };
+    const { tools, sheet } = useMonsterSheetTools(id, report);
     const campaignId = sheet.data && 'creature' in sheet.data ? sheet.data.creature.monster?.campaignId : undefined;
 
     useHeaderStatusBar(); // the phone's status bar matches the header
-
-    const addToFeed = (who: string, text: string) =>
-        setFeed((old) => [{ id: nextId.current++, who, text }, ...old].slice(0, 20));
 
     // The campaign's rolls: players' rolls, and (for the DM) the other monsters' rolls.
     // This monster's own rolls are already added when the server answers, so they're skipped here.
@@ -77,36 +73,10 @@ export default function MonsterSheetPage() {
         };
     }, [campaignId, id]);
 
-    const onAct = (request: ActRequest) => {
-        act.mutateAsync(request).then((r) => addToFeed('You', r.text), (err) => addToFeed('You', `Roll failed: ${messageOf(err)}`));
-    };
-
     if (sheet.isPending) return <Loader />;
     if (sheet.error) return <p className={styles.error} role="alert">{messageOf(sheet.error)}</p>;
     if (!('creature' in sheet.data)) return <Glimpse glimpse={sheet.data.glimpse} />;
-
-    const { creature, canEdit } = sheet.data;
-    const changeError = [change.hp.error, change.tempHp.error, change.conditions.error, change.notes.error].find(Boolean);
-
-    // Everything the blocks may need (blocks/SheetContext.tsx). Monsters have no casting, features or rests to run.
-    const tools: SheetTools = {
-        kind: 'monster',
-        id,
-        creature,
-        canEdit,
-        access: 'dm',
-        act: onAct,
-        note: (text) => addToFeed('You', text),
-        run: () => {},
-        busy: false,
-        hp: (action, amount) => change.hp.mutate({ action, amount }),
-        ward: (amount) => change.tempHp.mutate(amount),
-        setConditions: (body) => change.conditions.mutate(body),
-        saveNotes: (notes) => change.notes.mutate(notes),
-        savingNotes: change.notes.isPending,
-        changeError: changeError ? messageOf(changeError) : undefined,
-        feed,
-    };
+    if (!tools) return null;
 
     return (
         <SheetContext.Provider value={tools}>

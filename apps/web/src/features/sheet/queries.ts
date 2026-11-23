@@ -9,8 +9,9 @@ export type SheetResponse = { creature: Creature; canEdit: boolean; access: 'own
 
 const sheetKey = (id: string) => ['sheet', 'character', id];
 
-export function useSheet(id: string) {
-    return useQuery({ queryKey: sheetKey(id), queryFn: () => api<SheetResponse>(`/api/sheets/character/${id}`) });
+// enabled = false: no request (the DM page has no current player yet)
+export function useSheet(id: string, enabled = true) {
+    return useQuery({ queryKey: sheetKey(id), queryFn: () => api<SheetResponse>(`/api/sheets/character/${id}`), enabled });
 }
 
 // Ask the server to resolve one action. It answers the roll-feed text.
