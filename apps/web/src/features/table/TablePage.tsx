@@ -3,10 +3,10 @@
 // the board only asks and shows the answer.
 //
 // Tools: everyone can Move (click your token, then a hex). The DM also gets the terrain brushes, Place and Remove.
-import { Suspense, useRef, useState, type RefObject } from 'react'
+import { Suspense, useRef, useState, type RefObject, useEffect } from 'react'
 import { useParams } from 'react-router'
-import { Canvas, type ThreeEvent } from '@react-three/fiber'
-import { Html, MapControls, useTexture } from '@react-three/drei'
+import { Canvas, type ThreeEvent, useThree } from '@react-three/fiber'
+import { Html, OrbitControls, MapControls, useTexture } from '@react-three/drei'
 import { type Hex, hexKey, hexesWithin, TERRAIN_KINDS, type TerrainKind } from '@tenebris/rules/hex'
 import { ApiError } from '../../api.ts'
 import {
@@ -38,7 +38,7 @@ const TERRAIN_COLORS: Record<string, string> = {
 const TOKEN_COLORS = { mine: '#3fae6a', player: '#4d8fe0', monster: '#d0503c', summon: '#e0a63b' };
 
 function MapImage() {
-    const texture = useTexture('/topdowncabin.webp');
+     const texture = useTexture('/topdowncabin.webp');
     const height = 20 * ((texture.image as HTMLImageElement).height / (texture.image as HTMLImageElement).width);
     return (
         <mesh rotation={[-Math.PI/2, 0, 0]} position={[0, -0.11, 0]}>
@@ -59,6 +59,16 @@ const wasDrag = (e: ThreeEvent<MouseEvent>) => e.delta > 4;
 
 const messageOf = (err: unknown) => (err instanceof ApiError || err instanceof Error ? err.message : 'Something went wrong');
 
+function TopDownCamera({ on }: { on: boolean }) {
+    const camera = useThree((s) => s.camera);
+    useEffect(() => {
+        if (!on) return;
+        camera.position.set(camera.position.x, 10, camera.position.z);   // straight above where you are
+        camera.lookAt(camera.position.x, 0, camera.position.z);
+    }, [on, camera]);
+    return null;
+}
+
 export default function TablePage() {
     const hexes = hexesWithin({ q: 0, r: 0 }, GRID_RADIUS);
     const { campId = '' } = useParams();
@@ -68,6 +78,7 @@ export default function TablePage() {
     const place = usePlaceToken(campId);
     const move = useMoveToken(campId);
     const remove = useRemoveToken(campId);
+    const [view, setView] = useState<'top' | 'orbit'>('top');
 
     const [tool, setTool] = useState<Tool>({ type: 'move' });
     const [selected, setSelected] = useState<number | null>(null);    // the token about to move
@@ -123,6 +134,8 @@ export default function TablePage() {
     if (error) return <p className={styles.notice} role="alert">{messageOf(error)}</p>;
     if (data && !data.scene) return <p className={styles.notice}>The DM hasn't opened the table yet.</p>;
 
+
+
     return (
         <div className={styles.board} ref={boardRef}>
             <Toolbar
@@ -136,19 +149,23 @@ export default function TablePage() {
                 onRemove={() => selectedToken && remove.mutate(selectedToken.id, { onSuccess: () => { setSelected(null); setMessage(''); }, onError: (err) => setMessage(messageOf(err)) })}
                 message={message}
             />
+            <button type="button" className={styles.viewButton} onClick={() => setView(view === 'top' ? 'orbit' : 'top')}>
+                {view === 'top' ? 'Tilt view' : 'Top-down'}
+            </button>
+
             <Canvas orthographic camera={{ position: [0, 10, 0], zoom: startZoom() }}>
                 <ambientLight intensity={1.2} />
-                <directionalLight position={[5, 10, 5]} intensity={0.8} />
-                <Suspense fallback={null}>
+                <directionalLight position={[5, 10, 5]} intensity={1} />
+  {/*               <Suspense fallback={null}>
                     <MapImage />
-                </Suspense>
+                </Suspense> */}
                 {hexes.map((hex) => (
                     <mesh key={hexKey(hex)} position={hexToWorld(hex, 1)} rotation={[0, Math.PI/6, 0]} onClick={(e) => clickHex(hex, e)}>
                         <cylinderGeometry args={[.99, .99, 0.2, 6]} />
                         <meshStandardMaterial
-                            color={TERRAIN_COLORS[terrain[hexKey(hex)]] ?? '#7f77dd'}
+                            color={TERRAIN_COLORS[terrain[hexKey(hex)]] ?? '#0b4225'}
                             transparent
-                            opacity={terrain[hexKey(hex)] ? 0.9 : 0.25}     // open ground lets the map show through
+                            opacity={terrain[hexKey(hex)] ? 0.9 : 1}     // open ground lets the map show through
                         />
                     </mesh>
                 ))}
@@ -156,7 +173,11 @@ export default function TablePage() {
                     <TokenPiece key={token.id} token={token} mine={token.ownerId === data?.userId} labels={boardRef}
                         selected={token.id === selected} onClick={(e) => clickToken(token, e)} />
                 ))}
-                <MapControls enableRotate={false} />
+                
+                {view === 'top'
+                    ? <MapControls enableRotate={false} />
+                    : <OrbitControls maxPolarAngle={Math.PI / 2.2} />}
+                <TopDownCamera on={view === 'top'} />
             </Canvas>
         </div>
     );

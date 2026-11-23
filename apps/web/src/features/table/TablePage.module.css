@@ -6,9 +6,9 @@
 }
 
 .toolbar {
-    position: absolute;
-    top: 12px;
-    left: 12px;
+    position: fixed;
+    bottom: 2.5dvh;
+    right: 2.5dvw;
     z-index: 1;
     display: flex;
     flex-direction: column;
@@ -38,7 +38,7 @@
 .toolOn {
     border-color: var(--accent, #d4af37);
     background: var(--accent, #d4af37);
-    color: var(--bg, #0d042c);
+    color: var(--bg, #0b4225);
 }
 
 .field {
@@ -69,3 +69,17 @@
 }
 
 .notice { padding: 24px; }
+
+.viewButton {
+    position: fixed;
+    top: 2.5dvh;
+    right: 8vw;
+    z-index: 1;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border, #b27f50);
+    background: color-mix(in srgb, var(--background-color, #141414) 88%, transparent);
+    color: var(--text, #eee);
+    font-size: 13px;
+    cursor: pointer;
+}
