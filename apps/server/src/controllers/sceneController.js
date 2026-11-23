@@ -38,6 +38,16 @@ function tokenView(row) {
     };
 }
 
+// Step 14: tell everyone at the table what changed, so their boards update without a reload. Goes to the campaign's
+// room (every member's table page joins it). Everyone gets the same picture for now; when line of sight arrives
+// (step 18) each player will need their own filtered copy instead.
+async function tellTable(req, campId, scene) {
+    const io = req.app.get('io');
+    if (!io || !scene) return;
+    const tokens = (await Scenes.listTokens(scene.id)).map(tokenView);
+    io.to(`campaign:${campId}`).emit('table', { sceneId: scene.id, terrain: scene.terrain, tokens });
+}
+
 // The scene answer: the scene, its tokens, who's asking; for the DM also what they can place
 async function sceneAnswer(campId, role, userId, scene) {
     const answer = { scene, isDm: role === 'dm', userId, tokens: [] };
@@ -62,6 +72,7 @@ export async function getActiveScene(req, res) {
     let scene = await Scenes.activeScene(campId);
     if (!scene && role === 'dm') {
         scene = await Scenes.createActiveScene(campId, 'Scene 1');
+        req.app.get('io')?.to(`campaign:${campId}`).emit('table-opened', { sceneId: scene.id });
     }
     res.json(await sceneAnswer(campId, role, req.session.userId, scene));
 }
@@ -83,6 +94,7 @@ export async function paint(req, res) {
     else scene.terrain[key] = terrain;
     await Scenes.saveTerrain(scene.id, scene.terrain);
     res.json(scene.terrain);
+    await tellTable(req, scene.campaign_id, scene);
 }
 
 // POST /api/scenes/:id/tokens  body { kind, characterId?, campaignMonsterId?, name?, ownerId?, q, r }  -> the scene answer
@@ -133,6 +145,7 @@ export async function placeToken(req, res) {
         throw err;
     }
     res.json(await sceneAnswer(scene.campaign_id, role, req.session.userId, scene));
+    await tellTable(req, scene.campaign_id, scene);
 }
 
 // How many hexes a token may walk in one move: its speed (feet) / 5
@@ -182,6 +195,7 @@ export async function moveToken(req, res) {
     }
     const scene = await Scenes.getScene(token.scene_id);
     res.json(await sceneAnswer(token.campaign_id, role, req.session.userId, scene));
+    await tellTable(req, token.campaign_id, scene);
 }
 
 // DELETE /api/tokens/:id  -> the scene answer.  token.remove: DM only.
@@ -194,4 +208,5 @@ export async function removeToken(req, res) {
     await Scenes.removeToken(token.id);
     const scene = await Scenes.getScene(token.scene_id);
     res.json(await sceneAnswer(token.campaign_id, role, req.session.userId, scene));
+    await tellTable(req, token.campaign_id, scene);
 }

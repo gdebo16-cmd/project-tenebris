@@ -10,7 +10,7 @@ import { Html, MapControls, useTexture } from '@react-three/drei'
 import { type Hex, hexKey, hexesWithin, TERRAIN_KINDS, type TerrainKind } from '@tenebris/rules/hex'
 import { ApiError } from '../../api.ts'
 import {
-    useScene, usePaint, usePlaceToken, useMoveToken, useRemoveToken,
+    useScene, usePaint, usePlaceToken, useMoveToken, useRemoveToken, useTableSync,
     type PlaceRequest, type SceneData, type Token,
 } from './tableQueries.ts'
 import styles from './TablePage.module.css'
@@ -68,6 +68,7 @@ export default function TablePage() {
     const place = usePlaceToken(campId);
     const move = useMoveToken(campId);
     const remove = useRemoveToken(campId);
+    useTableSync(campId);                       // other people's paints and moves appear here as they happen
 
     const [tool, setTool] = useState<Tool>({ type: 'move' });
     const [selected, setSelected] = useState<number | null>(null);    // the token about to move
