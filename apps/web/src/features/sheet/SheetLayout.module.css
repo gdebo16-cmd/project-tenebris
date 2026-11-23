@@ -130,31 +130,48 @@
     outline: 2px solid var(--accent, #d4af37);
     background: color-mix(in srgb, var(--surface, #1a1030) 85%, transparent);
     z-index: 1;
-}
-
-.itemEditing:focus-visible { outline: 3px solid var(--text, #facd8d); }
-.itemDragging { opacity: 0.5; }
-
-/* The bar on top of a block: drag it to move the block */
-.handle {
-    flex: none;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 8px;
-    background: color-mix(in srgb, var(--accent, #d4af37) 30%, var(--surface, #1a1030));
-    cursor: grab;
+    cursor: grab;          /* the whole block is the handle */
     touch-action: none;
     user-select: none;
 }
 
-.handle:active { cursor: grabbing; }
-.handleName { flex: 1; font-weight: 700; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.handleSize { font-size: 12px; opacity: 0.8; }
+.itemEditing:active { cursor: grabbing; }
+
+.itemEditing:focus-visible { outline: 3px solid var(--text, #facd8d); }
+.itemDragging { opacity: 0.5; }
+
+/* The block's name, size and hide button: a small tag floating over the top of the block.
+   It takes no room (absolute), and only shows on hover, keyboard focus or while dragging. */
+.tag {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 16px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 4px 2px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent, #d4af37) 35%, var(--surface, #1a1030));
+    border: 1px solid var(--accent, #d4af37);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.itemEditing:hover .tag,
+.itemEditing:focus-visible .tag,
+.itemDragging .tag { opacity: 1; }
+
+.tagName { font-weight: 700; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tagSize { flex: none; font-size: 12px; opacity: 0.8; }
 
 .hide {
-    width: 28px;
-    height: 28px;
+    flex: none;
+    width: 26px;
+    height: 26px;
     border: none;
     border-radius: 50%;
     background: transparent;
@@ -173,7 +190,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap);
-    opacity: 0.7;
     pointer-events: none;
 }
 
