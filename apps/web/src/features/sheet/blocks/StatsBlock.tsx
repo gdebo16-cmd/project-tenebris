@@ -7,15 +7,18 @@ export default function StatsBlock({ creature, canEdit, onAct }: Pick<BlockProps
     return (
         <section className={styles.block} aria-label="Stats">
             <h2 className={styles.title}>Primary Stats</h2>
-            <div className={styles.grid4}>
-                {creature.stats.map((stat) => (
-                    <button key={stat.key} type="button" className={styles.tile} disabled={!canEdit} aria-label={`Roll ${stat.label}`}
-                        onClick={() => onAct({ actionKey: `stat:${stat.key}`, kind: 'check' })}>
-                        <span className={styles.tileLabel}>{stat.label}</span>
-                        <span className={styles.tileValue}>{signed(stat.mod)}</span>
-                        <span className={styles.tileLabel}>{stat.score}</span>
-                    </button>
-                ))}
+            {/* the tile area: a size container, so the grid can pick its columns from the area's shape (CSS) */}
+            <div className={styles.gridArea}>
+                <div className={styles.grid4}>
+                    {creature.stats.map((stat) => (
+                        <button key={stat.key} type="button" className={styles.tile} disabled={!canEdit} aria-label={`Roll ${stat.label}`}
+                            onClick={() => onAct({ actionKey: `stat:${stat.key}`, kind: 'check' })}>
+                            <span className={styles.tileLabel}>{stat.label}</span>
+                            <span className={styles.tileValue}>{signed(stat.mod)}</span>
+                            <span className={styles.tileLabel}>{stat.score}</span>
+                        </button>
+                    ))}
+                </div>
             </div>
         </section>
     );
