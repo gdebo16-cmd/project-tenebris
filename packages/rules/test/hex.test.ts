@@ -23,11 +23,21 @@ test('hexKey turns a hex into text', () => {
 
 test('findPath walks around a wall', () => {
     const walls = new Set(['1,0', '1,-1', '0,1']);
-    const path = findPath({ q: 0, r: 0 }, { q: 2, r: 0 }, walls);
+    const path = findPath({ q: 0, r: 0 }, { q: 2, r: 0 }, walls, 10);
 
     assert.ok(path);                                            // a path was found
     assert.deepEqual(path[0], { q: 0, r: 0 });                  // starts at the start
     assert.deepEqual(path[path.length - 1], { q: 2, r: 0 });    // ends at the goal
     assert.equal(path.length, 6);                               // 5 steps, plus the start
     assert.ok(path.every((h) => !walls.has(hexKey(h))));        // never steps on a wall
+});
+
+test('findPath gives up when the start is walled in', () => {
+    const walls = new Set(neighbors({ q: 0, r: 0 }).map(hexKey));   // all six ways out blocked
+    assert.equal(findPath({ q: 0, r: 0 }, { q: 3, r: 0 }, walls, 10), null);
+});
+
+test('findPath stops at the max steps', () => {
+    const walls = new Set(['1,0', '1,-1', '0,1']);
+    assert.equal(findPath({ q: 0, r: 0 }, { q: 2, r: 0 }, walls, 3), null);
 });
