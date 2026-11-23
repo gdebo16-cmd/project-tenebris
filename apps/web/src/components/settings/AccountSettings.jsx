@@ -49,7 +49,7 @@ function AccountForm({ saved }) {
 
     return (
         <section className={styles.group} aria-label="Account">
-            <h3 className={styles.heading}>Account</h3>
+            <h3 className={styles.title}>Account</h3>
             <form onSubmit={submit}>
             <article className={styles.profileTile}>
                     <label className={styles.profileLabel} htmlFor="username">Username</label>

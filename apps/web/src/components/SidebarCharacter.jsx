@@ -20,10 +20,9 @@ function CharacterLinks({ id }) {
 
     return (
         <>
-            <h3 className={styles.groupTitle}>{sheet.data.creature.name}</h3>
-            <Link className={styles.link} to={`/characters/${id}`}>Sheet</Link>
+            <h3 className={styles.characterTitle}>Character Editor</h3>
             {FORM_TAB_LIST.map((tab) => (
-                <Link key={tab.id} className={`${styles.link} ${styles.subLink}`} to={`/characters/${id}/edit?tab=${tab.id}`}>
+                <Link key={tab.id} className={`${styles.sheetLink} ${styles.sheetSubLink}`} to={`/characters/${id}/edit?tab=${tab.id}`}>
                     Edit · {tab.long}
                 </Link>
             ))}

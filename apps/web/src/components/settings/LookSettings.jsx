@@ -31,7 +31,7 @@ export default function LookSettings() {
 
     return (
         <section className={styles.group} aria-label="Look">
-            <h3 className={styles.heading}>Look</h3>
+            <h3 className={styles.title}>Look</h3>
             {select('theme-select', 'Color scheme', THEMES, 'siteTheme', 'default', pick('site_theme', 'siteTheme', 'data-theme'))}
             {select('display-select', 'Display', DISPLAYS, 'siteDisplay', 'standard', pick('site_display', 'siteDisplay', 'data-display'))}
             {select('background-select', 'Background', BACKGROUNDS, 'siteBackground', 'default', pick('site_background', 'siteBackground', 'data-background'))}

@@ -1,0 +1,14 @@
+// blocks/registry.ts
+export const BLOCKS = {
+    header:  { label: 'Header',      component: SheetHeader,  phoneTab: 'stats',     for: ['character', 'monster'] },
+    health:  { label: 'Health',      component: HealthBlock,  phoneTab: 'condition', for: ['character', 'monster'] },
+    stats: { label: 'Stats',      component: StatsBlock, phoneTab: 'stats',    for: ['character', 'monster'] },
+    skills: { label: 'Skills',      component: SkillsBlock, phoneTab: 'skills',    for: ['character', 'monster'] },
+    conditions: { label: 'Conditions',      component: ConditionsBlock, phoneTab: 'conditions',    for: ['character', 'monster'] },
+    rest: { label: 'Rest',      component: RestBlock, phoneTab: 'rest',    for: ['character', 'monster'] },
+    coreStats: { label: 'Core Stats',      component: CoreStatsBlock, phoneTab: 'coreStats',    for: ['character', 'monster'] },
+    actions: { label: 'Action panel', component: ActionPanel, phoneTab: 'combat',    for: ['character'] },
+    notes: { label: 'Notes',      component: NotesBlock, phoneTab: 'notes',    for: ['character', 'monster'] },
+    feed: { label: 'Feed',      component: FeedBlock, phoneTab: 'feed',    for: ['character', 'monster'] },
+    // …
+};

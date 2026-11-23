@@ -395,7 +395,6 @@ body:where(:has(.page)) {
     background-color: var(--bgc-char-name);
     margin: var(--mar1);
     padding: var(--pad1);
-    border-radius: 1.5rem 0 0 0;
     border: var(--tileBorder);
 }
 

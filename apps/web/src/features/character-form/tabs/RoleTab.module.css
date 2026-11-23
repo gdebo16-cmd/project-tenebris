@@ -106,6 +106,10 @@
     width: 100%;
     border: 1px solid var(--border, #b27f50);
     border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+    &:hover {
+        background: var(--accent, #3a2e1c);
+    }
 }
 
 .callSelected {
@@ -126,6 +130,10 @@
     border-radius: 1rem;
     padding: 0.5rem;
     background: var(--surface, #1a1030);
+    transition: all 0.2s ease-in-out;
+    &:hover {
+        background: var(--accent, #3a2e1c);
+    }
 }
 
 .roleSelected {

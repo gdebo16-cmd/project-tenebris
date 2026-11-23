@@ -35,32 +35,32 @@ export default function Sidebar() {
             </button>
 
             <dialog ref={dialog} className={styles.panel} aria-label="Menu" onClick={onDialogClick}>
+                
                 <div className={styles.inner}>
+                    
                     <div className={styles.top}>
-                        {view === 'settings' && (
-                            <button type="button" className={styles.iconButton} onClick={() => setView('menu')}>‹ Back</button>
-                        )}
+                        <div className={styles.titleContainer}>
+                                {view === 'settings' && (
+                                <button type="button" className={styles.backButton} onClick={() => setView('menu')}>‹ Back</button>  
+                            )} 
                             <h2 className={styles.title}>{view === 'menu' ? 'Menu' : 'Settings'}</h2>
-                            <button type="button" className={styles.iconButton} aria-label="Close menu" onClick={close}>×</button>
+                            <button type="button" className={styles.iconButton} aria-label="Close menu" onClick={close}>×</button> 
+                        </div>
                     </div>
 
                     {view === 'menu' ? (
                         <nav className={styles.links}>
                             <Link className={styles.homeLink} to="/home" onClick={close}>Home</Link>
+                            <button type="button" className={styles.settingsLink} onClick={() => setView('settings')}>Settings ›</button>
+                            <LogoutLink className={styles.logoutLink} />
                             <SidebarCharacter />
                             <SidebarCampaign />
                             <SidebarSheetLayout onDone={close} />
                             <h3 className={styles.group}>Adventures</h3>
-                            <ul className={styles.adventureLinks}>
                                 <Link className={styles.createCharacterLink} to="/characters/new">Create Character</Link>
                                 <Link className={styles.createTaleLink} to="/create_campaign">Create Tale</Link>
                                 <Link className={styles.taleListLink} to="/campaign_list">Tale List</Link>
-                            </ul>
-                            <h3 className={styles.group}>You</h3>
-                            <ul className={styles.youLinks}>
-                                <button type="button" className={styles.settingsLink} onClick={() => setView('settings')}>Settings ›</button>
-                                <LogoutLink className={styles.logoutLink} />
-                            </ul>
+
                         </nav>
                     ) : (
                         <div className={styles.settings}>
