@@ -12,8 +12,9 @@ export type MonsterSheetResponse =
 
 export const monsterKey = (id: string | number) => ['sheet', 'monster', String(id)];
 
-export function useMonsterSheet(id: string) {
-    return useQuery({ queryKey: monsterKey(id), queryFn: () => api<MonsterSheetResponse>(`/api/sheets/monster/${id}`) });
+// enabled = false: no request (the DM page has no current monster yet)
+export function useMonsterSheet(id: string, enabled = true) {
+    return useQuery({ queryKey: monsterKey(id), queryFn: () => api<MonsterSheetResponse>(`/api/sheets/monster/${id}`), enabled });
 }
 
 // Ask the server to roll one of the monster's actions or checks. It answers the roll-feed text.

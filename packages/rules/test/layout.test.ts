@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-    GRID, SHEET_BLOCKS, addBlock, checkLayout, hiddenBlocks, nudgeBlock, panelTabsOf, placeBlock, readingOrder, removeBlock, setPanelTabs,
+    GRID, MAX_ITEMS, SHEET_BLOCKS, addBlock, checkLayout, hiddenBlocks, nudgeBlock, panelTabsOf, placeBlock, readingOrder, removeBlock, setPanelTabs,
     type SheetLayout,
 } from '../src/layout.ts';
 
@@ -75,5 +75,14 @@ test('readingOrder and hiddenBlocks', () => {
 });
 
 test('every sheet has a header and the roll feed', () => {
-    for (const blocks of Object.values(SHEET_BLOCKS)) assert.ok(blocks.includes('header') && blocks.includes('rollFeed'));
+    for (const kind of ['character', 'monster'] as const) {
+        assert.ok(SHEET_BLOCKS[kind].includes('header') && SHEET_BLOCKS[kind].includes('rollFeed'));
+    }
+});
+
+test('the DM page has its own blocks, with no repeats', () => {
+    const dm = SHEET_BLOCKS.dm;
+    for (const block of ['initiative', 'tableRolls', 'party', 'encounter', 'dmNotes', 'monHeader', 'pcHeader']) assert.ok(dm.includes(block));
+    assert.equal(new Set(dm).size, dm.length);
+    assert.ok(dm.length <= MAX_ITEMS);
 });

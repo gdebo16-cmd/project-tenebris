@@ -5,12 +5,12 @@
 // Content smaller than its block is scaled up to fill it (Fit below); scrollbars are hidden (content still scrolls).
 // Editing (wide screens, started from the sidebar): the cells show, drag a block to move it, drag its corner to resize it;
 // or use the keyboard.
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
-import { GRID, nudgeBlock, placeBlock, readingOrder, removeBlock, type LayoutItem, type SheetLayout as Layout } from '@tenebris/rules/layout';
+import { Fragment, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
+import { GRID, nudgeBlock, placeBlock, readingOrder, removeBlock, type LayoutItem, type SheetKind as LayoutKind, type SheetLayout as Layout } from '@tenebris/rules/layout';
 import shared from './Sheet.module.css';
 import css from './SheetLayout.module.css';
 import { PHONE_TABS, blockDef, blocksFor, isBlockId, type BlockId, type PhoneTab } from './blocks/registry.tsx';
-import { useSheetTools } from './blocks/SheetContext.tsx';
+import { SheetContext } from './blocks/SheetContext.tsx';
 import { DEFAULT_LAYOUTS, PHONE_TABS_ON, useSheetLayout } from './layouts.ts';
 import { LayoutEditor } from './LayoutEditor.tsx';
 import { EDIT_LAYOUT_EVENT, isWideScreen } from './layoutEvents.ts';
@@ -101,18 +101,21 @@ function Fit({ children, scaling }: { children: ReactNode; scaling: Scaling }) {
     return <div ref={ref} className={css.fit}>{children}</div>;
 }
 
-export default function SheetLayout() {
-    const tools = useSheetTools();
-    const { layout: saved, save, saving } = useSheetLayout(tools.kind);
+// kind: which layout to draw. A sheet page leaves it out (its sheet's kind); the DM page passes 'dm'.
+export default function SheetLayout({ kind: kindProp }: { kind?: LayoutKind }) {
+    const tools = useContext(SheetContext);   // the sheet's tools (none on the DM page: its blocks bring their own)
+    const kind: LayoutKind = kindProp ?? tools!.kind;
+    const { layout: saved, save, saving } = useSheetLayout(kind);
     const [draft, setDraft] = useState<Layout | null>(null);   // the layout being edited; null = not editing
     const [message, setMessage] = useState('');
-    const [phoneTab, setPhoneTab] = useState<PhoneTab>('stats');
+    const tabs = PHONE_TABS[kind];
+    const [phoneTab, setPhoneTab] = useState<PhoneTab>(tabs[0].id);
     const [drag, setDrag] = useState<Drag | null>(null);
     const gridRef = useRef<HTMLDivElement>(null);
     const editing = draft !== null;
     const layout = draft ?? saved;
-    const blocks = blocksFor(tools.kind);
-    const tabsOn = PHONE_TABS_ON[tools.kind] && !editing;
+    const blocks = blocksFor(kind);
+    const tabsOn = PHONE_TABS_ON[kind] && !editing;
 
     // The sidebar's "Edit sheet layout" (layoutEvents.ts). Only on a wide screen, where the grid is shown.
     const savedRef = useRef(saved);
@@ -130,7 +133,7 @@ export default function SheetLayout() {
     const saveDraft = async () => {
         if (!draft) return;
         // Reset to default and saved unchanged: forget the player's layout, so future defaults reach them too
-        const error = await save(draft === DEFAULT_LAYOUTS[tools.kind] ? null : draft);
+        const error = await save(draft === DEFAULT_LAYOUTS[kind] ? null : draft);
         if (error) setMessage(error);
         else setDraft(null);
     };
@@ -191,8 +194,8 @@ export default function SheetLayout() {
     const items = readingOrder(layout.items).flatMap((item) => {
         if (!isBlockId(item.block)) return [];
         const def = blockDef(item.block);
-        if (!def.sheets.includes(tools.kind)) return [];
-        const visible = !def.show || def.show(tools);
+        if (!def.sheets.includes(kind)) return [];
+        const visible = !def.show || !tools || def.show(tools);
         return visible || editing ? [{ item, id: item.block, def, visible }] : [];
     });
     // On a phone the tab bar goes after the blocks that lead the page without a tab (the header)
@@ -200,7 +203,7 @@ export default function SheetLayout() {
     const tabBarAt = lead === -1 ? items.length : lead;
     const tabBar = tabsOn && (
         <nav className={css.phoneTabs} aria-label="Sheet areas">
-            {PHONE_TABS.map((t) => (
+            {tabs.map((t) => (
                 <button key={t.id} type="button" className={phoneTab === t.id ? shared.tabActive : shared.tab}
                     aria-pressed={phoneTab === t.id} onClick={() => setPhoneTab(t.id)}>{t.label}</button>
             ))}
@@ -212,7 +215,7 @@ export default function SheetLayout() {
             {editing && (
                 <LayoutEditor layout={layout} blocks={blocks} onChange={change} onSave={saveDraft} saving={saving} message={message}
                     onCancel={() => { setDraft(null); setMessage(''); }}
-                    onReset={() => { setDraft(DEFAULT_LAYOUTS[tools.kind]); setMessage(''); }} />
+                    onReset={() => { setDraft(DEFAULT_LAYOUTS[kind]); setMessage(''); }} />
             )}
 
             <div ref={gridRef} className={editing ? `${css.grid} ${css.gridEditing}` : css.grid}>
