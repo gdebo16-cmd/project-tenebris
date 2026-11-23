@@ -13,6 +13,8 @@ RUN npm run build -w apps/web
 FROM node:22-alpine
 WORKDIR /app
 ENV NODE_ENV=production
+# Render's free plan has no IPv6: reach Neon over IPv4 (was a dashboard setting on staging)
+ENV NODE_OPTIONS="--dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=2000"
 COPY package.json package-lock.json ./
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
