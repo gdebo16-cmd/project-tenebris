@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import RequireLogin from './components/RequireLogin';
 import CharacterSheetPage from './features/sheet/CharacterSheetPage.tsx';
@@ -15,7 +16,9 @@ import CampaignList from './pages/CampaignList';
 import JoinCampaign from './pages/JoinCampaign';
 import { ContentProvider } from './hooks/ContentContext';
 import AppLayout from './components/AppLayout';
-import TablePage from './features/table/TablePage.tsx';
+import Loader from './components/Loader.jsx';
+// The table brings in three.js (big), so it's only downloaded when someone opens the table
+const TablePage = lazy(() => import('./features/table/TablePage.tsx'));
 
 function ThemeWatcher() {
     usePageTheme();
@@ -36,7 +39,7 @@ function App() {
                         <Route path="/home" element={<HomePage />} />
                         <Route path="/campaign/:campId" element={<CampaignPage />} />
                         <Route path="/campaign/:campId/dm" element={<DmPage />} />
-                        <Route path="/campaign/:campId/table" element={<TablePage />} />
+                        <Route path="/campaign/:campId/table" element={<Suspense fallback={<Loader />}><TablePage /></Suspense>} />
                         <Route path="/monsters/:id" element={<MonsterSheetPage />} />
                         <Route path="/campaign_list" element={<CampaignList />} />
                         <Route path="/join/:code" element={<JoinCampaign />} />

@@ -4,13 +4,16 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 
 ## Now
 
-- **Stage 1, native rebuild:** R1–R7 all done and ticked (R5, R7, steps 5 and 7 on 2026-11-22). **Gate 1 is ready for Gabriel to check and tick.**
+- **Stage 2, the 2D hex table:** steps 8–13 done (2026-11-23). **Gate 2 is ready for Gabriel to check and tick.**
+- Stage 0 cutover: backup made (0.11) and rehearsed; new Render service `tenebris` runs on a copy of production. The switch itself waits for a time from Gabriel.
 - **Paused by Gabriel:** nothing.
 - **In progress:** nothing claimed.
 
 ## Next
 
-- Gabriel: Gate 1. Then either the cutover (Stage 0, 0.11–0.14: backup, rehearsal on a copy of production, then the switch) or Stage 2 (2D hex table, steps 8–13).
+- Gabriel: check and tick Gate 2 (open `/campaign/<id>/table` as DM and as a player). Confirm the *call* items in `docs/specs/table.md` (Tokens, "As built").
+- Then Stage 3 (live play, 14–18): socket sync is first, so moves show on everyone's screen without a reload.
+- Cutover (0.12–0.14) whenever Gabriel picks a time.
 - Small: turn staging's auto-deploy back on in Render; delete Neon branch `scratch-r7-drop-test`; layout decisions into DECISIONS.md (Gabriel's). PNG→WebP still open.
 
 ## Status by step
@@ -18,6 +21,15 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-23 — Claude (steps 11–13 finished, Gate 2 ready; Gabriel asked: "finish 11 and 12, then work through gate 2")
+- Gabriel built step 9 (scenes/tokens/overlays migration), step 10 (hex math: distance, neighbors, findPath with a step limit) and most of 11–12 himself (R3F board, terrain colours, scene model/controller/routes, scene queries). His uncommitted step 12 work was copied unchanged into `bot/claude` (commit 7409f88) before anything was added.
+- `packages/rules/src/hex.ts`: `hexesWithin`, `TERRAIN_KINDS` / `isTerrainKind`, `BLOCKING_TERRAIN` / `wallsOf`, `hexesForSpeed` (5 ft per hex); 4 new tests.
+- Server (`sceneController.js`, `sceneModel.js`, `routes/scenes.js`): the scene answer carries tokens, `userId` and (DM only) `placeable`; token place / move / remove with the table spec's rules. Moves use `findPath` around walls; players are held to the token's speed. Judgment calls listed in `docs/specs/table.md` (Tokens → As built).
+- Board (`features/table/`): grid of radius 8, see-through open hexes, DM toolbar (Move, brushes, Eraser, Place, Remove), tokens with name labels, click to select / click a hex to move, refusals shown. The table page is lazy-loaded (three.js only downloads there). Labels use drei `Html` with `portal` (without it the first label was lost) and don't take clicks.
+- `docs/PLAN.md`: decision row "2D table renderer = R3F, top-down orthographic" (Gabriel's decision today).
+- Checked: typecheck, 136 unit tests, web build; server rules request by request (DM/player, walls, speed, one per hex, reload); the Gate 2 flow by clicking in Chrome (DM paints, places, moves; reload keeps everything; player refused through a wall, moves legally, can't move others'); phone size. No page errors.
+- Not done: `token.update` (owner change for charms), overlays (table exists, no routes), real-time sync (Stage 3), map uploads (storage undecided). Neon scratch branches `scratch-step9`, `scratch-r7-drop-test`, `scratch-cutover-rehearsal` still exist (delete when Gabriel says).
 
 ### 2026-11-22 — Claude (step 8: table spec written from Gabriel's answers; DM page layout; cutover prep)
 - `docs/specs/table.md`: every table action with who can do it and its intent name (scenes, maps, tokens, measuring, overlays with turn counters). Decisions are Gabriel's (2026-11-22); undecided items listed under **Open**. Step 8 left unticked for Gabriel's review.
