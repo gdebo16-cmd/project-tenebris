@@ -15,19 +15,22 @@ import { getClassSlots, getLearnedSpells } from '../models/spellModel.js';
 import { sheetAccess } from '../models/sheetModel.js';
 import { loadSpellbook, changeSpellbook } from './apiSpellController.js';
 
-// Everything the old sheet request returned, read as the owner would see it
+// Everything the old sheet request returned, read as the owner would see it.
+// The character comes first (it says who may see it and which role/level to use); the rest don't depend on
+// each other, so they're asked for all at once: one wait for the database instead of five in a row.
 export async function loadSheetData(charId, ownerId) {
     const character = await Characters.getSheetCharacter(charId, ownerId);
     if (!character) return null;
-    character.spell_slots = await getClassSlots(character.role_id, character.level, character.calling_id);
-    return {
-        character,
-        ownedArmor: await Inventory.getOwnedArmor(charId),
-        ownedWeapons: await Inventory.getOwnedWeapons(charId),
-        ownedItems: await Inventory.getOwnedItems(charId),
-        learnedSpells: await getLearnedSpells(charId),
-        actionFeatures: await Characters.getActionFeatures(character.role_id, character.calling_id, character.level, character.species_id),
-    };
+    const [spellSlots, ownedArmor, ownedWeapons, ownedItems, learnedSpells, actionFeatures] = await Promise.all([
+        getClassSlots(character.role_id, character.level, character.calling_id),
+        Inventory.getOwnedArmor(charId),
+        Inventory.getOwnedWeapons(charId),
+        Inventory.getOwnedItems(charId),
+        getLearnedSpells(charId),
+        Characters.getActionFeatures(character.role_id, character.calling_id, character.level, character.species_id),
+    ]);
+    character.spell_slots = spellSlots;
+    return { character, ownedArmor, ownedWeapons, ownedItems, learnedSpells, actionFeatures };
 }
 
 export async function getCharacterSheet(req, res) {

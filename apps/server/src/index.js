@@ -8,12 +8,17 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { serverTiming } from './timing.js';
 
 
 const app = express();
 const PgStore = connectPgSimple(session);
 const store = new PgStore({
 	pool, createTableIfMissing: true,
+	// No database write on every request just to push the session's expiry back.
+	// Nothing changes for players: the cookie isn't rolling (rolling is off), so a login lasts
+	// maxAge from when the session was last saved either way; touch only moved the database row's date.
+	disableTouch: true,
 });
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,6 +37,7 @@ const sessionMiddleware = session({               //defines security and rule se
 	saveUninitialized: false, store,
 });
 
+app.use(serverTiming); // first, so the session's database read is in the number
 app.use(sessionMiddleware);
 
 app.use(compression()); // gzip every response, including /api/content

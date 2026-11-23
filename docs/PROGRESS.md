@@ -19,6 +19,14 @@ See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
 
+### 2026-11-22 — Claude (roll speed: fewer database waits per roll, bot/claude; Gabriel asked for fixes 1–3)
+- `apps/server/src/timing.js` + `index.js`: every response carries `Server-Timing: total;dur=…` (DevTools → Network → a request → Timing). Mounted before the session middleware so the session read counts.
+- `sheetController.js` `loadSheetData`: after the character loads, armor, weapons, items, learned spells, slots and action features load together (`Promise.all`). Used by the sheet, `/act`, feature/rune/rest/cast/conditions and the DM page.
+- `index.js` PgStore `disableTouch: true`: no session `UPDATE` at the end of every request. No change for players: `rolling` is off, so the cookie's expiry was already fixed at the last save; touch only moved the database row's date.
+- Measured with Postgres statement logging on one `/act` roll: before = 9 database waits in a row (session read, access, character, armor, weapons, items, 2 spell queries, session touch); after = 5 (session read, access, character, one parallel wave, the second spell query). Each wait is a full trip to Neon, so this roughly halves the database part of a roll.
+- Checked: typecheck, 125 unit tests, e2e 17/17 three runs in a row on a fresh local Postgres 16 (all migrations from nothing; smoketest + smoketest2 each with a finished warrior with a weapon).
+- Not done (by design): actions over the socket (fits step 14) and an in-memory sheet cache (after the write paths settle).
+
 ### 2026-11-22 — Claude (sheet polish PRs #2–#4, e2e tests updated and green, R5/R7 ticked)
 - PR #2: `Fit` (SheetLayout.tsx) stops scaling a block up when anything inside would spill sideways, not only at its height (Rest in a narrow column, Health buttons, stat labels).
 - PR #3: Skills as a 5×3 tile grid (name over bonus); solid phone tab bar; stat / core-stat / skill tile labels size to their tile (`container-type` + `cqi`).
