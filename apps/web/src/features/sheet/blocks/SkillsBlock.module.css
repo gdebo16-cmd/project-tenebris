@@ -12,9 +12,13 @@
     margin-bottom: 0.5rem;
 }
 
+/* The block fills its whole space and its tiles stretch to fill what's left under the title (SheetLayout doesn't
+   zoom this block). Each tile's text sizes itself to the tile: cqw / cqh are % of the tile's width / height. */
 .block {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
     gap: 8px;
     padding: 12px;
     border-radius: 1.5rem;
@@ -31,6 +35,9 @@
 
 .grid {
     display: grid;
+    flex: 1;
+    min-height: 0;
+    grid-auto-rows: minmax(0, 1fr);   /* the rows share the height evenly */
     grid-template-columns: repeat(5, minmax(0, 1fr));   /* minmax(0, …): a long name can't push its column wider */
     gap: 6px;
     text-align: center;
@@ -50,7 +57,10 @@
     color: inherit;
     font: inherit;
     cursor: pointer;
-    container-type: inline-size;   /* lets the label size itself to this tile's width (cqi below) */
+    container-type: size;   /* lets the text size itself to this tile (cqw / cqh below) */
+    justify-content: center;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .tile:disabled { cursor: default; }
@@ -63,7 +73,7 @@
 
 .tileLabel {
     max-width: 100%;
-    font-size: clamp(8px, 15cqi, 12px);   /* 15% of the tile's width: shrinks on a phone, never past 8–12px */
+    font-size: clamp(8px, min(14cqw, 20cqh), 22px);
     opacity: 0.8;
     white-space: nowrap;
     overflow: hidden;
@@ -71,6 +81,7 @@
 }
 
 .tileValue {
-    font-size: 18px;
+    font-size: clamp(14px, min(30cqw, 36cqh), 56px);
+    line-height: 1.1;
     font-weight: 700;
 }

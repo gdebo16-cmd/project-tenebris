@@ -26,6 +26,9 @@ const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n
 // content grows and shrinks with the block. Uses CSS zoom, so the content reflows at the new size instead of being
 // stretched. Re-fits when the box changes size (window, layout, resizing in the editor) or the content changes.
 // Blocks marked `scrolls` (growing lists: actions, spells...) only scale up; what doesn't fit scrolls out of sight.
+// Blocks marked `fills` (grids of tiles: stats, skills...) aren't zoomed at all: their tiles stretch to fill the block
+// in both directions and their text sizes itself to each tile (container units in the block's CSS). Zoom keeps the
+// content's shape, so in a tall, narrow block it could only ever fill the width; stretching fills both.
 // So do all blocks on a phone, where text shrunk to fit would be too small to read. Below MIN_ZOOM, a block scrolls too.
 // "Fits" means two things: the content is no taller than the box, and nothing inside spills sideways
 // (a stat label wider than its tile, a row of buttons wider than the block). A tall, narrow block stops growing
@@ -45,7 +48,10 @@ function spillsSideways(el: HTMLElement) {
     return false;
 }
 
-function Fit({ children, shrink }: { children: ReactNode; shrink: boolean }) {
+type Scaling = 'both' | 'up' | 'none';
+const scalingOf = (def: { scrolls?: true; fills?: true }): Scaling => (def.fills ? 'none' : def.scrolls ? 'up' : 'both');
+
+function Fit({ children, scaling }: { children: ReactNode; scaling: Scaling }) {
     const ref = useRef<HTMLDivElement>(null);
     useLayoutEffect(() => {
         const el = ref.current;
@@ -59,7 +65,9 @@ function Fit({ children, shrink }: { children: ReactNode; shrink: boolean }) {
             el.style.minHeight = '0px';
             const fits = () => el.getBoundingClientRect().height <= room && !spillsSideways(el);
             let zoom = 1;
-            if (el.getBoundingClientRect().height < room - 1 && fits()) {
+            if (scaling === 'none') {
+                // the block stretches itself to fill (see above): just give it the whole cell area
+            } else if (el.getBoundingClientRect().height < room - 1 && fits()) {
                 // The largest zoom at which the content still fits (a few halving steps are plenty)
                 let lo = 1, hi = MAX_ZOOM;
                 for (let i = 0; i < 7; i++) {
@@ -68,7 +76,7 @@ function Fit({ children, shrink }: { children: ReactNode; shrink: boolean }) {
                     if (fits()) lo = mid; else hi = mid;
                 }
                 zoom = lo;
-            } else if (shrink && isWideScreen() && !fits()) {
+            } else if (scaling === 'both' && isWideScreen() && !fits()) {
                 // Too big at full size: the largest zoom, down to MIN_ZOOM, at which it fits
                 // (still too big at MIN_ZOOM? it stays there and the rest scrolls)
                 let lo = MIN_ZOOM, hi = 1;
@@ -89,7 +97,7 @@ function Fit({ children, shrink }: { children: ReactNode; shrink: boolean }) {
         const changed = new MutationObserver(later);
         changed.observe(el, { childList: true, subtree: true, characterData: true });
         return () => { resized.disconnect(); changed.disconnect(); cancelAnimationFrame(frame); };
-    }, [shrink]);
+    }, [scaling]);
     return <div ref={ref} className={css.fit}>{children}</div>;
 }
 
@@ -221,7 +229,7 @@ export default function SheetLayout() {
                             <Fragment key={id}>
                                 {i === tabBarAt && tabBar}
                                 <div className={hiddenOnPhone ? css.itemPhoneHidden : css.item} style={place(item)} data-block={id}>
-                                    <Fit shrink={!def.scrolls}><Block layout={layout} /></Fit>
+                                    <Fit scaling={scalingOf(def)}><Block layout={layout} /></Fit>
                                 </div>
                             </Fragment>
                         );
@@ -236,7 +244,7 @@ export default function SheetLayout() {
                             aria-label={`${def.label}. Drag or use the arrow keys to move it, Shift and arrows to resize it, Delete to hide it.`}>
                             {/* A preview: nothing inside can be clicked while arranging */}
                             <div className={css.preview} inert>
-                                <Fit shrink={!def.scrolls}>{visible ? <Block layout={layout} /> : <p className={shared.muted}>{def.label}: {def.note}</p>}</Fit>
+                                <Fit scaling={scalingOf(def)}>{visible ? <Block layout={layout} /> : <p className={shared.muted}>{def.label}: {def.note}</p>}</Fit>
                             </div>
                             <div className={css.tag}>
                                 <span className={css.tagName}>{def.label}</span>
