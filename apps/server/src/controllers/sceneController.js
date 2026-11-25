@@ -2,12 +2,14 @@
 // The server decides everything (hard rule): painting, placing and removing are DM only; moving is the token's
 // owner or the DM, and a move must have a path around walls (findPath from @tenebris/rules/hex).
 // Spec: docs/specs/table.md.
-import { isTerrainKind, findPath, wallsOf, hexKey, hexesForSpeed } from '@tenebris/rules/hex';
+import { isTerrainKind, isSurface, isFeatureKind, LIGHT_FEATURES, MAX_LIGHTS, MAX_HEIGHT, checkLookChange, findPath, wallsOf, hexKey, hexesForSpeed, onBoard } from '@tenebris/rules/board';
 import { characterToCreature } from '@tenebris/rules/creature';
 import * as Scenes from '../models/sceneModel.js';
 import * as Monsters from '../models/monsterModel.js';   // for memberRole(campId, userId)
 import { getMonster } from '../models/monsterPack.js';
-import { tokenView, tellTable as sendTable } from './tableNews.js';
+import { tokenView, tellTable as sendTable, turnsView, visionOf, tableView, overlayView } from './tableNews.js';
+import { checkArea } from '@tenebris/rules/sight';
+import * as Dm from '../models/dmModel.js';
 import { loadSheetData } from './sheetController.js';
 import { creatureOfRow } from './apiMonsterController.js';
 
@@ -30,8 +32,16 @@ const tellTable = (req, campId, scene) => sendTable(req.app.get('io'), campId, s
 
 // The scene answer: the scene, its tokens, who's asking; for the DM also what they can place
 async function sceneAnswer(campId, role, userId, scene) {
-    const answer = { scene, isDm: role === 'dm', userId, tokens: [] };
-    if (scene) answer.tokens = (await Scenes.listTokens(scene.id)).map(tokenView);
+    const answer = { scene: null, isDm: role === 'dm', userId, tokens: [], overlays: [], fog: null, turns: turnsView((await Dm.getDmState(campId))?.initiative) };
+    if (scene) {
+        // the table as this person may see it (the fog leaves out what the party hasn't seen: tableView)
+        const rows = await Scenes.listTokens(scene.id);
+        const view = tableView(scene, rows, await Scenes.listOverlays(scene.id), await visionOf(scene, rows), role === 'dm');
+        answer.scene = { id: scene.id, name: scene.name, terrain: view.terrain, surfaces: view.surfaces, features: view.features, look: view.look };
+        answer.tokens = view.tokens;
+        answer.overlays = view.overlays;
+        answer.fog = view.fog;
+    }
     if (role === 'dm') {
         const party = await Scenes.partyForTable(campId);
         const monsters = await Monsters.listForCampaign(campId);
@@ -57,7 +67,12 @@ export async function getActiveScene(req, res) {
     res.json(await sceneAnswer(campId, role, req.session.userId, scene));
 }
 
-// POST /api/scenes/:id/paint  body { q, r, terrain }  -> the scene's terrain
+// POST /api/scenes/:id/paint  body: the hexes, then ONE brush  -> { terrain, surfaces, features, look }
+//   hexes: [{ q, r }, ...] (a whole drag stroke, up to MAX_STROKE), or a single q, r
+//   brush: { terrain } the rules (wall, water...) | { surface } the look (grass, cobble...) | { feature } a tree, a light...
+//          | { height } raised ground 0..3 | { clear: true } everything on those hexes goes. null erases that one brush.
+// The whole stroke is checked first, then saved once and sent to the table once.
+const MAX_STROKE = 1000;
 export async function paint(req, res) {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const scene = await Scenes.getScene(Number(req.params.id));
@@ -65,15 +80,83 @@ export async function paint(req, res) {
     const role = await Monsters.memberRole(scene.campaign_id, req.session.userId);
     if (role !== 'dm') return res.status(403).json({ error: 'You are not the DM' });
 
-    const { q, r, terrain } = req.body;
-    if (!Number.isInteger(q) || !Number.isInteger(r)) return res.status(400).json({ error: 'q and r must be whole numbers' });
-    if (terrain !== null && !isTerrainKind(terrain)) return res.status(400).json({ error: 'Invalid terrain' });
+    // which hexes
+    const list = Array.isArray(req.body?.hexes) ? req.body.hexes : [{ q: req.body?.q, r: req.body?.r }];
+    if (list.length === 0 || list.length > MAX_STROKE) return res.status(400).json({ error: `Paint 1 to ${MAX_STROKE} hexes at a time` });
+    for (const h of list) {
+        if (!Number.isInteger(h?.q) || !Number.isInteger(h?.r)) return res.status(400).json({ error: 'q and r must be whole numbers' });
+        if (!onBoard(h)) return res.status(400).json({ error: "That hex isn't on the board" });
+    }
+    const keys = [...new Set(list.map(hexKey))];
+    const body = req.body;
 
-    const key = `${q},${r}`;
-    if (terrain === null) delete scene.terrain[key];   // erase back to open ground
-    else scene.terrain[key] = terrain;
-    await Scenes.saveTerrain(scene.id, scene.terrain);
-    res.json(scene.terrain);
+    if (body.clear === true) {                            // the eraser: everything on these hexes
+        const heights = { ...(scene.look.heights ?? {}) };
+        for (const key of keys) { delete scene.terrain[key]; delete scene.surfaces[key]; delete scene.features[key]; delete heights[key]; }
+        scene.look = { ...scene.look, heights };
+        await Scenes.saveTerrain(scene.id, scene.terrain);
+        await Scenes.saveSurfaces(scene.id, scene.surfaces);
+        await Scenes.saveFeatures(scene.id, scene.features);
+        await Scenes.saveLook(scene.id, scene.look);
+    } else if ('height' in body) {                        // raised ground (looks only for now)
+        const height = body.height;
+        if (!Number.isInteger(height) || height < 0 || height > MAX_HEIGHT) return res.status(400).json({ error: `height must be 0 to ${MAX_HEIGHT}` });
+        const heights = { ...(scene.look.heights ?? {}) };
+        for (const key of keys) { if (height === 0) delete heights[key]; else heights[key] = height; }
+        scene.look = { ...scene.look, heights };
+        await Scenes.saveLook(scene.id, scene.look);
+    } else if ('feature' in body) {                       // something placed on the hex
+        const { feature } = body;
+        if (feature === null) for (const key of keys) delete scene.features[key];
+        else {
+            if (!isFeatureKind(feature?.kind)) return res.status(400).json({ error: 'Invalid feature' });
+            const size = feature.size === undefined ? 1 : Number(feature.size);
+            if (!(size >= 0.5 && size <= 2)) return res.status(400).json({ error: 'size must be from 0.5 to 2' });
+            const color = feature.color;
+            if (color !== undefined && !/^#[0-9a-f]{6}$/i.test(color)) return res.status(400).json({ error: 'color must look like #ffcc88' });
+            // lights are real lights: keep a scene to a handful (counting the ones this stroke would add)
+            if (LIGHT_FEATURES.includes(feature.kind)) {
+                const others = Object.entries(scene.features).filter(([k, f]) => !keys.includes(k) && LIGHT_FEATURES.includes(f.kind)).length;
+                if (others + keys.length > MAX_LIGHTS) return res.status(400).json({ error: `At most ${MAX_LIGHTS} lights in a scene` });
+            }
+            for (const key of keys) scene.features[key] = { kind: feature.kind, size, ...(color ? { color } : {}) };
+        }
+        await Scenes.saveFeatures(scene.id, scene.features);
+    } else if ('surface' in body) {                       // the look
+        const { surface } = body;
+        if (surface !== null && !isSurface(surface)) return res.status(400).json({ error: 'Invalid surface' });
+        for (const key of keys) { if (surface === null) delete scene.surfaces[key]; else scene.surfaces[key] = surface; }
+        await Scenes.saveSurfaces(scene.id, scene.surfaces);
+    } else if ('terrain' in body) {                       // the rules
+        const { terrain } = body;
+        if (terrain !== null && !isTerrainKind(terrain)) return res.status(400).json({ error: 'Invalid terrain' });
+        for (const key of keys) { if (terrain === null) delete scene.terrain[key]; else scene.terrain[key] = terrain; }
+        await Scenes.saveTerrain(scene.id, scene.terrain);
+    } else {
+        return res.status(400).json({ error: 'Pick a brush: terrain, surface, feature, height or clear' });
+    }
+    res.json({ terrain: scene.terrain, surfaces: scene.surfaces, features: scene.features, look: scene.look });
+    await tellTable(req, scene.campaign_id, scene);
+}
+
+// POST /api/scenes/:id/clear  (DM) -> { terrain, surfaces, features, look }
+// Start the map over: terrain, ground, everything placed, raised ground, shapes and what the fog remembers all go.
+// Tokens stay where they are, and the scene's mood, weather, room and map picture are kept.
+export async function clearMap(req, res) {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    const scene = await Scenes.getScene(Number(req.params.id));
+    if (!scene) return res.status(404).json({ error: 'Scene not found' });
+    if (await Monsters.memberRole(scene.campaign_id, req.session.userId) !== 'dm') return res.status(403).json({ error: 'You are not the DM' });
+    scene.terrain = {}; scene.surfaces = {}; scene.features = {};
+    scene.look = { ...scene.look, heights: {} };
+    scene.explored = {};
+    await Scenes.saveTerrain(scene.id, {});
+    await Scenes.saveSurfaces(scene.id, {});
+    await Scenes.saveFeatures(scene.id, {});
+    await Scenes.saveLook(scene.id, scene.look);
+    await Scenes.saveExplored(scene.id, {});
+    await Scenes.removeAllOverlays(scene.id);
+    res.json({ terrain: scene.terrain, surfaces: scene.surfaces, features: scene.features, look: scene.look });
     await tellTable(req, scene.campaign_id, scene);
 }
 
@@ -89,7 +172,8 @@ export async function placeToken(req, res) {
 
     const { kind, characterId, campaignMonsterId, name, ownerId, q, r } = req.body ?? {};
     if (!isWholeNumber(q) || !isWholeNumber(r)) return res.status(400).json({ error: 'q and r must be whole numbers' });
-    if (wallsOf(scene.terrain).has(hexKey({ q, r }))) return res.status(400).json({ error: "A token can't stand in a wall" });
+    if (!onBoard({ q, r })) return res.status(400).json({ error: "That hex isn't on the board" });
+    if (wallsOf(scene.terrain, scene.features).has(hexKey({ q, r }))) return res.status(400).json({ error: "A token can't stand there (a wall, tree, boulder or pillar)" });
 
     let token;
     if (kind === 'character') {
@@ -156,9 +240,10 @@ export async function moveToken(req, res) {
 
     const { q, r } = req.body ?? {};
     if (!isWholeNumber(q) || !isWholeNumber(r)) return res.status(400).json({ error: 'q and r must be whole numbers' });
+    if (!onBoard({ q, r })) return res.status(400).json({ error: "That hex isn't on the board" });
 
-    const walls = wallsOf(token.terrain);
-    if (walls.has(hexKey({ q, r }))) return res.status(400).json({ error: "A token can't stand in a wall" });
+    const walls = wallsOf(token.terrain, token.features);
+    if (walls.has(hexKey({ q, r }))) return res.status(400).json({ error: "A token can't stand there (a wall, tree, boulder or pillar)" });
     const maxSteps = isDm ? DM_MAX_STEPS : await speedInHexes(token);
     const path = findPath({ q: token.q, r: token.r }, { q, r }, walls, maxSteps);
     if (!path) {
@@ -189,4 +274,162 @@ export async function removeToken(req, res) {
     const scene = await Scenes.getScene(token.scene_id);
     res.json(await sceneAnswer(token.campaign_id, role, req.session.userId, scene));
     await tellTable(req, token.campaign_id, scene);
+}
+
+// PUT /api/scenes/:id/look  body: any of { mood, weather, room, map }  -> the scene's look
+// The DM sets the scene's mood, weather, the room around the table and a map picture (checkLookChange in rules/hex).
+export async function setLook(req, res) {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    const scene = await Scenes.getScene(Number(req.params.id));
+    if (!scene) return res.status(404).json({ error: 'Scene not found' });
+    const role = await Monsters.memberRole(scene.campaign_id, req.session.userId);
+    if (role !== 'dm') return res.status(403).json({ error: 'You are not the DM' });
+    const checked = checkLookChange(req.body);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    scene.look = { ...scene.look, ...checked.change };
+    await Scenes.saveLook(scene.id, scene.look);
+    res.json(scene.look);
+    await tellTable(req, scene.campaign_id, scene);
+}
+
+// POST /api/scenes/:id/fog/reset  (DM) -> 204. Forget what the party has seen: the whole map goes dark again.
+export async function resetFog(req, res) {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    const scene = await Scenes.getScene(Number(req.params.id));
+    if (!scene) return res.status(404).json({ error: 'Scene not found' });
+    if (await Monsters.memberRole(scene.campaign_id, req.session.userId) !== 'dm') return res.status(403).json({ error: 'You are not the DM' });
+    scene.explored = {};
+    await Scenes.saveExplored(scene.id, {});
+    res.status(204).end();
+    await tellTable(req, scene.campaign_id, scene);
+}
+
+// ---- Overlays (spec: Overlays) ----
+
+const MAX_OVERLAY_TURNS = 100;
+
+// POST /api/scenes/:id/overlays  body { name?, area: { kind, at, sizeFt }, from?: { q, r }, turns?, countsTokenId? }
+// overlay.add: anyone at the table. turns: count it down over that many of a creature's turns (a player's: their own
+// character's; the DM picks whose). No turns = it stays until someone removes it.
+export async function addOverlay(req, res) {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    const scene = await Scenes.getScene(Number(req.params.id));
+    if (!scene) return res.status(404).json({ error: 'Scene not found' });
+    const role = await Monsters.memberRole(scene.campaign_id, req.session.userId);
+    if (!role) return res.status(404).json({ error: 'Scene not found' });
+
+    const checked = checkArea(req.body?.area);
+    if ('error' in checked) return res.status(400).json({ error: checked.error });
+    const from = req.body?.from;
+    if (from != null && !(isWholeNumber(from.q) && isWholeNumber(from.r))) return res.status(400).json({ error: 'from must be a hex (q and r)' });
+    const name = (typeof req.body?.name === 'string' ? req.body.name.trim() : '').slice(0, 40) || checked.area.kind[0].toUpperCase() + checked.area.kind.slice(1);
+    const turns = req.body?.turns == null ? null : Number(req.body.turns);
+    if (turns !== null && !(isWholeNumber(turns) && turns >= 1 && turns <= MAX_OVERLAY_TURNS)) return res.status(400).json({ error: `turns must be 1 to ${MAX_OVERLAY_TURNS}` });
+
+    // whose turns count it down: the DM may pick any token; a player's counts their own character's turns
+    const rows = await Scenes.listTokens(scene.id);
+    let countsTokenId = null;
+    if (turns !== null) {
+        if (role === 'dm') countsTokenId = rows.some((r) => r.id === req.body?.countsTokenId) ? req.body.countsTokenId : null;
+        else countsTokenId = rows.find((r) => r.kind === 'character' && r.owner_id === req.session.userId)?.id ?? null;
+    }
+    await Scenes.addOverlay(scene.id, { name, ownerId: req.session.userId, shape: { area: checked.area, from: from ?? checked.area.at }, turnsLeft: turns, countsTokenId });
+    res.status(201).json({ overlays: (await Scenes.listOverlays(scene.id)).map(overlayView) });
+    await tellTable(req, scene.campaign_id, scene);
+}
+
+// DELETE /api/overlays/:id  overlay.remove: whoever placed it, or the DM. The DM removing someone else's tells the feed.
+export async function removeOverlay(req, res) {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    const overlay = await Scenes.getOverlay(Number(req.params.id));
+    if (!overlay) return res.status(404).json({ error: 'Overlay not found' });
+    const role = await Monsters.memberRole(overlay.campaign_id, req.session.userId);
+    if (!role) return res.status(404).json({ error: 'Overlay not found' });
+    const mine = overlay.owner_id === req.session.userId;
+    if (!mine && role !== 'dm') return res.status(403).json({ error: 'Only whoever placed it, or the DM, can remove it' });
+    await Scenes.removeOverlay(overlay.id);
+    res.status(204).end();
+    if (!mine) {
+        const note = { id: `note-${Date.now()}`, at: Date.now(), title: `DM removed ${overlay.name}`, lines: [], area: null, outcomes: [], actorTokenId: null };
+        req.app.get('io')?.to(`campaign:${overlay.campaign_id}`).emit('table-feed', note);
+    }
+    await tellTable(req, overlay.campaign_id, await Scenes.getScene(overlay.scene_id));
+}
+
+// ---- The board library (map editor, DM only) and the live board (play session) ----
+
+const MAX_BOARD_NAME = 60;
+const boardName = (raw) => (typeof raw === 'string' ? raw.trim().slice(0, MAX_BOARD_NAME) : '');
+
+// GET /api/campaigns/:id/scenes -> { scenes: [{ id, name, isActive, tokenCount }] }  (everyone: the session's selector)
+export async function listBoards(req, res) {
+    const campId = Number(req.params.id);
+    if (!await roleIn(req, res, campId)) return;
+    const rows = await Scenes.listScenes(campId);
+    res.json({ scenes: rows.map((s) => ({ id: s.id, name: s.name, isActive: !!s.is_active, tokenCount: s.token_count })) });
+}
+
+// POST /api/campaigns/:id/scenes  body { name, copyFrom? } -> { id, name }   a new board (DM); it isn't live until chosen
+export async function createBoard(req, res) {
+    const campId = Number(req.params.id);
+    const role = await roleIn(req, res, campId);
+    if (!role) return;
+    if (role !== 'dm') return res.status(403).json({ error: 'You are not the DM' });
+    const name = boardName(req.body?.name);
+    if (!name) return res.status(400).json({ error: 'Give the board a name' });
+    const copyFrom = req.body?.copyFrom == null ? null : Number(req.body.copyFrom);
+    if (copyFrom !== null && !Number.isInteger(copyFrom)) return res.status(400).json({ error: 'copyFrom must be a board id' });
+    const made = await Scenes.createScene(campId, name, copyFrom);
+    if (!made) return res.status(404).json({ error: 'Board to copy not found' });
+    if (!await Scenes.activeSceneId(campId)) await Scenes.setActiveScene(campId, made.id);   // the first board is live at once
+    res.status(201).json(made);
+}
+
+// A board and the DM check, for the routes below
+async function dmBoard(req, res) {
+    if (!req.session.userId) { res.status(401).json({ error: 'Not logged in' }); return null; }
+    const scene = await Scenes.getScene(Number(req.params.id));
+    if (!scene) { res.status(404).json({ error: 'Board not found' }); return null; }
+    if (await Monsters.memberRole(scene.campaign_id, req.session.userId) !== 'dm') { res.status(403).json({ error: 'You are not the DM' }); return null; }
+    return scene;
+}
+
+// GET /api/scenes/:id/edit -> the scene answer for that board, whether or not it's live (the map editor)
+export async function editBoard(req, res) {
+    const scene = await dmBoard(req, res);
+    if (!scene) return;
+    res.json({ ...(await sceneAnswer(scene.campaign_id, 'dm', req.session.userId, scene)), isLive: await Scenes.activeSceneId(scene.campaign_id) === scene.id });
+}
+
+// PATCH /api/scenes/:id  body { name } -> 204   rename a board
+export async function renameBoard(req, res) {
+    const scene = await dmBoard(req, res);
+    if (!scene) return;
+    const name = boardName(req.body?.name);
+    if (!name) return res.status(400).json({ error: 'Give the board a name' });
+    await Scenes.renameScene(scene.id, name);
+    res.status(204).end();
+}
+
+// DELETE /api/scenes/:id -> 204   delete a board, with its tokens and shapes. The live board can't be deleted.
+export async function deleteBoard(req, res) {
+    const scene = await dmBoard(req, res);
+    if (!scene) return;
+    if (await Scenes.activeSceneId(scene.campaign_id) === scene.id) return res.status(400).json({ error: 'That board is being played: switch to another one first' });
+    await Scenes.deleteScene(scene.id);
+    res.status(204).end();
+}
+
+// PUT /api/campaigns/:id/active-scene  body { sceneId } -> 204   the DM switches the table to another board.
+// Everyone's session loads the new board ('table-switch').
+export async function setLiveBoard(req, res) {
+    const campId = Number(req.params.id);
+    const role = await roleIn(req, res, campId);
+    if (!role) return;
+    if (role !== 'dm') return res.status(403).json({ error: 'You are not the DM' });
+    const scene = await Scenes.getScene(Number(req.body?.sceneId));
+    if (!scene || scene.campaign_id !== campId) return res.status(404).json({ error: 'Board not found' });
+    await Scenes.setActiveScene(campId, scene.id);
+    res.status(204).end();
+    req.app.get('io')?.to(`campaign:${campId}`).emit('table-switch', { campaignId: campId, sceneId: scene.id });
 }

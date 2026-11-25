@@ -313,7 +313,7 @@
         "resist": [
           "acid",
           "bludgeoning",
-          "cold",
+          "frost",
           "fire",
           "force",
           "lightning",
@@ -1021,14 +1021,14 @@
     "name": "Ring of Warmth",
     "item_category": "magical_item",
     "rarity": "Magical",
-    "description": "Resistance to cold damage.",
+    "description": "Resistance to frost damage.",
     "effects": [
       {
         "name": "Kept Warm",
-        "text": "Resistance to cold damage.",
+        "text": "Resistance to frost damage.",
         "uses": null,
         "resist": [
-          "cold"
+          "frost"
         ],
         "ac_bonus": null,
         "recharge": null,
@@ -1769,14 +1769,14 @@
     "name": "Orb of Kept Seasons",
     "item_category": "magical_item",
     "rarity": "Object of Power",
-    "description": "Resistance to cold and fire damage; Once per long rest, set the weather within 1 mile for the rest of the combat, or 8 hours out of combat; Your weapon hits deal an extra 1d4 cold or fire damage (your choice); Once per long rest, as an action, creatures of your choice within 30 ft regain 4d8 HP if they are above 0 HP.",
+    "description": "Resistance to frost and fire damage; Once per long rest, set the weather within 1 mile for the rest of the combat, or 8 hours out of combat; Your weapon hits deal an extra 1d4 frost or fire damage (your choice); Once per long rest, as an action, creatures of your choice within 30 ft regain 4d8 HP if they are above 0 HP.",
     "effects": [
       {
         "name": "Season's Shield",
-        "text": "Resistance to cold and fire damage.",
+        "text": "Resistance to frost and fire damage.",
         "uses": null,
         "resist": [
-          "cold",
+          "frost",
           "fire"
         ],
         "ac_bonus": null,
@@ -1806,7 +1806,7 @@
       },
       {
         "name": "Thaw and Frost",
-        "text": "Your weapon hits deal an extra 1d4 cold or fire damage (your choice).",
+        "text": "Your weapon hits deal an extra 1d4 frost or fire damage (your choice).",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -2429,7 +2429,7 @@
     "name": "Pendant of the Calm Sea",
     "item_category": "magical_item",
     "rarity": "Arcane",
-    "description": "Breathe water; Resistance to cold damage while underwater.",
+    "description": "Breathe water; Resistance to frost damage while underwater.",
     "effects": [
       {
         "name": "Sea Lungs",
@@ -2448,7 +2448,7 @@
       },
       {
         "name": "Deep Pressure",
-        "text": "Resistance to cold damage while underwater.",
+        "text": "Resistance to frost damage while underwater.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -4238,11 +4238,11 @@
     "name": "Rimecask",
     "item_category": "potion",
     "rarity": "Arcane",
-    "description": "Throw 30/90 ft; 15-ft radius. Endurance roll DC 15 or 4d6 cold damage and frozen in place (restrained) until the end of its next turn; half damage only on a success.",
+    "description": "Throw 30/90 ft; 15-ft radius. Endurance roll DC 15 or 4d6 frost damage and frozen in place (restrained) until the end of its next turn; half damage only on a success.",
     "effects": [
       {
         "name": "Rime Lock",
-        "text": "Throw 30/90 ft; 15-ft radius. CON save DC 15 or 4d6 cold damage and frozen in place (restrained) until the end of its next turn; half damage only on a success.",
+        "text": "Throw 30/90 ft; 15-ft radius. CON save DC 15 or 4d6 frost damage and frozen in place (restrained) until the end of its next turn; half damage only on a success.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -4250,7 +4250,7 @@
         "bonus_dice": null,
         "until_rest": null,
         "action_type": "action",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": null,
         "combat_rounds": null,
         "duration_text": null
@@ -4358,11 +4358,11 @@
     "name": "Frostburst Flask",
     "item_category": "potion",
     "rarity": "Magical",
-    "description": "Throw up to 20/60 ft; 10-ft radius. Precision roll DC 13 or 2d6 cold damage and speed halved until the end of its next turn; half damage only on a success.",
+    "description": "Throw up to 20/60 ft; 10-ft radius. Precision roll DC 13 or 2d6 frost damage and speed halved until the end of its next turn; half damage only on a success.",
     "effects": [
       {
         "name": "Frost Burst",
-        "text": "Throw up to 20/60 ft; 10-ft radius. DEX save DC 13 or 2d6 cold damage and speed halved until the end of its next turn; half damage only on a success.",
+        "text": "Throw up to 20/60 ft; 10-ft radius. DEX save DC 13 or 2d6 frost damage and speed halved until the end of its next turn; half damage only on a success.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -4370,7 +4370,7 @@
         "bonus_dice": null,
         "until_rest": null,
         "action_type": "action",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": null,
         "combat_rounds": null,
         "duration_text": null
@@ -4962,14 +4962,14 @@
     "name": "Ring of the Glacier Heart",
     "item_category": "magical_item",
     "rarity": "Mythical",
-    "description": "Resistance to cold damage; Your weapon hits deal an extra 1d4 cold damage; Once per long rest, as an action, a creature within 60 ft makes a Endurance roll or is restrained by ice for 10 rounds in combat, or 1 minute out of combat (save ends each turn).",
+    "description": "Resistance to frost damage; Your weapon hits deal an extra 1d4 frost damage; Once per long rest, as an action, a creature within 60 ft makes a Endurance roll or is restrained by ice for 10 rounds in combat, or 1 minute out of combat (save ends each turn).",
     "effects": [
       {
         "name": "Frozen Core",
-        "text": "Resistance to cold damage.",
+        "text": "Resistance to frost damage.",
         "uses": null,
         "resist": [
-          "cold"
+          "frost"
         ],
         "ac_bonus": null,
         "recharge": null,
@@ -4983,7 +4983,7 @@
       },
       {
         "name": "Chill Grip",
-        "text": "Your weapon hits deal an extra 1d4 cold damage.",
+        "text": "Your weapon hits deal an extra 1d4 frost damage.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -4991,7 +4991,7 @@
         "bonus_dice": "1d4",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": null,
         "combat_rounds": null,
         "duration_text": null

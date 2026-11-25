@@ -78,11 +78,11 @@
   {
     "id": 10,
     "key": "resist_cold",
-    "name": "Cold Resistance",
+    "name": "Frost Resistance",
     "type": "passive",
-    "description": "You take half damage from cold damage.",
+    "description": "You take half damage from frost damage.",
     "data": {
-      "resistance": "cold"
+      "resistance": "frost"
     }
   },
   {
@@ -5237,7 +5237,7 @@
     "key": "elemental_attunement",
     "name": "Elemental Attunement",
     "type": "passive",
-    "description": "Choose an element (fire, cold, lightning, or force). Your cantrips and Mage spells that deal that damage type add +1d4. Change attunement on a long rest.",
+    "description": "Choose an element (fire, frost, lightning, or force). Your cantrips and Mage spells that deal that damage type add +1d4. Change attunement on a long rest.",
     "data": {
       "dice": "1d4",
       "save": null,
@@ -5781,7 +5781,7 @@
     "key": "eclipse",
     "name": "Eclipse",
     "type": "action",
-    "description": "Action: 20-ft radius within 60 feet becomes magical darkness for 1 minute that you and allies can see through. Enemies starting turn there take 2d6 cold. Once per long rest.",
+    "description": "Action: 20-ft radius within 60 feet becomes magical darkness for 1 minute that you and allies can see through. Enemies starting turn there take 2d6 frost. Once per long rest.",
     "data": {
       "dice": "2d6",
       "save": null,
@@ -5858,7 +5858,7 @@
     "key": "flowing_element",
     "name": "Flowing Element",
     "type": "passive",
-    "description": "Choose an element (fire, cold, lightning, or water/force). Unarmed strikes deal +1d4 of that type. Change on long rest.",
+    "description": "Choose an element (fire, frost, lightning, or water/force). Unarmed strikes deal +1d4 of that type. Change on long rest.",
     "data": {
       "dice": "1d4",
       "save": null,

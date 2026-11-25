@@ -92,6 +92,23 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 - [ ] **S3** Forge — Done when: an approved forged spell matches catalog spells of its level
 - [ ] **S4** Sigil — Done when: the sigil plays on the sheet and, after Stage 4, on the phone
 
+## Side track — Real terrain (web table, alongside Stage 3, before Stage 5 / Unreal)
+
+Full step wording: https://claude.ai/artifact/UbeSb4hBMicUMUZ5tpwYL6
+
+- [ ] **T0** One terrain model (ground looks / ground rules / objects) — Done when: an old board converts with nothing lost, and moves through rough, steep, slick and deep water, and past each object kind, resolve correctly on the server
+- [ ] **T1** Board style switch (Tiles / Natural) — Done when: switching a board's style keeps its terrain exactly and both styles reload as saved
+- [ ] **T2** Ground textures — Done when: every surface and terrain type has a texture set in `assets/` and the whole set loads in under 2 seconds locally
+- [ ] **T3** Splat map and blended ground — Done when: a painted board in Natural style shows soft transitions between terrains and no hex edges
+- [ ] **T4** Grid overlay — Done when: the DM can set the grid to on, faint or off, and moving, Measure and shapes still work with it off
+- [ ] **T5** Sky light per mood (HDRI) — Done when: each mood has its own sky light and tokens stay readable in all of them
+- [ ] **T6** Model cleanup script — Done when: `npm run model -- <file>.glb` turns a raw Poly Haven or TRELLIS model into a board-ready file under 2 MB
+- [ ] **T7** Model support with footprints — Done when: a boulder model placed on a hex looks right, and the server refuses a move into it and blocks sight through it
+- [ ] **T8** Slopes and cliffs — Done when: heights rise as smooth hills, cliffs appear only where marked, and movement and sight give the same results as before
+- [ ] **T9** Code-built city walls — Done when: a painted wall line with a bend and a gate makes one joined wall that blocks movement and sight
+- [ ] **T10** Buildings — Done when: a multi-hex building stands on the board, a token walks in through its door, and its roof fades while it's inside
+- [ ] **T11** Performance check — Done when: a full city board holds a steady 60 frames a second on the laptop, plugged in, at 4K on the TV
+
 ## Stage 4 — Phones and the TV
 
 - [ ] **19** Polish for regular games — Done when: a real party plays weekly with a short written list of known issues

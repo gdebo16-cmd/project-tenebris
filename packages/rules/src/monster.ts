@@ -146,6 +146,7 @@ export function monsterToCreature(m: PackMonster, row: CampaignMonsterRow): Crea
         proficiency: prof,
         speedFt: Math.round(walk * (hpMax ? hpNow / hpMax : 1)),
         stats: STATS.map((s) => ({ key: s.key, label: s.label, score: score(s.key), mod: mod(s.key) })),
+        saves: Object.fromEntries(STATS.map((s) => [s.key, mod(s.key) + (saves.includes(s.key) ? prof : 0)])),
         skills: SKILLS.map((s) => {
             const bonus = Number(skillBonuses[s.id] ?? 0);
             return { id: s.id, name: s.name, proficient: bonus !== 0, value: mod(s.stats[0]) + mod(s.stats[1]) + bonus };

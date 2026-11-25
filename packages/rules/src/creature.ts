@@ -30,7 +30,7 @@ export type SheetArmor = {
 };
 export type SheetSpell = {
     id: number; name: string; base_level: number; is_action?: boolean; is_prepared?: boolean; action_type?: string | null;
-    description?: string | null;
+    description?: string | null; range?: number | string | null;   // range in feet (0 = self, none = touch)
     attack_type?: string | null; opponent_save_roll?: string | null; base_to_hit_modifier?: number | null;
     base_damage_dice?: string | null; heal_dice?: string | null; heal_add_mod?: boolean; dmgMod?: number;
     beam_scaling?: ScalingStep[] | null;
@@ -95,6 +95,7 @@ export type Creature = {
     proficiency: number;
     speedFt: number;
     stats: { key: StatKey; label: string; score: number; mod: number }[];
+    saves: Partial<Record<StatKey, number>>;   // saving throw bonus per stat: its mod, + proficiency if trained in that save
     skills: { id: string; name: string; value: number; proficient: boolean }[];
     conditions: Record<string, boolean>;
     exhaustion: number;
@@ -236,6 +237,7 @@ export function characterToCreature(data: SheetData): Creature {
         proficiency: prof,
         speedFt,
         stats: STATS.map((s) => ({ key: s.key, label: s.label, score: score(s.key), mod: mod(s.key) })),
+        saves: Object.fromEntries(STATS.map((s) => [s.key, mod(s.key) + ((ch.class_saving_throws ?? []).map((x) => statKey(x)).includes(s.key) ? prof : 0)])),
         skills: SKILLS.map((s) => {
             const proficient = proficientSkills.includes(s.name);
             return { id: s.id, name: s.name, proficient, value: mod(s.stats[0]) + mod(s.stats[1]) + (proficient ? prof : 0) };

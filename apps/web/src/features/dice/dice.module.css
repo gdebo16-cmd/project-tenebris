@@ -26,11 +26,13 @@
     font-size: 1.5rem;
 }
 :root {
-    --dice-color: #230d39;
-    --dice-number: #be9330;
+    --dice-color: #aa8f3e;
+    --dice-number: #ffffff;
     --hex-open: #2b4a2f;
     --hex-wall: #4a4a4a;
     --dice-button-selected: #725c89;
+    --table-color: #281616;
+    --background-color: #213e36;
 }
 
 .picker { display: flex; gap: 8px; }
@@ -60,3 +62,49 @@
 }
 
 .dieOn { color: var(--dice-button-selected, #725c89); border-color: var(--dice-button-selected, #725c89); }
+
+.landed {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text, #eee);
+    position: fixed;
+    bottom: 25dvh;
+    right: 2dvw;
+    border: 1px solid var(--border, #b27f50);
+    padding: 2rem;
+    border-radius: 1rem;
+    color: var(--text, #eee);
+    background: color-mix(in srgb, var(--background-color, #0e1815) 88%, transparent);
+}
+
+.feed {
+    list-style: none;
+    position: fixed;
+    right: 2dvw;
+    bottom: 16dvh;
+    width: 20dvw;
+    text-align: center;
+    border: 1px solid var(--border, #b27f50);
+    padding: 2rem;
+    border-radius: 1rem;
+    color: var(--text, #eee);
+    background: color-mix(in srgb, var(--background-color, #0e1815) 88%, transparent);
+}
+
+.feed li {
+    margin-bottom: 0.5rem;
+}
+
+.poolRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0.75rem 0;
+}
+
+.poolRow input { width: 4rem; }
+
+.rollButtonRoll:disabled { opacity: 0.5; cursor: default; }
+
+

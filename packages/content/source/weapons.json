@@ -877,7 +877,7 @@
     "effects": [
       {
         "name": "Rimecrest Sweep",
-        "text": "On a hit, deal an extra 1d8 cold damage. +1 to attack rolls with this weapon (on top of its magic bonus).",
+        "text": "On a hit, deal an extra 1d8 frost damage. +1 to attack rolls with this weapon (on top of its magic bonus).",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -885,7 +885,7 @@
         "bonus_dice": "1d8",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": 1,
         "combat_rounds": null,
         "duration_text": null
@@ -1188,7 +1188,7 @@
     "effects": [
       {
         "name": "Frostbite Sweep",
-        "text": "On a hit, deal an extra 1d4 cold damage.",
+        "text": "On a hit, deal an extra 1d4 frost damage.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -1196,7 +1196,7 @@
         "bonus_dice": "1d4",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": null,
         "combat_rounds": null,
         "duration_text": null
@@ -1427,7 +1427,7 @@
     "effects": [
       {
         "name": "Frostfletch",
-        "text": "On a hit, deal an extra 1d4 cold damage.",
+        "text": "On a hit, deal an extra 1d4 frost damage.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -1435,7 +1435,7 @@
         "bonus_dice": "1d4",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": null,
         "combat_rounds": null,
         "duration_text": null
@@ -2270,7 +2270,7 @@
     "effects": [
       {
         "name": "Winterfletch",
-        "text": "On a hit, deal an extra 1d8 cold damage. +1 to attack rolls with this weapon (on top of its magic bonus).",
+        "text": "On a hit, deal an extra 1d8 frost damage. +1 to attack rolls with this weapon (on top of its magic bonus).",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -2278,7 +2278,7 @@
         "bonus_dice": "1d8",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": 1,
         "combat_rounds": null,
         "duration_text": null
@@ -3283,7 +3283,7 @@
     "effects": [
       {
         "name": "Glacier's Arc",
-        "text": "On a hit, deal an extra 1d8 cold damage. +3 to attack rolls with this weapon (on top of its magic bonus). Your attacks with it ignore resistance to cold damage.",
+        "text": "On a hit, deal an extra 1d8 frost damage. +3 to attack rolls with this weapon (on top of its magic bonus). Your attacks with it ignore resistance to frost damage.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -3291,14 +3291,14 @@
         "bonus_dice": "1d8",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": 3,
         "combat_rounds": null,
         "duration_text": null
       },
       {
         "name": "Greater Rimebind Sweep",
-        "text": "Once per turn on a hit, the target's speed is reduced by 10 ft until the start of your next turn. When it triggers, the hit also deals an extra 1d8 cold damage.",
+        "text": "Once per turn on a hit, the target's speed is reduced by 10 ft until the start of your next turn. When it triggers, the hit also deals an extra 1d8 frost damage.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -3306,7 +3306,7 @@
         "bonus_dice": "1d8",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": null,
         "combat_rounds": null,
         "duration_text": null
@@ -3702,7 +3702,7 @@
     "effects": [
       {
         "name": "Polar Fletch",
-        "text": "On a hit, deal an extra 1d8 cold damage. +3 to attack rolls with this weapon (on top of its magic bonus). Your attacks with it ignore resistance to cold damage.",
+        "text": "On a hit, deal an extra 1d8 frost damage. +3 to attack rolls with this weapon (on top of its magic bonus). Your attacks with it ignore resistance to frost damage.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -3710,14 +3710,14 @@
         "bonus_dice": "1d8",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": 3,
         "combat_rounds": null,
         "duration_text": null
       },
       {
         "name": "Greater Covercutter",
-        "text": "Once per turn on a hit, you ignore half cover. When it triggers, the hit also deals an extra 1d8 cold damage.",
+        "text": "Once per turn on a hit, you ignore half cover. When it triggers, the hit also deals an extra 1d8 frost damage.",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -3725,7 +3725,7 @@
         "bonus_dice": "1d8",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": null,
         "combat_rounds": null,
         "duration_text": null
@@ -5505,7 +5505,7 @@
     "effects": [
       {
         "name": "Mistcutter Edge",
-        "text": "On a hit, deal an extra 1d8 cold damage. +1 to attack rolls with this weapon (on top of its magic bonus).",
+        "text": "On a hit, deal an extra 1d8 frost damage. +1 to attack rolls with this weapon (on top of its magic bonus).",
         "uses": null,
         "resist": [],
         "ac_bonus": null,
@@ -5513,7 +5513,7 @@
         "bonus_dice": "1d8",
         "until_rest": null,
         "action_type": "passive",
-        "damage_type": "cold",
+        "damage_type": "frost",
         "to_hit_bonus": 1,
         "combat_rounds": null,
         "duration_text": null

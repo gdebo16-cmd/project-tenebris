@@ -9,6 +9,7 @@ import * as Monsters from '../models/monsterModel.js';
 import { loadSheetData } from './sheetController.js';
 import { creatureOfRow, monsterSummary } from './apiMonsterController.js';
 import { rng } from '../dice.js';
+import { tellTurns, endOfTurn } from './tableNews.js';
 
 // Answers the campaign id, or null after sending 401/403/404
 async function dmOf(req, res) {
@@ -74,9 +75,11 @@ export async function initiative(req, res) {
         const now = initiativeOf((await Dm.getDmState(campId)).initiative);
         if (!now) return res.status(400).json({ error: 'Roll initiative first' });
         next = nextTurn(now);
+        await endOfTurn(req.app.get('io'), campId, now.order[now.turn]);     // overlays counting that creature's turns go down by one
     }
     const saved = await Dm.saveInitiative(campId, next);
     res.json({ initiative: initiativeOf(saved.initiative) });
+    tellTurns(req.app.get('io'), campId, saved.initiative);     // the table's portrait bar and spotlight follow along
 }
 
 // PUT /api/campaigns/:id/dm-notes   body: { notes }

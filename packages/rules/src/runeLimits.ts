@@ -3,7 +3,8 @@
 export const RUNE_CALLING = 'Tome of Inscription';
 export const RUNES_PER_ITEM = [0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3];
 export const ACTIVE_RUNES = [0,0,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,6,6,7,7,7,7,8,8,8];
-export const WARDING_TYPES = ['acid', 'cold', 'fire', 'force', 'lightning', 'necrotic', 'poison', 'psychic', 'radiant', 'thunder'];
+// Damage types a warding rune can guard against. Frost, never "cold" (Gabriel, 2026-11-24)
+export const WARDING_TYPES = ['acid', 'fire', 'force', 'frost', 'lightning', 'necrotic', 'poison', 'psychic', 'radiant', 'thunder'];
 
 const at = (arr: number[], level: number): number => arr[Math.min(30, Math.max(1, Number(level) || 1)) - 1];
 export const runesPerItem = (level: number) => at(RUNES_PER_ITEM, level);

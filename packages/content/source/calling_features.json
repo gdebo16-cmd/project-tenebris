@@ -4237,7 +4237,7 @@
       "duration": null,
       "recharge": null,
       "action_type": "passive",
-      "description": "Choose an element (fire, cold, lightning, or force). Your cantrips and Mage spells that deal that damage type add +1d4. Change attunement on a long rest.",
+      "description": "Choose an element (fire, frost, lightning, or force). Your cantrips and Mage spells that deal that damage type add +1d4. Change attunement on a long rest.",
       "scaling_rule": "Flat +1 every 5"
     },
     "link_id": 114,
@@ -4261,7 +4261,7 @@
     "hp_per_level": null,
     "description": null,
     "name": "Elemental Attunement",
-    "feature_description": "Choose an element (fire, cold, lightning, or force). Your cantrips and Mage spells that deal that damage type add +1d4. Change attunement on a long rest."
+    "feature_description": "Choose an element (fire, frost, lightning, or force). Your cantrips and Mage spells that deal that damage type add +1d4. Change attunement on a long rest."
   },
   {
     "calling_id": 15,
@@ -8555,7 +8555,7 @@
       "duration": "1 minute",
       "recharge": "long_rest",
       "action_type": "action",
-      "description": "Action: 20-ft radius within 60 feet becomes magical darkness for 1 minute that you and allies can see through. Enemies starting turn there take 2d6 cold. Once per long rest."
+      "description": "Action: 20-ft radius within 60 feet becomes magical darkness for 1 minute that you and allies can see through. Enemies starting turn there take 2d6 frost. Once per long rest."
     },
     "link_id": 224,
     "legacy_feature_id": null,
@@ -8578,7 +8578,7 @@
     "hp_per_level": null,
     "description": null,
     "name": "Eclipse",
-    "feature_description": "Action: 20-ft radius within 60 feet becomes magical darkness for 1 minute that you and allies can see through. Enemies starting turn there take 2d6 cold. Once per long rest."
+    "feature_description": "Action: 20-ft radius within 60 feet becomes magical darkness for 1 minute that you and allies can see through. Enemies starting turn there take 2d6 frost. Once per long rest."
   },
   {
     "calling_id": 29,
@@ -8875,7 +8875,7 @@
       "duration": null,
       "recharge": null,
       "action_type": "passive",
-      "description": "Choose an element (fire, cold, lightning, or water/force). Unarmed strikes deal +1d4 of that type. Change on long rest.",
+      "description": "Choose an element (fire, frost, lightning, or water/force). Unarmed strikes deal +1d4 of that type. Change on long rest.",
       "scaling_rule": "Brand d6 every 5"
     },
     "link_id": 245,
@@ -8899,7 +8899,7 @@
     "hp_per_level": null,
     "description": null,
     "name": "Flowing Element",
-    "feature_description": "Choose an element (fire, cold, lightning, or water/force). Unarmed strikes deal +1d4 of that type. Change on long rest."
+    "feature_description": "Choose an element (fire, frost, lightning, or water/force). Unarmed strikes deal +1d4 of that type. Change on long rest."
   },
   {
     "calling_id": 31,
@@ -15782,7 +15782,7 @@
     "dice": null,
     "options": [
       "Acid",
-      "Cold",
+      "Frost",
       "Fire",
       "Lightning",
       "Thunder"
@@ -15800,7 +15800,7 @@
     "uses_scaling": null,
     "on_weapon_hit": false,
     "hp_per_level": 0,
-    "description": "Choose acid, cold, fire, lightning, or thunder. You resist that damage type and add your Intellect modifier to one damage roll of each spell you cast that deals it.",
+    "description": "Choose acid, frost, fire, lightning, or thunder. You resist that damage type and add your Intellect modifier to one damage roll of each spell you cast that deals it.",
     "name": "Elemental Affinity",
     "feature_description": ""
   },
@@ -19685,7 +19685,7 @@
     "uses_scaling": null,
     "on_weapon_hit": false,
     "hp_per_level": 0,
-    "description": "After each long rest choose a season. Spring: your healing spells restore +Judgment modifier HP. Summer: once per spell, add Judgment modifier to fire or radiant damage. Autumn: a creature that fails your spell's save has -1d4 on its next save. Winter: creatures you deal cold damage to lose 10 ft of speed until your next turn.",
+    "description": "After each long rest choose a season. Spring: your healing spells restore +Judgment modifier HP. Summer: once per spell, add Judgment modifier to fire or radiant damage. Autumn: a creature that fails your spell's save has -1d4 on its next save. Winter: creatures you deal frost damage to lose 10 ft of speed until your next turn.",
     "name": "Seasonal Boon",
     "feature_description": ""
   },
@@ -19716,7 +19716,7 @@
     "uses_scaling": null,
     "on_weapon_hit": false,
     "hp_per_level": 0,
-    "description": "Action, concentration up to 10 minutes, 1 use per rest: within 60 ft of you call rain (lightly obscured, extinguishes flames), gale (ranged weapon attacks have disadvantage), fog (heavily obscured), or heat (allies resist cold).",
+    "description": "Action, concentration up to 10 minutes, 1 use per rest: within 60 ft of you call rain (lightly obscured, extinguishes flames), gale (ranged weapon attacks have disadvantage), fog (heavily obscured), or heat (allies resist frost).",
     "name": "Weather Call",
     "feature_description": ""
   },
@@ -19747,7 +19747,7 @@
     "uses_scaling": null,
     "on_weapon_hit": false,
     "hp_per_level": 0,
-    "description": "Action, 1 minute, 1 use per rest: flip a 30-ft-radius zone within 60 ft. Spring: allies starting their turn there regain 1d6 HP. Summer: enemies starting there take 2d6 fire. Autumn: enemies there have disadvantage on Judgment rolls. Winter: difficult terrain, and enemies starting there take 2d6 cold.",
+    "description": "Action, 1 minute, 1 use per rest: flip a 30-ft-radius zone within 60 ft. Spring: allies starting their turn there regain 1d6 HP. Summer: enemies starting there take 2d6 fire. Autumn: enemies there have disadvantage on Judgment rolls. Winter: difficult terrain, and enemies starting there take 2d6 frost.",
     "name": "Sudden Season",
     "feature_description": ""
   },

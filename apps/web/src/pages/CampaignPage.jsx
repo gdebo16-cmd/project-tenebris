@@ -112,19 +112,19 @@ function CampaignPage() {
                     {editing ? (
                     <>
                         <div className={styles.editContainer}>
-                            <article className={styles.titleEdit}>
+                            <article className={styles.editTitle}>
                                 <h2><strong>Edit Tale</strong></h2>
                             </article>
                             
                             <form onSubmit={saveEdit}>
-                                <div className={styles.titleEdit}>
+                                <div className={styles.editTitleInputContainer}>
                                     <label className={styles.editLabel} htmlFor="camp-edit-name">Title</label>
-                                    <input id="camp-edit-name" className={styles.editInput} type="text" maxLength={120} value={form.name}
+                                    <input id="camp-edit-name" className={styles.editTitleInput} type="text" maxLength={120} value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })} />
                                 </div>
                                 <div className={styles.descriptionEdit}>
                                     <label className={styles.editLabel} htmlFor="camp-edit-desc">Description</label>
-                                    <textarea id="camp-edit-desc" className={styles.editInput} rows={5} value={form.description}
+                                    <textarea id="camp-edit-desc" className={styles.editDescriptionInput} rows={5} value={form.description}
                                         onChange={(e) => setForm({ ...form, description: e.target.value })} />
                                 </div>
                                 
@@ -150,21 +150,30 @@ function CampaignPage() {
                     ) : (
                         <>
                             <h2 className={styles.titleEdit}><strong>{campaign.name}</strong></h2>
-                            {campaign.campaign_img_url
-                                ? <img className={styles.imageCampaign} src={campaign.campaign_img_url} alt={`${campaign.name} picture`} />
-                                : <div className={styles.imageCampaign} role="img" aria-label={`${campaign.name} picture`} />}
-                            <div className={styles.descriptionEdit}>
-                                <div>
-                                    <p className={styles.editLabel}>Description</p>
-                                    <p className={styles.editInputDisplay}>{campaign.description || 'No description yet.'}</p>
+                            <div className={styles.imageCampaignContainer}>
+                                {campaign.campaign_img_url
+                                    ? <img className={styles.imageCampaign} src={campaign.campaign_img_url} alt={`${campaign.name} picture`} />
+                                    : <div className={styles.imageCampaign} role="img" aria-label={`${campaign.name} picture`} />}
+                                <div className={styles.descriptionEdit}>
+                                    <div>
+                                        <p className={styles.editLabel}>Description</p>
+                                        <p className={styles.editInputDisplay}>{campaign.description || 'No description yet.'}</p>
+                                    </div>
                                 </div>
                             </div>
-                            {campaign.role === 'dm' && (
-                                <div className={styles.editActions}>
-                                    <button type="button" className={styles.actionButton} onClick={startEdit}>Edit Tale</button>
-                                    <Link className={styles.actionButton} to={`/campaign/${campId}/dm`}>DM page</Link>
+                            <div className={styles.campaignActionsContainer}>
+                                {campaign.role === 'dm' && (
+                                    <div className={styles.campaignActionsDM}>
+                                        <button type="button" className={styles.campaignActionRealButton} onClick={startEdit}>Edit Tale</button>
+                                        <Link className={styles.campaignActionButton} to={`/campaign/${campId}/dm`}>DM page</Link>
+                                    </div>
+                                    
+                                )}
+                                <div className={styles.campaignActionsPlayer}>
+                                    <Link className={styles.campaignActionButton} to={`/campaign/${campId}/table`}>Play Session</Link>
+                                    {campaign.role === 'dm' && <Link className={styles.campaignActionButton} to={`/campaign/${campId}/maps`}>Map Editor</Link>}
                                 </div>
-                            )}
+                            </div>
                         </>
                     )}
                 </section>
@@ -221,13 +230,12 @@ function CampaignPage() {
                             <option value="">Choose a monster…</option>
                                 {(catalog.data || []).map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                         </select>
-                        <button type="button" className={styles.actionButton} onClick={addMonster} disabled={!pickMonster}>Add Monster</button>
+                        <button type="button" className={styles.monstersButton} onClick={addMonster} disabled={!pickMonster}>Add Monster</button>
                         </div>
                         <ul className={styles.monsterList}>
                             {(monsters.data || []).map((m) => (
                                 <li key={m.id} className={styles.monsterRow}>
-                                    <Link to={`/monsters/${m.id}`}>{m.name}</Link>
-                                    <span className={styles.monsterHp}>{m.health} · HP {m.hp.current}/{m.hp.max}</span>
+                                    <Link className={styles.monsterLink} to={`/monsters/${m.id}`}>{m.name}</Link>
                                 </li>
                             ))}
                         </ul>

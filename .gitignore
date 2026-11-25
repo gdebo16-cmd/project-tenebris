@@ -29,3 +29,6 @@ playwright-report/
 
 # local content backups (e.g. before an elf sub-species update)
 *.bak-elf
+
+# texture downloads (the originals); the trimmed copies the board uses live in assets/textures
+texture-sources/

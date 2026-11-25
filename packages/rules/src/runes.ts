@@ -6,7 +6,7 @@ export type Rune = { id?: number; name: string; dice?: string | null; is_damage_
 export type RunedItem = { name?: string; is_equipped?: boolean; attack_bonus?: number | string | null; armor_type?: string | null; runes?: Rune[] | null };
 export type Rider = { name: string; dice: string; type: string };
 
-const RIDER_TYPES: Record<string, string> = { 'Ember Rune': 'fire', 'Rime Rune': 'cold', 'Spark Rune': 'lightning', 'Gall Rune': 'acid' };
+const RIDER_TYPES: Record<string, string> = { 'Ember Rune': 'fire', 'Rime Rune': 'frost', 'Spark Rune': 'lightning', 'Gall Rune': 'acid' };
 
 export function weaponRuneEffects(weapon: RunedItem): { hitBonus: number; riders: Rider[] } {
     const runes = weapon.runes ?? [];

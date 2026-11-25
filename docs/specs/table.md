@@ -97,9 +97,22 @@ Written from Gabriel's answers on 2026-11-22. Anything not decided yet is under 
 - **Line of sight** (Stage 3, step 18): a toggle so rolls, measurements and the like are shown only to those who can see them.
   The server already owns vision, so it decides who gets each event. Build measuring and the feed so they can be filtered per player later.
 
+## Decided by Gabriel (2026-11-23), built in steps 17–18
+
+- **Overlay shapes v1:** circle, cone, line and square, on whole hexes. The caster or drawer picks the shape and size (5–120 ft); the
+  content pack's spells have a range but no area, so the area is chosen when casting.
+- **Resolving actions (step 17):** the server rolls and applies damage straight to HP (the DM can still fix HP on the sheet).
+  Range is enforced (weapons up to their long range, spells their range; 0 = self, none = touch), and the target or the area's
+  centre must be in sight. Attacks: d20 + to-hit against AC; a natural 20 always hits and doubles the dice, a 1 always misses.
+  Saving throws: **success = no damage** (not half). Single attacks and area spells are both in.
+- **Fog (step 18):** a per-scene switch (Scene → Fog). Players see what **any party member** sees (characters and player-owned
+  summons); the DM sees everything with the fog shaded. Walls, trees, boulders and pillars block sight (the same set that blocks
+  walking). Light doesn't matter yet: Night and Dungeon are looks only (darkvision / light radius later). Hexes seen once stay
+  uncovered but veiled; "Cover the map again" clears them. The server leaves unseen tokens and unexplored terrain out of what
+  players receive.
+
 ## Open (Gabriel decides)
 
 - **Where uploaded maps are stored.** Not on Render's disk (it's wiped on every deploy): object storage such as Cloudflare R2 or Neon storage.
   Also: largest file size, and whether pictures are converted to WebP on upload.
-- Overlay shapes for v1 (circle, cone, line, square?) and whether they snap to hexes.
 - Whether players can see a token's exact HP on the table (the sheet rule says players see only a health word for monsters).

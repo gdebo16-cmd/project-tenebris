@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { distance, neighbors, hexKey, findPath, hexesWithin, wallsOf, hexesForSpeed, isTerrainKind } from '../src/hex.ts';
+import { distance, neighbors, hexKey, findPath, hexesWithin, wallsOf, hexesForSpeed, isTerrainKind, checkLookChange } from '../src/hex.ts';
 
 test('distance counts the fewest steps between two hexes', () => {
     assert.equal(distance({q:0,r:0}, {q:2,r:2}), 4)
@@ -47,6 +47,20 @@ test('hexesWithin fills a hexagon: 1, 7, 19 hexes for radius 0, 1, 2', () => {
     assert.equal(hexesWithin({ q: 0, r: 0 }, 1).length, 7);
     assert.equal(hexesWithin({ q: 0, r: 0 }, 2).length, 19);
     assert.ok(hexesWithin({ q: 3, r: -1 }, 2).every((h) => distance({ q: 3, r: -1 }, h) <= 2));
+});
+
+test('checkLookChange keeps good changes and refuses bad ones', () => {
+    assert.deepEqual(checkLookChange({ mood: 'night', room: true }), { change: { mood: 'night', room: true } });
+    assert.deepEqual(checkLookChange({ map: { url: 'https://x.test/map.jpg' } }), { change: { map: { url: 'https://x.test/map.jpg', size: 30 } } });
+    assert.ok('error' in checkLookChange({ mood: 'disco' }));
+    assert.ok('error' in checkLookChange({ map: { url: 'javascript:alert(1)' } }));
+    assert.ok('error' in checkLookChange({ map: { url: 'https://x.test/a.png', size: 500 } }));
+    assert.ok('error' in checkLookChange({}));
+});
+
+test('wallsOf adds features that block (trees, boulders, pillars) but not the rest', () => {
+    const walls = wallsOf({ '1,0': 'wall' }, { '2,0': { kind: 'tree' }, '3,0': { kind: 'crate' }, '4,0': { kind: 'light', color: '#ffffff' } });
+    assert.deepEqual([...walls].sort(), ['1,0', '2,0']);
 });
 
 test('wallsOf keeps only the terrain that blocks movement', () => {

@@ -7,7 +7,9 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 - **Stage 2, the 2D hex table:** steps 8–13 done (2026-11-23). **Gate 2 is ready for Gabriel to check and tick.**
 - Stage 0 cutover: backup made (0.11) and rehearsed; new Render service `tenebris` runs on a copy of production. The switch itself waits for a time from Gabriel.
 - **Paused by Gabriel:** nothing.
-- **In progress:** nothing claimed.
+- **In progress:** nothing claimed. Steps 17–18 built (uncommitted in Gabriel's main folder), waiting for his check.
+- **Map Editor / Play Session split** built 2026-11-24 (uncommitted in Gabriel's main folder), waiting for his check.
+- **New side track T0–T11 (Real terrain)** planned, alongside Stage 3; T0 (one terrain model) is next, Gabriel building with guidance.
 
 ## Next
 
@@ -21,6 +23,49 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-24 — Claude (Map Editor / Play Session split, editor tools, monsters, frost; real-terrain plan; Gabriel asked: "Do it", "go for it")
+All in Gabriel's main folder, **uncommitted** (he commits). No new migrations (look + explored from 2026-11-23 already run on `rework`).
+- **Map Editor / Play Session split:** the campaign page now has **Play Session** (`/campaign/:id/table`) and, for the DM,
+  **Map Editor** (`/campaign/:id/maps`, `/maps/:sceneId`). Editor = terrain brushes, Eraser, Surface, Features, Height, Place, Look,
+  Clear map, map picture. Session = Move, Place, Shapes, **Measure** (new: hexes · feet), Scene (mood, weather, fog) + a **board selector**
+  that puts a board on everyone's table at once. Files: `BoardLibrary.tsx` (+ `.module.css`), `MapEditorPage.tsx`, `TablePage.tsx`
+  (`mode`, `editSceneId`, board key `"41"` live / `"41@7"` editing), `tableQueries.ts` (board hooks, `table-switch`), `App.jsx`, `CampaignPage.jsx`.
+- **Server boards:** `GET/POST /campaigns/:id/scenes`, `PUT /campaigns/:id/active-scene`, `GET /scenes/:id/edit`, `PATCH`/`DELETE /scenes/:id`
+  (the live board can't be deleted), `POST /scenes/:id/clear`; batch paint (a whole stroke in one request). `tellTable` only broadcasts the live board.
+- **Editor fixes:** board radius 12 (`BOARD_RADIUS`, `onBoard`); one plane click handler (placing one tree made ~100 before); drag painting with
+  `hexLine` fill-in; brushes; hex patches turned the right way; `HexPatches` makes room as a list grows (the Measure line showed one hex).
+- **Content:** 322 monsters (`scripts/import-monsters.mjs`, `packages/content/import/new-monsters-*.json`); **Frost replaces cold** everywhere in content + rules.
+  Production still has cold warding runes: convert at cutover.
+- Checked: typecheck, 151 rules tests, board routes request by request on a local Postgres, editor + session + selector + Measure in the browser.
+- **Planned (Gabriel's decisions, nothing built):** side track **T0–T11 Real terrain** added to `docs/CHECKLIST.md`, alongside Stage 3, before Unreal.
+  Guide: https://claude.ai/artifact/UbeSb4hBMicUMUZ5tpwYL6 . T0 = one terrain model: ground looks (cosmetic) / ground rules (rough, slick,
+  deep water, steep — steep automatic from heights) / objects with their own rules (walls, thin + thick trees, bushes…), stacking per hex.
+  Ground looks = **any Poly Haven texture** (library in the paint menu, downloaded the first time it's painted, "Powered by Poly Haven" credit,
+  app named in the User-Agent), **16 textures max per board**. Hiding, deep water, Balance prompts and TV-only dice are recorded in the guide
+  and the project's ideas doc.
+- Known / left: campaign 41 (on `rework`) has a "Test Cave" board and ~96 stray trees on Scene 1; the turn bar is per campaign, not per board;
+  test switches `?nofx` / `?off=` can go; TS 7's `tsc` is Windows-only, so the Linux sandbox can't typecheck in place (copy out to check).
+
+### 2026-11-23 — Claude (table polish, flash + lag fixes, steps 17 and 18; Gabriel asked: "do them all", "You can do 17 and 18")
+All in Gabriel's main folder, **uncommitted** (he commits). Two migrations to run: `add-scene-look`, `add-scene-explored`.
+- **Table polish:** scene moods (day/dawn/dusk/night/dungeon), weather (fog/rain/snow), room with candles, map picture link,
+  raised ground (Height tool, looks only), turn bar with portraits + spotlight + camera glide, hover glow, footprints,
+  hit/heal bursts with floating numbers, swaying grass, wobbly hex edges, fly-in. Files: `BoardWorld.tsx`, `BoardMoments.tsx`, `TurnBar.tsx`.
+- **The black flash:** drei `Sparkles` (the dust) divided by zero on a pixel centre; Bloom smeared the broken pixel into a black
+  box. Replaced with our own dust shader (`BoardAtmosphere.tsx`). `?perf` turns on a frame counter + console recorder
+  (`tableDebug.ts`); `?nofx` / `?off=ao,bloom,vignette` switch effects off for testing (can be removed now).
+- **Lag on move:** the whole board redrew on every change; board pieces are now `memo` with stable click handlers (~600 → ~150 ms).
+- **Step 17** (`packages/rules/src/combat.ts`, `sight.ts`; server `tableActController.js`; board `BoardActs.tsx`): select your token →
+  Act menu → weapon or spell → click a target or (spells) an area. Server checks range + line of sight, rolls to hit / saves,
+  applies damage or healing, spends the slot, sends a `table-feed` entry (players never see a monster's own rolls). Overlays:
+  `POST /scenes/:id/overlays`, `DELETE /overlays/:id`, count down on the DM's Next. Creatures now carry `saves`.
+- **Step 18** (`tableNews.js`): Scene → Fog. Party sight computed on the server, `scenes.explored` remembers what was seen; players
+  get only explored terrain and visible tokens. Gabriel's rules are in `docs/specs/table.md` ("Decided by Gabriel").
+- Checked: typecheck, 149 unit tests (11 new), the server request by request on a local Postgres (hit, miss, out of range,
+  not yours, save/fail, cone, overlay countdown, fog hiding a monster, no attacking what you can't see), screenshots of DM and player views.
+- Not done / known: turn bar still names monsters hidden in fog; weapon extras (Soul/Runic Strike) only from the sheet; long range has no
+  disadvantage; area spells don't need line of effect from the centre. Steps 17/18 not ticked (Gabriel commits first).
 
 ### 2026-11-23 — Claude (Stage 3: steps 14 and 16; Gabriel asked "deploy, and keep going")
 - Staging deployed with PR #17 (Stage 2); the IPv4 Dockerfile build works. Gabriel's main folder: his uncommitted step 12 copies stashed (`stash@{0}`, with his OK) and `main` pulled.

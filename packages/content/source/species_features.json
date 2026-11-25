@@ -316,8 +316,8 @@
     "dice": null,
     "description": null,
     "data": {},
-    "name": "Cold Resistance",
-    "feature_description": "You take half damage from cold damage."
+    "name": "Frost Resistance",
+    "feature_description": "You take half damage from frost damage."
   },
   {
     "species_id": 48,
@@ -868,7 +868,7 @@
     "action_type": null,
     "uses": "Passive",
     "dice": null,
-    "description": "Choose your gem line at character creation. It sets your fur color and gives resistance to one damage type: Opal radiant, Onyx necrotic, Amethyst psychic, Topaz lightning, Quartz force, Emerald poison, Ruby fire, Sapphire cold.",
+    "description": "Choose your gem line at character creation. It sets your fur color and gives resistance to one damage type: Opal radiant, Onyx necrotic, Amethyst psychic, Topaz lightning, Quartz force, Emerald poison, Ruby fire, Sapphire frost.",
     "data": {
       "legacy_race_lineage_id": 49
     },
@@ -918,8 +918,8 @@
     "dice": null,
     "description": null,
     "data": {},
-    "name": "Cold Resistance",
-    "feature_description": "You take half damage from cold damage."
+    "name": "Frost Resistance",
+    "feature_description": "You take half damage from frost damage."
   },
   {
     "species_id": 57,
@@ -1446,7 +1446,7 @@
     "action_type": null,
     "uses": "Passive",
     "dice": null,
-    "description": "Choose a breed at character creation. Mastiff: +1 HP per level. Greyhound: +10 ft speed. Husky: cold resistance. Rottweiler: bite 1d6 + Might (bonus action, 1 per short rest). Shepherd: +2 Awareness. Hound: track by scent across up to a day-old trail.",
+    "description": "Choose a breed at character creation. Mastiff: +1 HP per level. Greyhound: +10 ft speed. Husky: frost resistance. Rottweiler: bite 1d6 + Might (bonus action, 1 per short rest). Shepherd: +2 Awareness. Hound: track by scent across up to a day-old trail.",
     "data": {
       "legacy_race_lineage_id": 68
     },

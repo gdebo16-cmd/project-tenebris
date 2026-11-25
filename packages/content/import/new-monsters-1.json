@@ -1,0 +1,1906 @@
+[
+ {
+  "id": 1,
+  "name": "Bandit",
+  "description": "A road-worn outlaw who survives by ambushing travelers and knowing when to run.",
+  "threat": 1,
+  "size": "medium",
+  "type": "humanoid",
+  "armor_class": 12,
+  "hit_points": 11,
+  "speed": 30,
+  "stats": {
+   "str": 11,
+   "dex": 12,
+   "con": 12,
+   "int": 10,
+   "wis": 10,
+   "cha": 10
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [],
+  "immunities": [],
+  "weaknesses": [],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": null,
+  "attacks": [
+   {
+    "name": "Scimitar",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "1d6",
+    "damage_type": "slashing",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 5,
+    "action_type": "action"
+   },
+   {
+    "name": "Light Crossbow",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "1d8",
+    "damage_type": "piercing",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Roadside Ambush",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "If the bandit acts before its target during the first round of combat, it gains +2 on its first attack roll against that target."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Cut and Run",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "After taking damage, the bandit moves up to half its speed without provoking opportunity attacks."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 2,
+  "name": "Cinder Imp",
+  "description": "A spiteful little fiend that nests in cold hearths and rekindles them into dangerous blazes.",
+  "threat": 2,
+  "size": "small",
+  "type": "fiend",
+  "armor_class": 13,
+  "hit_points": 18,
+  "speed": 30,
+  "stats": {
+   "str": 6,
+   "dex": 15,
+   "con": 12,
+   "int": 10,
+   "wis": 12,
+   "cha": 14
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [],
+  "immunities": [
+   "fire"
+  ],
+  "weaknesses": [
+   "frost"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "cha",
+  "attacks": [
+   {
+    "name": "Coal Bite",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "1d4",
+    "damage_type": "piercing",
+    "extra_dice": "1d4",
+    "extra_type": "fire",
+    "reach": 5,
+    "action_type": "action"
+   },
+   {
+    "name": "Spark Ray",
+    "stat": "cha",
+    "to_hit_bonus": 0,
+    "damage_dice": "1d8",
+    "damage_type": "fire",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 60,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Skittering Flame",
+    "action_type": "bonus",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "The imp transforms into a streak of sparks and teleports up to 15 feet to an unoccupied space it can see."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Flash of Cinders",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When hit by a creature within 5 feet, the imp releases a burst of sparks. That creature takes -2 on its next attack roll before the end of its next turn."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 3,
+  "name": "Mirejaw",
+  "description": "A patient marsh predator with a lantern-like tongue and jaws capable of crushing a wooden boat.",
+  "threat": 3,
+  "size": "large",
+  "type": "beast",
+  "armor_class": 13,
+  "hit_points": 39,
+  "speed": 30,
+  "stats": {
+   "str": 16,
+   "dex": 12,
+   "con": 15,
+   "int": 3,
+   "wis": 12,
+   "cha": 6
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "acid"
+  ],
+  "immunities": [],
+  "weaknesses": [],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": null,
+  "attacks": [
+   {
+    "name": "Serrated Bite",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d6",
+    "damage_type": "piercing",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 5,
+    "action_type": "action"
+   },
+   {
+    "name": "Tongue Lash",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "1d8",
+    "damage_type": "bludgeoning",
+    "extra_dice": "1d4",
+    "extra_type": "acid",
+    "reach": 15,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Bog Camouflage",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "The mirejaw gains +2 on Dexterity (Stealth) checks while it is in mud or shallow water."
+   },
+   {
+    "name": "Drag Under",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "One creature grappled by the mirejaw must succeed on a DC 13 Strength saving throw or be pulled 10 feet and knocked prone."
+   }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 4,
+  "name": "Gloam Stalker",
+  "description": "A lean nocturnal hunter that studies its prey's fears before striking from the darkest available cover.",
+  "threat": 4,
+  "size": "medium",
+  "type": "monstrosity",
+  "armor_class": 14,
+  "hit_points": 52,
+  "speed": 40,
+  "stats": {
+   "str": 12,
+   "dex": 17,
+   "con": 14,
+   "int": 8,
+   "wis": 14,
+   "cha": 10
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "psychic"
+  ],
+  "immunities": [],
+  "weaknesses": [
+   "radiant"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "wis",
+  "attacks": [
+   {
+    "name": "Crescent Claw",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d6",
+    "damage_type": "slashing",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 5,
+    "action_type": "action"
+   },
+   {
+    "name": "Mindspike Ray",
+    "stat": "wis",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d8",
+    "damage_type": "psychic",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 60,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Lightless Pounce",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "After moving at least 20 feet straight toward a creature in dim light or darkness, the stalker gains +2 on its first attack roll against that creature."
+   },
+   {
+    "name": "Shroud",
+    "action_type": "bonus",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "Until the start of its next turn, attack rolls against the stalker take -2."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Sudden Stillness",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When targeted by an attack, the stalker becomes motionless and gains +2 to its armor class against that attack."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 5,
+  "name": "Brass Sentinel",
+  "description": "A meticulous clockwork guardian whose internal engine records every threat it has ever faced.",
+  "threat": 5,
+  "size": "medium",
+  "type": "construct",
+  "armor_class": 17,
+  "hit_points": 68,
+  "speed": 30,
+  "stats": {
+   "str": 18,
+   "dex": 10,
+   "con": 16,
+   "int": 14,
+   "wis": 12,
+   "cha": 10
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "lightning"
+  ],
+  "immunities": [
+   "poison",
+   "psychic"
+  ],
+  "weaknesses": [],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "int",
+  "attacks": [
+   {
+    "name": "Halberd",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d8",
+    "damage_type": "slashing",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 10,
+    "action_type": "action"
+   },
+   {
+    "name": "Arc Bolt",
+    "stat": "int",
+    "to_hit_bonus": 1,
+    "damage_dice": "2d8",
+    "damage_type": "lightning",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 60,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The sentinel makes two attacks."
+   },
+   {
+    "name": "Guard Protocol",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "While within 5 feet of an ally, the sentinel gains +2 on checks and saving throws made to resist being moved."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Interposing Plate",
+    "action_type": "reaction",
+    "uses": null,
+    "recharge": null,
+    "description": "When an ally within 5 feet is attacked, the sentinel grants that ally +2 to armor class against the attack."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 6,
+  "name": "Rime Witch",
+  "description": "A solitary winter mage who bargains in memories and preserves her favorite trophies in enchanted ice.",
+  "threat": 6,
+  "size": "medium",
+  "type": "humanoid",
+  "armor_class": 14,
+  "hit_points": 75,
+  "speed": 30,
+  "stats": {
+   "str": 8,
+   "dex": 14,
+   "con": 14,
+   "int": 16,
+   "wis": 13,
+   "cha": 17
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "frost"
+  ],
+  "immunities": [],
+  "weaknesses": [
+   "fire"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "int",
+  "attacks": [
+   {
+    "name": "Ice Shard",
+    "stat": "int",
+    "to_hit_bonus": 0,
+    "damage_dice": "3d6",
+    "damage_type": "frost",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   },
+   {
+    "name": "Ritual Dagger",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "1d4",
+    "damage_type": "piercing",
+    "extra_dice": "1d6",
+    "extra_type": "frost",
+    "reach": 5,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Frozen Veil",
+    "action_type": "bonus",
+    "uses": 1,
+    "recharge": "long rest",
+    "description": "For 1 minute, a layer of enchanted ice grants the witch +2 to armor class. The veil ends early if she takes fire damage."
+   },
+   {
+    "name": "Winter's Grasp",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "Each creature in a 15-foot cone makes a DC 14 Dexterity saving throw, taking 3d6 frost damage on a failure or half as much on a success. A creature that fails also has its speed reduced by 10 feet until the end of its next turn."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Rimeward",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When the witch takes frost damage, she reduces that damage by 10 and gains +2 on her next spell attack roll."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 7,
+  "name": "Ossuary Moth",
+  "description": "A broad-winged undead scavenger that lines its dusty body with fragments of bone from forgotten graves.",
+  "threat": 7,
+  "size": "large",
+  "type": "undead",
+  "armor_class": 15,
+  "hit_points": 95,
+  "speed": 30,
+  "stats": {
+   "str": 14,
+   "dex": 16,
+   "con": 16,
+   "int": 6,
+   "wis": 14,
+   "cha": 12
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "necrotic"
+  ],
+  "immunities": [
+   "poison"
+  ],
+  "weaknesses": [
+   "radiant"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": null,
+  "attacks": [
+   {
+    "name": "Bone Proboscis",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d8",
+    "damage_type": "piercing",
+    "extra_dice": "1d8",
+    "extra_type": "necrotic",
+    "reach": 10,
+    "action_type": "action"
+   },
+   {
+    "name": "Skull Shard",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d8",
+    "damage_type": "piercing",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 60,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Deathly Dust",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "Creatures within 10 feet make a DC 15 Constitution saving throw, taking 4d6 necrotic damage on a failure or half as much on a success."
+   },
+   {
+    "name": "Silent Wings",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "The moth gains +2 on Dexterity (Stealth) checks while flying."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Papery Evasion",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When targeted by an attack, the moth twists its wings and gains +2 to armor class against that attack."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 8,
+  "name": "Dune Reaver",
+  "description": "A burrowing desert horror whose armored fins cut through sand as easily as a shark's fin cuts water.",
+  "threat": 8,
+  "size": "huge",
+  "type": "monstrosity",
+  "armor_class": 16,
+  "hit_points": 126,
+  "speed": 40,
+  "stats": {
+   "str": 20,
+   "dex": 14,
+   "con": 18,
+   "int": 5,
+   "wis": 14,
+   "cha": 8
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "poison"
+  ],
+  "immunities": [],
+  "weaknesses": [],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": null,
+  "attacks": [
+   {
+    "name": "Mandible Shear",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d10",
+    "damage_type": "slashing",
+    "extra_dice": "1d6",
+    "extra_type": "acid",
+    "reach": 10,
+    "action_type": "action"
+   },
+   {
+    "name": "Tail Barb",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d8",
+    "damage_type": "piercing",
+    "extra_dice": "2d6",
+    "extra_type": "poison",
+    "reach": 15,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The reaver makes one Mandible Shear attack and one Tail Barb attack."
+   },
+   {
+    "name": "Sand Swim",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "The reaver can burrow through loose sand at its full speed and gains +2 on Wisdom (Perception) checks to detect movement above it."
+   },
+   {
+    "name": "Burst From Sand",
+    "action_type": "bonus",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "After emerging from burrowing, the reaver gains +2 on its next attack roll before the end of its turn."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Granular Guard",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When hit by an attack, the reaver sheds a sheet of sand and gains +2 to armor class until the start of its next turn."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 9,
+  "name": "Storm Raptor",
+  "description": "A fierce aerial elemental whose feathers carry the charge and pressure of an approaching storm.",
+  "threat": 9,
+  "size": "large",
+  "type": "elemental",
+  "armor_class": 16,
+  "hit_points": 130,
+  "speed": 40,
+  "stats": {
+   "str": 18,
+   "dex": 18,
+   "con": 16,
+   "int": 8,
+   "wis": 16,
+   "cha": 12
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "force"
+  ],
+  "immunities": [
+   "lightning",
+   "poison"
+  ],
+  "weaknesses": [],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "wis",
+  "attacks": [
+   {
+    "name": "Storm Talon",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d8",
+    "damage_type": "slashing",
+    "extra_dice": "1d8",
+    "extra_type": "lightning",
+    "reach": 10,
+    "action_type": "action"
+   },
+   {
+    "name": "Lightning Lance",
+    "stat": "wis",
+    "to_hit_bonus": 0,
+    "damage_dice": "4d6",
+    "damage_type": "lightning",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The raptor makes two Storm Talon attacks."
+   },
+   {
+    "name": "Break of Sky",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "Each creature within 15 feet makes a DC 16 Constitution saving throw, taking 5d6 force damage on a failure or half as much on a success."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Ride the Bolt",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When the raptor would take lightning damage, it instead teleports up to 30 feet to an unoccupied space it can see."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 10,
+  "name": "Mycelial Matron",
+  "description": "An ancient fungal intelligence that tends a forest of molds and speaks through the bodies rooted in its garden.",
+  "threat": 10,
+  "size": "large",
+  "type": "plant",
+  "armor_class": 15,
+  "hit_points": 150,
+  "speed": 25,
+  "stats": {
+   "str": 18,
+   "dex": 10,
+   "con": 18,
+   "int": 12,
+   "wis": 16,
+   "cha": 14
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "poison"
+  ],
+  "immunities": [],
+  "weaknesses": [
+   "fire"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": null,
+  "attacks": [
+   {
+    "name": "Root Flail",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "3d8",
+    "damage_type": "bludgeoning",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 15,
+    "action_type": "action"
+   },
+   {
+    "name": "Spore Dart",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "3d8",
+    "damage_type": "poison",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 60,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The matron makes two attacks."
+   },
+   {
+    "name": "Fungal Network",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "While touching soil, the matron gains +2 on Wisdom (Perception) checks and can sense creatures within 30 feet that are also touching the ground."
+   },
+   {
+    "name": "Bloom of Decay",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "Creatures within 20 feet make a DC 16 Constitution saving throw, taking 5d6 poison damage on a failure or half as much on a success."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Spore Burst",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "After taking damage from a creature within 10 feet, the matron releases spores. That creature takes 2d6 poison damage and takes -2 on its next saving throw."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 11,
+  "name": "Rift Hound",
+  "description": "A many-eyed fiend that pursues its quarry through folded space and always arrives a heartbeat too soon.",
+  "threat": 11,
+  "size": "medium",
+  "type": "fiend",
+  "armor_class": 17,
+  "hit_points": 145,
+  "speed": 50,
+  "stats": {
+   "str": 16,
+   "dex": 20,
+   "con": 18,
+   "int": 12,
+   "wis": 16,
+   "cha": 16
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "fire",
+   "frost",
+   "lightning"
+  ],
+  "immunities": [],
+  "weaknesses": [
+   "radiant"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "cha",
+  "attacks": [
+   {
+    "name": "Phase Fangs",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "3d8",
+    "damage_type": "piercing",
+    "extra_dice": "2d6",
+    "extra_type": "force",
+    "reach": 5,
+    "action_type": "action"
+   },
+   {
+    "name": "Rift Lance",
+    "stat": "cha",
+    "to_hit_bonus": 1,
+    "damage_dice": "4d8",
+    "damage_type": "force",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The hound makes two Phase Fangs attacks."
+   },
+   {
+    "name": "Rift Sense",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "The hound gains +2 on initiative rolls and Wisdom (Perception) checks to detect invisible creatures."
+   },
+   {
+    "name": "Fold Space",
+    "action_type": "bonus",
+    "uses": 3,
+    "recharge": "long rest",
+    "description": "The hound teleports up to 40 feet to an unoccupied space it can see."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Sidestep",
+    "action_type": "reaction",
+    "uses": null,
+    "recharge": null,
+    "description": "When targeted by an attack, the hound shifts partway into a rift, imposing -2 on the attack roll."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 12,
+  "name": "Forge Tyrant",
+  "description": "A giant war-smith who treats conquered fortresses as raw material and prisoners as apprentices.",
+  "threat": 12,
+  "size": "large",
+  "type": "giant",
+  "armor_class": 18,
+  "hit_points": 180,
+  "speed": 35,
+  "stats": {
+   "str": 24,
+   "dex": 12,
+   "con": 20,
+   "int": 14,
+   "wis": 12,
+   "cha": 16
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "bludgeoning"
+  ],
+  "immunities": [
+   "fire"
+  ],
+  "weaknesses": [
+   "frost"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": null,
+  "attacks": [
+   {
+    "name": "Furnace Maul",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "3d10",
+    "damage_type": "bludgeoning",
+    "extra_dice": "2d8",
+    "extra_type": "fire",
+    "reach": 10,
+    "action_type": "action"
+   },
+   {
+    "name": "Slag Javelin",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "2d8",
+    "damage_type": "piercing",
+    "extra_dice": "2d6",
+    "extra_type": "fire",
+    "reach": 20,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The tyrant makes two attacks."
+   },
+   {
+    "name": "Furnace Aura",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "A creature that starts its turn within 5 feet of the tyrant takes 2d6 fire damage."
+   },
+   {
+    "name": "Hammerfall",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "Creatures within 15 feet make a DC 18 Dexterity saving throw, taking 6d6 fire damage on a failure or half as much on a success. Creatures that fail are also knocked prone."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Tempered Rebuke",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "After taking damage from a melee attack, the tyrant deals 3d8 fire damage to the attacker."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 13,
+  "name": "Pale Mirror",
+  "description": "An aberrant reflection that escaped its silvered prison and now collects the faces and memories of living creatures.",
+  "threat": 13,
+  "size": "medium",
+  "type": "aberration",
+  "armor_class": 17,
+  "hit_points": 160,
+  "speed": 30,
+  "stats": {
+   "str": 10,
+   "dex": 18,
+   "con": 18,
+   "int": 20,
+   "wis": 16,
+   "cha": 20
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "radiant"
+  ],
+  "immunities": [
+   "psychic"
+  ],
+  "weaknesses": [
+   "force"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "int",
+  "attacks": [
+   {
+    "name": "Glass Tendril",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "3d8",
+    "damage_type": "slashing",
+    "extra_dice": "2d8",
+    "extra_type": "psychic",
+    "reach": 15,
+    "action_type": "action"
+   },
+   {
+    "name": "Reflected Ray",
+    "stat": "int",
+    "to_hit_bonus": 0,
+    "damage_dice": "5d8",
+    "damage_type": "psychic",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The mirror makes two attacks."
+   },
+   {
+    "name": "Borrowed Face",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "The mirror gains +2 on Charisma (Deception) checks and can mimic the voice of any creature whose reflection it has seen."
+   },
+   {
+    "name": "Duplicate",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "The mirror creates an illusory double for 1 minute. While the double is within 30 feet, attack rolls against the mirror take -2."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Return to Sender",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When hit by a spell attack, the mirror reduces the damage by 10 and deals 3d8 psychic damage to the attacker."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 14,
+  "name": "Starved Cathedral",
+  "description": "A mobile shrine animated by centuries of unanswered prayers, still seeking worshippers to fill its hollow nave.",
+  "threat": 14,
+  "size": "huge",
+  "type": "construct",
+  "armor_class": 19,
+  "hit_points": 210,
+  "speed": 20,
+  "stats": {
+   "str": 24,
+   "dex": 8,
+   "con": 22,
+   "int": 10,
+   "wis": 18,
+   "cha": 16
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "radiant",
+   "necrotic"
+  ],
+  "immunities": [
+   "poison",
+   "psychic"
+  ],
+  "weaknesses": [],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "wis",
+  "attacks": [
+   {
+    "name": "Bell Ram",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "4d10",
+    "damage_type": "bludgeoning",
+    "extra_dice": "3d8",
+    "extra_type": "force",
+    "reach": 15,
+    "action_type": "action"
+   },
+   {
+    "name": "Choir Ray",
+    "stat": "wis",
+    "to_hit_bonus": 0,
+    "damage_dice": "5d10",
+    "damage_type": "radiant",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The cathedral makes two attacks."
+   },
+   {
+    "name": "Hollow Nave",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "The cathedral gains +2 on saving throws against effects that would move it or knock it prone."
+   },
+   {
+    "name": "Processional",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "The cathedral moves up to its speed. Creatures in its path make a DC 19 Strength saving throw, taking 5d10 bludgeoning damage and falling prone on a failure."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Toll for the Living",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When a creature within 30 feet casts a spell, the cathedral rings its great bell. The caster takes 4d8 force damage and takes -2 on the next roll made as part of that spell."
+   }
+  ],
+  "legendary_actions": [],
+  "notes": ""
+ },
+ {
+  "id": 15,
+  "name": "Ash Wyrm",
+  "description": "A furnace-hearted dragon that sleeps beneath burned cities and dreams of the next great fire.",
+  "threat": 15,
+  "size": "huge",
+  "type": "dragon",
+  "armor_class": 19,
+  "hit_points": 230,
+  "speed": 40,
+  "stats": {
+   "str": 24,
+   "dex": 14,
+   "con": 22,
+   "int": 14,
+   "wis": 16,
+   "cha": 18
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "bludgeoning",
+   "piercing",
+   "slashing"
+  ],
+  "immunities": [
+   "fire"
+  ],
+  "weaknesses": [
+   "frost"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "cha",
+  "attacks": [
+   {
+    "name": "Furnace Bite",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "4d10",
+    "damage_type": "piercing",
+    "extra_dice": "3d8",
+    "extra_type": "fire",
+    "reach": 10,
+    "action_type": "action"
+   },
+   {
+    "name": "Wyrm Claw",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "3d8",
+    "damage_type": "slashing",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 10,
+    "action_type": "action"
+   },
+   {
+    "name": "Cinder Ray",
+    "stat": "cha",
+    "to_hit_bonus": 0,
+    "damage_dice": "6d8",
+    "damage_type": "fire",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The wyrm makes one Furnace Bite attack and two Wyrm Claw attacks."
+   },
+   {
+    "name": "Ash Cloud",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "The wyrm exhales a 30-foot cone of burning ash. Creatures in the area make a DC 20 Dexterity saving throw, taking 8d6 fire damage on a failure or half as much on a success."
+   },
+   {
+    "name": "Legendary Resistance",
+    "action_type": "passive",
+    "uses": 3,
+    "recharge": "long rest",
+    "description": "If the wyrm fails a saving throw, it can expend one use to succeed instead."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Backdraft",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "After taking damage from a creature within 15 feet, the wyrm exhales a sudden flare. That creature takes 4d8 fire damage."
+   }
+  ],
+  "legendary_actions": [
+   {
+    "name": "Smolder",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "The wyrm makes one Cinder Ray attack."
+   },
+   {
+    "name": "Coiling Advance",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "The wyrm moves up to half its speed without provoking opportunity attacks."
+   },
+   {
+    "name": "Wing Buffet",
+    "action_type": "legendary",
+    "uses": 2,
+    "recharge": "long rest",
+    "description": "Creatures within 10 feet make a DC 20 Strength saving throw, taking 3d8 bludgeoning damage and falling prone on a failure."
+   }
+  ],
+  "notes": ""
+ },
+ {
+  "id": 16,
+  "name": "Tidebound Leviathan",
+  "description": "A colossal elemental that carries an entire ecosystem within the currents spiraling around its body.",
+  "threat": 16,
+  "size": "gargantuan",
+  "type": "elemental",
+  "armor_class": 18,
+  "hit_points": 280,
+  "speed": 40,
+  "stats": {
+   "str": 26,
+   "dex": 14,
+   "con": 24,
+   "int": 12,
+   "wis": 18,
+   "cha": 16
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "fire",
+   "frost"
+  ],
+  "immunities": [
+   "poison"
+  ],
+  "weaknesses": [
+   "lightning"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "wis",
+  "attacks": [
+   {
+    "name": "Undertow Maw",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "4d12",
+    "damage_type": "piercing",
+    "extra_dice": "3d8",
+    "extra_type": "frost",
+    "reach": 15,
+    "action_type": "action"
+   },
+   {
+    "name": "Crest Slam",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "4d10",
+    "damage_type": "bludgeoning",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 20,
+    "action_type": "action"
+   },
+   {
+    "name": "Waterspout",
+    "stat": "wis",
+    "to_hit_bonus": 0,
+    "damage_dice": "6d10",
+    "damage_type": "bludgeoning",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The leviathan makes one Undertow Maw attack and one Crest Slam attack."
+   },
+   {
+    "name": "Maelstrom",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "Creatures within 30 feet make a DC 21 Strength saving throw. On a failure, a creature takes 7d8 bludgeoning damage and is pulled 20 feet toward the leviathan. On a success, it takes half as much damage and is not moved."
+   },
+   {
+    "name": "Legendary Resistance",
+    "action_type": "passive",
+    "uses": 3,
+    "recharge": "long rest",
+    "description": "If the leviathan fails a saving throw, it can expend one use to succeed instead."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Crushing Undertow",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When a creature within 20 feet moves away, the leviathan pulls it 10 feet closer and deals 4d8 bludgeoning damage."
+   }
+  ],
+  "legendary_actions": [
+   {
+    "name": "Current Lash",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "The leviathan makes one Waterspout attack."
+   },
+   {
+    "name": "Rime Surge",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "One creature within 20 feet takes 3d8 frost damage and has its speed reduced by 10 feet until the end of its next turn."
+   },
+   {
+    "name": "Depth Charge",
+    "action_type": "legendary",
+    "uses": 2,
+    "recharge": "long rest",
+    "description": "Creatures within 20 feet make a DC 21 Constitution saving throw, taking 5d8 force damage on a failure or half as much on a success."
+   }
+  ],
+  "notes": ""
+ },
+ {
+  "id": 17,
+  "name": "Vesper Seraph",
+  "description": "A winged arbiter of dusk sent to settle conflicts that have lasted beyond their appointed ending.",
+  "threat": 17,
+  "size": "medium",
+  "type": "celestial",
+  "armor_class": 20,
+  "hit_points": 245,
+  "speed": 40,
+  "stats": {
+   "str": 20,
+   "dex": 20,
+   "con": 22,
+   "int": 18,
+   "wis": 22,
+   "cha": 24
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "necrotic",
+   "psychic"
+  ],
+  "immunities": [
+   "radiant",
+   "poison"
+  ],
+  "weaknesses": [],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "cha",
+  "attacks": [
+   {
+    "name": "Eventide Blade",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "4d8",
+    "damage_type": "slashing",
+    "extra_dice": "4d8",
+    "extra_type": "radiant",
+    "reach": 10,
+    "action_type": "action"
+   },
+   {
+    "name": "Last-Light Ray",
+    "stat": "cha",
+    "to_hit_bonus": 2,
+    "damage_dice": "7d8",
+    "damage_type": "radiant",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The seraph makes two attacks."
+   },
+   {
+    "name": "Twilight Aura",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "Allies within 15 feet gain +2 on saving throws against being frightened, while hostile creatures in the area take -2 on checks to hide."
+   },
+   {
+    "name": "Legendary Resistance",
+    "action_type": "passive",
+    "uses": 3,
+    "recharge": "long rest",
+    "description": "If the seraph fails a saving throw, it can expend one use to succeed instead."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Measured Judgment",
+    "action_type": "reaction",
+    "uses": null,
+    "recharge": null,
+    "description": "When a creature within 30 feet makes an attack roll, the seraph imposes -2 on that roll. If the attack misses, the attacker takes 3d8 radiant damage."
+   }
+  ],
+  "legendary_actions": [
+   {
+    "name": "Wing Step",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "The seraph moves up to half its speed without provoking opportunity attacks."
+   },
+   {
+    "name": "Gloaming",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "One creature within 30 feet takes 4d8 necrotic damage and cannot regain hit points until the end of its next turn."
+   },
+   {
+    "name": "Edict",
+    "action_type": "legendary",
+    "uses": 2,
+    "recharge": "long rest",
+    "description": "Each hostile creature within 20 feet makes a DC 22 Wisdom saving throw. On a failure, a creature takes 5d8 radiant damage and takes -2 on attack rolls until the end of its next turn."
+   }
+  ],
+  "notes": ""
+ },
+ {
+  "id": 18,
+  "name": "Null Behemoth",
+  "description": "A mountain-sized absence given appetite, leaving smooth and empty spaces wherever its passage erases the world.",
+  "threat": 18,
+  "size": "gargantuan",
+  "type": "aberration",
+  "armor_class": 20,
+  "hit_points": 320,
+  "speed": 40,
+  "stats": {
+   "str": 28,
+   "dex": 12,
+   "con": 26,
+   "int": 16,
+   "wis": 18,
+   "cha": 20
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "acid",
+   "fire",
+   "frost",
+   "lightning",
+   "poison"
+  ],
+  "immunities": [
+   "force",
+   "psychic"
+  ],
+  "weaknesses": [
+   "radiant"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "cha",
+  "attacks": [
+   {
+    "name": "Unmaking Bite",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "5d12",
+    "damage_type": "piercing",
+    "extra_dice": "4d8",
+    "extra_type": "force",
+    "reach": 15,
+    "action_type": "action"
+   },
+   {
+    "name": "Gravity Horn",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "5d10",
+    "damage_type": "bludgeoning",
+    "extra_dice": "3d8",
+    "extra_type": "force",
+    "reach": 20,
+    "action_type": "action"
+   },
+   {
+    "name": "Null Ray",
+    "stat": "cha",
+    "to_hit_bonus": 0,
+    "damage_dice": "8d8",
+    "damage_type": "force",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The behemoth makes one Unmaking Bite attack and one Gravity Horn attack."
+   },
+   {
+    "name": "Event Horizon",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "Creatures within 40 feet make a DC 22 Strength saving throw. On a failure, a creature takes 8d8 force damage and is pulled 20 feet toward the behemoth. On a success, it takes half as much damage and is not moved."
+   },
+   {
+    "name": "Legendary Resistance",
+    "action_type": "passive",
+    "uses": 3,
+    "recharge": "long rest",
+    "description": "If the behemoth fails a saving throw, it can expend one use to succeed instead."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Unmake Effect",
+    "action_type": "reaction",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "When targeted by a spell, the behemoth gains +2 to its armor class and saving throws against that spell. If the spell deals damage, the behemoth reduces that damage by 20."
+   }
+  ],
+  "legendary_actions": [
+   {
+    "name": "Gravity Step",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "The behemoth teleports up to 30 feet to an unoccupied space it can see."
+   },
+   {
+    "name": "Rend Space",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "The behemoth makes one Null Ray attack."
+   },
+   {
+    "name": "Devour Light",
+    "action_type": "legendary",
+    "uses": 2,
+    "recharge": "long rest",
+    "description": "Light within 40 feet dims until the end of the behemoth's next turn. Hostile creatures in the area take 5d8 force damage and take -2 on Wisdom (Perception) checks."
+   }
+  ],
+  "notes": ""
+ },
+ {
+  "id": 19,
+  "name": "Sepulcher Sovereign",
+  "description": "An undead monarch whose decree binds every soul buried within the borders of its former kingdom.",
+  "threat": 19,
+  "size": "medium",
+  "type": "undead",
+  "armor_class": 19,
+  "hit_points": 260,
+  "speed": 30,
+  "stats": {
+   "str": 12,
+   "dex": 18,
+   "con": 20,
+   "int": 24,
+   "wis": 20,
+   "cha": 22
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "bludgeoning",
+   "piercing",
+   "slashing",
+   "necrotic"
+  ],
+  "immunities": [
+   "poison"
+  ],
+  "weaknesses": [
+   "radiant"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "int",
+  "attacks": [
+   {
+    "name": "Royal Boneblade",
+    "stat": "dex",
+    "to_hit_bonus": 0,
+    "damage_dice": "4d8",
+    "damage_type": "slashing",
+    "extra_dice": "4d8",
+    "extra_type": "necrotic",
+    "reach": 5,
+    "action_type": "action"
+   },
+   {
+    "name": "Sepulchral Ray",
+    "stat": "int",
+    "to_hit_bonus": 1,
+    "damage_dice": "8d8",
+    "damage_type": "necrotic",
+    "extra_dice": null,
+    "extra_type": null,
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The sovereign makes two attacks."
+   },
+   {
+    "name": "Court of the Dead",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "short rest",
+    "description": "Spectral courtiers fill a 20-foot radius around the sovereign until the end of its next turn. Hostile creatures that enter the area for the first time on a turn or start their turn there take 5d8 necrotic damage."
+   },
+   {
+    "name": "Legendary Resistance",
+    "action_type": "passive",
+    "uses": 3,
+    "recharge": "long rest",
+    "description": "If the sovereign fails a saving throw, it can expend one use to succeed instead."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Royal Decree",
+    "action_type": "reaction",
+    "uses": null,
+    "recharge": null,
+    "description": "When targeted by an attack or spell, the sovereign imposes -2 on the attack roll or grants itself +2 on the saving throw. The source then takes 3d8 psychic damage."
+   }
+  ],
+  "legendary_actions": [
+   {
+    "name": "Grave Step",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "The sovereign teleports up to 30 feet to an unoccupied space it can see."
+   },
+   {
+    "name": "Command the Dead",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "One allied undead within 30 feet moves up to half its speed and gains +2 on its next attack roll."
+   },
+   {
+    "name": "Soul Tithe",
+    "action_type": "legendary",
+    "uses": 2,
+    "recharge": "long rest",
+    "description": "Each hostile creature within 20 feet makes a DC 22 Constitution saving throw, taking 6d8 necrotic damage on a failure or half as much on a success. The sovereign regains hit points equal to half the total damage dealt."
+   }
+  ],
+  "notes": ""
+ },
+ {
+  "id": 20,
+  "name": "Worldroot Ancient",
+  "description": "A primordial tree-being whose roots remember the shaping of continents and whose branches shelter entire nations.",
+  "threat": 20,
+  "size": "gargantuan",
+  "type": "plant",
+  "armor_class": 21,
+  "hit_points": 400,
+  "speed": 30,
+  "stats": {
+   "str": 30,
+   "dex": 8,
+   "con": 28,
+   "int": 18,
+   "wis": 24,
+   "cha": 22
+  },
+  "skill_ids": [],
+  "condition_ids": [],
+  "resistances": [
+   "bludgeoning",
+   "piercing",
+   "slashing",
+   "radiant"
+  ],
+  "immunities": [
+   "poison"
+  ],
+  "weaknesses": [
+   "fire"
+  ],
+  "affinity_element_ids": [],
+  "spell_ids": [],
+  "spell_stat": "wis",
+  "attacks": [
+   {
+    "name": "Epoch Limb",
+    "stat": "str",
+    "to_hit_bonus": 0,
+    "damage_dice": "6d12",
+    "damage_type": "bludgeoning",
+    "extra_dice": "4d8",
+    "extra_type": "acid",
+    "reach": 20,
+    "action_type": "action"
+   },
+   {
+    "name": "Verdant Lance",
+    "stat": "wis",
+    "to_hit_bonus": 0,
+    "damage_dice": "8d10",
+    "damage_type": "piercing",
+    "extra_dice": "4d8",
+    "extra_type": "poison",
+    "reach": 80,
+    "action_type": "action"
+   }
+  ],
+  "features": [
+   {
+    "name": "Multiattack",
+    "action_type": "action",
+    "uses": null,
+    "recharge": null,
+    "description": "The ancient makes two Epoch Limb attacks or two Verdant Lance attacks."
+   },
+   {
+    "name": "Rooted in Ages",
+    "action_type": "passive",
+    "uses": null,
+    "recharge": null,
+    "description": "While touching natural ground, the ancient gains +2 on saving throws and cannot be moved against its will."
+   },
+   {
+    "name": "Worldbloom",
+    "action_type": "action",
+    "uses": 1,
+    "recharge": "long rest",
+    "description": "A 40-foot radius around the ancient fills with supernatural growth for 1 minute. Hostile creatures treat the area as difficult terrain, and the ancient and its allies regain 20 hit points at the start of their turns while inside it."
+   },
+   {
+    "name": "Legendary Resistance",
+    "action_type": "passive",
+    "uses": 3,
+    "recharge": "long rest",
+    "description": "If the ancient fails a saving throw, it can expend one use to succeed instead."
+   }
+  ],
+  "reactions": [
+   {
+    "name": "Bark of Ages",
+    "action_type": "reaction",
+    "uses": null,
+    "recharge": null,
+    "description": "When the ancient takes damage, it reduces that damage by 20. If the damage came from a creature within 20 feet, that creature takes 4d8 piercing damage."
+   }
+  ],
+  "legendary_actions": [
+   {
+    "name": "Rootquake",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "One creature within 30 feet makes a DC 23 Strength saving throw, taking 5d10 bludgeoning damage and falling prone on a failure."
+   },
+   {
+    "name": "Regrowth",
+    "action_type": "legendary",
+    "uses": null,
+    "recharge": null,
+    "description": "The ancient regains 20 hit points, then makes one Verdant Lance attack."
+   },
+   {
+    "name": "Canopy of Night",
+    "action_type": "legendary",
+    "uses": 2,
+    "recharge": "long rest",
+    "description": "A vast canopy darkens the area within 40 feet until the end of the ancient's next turn. Hostile creatures in the area take -2 on attack rolls and 5d8 necrotic damage."
+   }
+  ],
+  "notes": ""
+ }
+]

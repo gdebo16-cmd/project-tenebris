@@ -1,0 +1,60 @@
+/* The board library (Map Editor), the board selector and the measuring label (BoardLibrary.tsx) */
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border, #b27f50);
+    background: color-mix(in srgb, #0c0907 85%, transparent);
+    color: #f3e8d4;
+}
+/* the full page you land on */
+.page { width: min(720px, 92vw); margin: 6dvh auto; }
+/* the small panel over the editor's board */
+.compact { position: fixed; top: 2.5dvh; left: 2vw; z-index: 2; width: min(420px, 40vw); max-height: 70dvh; overflow-y: auto; }
+.opener { width: auto; cursor: pointer; font: inherit; }
+
+.header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.title { margin: 0; font-size: 1.2rem; }
+
+.list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 8px; border-radius: 10px; }
+.current { background: color-mix(in srgb, var(--accent, #d4af37) 18%, transparent); }
+.open { display: flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 700; cursor: pointer; text-align: left; }
+.live { padding: 1px 8px; border-radius: 999px; background: #2f6b3a; font-size: 0.75rem; font-weight: 400; }
+.actions { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.small {
+    padding: 4px 9px;
+    border-radius: 9px;
+    border: 1px solid var(--border, #b27f50);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 0.85rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+.danger { border-color: #d0503c; color: #ffb3a6; }
+
+.newForm, .renameForm {  display: flex; flex-wrap: wrap; gap: 6px; }
+.newForm input, .renameForm input { flex: 1; min-width: 10em; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border, #b27f50); background: #1a1410; color: inherit; font: inherit; }
+.error { margin: 0; color: #ffb3a6; }
+
+/* the play session's board selector (next to Top-down / Fit) */
+.selector { display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 12px; border: 1px solid var(--border, #b27f50); background: color-mix(in srgb, #0c0907 70%, transparent); color: #f3e8d4; }
+.selectorLabel { font-size: 0.85rem; opacity: 0.8; }
+.selector select { border-radius: 1rem; width: 100%; height: 100%; background: none;  border: 0; font: inherit; }
+.selector option { background: none; color: black; border: 0; font: inherit; }
+.boardName { padding: 6px 10px; border-radius: 12px; background: color-mix(in srgb, #0c0907 70%, transparent); color: #f3e8d4; }
+
+/* the Measure tool's distance */
+.measure {
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: #10314a;
+    color: #e6f4ff;
+    font: 700 clamp(12px, 1vw, 20px) Georgia, serif;
+    white-space: nowrap;
+}

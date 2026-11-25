@@ -1,0 +1,65 @@
+/* The turn bar (TurnBar.tsx): centred across the top, sized for a TV across the room */
+.bar {
+    position: fixed;
+    top: 2dvh;
+    left: 10%;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 16px;
+    border-radius: 1.5rem;
+    background: color-mix(in srgb, #0c0907 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent, #d4af37) 40%, transparent);
+    color: #f3e8d4;
+    pointer-events: none;
+}
+
+.round { font-size: clamp(11px, 0.9vw, 18px); opacity: 0.8; white-space: nowrap; }
+
+.list { display: flex; align-items: flex-end; gap: 10px; margin: 0; padding: 0; list-style: none; }
+
+.face {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: clamp(0px, 3.4vw, 72px);
+    transition: width 400ms ease, opacity 400ms ease;
+    opacity: 0.75;
+}
+.face > .picture, .face > .letter {
+    width: 80%;
+    aspect-ratio: 1;
+    border-radius: 1.5rem;
+    border: 2px solid #4d8fe0;
+    object-fit: cover;
+    background: #2a2230;
+}
+.monster > .picture, .monster > .letter { border-color: #d0503c; }
+.letter {
+    display: grid;
+    place-items: center;
+    font: bold clamp(16px, 1.6vw, 34px) Georgia, serif;
+}
+.name {
+    max-width: 120%;
+    margin-top: 4px;
+    overflow: hidden;
+    font-size: clamp(9px, 0.7vw, 15px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* whose turn it is: bigger, fully lit, with a gold glow */
+.current { width: clamp(64px, 5.6vw, 120px); opacity: 1; }
+.current > .picture, .current > .letter {
+    border-color: var(--accent, #d4af37);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent, #d4af37) 70%, transparent);
+}
+.current > .name { font-weight: 700; font-size: clamp(11px, 0.95vw, 19px); }
+
+.down { filter: grayscale(1); opacity: 0.4; }
+
+@media (prefers-reduced-motion: reduce) { .face { transition: none; } }
