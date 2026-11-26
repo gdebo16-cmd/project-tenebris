@@ -9,16 +9,14 @@ import { EffectComposer, N8AO, Bloom, Vignette, ToneMapping } from '@react-three
 import { ToneMappingMode } from 'postprocessing'
 import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, ShaderMaterial, type Mesh, type PointLight } from 'three'
 import { type Hex } from '@tenebris/rules/board'
-import { hexToWorld, wallTop, fixedRandom, RIM_OUTER } from './TableScenery.tsx'
+import { hexToWorld, wallTop, fixedRandom, rimOuter } from './TableScenery.tsx'
 import { waterTime } from './boardLooks.ts'
 import type { MoodLight } from './BoardWorld.tsx'
 
-// how far the sun's shadows reach from the centre: the whole board and its rim
-const SHADOW_REACH = RIM_OUTER + 3;
-
 // ---- lights ----
 
-export function BoardLights({ mood }: { mood: MoodLight }) {
+export function BoardLights({ mood, radius }: { mood: MoodLight; radius: number }) {
+    const reach = rimOuter(radius) + 3;     // how far the sun's shadows reach from the centre: the whole board and its rim
     // keep the water moving (its shader reads this clock)
     useFrame((_, delta) => { waterTime.value += delta; });
     return (
@@ -36,7 +34,7 @@ export function BoardLights({ mood }: { mood: MoodLight }) {
             {/* the shadow light: high and a little to the side, its shadow area fitted to the board so edges stay crisp */}
             <directionalLight position={[6, 20, 9]} intensity={mood.sunPower} color={mood.sun} castShadow
                 shadow-mapSize={[4096, 4096]} shadow-camera-near={1} shadow-camera-far={90}
-                shadow-camera-left={-SHADOW_REACH} shadow-camera-right={SHADOW_REACH} shadow-camera-top={SHADOW_REACH} shadow-camera-bottom={-SHADOW_REACH}
+                shadow-camera-left={-reach} shadow-camera-right={reach} shadow-camera-top={reach} shadow-camera-bottom={-reach}
                 shadow-bias={-0.0003} shadow-normalBias={0.03} />
             {/* a faint second light from the side, so walls show their shape */}
             <directionalLight position={[-10, 8, -6]} intensity={mood.roomPower * 0.8} color="#bcd0ff" />
@@ -94,18 +92,19 @@ void main() {
 }
 `;
 
-export function Dust({ color = '#ffdcae' }: { color?: string }) {
+export function Dust({ color = '#ffdcae', radius }: { color?: string; radius: number }) {
     const geometry = useMemo(() => {
         const g = new BufferGeometry();
         const pos = new Float32Array(DUST_COUNT * 3), seed = new Float32Array(DUST_COUNT);
         for (let i = 0; i < DUST_COUNT; i++) {
-            pos.set([(Math.random() - 0.5) * RIM_OUTER * 1.8, 0.5 + Math.random() * 5, (Math.random() - 0.5) * RIM_OUTER * 1.8], i * 3);
+            const outer = rimOuter(radius);
+            pos.set([(Math.random() - 0.5) * outer * 1.8, 0.5 + Math.random() * 5, (Math.random() - 0.5) * outer * 1.8], i * 3);
             seed[i] = Math.random();
         }
         g.setAttribute('position', new BufferAttribute(pos, 3));
         g.setAttribute('aSeed', new BufferAttribute(seed, 1));
         return g;
-    }, []);
+    }, [radius]);
     const material = useMemo(() => new ShaderMaterial({
         uniforms: { uTime: waterTime, uColor: { value: new Color(color) } },
         vertexShader: DUST_VERTEX, fragmentShader: DUST_FRAGMENT,

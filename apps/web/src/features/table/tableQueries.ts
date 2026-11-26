@@ -2,7 +2,7 @@
 // stored scene (setQueryData): one trip per click instead of two.
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Feature, SceneLook, Hex } from '@tenebris/rules/hex';
+import type { Feature, SceneLook, Hex } from '@tenebris/rules/board';
 import type { Area } from '@tenebris/rules/sight';
 import type { ActChoice } from '@tenebris/rules/combat';
 import { api } from '../../api.ts';

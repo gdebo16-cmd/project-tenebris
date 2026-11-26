@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { distance, neighbors, hexKey, findPath, hexesWithin, wallsOf, hexesForSpeed, isTerrainKind, checkLookChange } from '../src/hex.ts';
+import { distance, neighbors, hexKey, findPath, hexesWithin, wallsOf, hexesForSpeed, isTerrainKind, checkLookChange } from '../src/board.ts';
 
 test('distance counts the fewest steps between two hexes', () => {
     assert.equal(distance({q:0,r:0}, {q:2,r:2}), 4)
@@ -59,12 +59,12 @@ test('checkLookChange keeps good changes and refuses bad ones', () => {
 });
 
 test('wallsOf adds features that block (trees, boulders, pillars) but not the rest', () => {
-    const walls = wallsOf({ '1,0': 'wall' }, { '2,0': { kind: 'tree' }, '3,0': { kind: 'crate' }, '4,0': { kind: 'light', color: '#ffffff' } });
+    const walls = wallsOf({ '1,0': 'block' }, { '2,0': { kind: 'tree' }, '3,0': { kind: 'crate' }, '4,0': { kind: 'light', color: '#ffffff' } });
     assert.deepEqual([...walls].sort(), ['1,0', '2,0']);
 });
 
 test('wallsOf keeps only the terrain that blocks movement', () => {
-    const walls = wallsOf({ '1,0': 'wall', '2,0': 'water', '3,0': 'rough', '0,1': 'wall' });
+    const walls = wallsOf({ '1,0': 'block', '2,0': 'deep', '3,0': 'rough', '0,1': 'block' });
     assert.deepEqual([...walls].sort(), ['0,1', '1,0']);
 });
 
@@ -76,7 +76,7 @@ test('hexesForSpeed: 5 ft per hex, rounded down, never below 0', () => {
 });
 
 test('isTerrainKind accepts only the paintable kinds', () => {
-    assert.ok(isTerrainKind('wall'));
+    assert.ok(isTerrainKind('block'));
     assert.ok(!isTerrainKind('lava'));
     assert.ok(!isTerrainKind(null));
 });

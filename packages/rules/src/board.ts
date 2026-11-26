@@ -4,3 +4,4 @@ export * from './board/pathfinding.ts';
 export * from './board/scene.ts';
 export * from './board/movement.ts';
 export * from './board/paint.ts';
+

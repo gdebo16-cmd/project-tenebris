@@ -2,7 +2,7 @@
 // The server decides everything (hard rule): painting, placing and removing are DM only; moving is the token's
 // owner or the DM, and a move must have a path around walls (findPath from @tenebris/rules/hex).
 // Spec: docs/specs/table.md.
-import { isTerrainKind, isSurface, isFeatureKind, LIGHT_FEATURES, MAX_LIGHTS, MAX_HEIGHT, checkLookChange, findPath, wallsOf, hexKey, hexesForSpeed, onBoard } from '@tenebris/rules/board';
+import { isTerrainKind, isSurface, isFeatureKind, LIGHT_FEATURES, MAX_LIGHTS, MAX_HEIGHT, checkLookChange, radiusOf, keepOnBoard, findPath, wallsOf, hexKey, hexesForSpeed, onBoard } from '@tenebris/rules/board';
 import { characterToCreature } from '@tenebris/rules/creature';
 import * as Scenes from '../models/sceneModel.js';
 import * as Monsters from '../models/monsterModel.js';   // for memberRole(campId, userId)
@@ -85,7 +85,7 @@ export async function paint(req, res) {
     if (list.length === 0 || list.length > MAX_STROKE) return res.status(400).json({ error: `Paint 1 to ${MAX_STROKE} hexes at a time` });
     for (const h of list) {
         if (!Number.isInteger(h?.q) || !Number.isInteger(h?.r)) return res.status(400).json({ error: 'q and r must be whole numbers' });
-        if (!onBoard(h)) return res.status(400).json({ error: "That hex isn't on the board" });
+        if (!onBoard(h, radiusOf(scene.look))) return res.status(400).json({ error: "That hex isn't on the board" });
     }
     const keys = [...new Set(list.map(hexKey))];
     const body = req.body;
@@ -172,7 +172,7 @@ export async function placeToken(req, res) {
 
     const { kind, characterId, campaignMonsterId, name, ownerId, q, r } = req.body ?? {};
     if (!isWholeNumber(q) || !isWholeNumber(r)) return res.status(400).json({ error: 'q and r must be whole numbers' });
-    if (!onBoard({ q, r })) return res.status(400).json({ error: "That hex isn't on the board" });
+    if (!onBoard({ q, r }, radiusOf(scene.look))) return res.status(400).json({ error: "That hex isn't on the board" });
     if (wallsOf(scene.terrain, scene.features).has(hexKey({ q, r }))) return res.status(400).json({ error: "A token can't stand there (a wall, tree, boulder or pillar)" });
 
     let token;
@@ -240,7 +240,7 @@ export async function moveToken(req, res) {
 
     const { q, r } = req.body ?? {};
     if (!isWholeNumber(q) || !isWholeNumber(r)) return res.status(400).json({ error: 'q and r must be whole numbers' });
-    if (!onBoard({ q, r })) return res.status(400).json({ error: "That hex isn't on the board" });
+    if (!onBoard({ q, r }, radiusOf(token.look))) return res.status(400).json({ error: "That hex isn't on the board" });
 
     const walls = wallsOf(token.terrain, token.features);
     if (walls.has(hexKey({ q, r }))) return res.status(400).json({ error: "A token can't stand there (a wall, tree, boulder or pillar)" });
@@ -286,6 +286,21 @@ export async function setLook(req, res) {
     if (role !== 'dm') return res.status(403).json({ error: 'You are not the DM' });
     const checked = checkLookChange(req.body);
     if ('error' in checked) return res.status(400).json({ error: checked.error });
+    // a new size: nothing may be left outside it (tokens must be moved first; painted hexes beyond it are dropped)
+    if ('radius' in checked.change && checked.change.radius !== radiusOf(scene.look)) {
+        const radius = checked.change.radius;
+        const tokens = await Scenes.listTokens(scene.id);
+        if (tokens.some((t) => !onBoard({ q: t.q, r: t.r }, radius))) return res.status(400).json({ error: 'Move the tokens inside the smaller board first' });
+        scene.terrain = keepOnBoard(scene.terrain, radius);
+        scene.surfaces = keepOnBoard(scene.surfaces, radius);
+        scene.features = keepOnBoard(scene.features, radius);
+        scene.explored = keepOnBoard(scene.explored, radius);
+        scene.look = { ...scene.look, heights: keepOnBoard(scene.look?.heights, radius) };
+        await Scenes.saveTerrain(scene.id, scene.terrain);
+        await Scenes.saveSurfaces(scene.id, scene.surfaces);
+        await Scenes.saveFeatures(scene.id, scene.features);
+        await Scenes.saveExplored(scene.id, scene.explored);
+    }
     scene.look = { ...scene.look, ...checked.change };
     await Scenes.saveLook(scene.id, scene.look);
     res.json(scene.look);

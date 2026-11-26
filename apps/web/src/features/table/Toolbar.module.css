@@ -1,0 +1,49 @@
+
+
+.toolbar {
+    position: fixed;
+    bottom: 2.5dvh;
+    right: 2.5dvw;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    max-width: calc(100vw - 80px);   /* leaves room for the menu button on the right */
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border, #b27f50);
+    background: color-mix(in srgb, var(--background-color, #141414) 88%, transparent);
+    color: var(--text, #000000);
+}
+
+.error { color: #f08a7a; opacity: 1; }
+
+
+/* the little colour square on each Surface button */
+.swatch {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+
+/* a button that can't be undone (Clear map) */
+.toolDanger { border-color: #d0503c; color: #ffb3a6; }
+
+/* the Surface brush swatches: one colour per kind of ground (same colours as SURFACE_LOOK in TableScenery.tsx) */
+.swatch[data-surface='grass'] { background: #3f6b2a; }
+.swatch[data-surface='moss'] { background: #5a6b33; }
+.swatch[data-surface='dirt'] { background: #6b5440; }
+.swatch[data-surface='cobble'] { background: #8a8a7a; }
+.swatch[data-surface='flagstone'] { background: #7a7468; }
+.swatch[data-surface='rock'] { background: #5d5a55; }
+.swatch[data-surface='bricks'] { background: #9a7b5c; }
+.swatch[data-surface='snow'] { background: #e8eef2; }
+.swatch[data-surface='bark'] { background: #5a4632; }
+.swatch[data-surface='woodfloor'] { background: #7a5a3a; }
+.swatch[data-surface='roof'] { background: #3a3a3e; }

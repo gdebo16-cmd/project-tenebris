@@ -8,7 +8,7 @@
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react'
 import { type ThreeEvent } from '@react-three/fiber'
 import { Instances, Instance, useTexture } from '@react-three/drei'
-import { type Hex, hexKey, SURFACES, DEFAULT_SURFACE, type Surface, BOARD_RADIUS } from '@tenebris/rules/board'
+import { type Hex, hexKey, SURFACES, DEFAULT_SURFACE, type Surface } from '@tenebris/rules/board'
 import { Shape, ExtrudeGeometry, RepeatWrapping, SRGBColorSpace, type BufferGeometry, type Texture } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { paintTiles, paintStone, waterLook } from './boardLooks.ts'
@@ -22,7 +22,6 @@ const backgroundColor = useCssColor('--background-color', '#0e1815');
 // Set to true to bring the rest of the pictures back.
 const USE_TEXTURES = false;
 
-export const GRID_RADIUS = BOARD_RADIUS;   // how many rings of hexes around the centre (set in @tenebris/rules/hex)
 
 // Axial (q, r) -> world position, flat-top hexes of radius `size`
 export function hexToWorld(hex: Hex, size: number): [number, number, number] {
@@ -334,17 +333,21 @@ function hexOutline(radius: number) {
     return s;
 }
 
-// The wooden frame: a big hexagon with the board-sized hexagon cut out, pushed up 0.4 tall.
-// Sized from GRID_RADIUS, so a bigger grid gets a bigger frame automatically.
-const RIM_INNER = GRID_RADIUS * Math.sqrt(3) + 1.3;    // distance to the corner hexes, plus a little room
-export const RIM_OUTER = RIM_INNER + 1.3;                     // how wide the wood is
-const RIM = (() => {
-    const frame = hexOutline(RIM_OUTER);
-    frame.holes.push(hexOutline(RIM_INNER));           // cut the middle out
+// The wooden frame around a board of this radius: a big hexagon with the board-sized hexagon cut out, 0.4 tall.
+export const rimInner = (radius: number) => radius * Math.sqrt(3) + 1.3;    // distance to the corner hexes, plus a little room
+export const rimOuter = (radius: number) => rimInner(radius) + 1.3;           // how wide the wood is
+function rimGeometry(radius: number) {
+    const frame = hexOutline(rimOuter(radius));
+    frame.holes.push(hexOutline(rimInner(radius)));       // cut the middle out
     return new ExtrudeGeometry(frame, { depth: 0.4, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 2 });
-})();
+}
+function useRim(radius: number) {
+    const geometry = useMemo(() => rimGeometry(radius), [radius]);
+    useEffect(() => () => { geometry.dispose(); }, [geometry]);
+    return geometry;
+}
 
-type TabletopProps = { wood: string; surface: string; felt?: boolean };   // felt: false when the room's table is showing   // plain colours (from CSS) for before the pictures load
+type TabletopProps = { wood: string; surface: string; felt?: boolean; radius: number };   // felt: false when the room's table is showing   // plain colours (from CSS) for before the pictures load
 
 // The felt tabletop with its picture (only when USE_TEXTURES is on)
 function FeltTabletop() {
@@ -359,7 +362,8 @@ function FeltTabletop() {
 }
 
 // The wooden rim always uses its wood picture (owner's call: the grain looks good); the tabletop only when USE_TEXTURES is on
-function TexturedTabletop({ surface, felt = true }: { surface: string; felt?: boolean }) {
+function TexturedTabletop({ surface, felt = true, radius }: { surface: string; felt?: boolean; radius: number }) {
+    const rim = useRim(radius);
     const wood = useTexture(filesFor('wood', 'wood')) as Record<string, Texture>;
     useMemo(() => prepare(wood, 0.25), [wood]);   // the rim's shape is in world units, so shrink the tiling
     return (
@@ -370,7 +374,7 @@ function TexturedTabletop({ surface, felt = true }: { surface: string; felt?: bo
                     <meshStandardMaterial color={surface} roughness={0.9} />
                 </mesh>
             )}
-            <mesh geometry={RIM} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} castShadow receiveShadow>
+            <mesh geometry={rim} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} castShadow receiveShadow>
                 {/* color darkens the pale pine picture to a warm stained wood (white = the picture as it is) */}
                 <meshPhysicalMaterial {...pictures(wood, 'wood')} color="#b07a52" roughness={1} clearcoat={0.5} clearcoatRoughness={0.25} />
             </mesh>
@@ -378,14 +382,15 @@ function TexturedTabletop({ surface, felt = true }: { surface: string; felt?: bo
     );
 }
 
-function PlainTabletop({ wood, surface, felt = true }: TabletopProps) {
+function PlainTabletop({ wood, surface, felt = true, radius }: TabletopProps) {
+    const rim = useRim(radius);
     return (
         <>
             <mesh visible={felt} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.12, 0]} receiveShadow>
                 <planeGeometry args={[200, 200]} />
                 <meshStandardMaterial color={surface} roughness={0.9} />
             </mesh>
-            <mesh geometry={RIM} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} castShadow receiveShadow>
+            <mesh geometry={rim} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} castShadow receiveShadow>
                 <meshPhysicalMaterial color={wood} roughness={0.55} clearcoat={0.4} clearcoatRoughness={0.3} />
             </mesh>
         </>
@@ -398,7 +403,7 @@ export function Tabletop(props: TabletopProps) {
     return (
         <Fallback plain={plain}>
             <Suspense fallback={plain}>
-                <TexturedTabletop surface={props.surface} felt={props.felt} />
+                <TexturedTabletop surface={props.surface} felt={props.felt} radius={props.radius} />
             </Suspense>
         </Fallback>
     );

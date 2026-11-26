@@ -1,0 +1,31 @@
+
+/* step 17: what just happened, bottom left, readable from across the room */
+.feed {
+    position: fixed;
+    left: 2.5dvw;
+    bottom: 2.5dvh;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: min(420px, 40vw);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+}
+
+.feedEntry {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: color-mix(in srgb, #0c0907 78%, transparent);
+    color: #f3e8d4;
+}
+
+.feedEntry:not(:first-child) { opacity: 0.6; }
+
+.feedTitle { font-weight: 700; font-size: clamp(12px, 0.95vw, 19px); }
+
+.feedLine { font-size: clamp(11px, 0.85vw, 17px); }

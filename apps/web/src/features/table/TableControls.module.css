@@ -1,0 +1,80 @@
+
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+
+.tool {
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border, #b27f50);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+
+.toolOn {
+    border-color: var(--accent, #d4af37);
+    background: var(--accent, #d4af37);
+    color: var(--bg, #0b4225);
+}
+
+
+.field {
+    min-height: 32px;
+    max-width: 220px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #b27f50);
+    font-size: 13px;
+    padding: 0 12px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+
+.tool.isActive {
+    border-color: var(--accent, #d4af37);
+    background: var(--accent, #d4af37);
+    color: var(--bg, #0b4225);
+}
+
+
+.input {
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text, #000000);
+    font: var(--font, #000000);
+    font-size: 13px;
+}
+
+
+.status { margin: 0; font-size: 13px; opacity: 0.85; }
+
+
+.option {
+    background: var(--background-color, #141414);
+    color: var(--text, #000000);
+    font: var(--font, #000000);
+    font-size: 13px;
+}
+
+
+.select {
+    min-height: 32px;
+    max-width: 220px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text, #000000);
+    font: var(--font, #000000);
+    font-size: 13px;
+}

@@ -9,7 +9,7 @@ import { useFrame } from '@react-three/fiber'
 import { BufferAttribute, BufferGeometry, DoubleSide, type LineSegments, type Mesh, type Points,
     ShaderMaterial, SRGBColorSpace, TextureLoader, type Texture, Color } from 'three'
 import type { SceneMood, SceneWeather, SceneMap } from '@tenebris/rules/board'
-import { RIM_OUTER } from './TableScenery.tsx'
+import { rimOuter } from './TableScenery.tsx'
 import { waterTime } from './boardLooks.ts'
 
 // ---- moods: one set of light colours and strengths per mood ----
@@ -31,15 +31,16 @@ export const moodOf = (mood?: SceneMood) => MOODS[mood ?? 'day'] ?? MOODS.day;
 
 // ---- weather ----
 
-const AREA = RIM_OUTER * 2 + 12;   // the weather covers a square this wide, centred on the board (wider than the table)
+const weatherArea = (radius: number) => rimOuter(radius) * 2 + 12;   // the weather covers a square this wide, centred on the board (wider than the table)
 
 // Rain: short streaks falling fast, slightly slanted. One shape for all the drops, moved every frame.
-function Rain() {
+function Rain({ radius }: { radius: number }) {
+    const AREA = weatherArea(radius);
     const COUNT = 2400;
     const lines = useRef<LineSegments>(null);
     const drops = useMemo(() => Array.from({ length: COUNT }, () => ({
         x: (Math.random() - 0.5) * AREA, y: Math.random() * 12, z: (Math.random() - 0.5) * AREA, speed: 18 + Math.random() * 8,
-    })), []);
+    })), [AREA]);
     const geometry = useMemo(() => {
         const g = new BufferGeometry();
         g.setAttribute('position', new BufferAttribute(new Float32Array(COUNT * 6), 3));
@@ -64,13 +65,14 @@ function Rain() {
 }
 
 // Snow: soft flakes drifting down and swaying
-function Snow() {
+function Snow({ radius }: { radius: number }) {
+    const AREA = weatherArea(radius);
     const COUNT = 2600;
     const points = useRef<Points>(null);
     const flakes = useMemo(() => Array.from({ length: COUNT }, () => ({
         x: (Math.random() - 0.5) * AREA, y: Math.random() * 10, z: (Math.random() - 0.5) * AREA,
         speed: 0.6 + Math.random() * 0.6, phase: Math.random() * 6.28,
-    })), []);
+    })), [AREA]);
     const geometry = useMemo(() => {
         const g = new BufferGeometry();
         g.setAttribute('position', new BufferAttribute(new Float32Array(COUNT * 3), 3));
@@ -113,7 +115,7 @@ void main() {
     gl_FragColor = vec4(uColor, cloud * edge * 0.16);       // thin: the board must stay readable through it
 }
 `;
-function FogLayer({ y, seed }: { y: number; seed: number }) {
+function FogLayer({ y, seed, area }: { y: number; seed: number; area: number }) {
     const material = useMemo(() => new ShaderMaterial({
         uniforms: { uTime: waterTime, uSeed: { value: seed }, uColor: { value: new Color('#dfe6ea') } },
         vertexShader: FOG_VERTEX, fragmentShader: FOG_FRAGMENT, transparent: true, depthWrite: false, side: DoubleSide,
@@ -121,24 +123,25 @@ function FogLayer({ y, seed }: { y: number; seed: number }) {
     useEffect(() => () => material.dispose(), [material]);
     return (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, y, 0]} material={material} raycast={() => null}>
-            <planeGeometry args={[AREA * 1.2, AREA * 1.2]} />
+            <planeGeometry args={[area * 1.2, area * 1.2]} />
         </mesh>
     );
 }
-function Fog() {
-    return <>{[0.3, 0.8].map((y, i) => <FogLayer key={y} y={y} seed={i * 7.3} />)}</>;
+function Fog({ radius }: { radius: number }) {
+    const area = weatherArea(radius);
+    return <>{[0.3, 0.8].map((y, i) => <FogLayer key={y} y={y} seed={i * 7.3} area={area} />)}</>;
 }
 
-export function Weather({ weather }: { weather?: SceneWeather }) {
-    if (weather === 'rain') return <Rain />;
-    if (weather === 'snow') return <Snow />;
-    if (weather === 'fog') return <Fog />;
+export function Weather({ weather, radius }: { weather?: SceneWeather; radius: number }) {
+    if (weather === 'rain') return <Rain radius={radius} />;
+    if (weather === 'snow') return <Snow radius={radius} />;
+    if (weather === 'fog') return <Fog radius={radius} />;
     return null;
 }
 
 // ---- the room: the table is a real piece of furniture in a dim room, with candles on its corners ----
 
-const TABLE_RADIUS = RIM_OUTER + 4;
+
 
 function Candle({ x, z, seed }: { x: number; z: number; seed: number }) {
     const flame = useRef<Mesh>(null);
@@ -162,16 +165,18 @@ function Candle({ x, z, seed }: { x: number; z: number; seed: number }) {
     );
 }
 
-export function Room({ felt }: { felt: string }) {
+export function Room({ felt, radius }: { felt: string; radius: number }) {
+    const outer = rimOuter(radius);
+    const tableRadius = outer + 4;
     // the table: a thick hexagon slab; corners where the candles go
     const corners = useMemo(() => Array.from({ length: 6 }, (_, k) => {
         const a = Math.PI / 6 + (k * Math.PI) / 3;
-        return [Math.cos(a) * (RIM_OUTER + 1.4), -Math.sin(a) * (RIM_OUTER + 1.4)] as const;   // just beyond the wooden rim
-    }), []);
+        return [Math.cos(a) * (outer + 1.4), -Math.sin(a) * (outer + 1.4)] as const;   // just beyond the wooden rim
+    }), [outer]);
     return (
         <>
             <mesh position={[0, -0.72, 0]} receiveShadow castShadow rotation={[0, Math.PI / 6, 0]}>
-                <cylinderGeometry args={[TABLE_RADIUS, TABLE_RADIUS, 1.2, 6]} />
+                <cylinderGeometry args={[tableRadius, tableRadius, 1.2, 6]} />
                 <meshStandardMaterial color={felt} roughness={0.95} />
             </mesh>
             {/* the floor far below, in deep shadow */}

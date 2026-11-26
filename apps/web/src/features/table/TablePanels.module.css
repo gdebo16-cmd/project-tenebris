@@ -1,0 +1,21 @@
+
+/* the camera buttons, top right: Tilt view / Top-down and Fit */
+.viewButtons {
+    position: fixed;
+    top: 2.5dvh;
+    right: 8vw;
+    z-index: 1;
+    display: flex;
+    gap: 6px;
+}
+
+
+.viewButton {
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border, #b27f50);
+    background: color-mix(in srgb, var(--background-color, #141414) 88%, transparent);
+    color: var(--text, #eee);
+    font-size: 13px;
+    cursor: pointer;
+}

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { characterToCreature, type SheetData } from '../src/creature.ts';
 import { checkTableAct, resolveTableAct, reachFt, outcomeLine, actChoices, type Placed } from '../src/combat.ts';
 import { canSee, areaHexes, visibleFrom, checkArea, hexLine } from '../src/sight.ts';
-import { hexKey } from '../src/hex.ts';
+import { hexKey } from '../src/board.ts';
 import { fixedDice } from './helpers.ts';
 
 // ---- sight and areas ----

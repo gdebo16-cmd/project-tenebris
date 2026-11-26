@@ -6,195 +6,16 @@
 }
 
 
-.toolbar {
-    position: fixed;
-    bottom: 2.5dvh;
-    right: 2.5dvw;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    max-width: calc(100vw - 80px);   /* leaves room for the menu button on the right */
-    padding: 8px 10px;
-    border-radius: 12px;
-    border: 1px solid var(--border, #b27f50);
-    background: color-mix(in srgb, var(--background-color, #141414) 88%, transparent);
-    color: var(--text, #000000);
-}
-
-.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-
-.tool {
-    min-height: 32px;
-    padding: 0 12px;
-    border-radius: 999px;
-    border: 1px solid var(--border, #b27f50);
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.toolOn {
-    border-color: var(--accent, #d4af37);
-    background: var(--accent, #d4af37);
-    color: var(--bg, #0b4225);
-}
-
-.field {
-    min-height: 32px;
-    max-width: 220px;
-    border-radius: 8px;
-    border: 1px solid var(--border, #b27f50);
-    font-size: 13px;
-    padding: 0 12px;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    flex-direction: row;
-    flex-grow: 1;
-}
-
-.tool.isActive {
-    border-color: var(--accent, #d4af37);
-    background: var(--accent, #d4af37);
-    color: var(--bg, #0b4225);
-}
-
-.input {
-    border: 1px solid var(--border, #b27f50);
-    border-radius: 8px;
-    background: transparent;
-    color: var(--text, #000000);
-    font: var(--font, #000000);
-    font-size: 13px;
-}
-
-.status { margin: 0; font-size: 13px; opacity: 0.85; }
-.error { color: #f08a7a; opacity: 1; }
-
-/* A token's name, drawn over the board. Neither it nor drei's box around it takes clicks: they go to the board. */
-.labelWrap { pointer-events: none; }
-
-.label {
-    pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.25;
-    padding: 1px 6px;
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--background-color, #141414) 88%, transparent);
-    color: var(--text, #000000);
-    font-size: 12px;
-    white-space: nowrap;
-}
-
-.option {
-    background: var(--background-color, #141414);
-    color: var(--text, #000000);
-    font: var(--font, #000000);
-    font-size: 13px;
-}
-
-.labelName { font-size: clamp(12px, 1.1vw, 22px); font-weight: 600; }   /* grows with the screen: readable on a TV */
-.labelDetails { font-size: clamp(10px, 0.85vw, 17px); opacity: 0.85; }
-
 .notice { padding: 24px; }
 
-/* the camera buttons, top right: Tilt view / Top-down and Fit */
-.viewButtons {
-    position: fixed;
-    top: 2.5dvh;
-    right: 8vw;
-    z-index: 1;
-    display: flex;
-    gap: 6px;
-}
-
-.viewButton {
-    padding: 8px 10px;
-    border-radius: 12px;
-    border: 1px solid var(--border, #b27f50);
-    background: color-mix(in srgb, var(--background-color, #141414) 88%, transparent);
-    color: var(--text, #eee);
-    font-size: 13px;
-    cursor: pointer;
-}
-
-/* the little colour square on each Surface button */
-.swatch {
-    display: inline-block;
-    width: 22px;
-    height: 22px;
-    border-radius: 4px;
-    vertical-align: middle;
-    margin-right: 6px;
-}
-
-.select {
-    min-height: 32px;
-    max-width: 220px;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    color: var(--text, #000000);
-    font: var(--font, #000000);
-    font-size: 13px;
-}
-
-
-
-
-/* hurt or healed: the change floats up over the token and fades (TokenPiece) */
-.hit {
-    display: block;
-    color: #ff6b5a;
-    font: 800 clamp(16px, 1.6vw, 34px) Georgia, serif;
-    text-shadow: 0 2px 6px #000;
-    white-space: nowrap;
-    animation: hitRise 1.4s ease-out forwards;
-}
-.hitHeal { color: #7be08a; }
 @keyframes hitRise {
     0% { transform: translateY(10px) scale(0.7); opacity: 0; }
     15% { transform: translateY(0) scale(1.15); opacity: 1; }
     100% { transform: translateY(-40px) scale(1); opacity: 0; }
 }
+
 @media (prefers-reduced-motion: reduce) { .hit { animation-duration: 0.01s; } }
 
-/* step 17: what just happened, bottom left, readable from across the room */
-.feed {
-    position: fixed;
-    left: 2.5dvw;
-    bottom: 2.5dvh;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-width: min(420px, 40vw);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    pointer-events: none;
-}
-.feedEntry {
-    display: flex;
-    flex-direction: column;
-    padding: 6px 10px;
-    border-radius: 10px;
-    background: color-mix(in srgb, #0c0907 78%, transparent);
-    color: #f3e8d4;
-}
-.feedEntry:not(:first-child) { opacity: 0.6; }
-.feedTitle { font-weight: 700; font-size: clamp(12px, 0.95vw, 19px); }
-.feedLine { font-size: clamp(11px, 0.85vw, 17px); }
 .overlayLabel {
     padding: 1px 6px;
     border-radius: 6px;
@@ -203,8 +24,5 @@
     font-size: clamp(10px, 0.8vw, 15px);
     white-space: nowrap;
 }
-.hitPlain { color: #e8e0d0; }
-.small { width: 4.5em; }
 
-/* a button that can't be undone (Clear map) */
-.toolDanger { border-color: #d0503c; color: #ffb3a6; }
+.small { width: 4.5em; }

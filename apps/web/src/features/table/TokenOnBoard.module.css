@@ -1,0 +1,40 @@
+
+/* A token's name, drawn over the board. Neither it nor drei's box around it takes clicks: they go to the board. */
+.labelWrap { pointer-events: none; }
+
+
+.label {
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.25;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--background-color, #141414) 88%, transparent);
+    color: var(--text, #000000);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+
+.labelName { font-size: clamp(12px, 1.1vw, 22px); font-weight: 600; }   /* grows with the screen: readable on a TV */
+.labelDetails { font-size: clamp(10px, 0.85vw, 17px); opacity: 0.85; }
+
+
+
+
+
+/* hurt or healed: the change floats up over the token and fades (TokenPiece) */
+.hit {
+    display: block;
+    color: #ff6b5a;
+    font: 800 clamp(16px, 1.6vw, 34px) Georgia, serif;
+    text-shadow: 0 2px 6px #000;
+    white-space: nowrap;
+    animation: hitRise 1.4s ease-out forwards;
+}
+
+.hitHeal { color: #7be08a; }
+
+.hitPlain { color: #e8e0d0; }

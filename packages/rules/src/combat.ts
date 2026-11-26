@@ -13,7 +13,6 @@ import { canSee, areaHexes, checkArea, type Area } from './sight.ts';
 import { spendSlot, type UsedSlots } from './sheetState.ts';
 import { spellDiceAt, spellHealAt, type Creature, type WeaponAction, type SpellAction } from './creature.ts';
 import { statKey, statName } from './stats.ts';
-
 // ---- the request ----
 
 // target: a token id (one target).  area: a shape (area spells).  keepTurns: leave the area on the board for that many

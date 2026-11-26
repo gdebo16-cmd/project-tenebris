@@ -4,7 +4,7 @@
 // importing each other.
 import { monsterToCreature, healthWord } from '@tenebris/rules/monster';
 import { initiativeOf } from '@tenebris/rules/initiative';
-import { wallsOf, hexKey, BOARD_RADIUS, onBoard as hexOnBoard } from '@tenebris/rules/board';
+import { wallsOf, hexKey, radiusOf, onBoard as hexOnBoard } from '@tenebris/rules/board';
 import { visibleFrom, areaHexes } from '@tenebris/rules/sight';
 import * as Scenes from '../models/sceneModel.js';
 import { getMonster } from '../models/monsterPack.js';
@@ -45,15 +45,16 @@ export function tokenView(row) {
 // The party's eyes: the players' characters, and summons a player owns. With the fog on, players only get what those
 // eyes can see now (tokens) and what they have ever seen (terrain, ground, features): the server leaves the rest out,
 // so nothing hidden ever reaches a player's browser. The DM always gets everything.
-const SIGHT_RADIUS = BOARD_RADIUS * 2;     // hexes: the whole board, corner to corner (light and darkvision come later)
+// Sight reaches twice the board's radius: the whole board, corner to corner (light and darkvision come later)
 const isEye = (row) => row.kind === 'character' || (row.kind === 'summon' && row.owner_id != null);
 
 // What the party sees now and has seen so far, or null when the scene's fog is off. Saves "seen so far" when it grows.
 export async function visionOf(scene, rows) {
     if (!scene?.look?.fog) return null;
     const blockers = wallsOf(scene.terrain ?? {}, scene.features ?? {});
-    const onBoard = (key) => { const [q, r] = key.split(',').map(Number); return hexOnBoard({ q, r }); };   // nothing beyond the board is tracked
-    const visible = new Set([...visibleFrom(rows.filter(isEye).map((r) => ({ q: r.q, r: r.r })), blockers, SIGHT_RADIUS)].filter(onBoard));
+    const radius = radiusOf(scene.look);
+    const onBoard = (key) => { const [q, r] = key.split(',').map(Number); return hexOnBoard({ q, r }, radius); };   // nothing beyond the board is tracked
+    const visible = new Set([...visibleFrom(rows.filter(isEye).map((r) => ({ q: r.q, r: r.r })), blockers, radius * 2)].filter(onBoard));
     const explored = new Set(Object.keys(scene.explored ?? {}));
     let grew = false;
     for (const key of visible) if (!explored.has(key)) { explored.add(key); grew = true; }
