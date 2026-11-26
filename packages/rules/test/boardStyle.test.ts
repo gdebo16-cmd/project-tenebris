@@ -7,13 +7,13 @@ test('styleOf defaults to tiles for missing or bad style and answers natural whe
     assert.equal(styleOf(null), 'tiles');
     assert.equal(styleOf(undefined), 'tiles');
     assert.equal(styleOf({ style: 'natural' }), 'natural');
-    assert.equal(styleOf({ style: 'hex' }), 'tiles');
-    assert.equal(styleOf({ style: 1 }), 'tiles');
+    assert.equal(styleOf({ style: 'hex' as any }), 'tiles');
+    assert.equal(styleOf({ style: 1 as any }), 'tiles');
 });
 
 test('checkLookChange accepts valid styles and rejects invalid ones', () => {
     assert.deepEqual(checkLookChange({ style: 'natural' }), { change: { style: 'natural' } });
-    assert.ok('error' in checkLookChange({ style: 'hex' }));
+    assert.ok('error' in checkLookChange({ style: 'hex' as any }));
     assert.ok('error' in testCheckLookChangeStyleNumber());
 });
 
