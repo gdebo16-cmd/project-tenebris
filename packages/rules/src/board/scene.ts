@@ -27,7 +27,8 @@ export const styleOf = (look?: SceneLook | null): BoardStyle => {
     if (!look || !BOARD_STYLES.includes(look.style as BoardStyle)) {
         return DEFAULT_BOARD_STYLE;
     }
-    return look.style;
+    // TypeScript needs explicit type assertion here because it can't narrow the optional property
+    return look.style as BoardStyle;
 };
 
 // Check a change to the look (anything except heights, which are painted hex by hex). Answers the cleaned change.
