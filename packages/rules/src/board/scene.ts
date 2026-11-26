@@ -23,7 +23,12 @@ export function keepOnBoard<T>(map: Record<string, T> | null | undefined, radius
 }
 
 // A board's style: its own, or the old default for boards made before styles existed
-export const styleOf = (look?: SceneLook | null): BoardStyle => (BOARD_STYLES.includes(look?.style as BoardStyle) ? look.style : DEFAULT_BOARD_STYLE);
+export const styleOf = (look?: SceneLook | null): BoardStyle => {
+    if (!look || !BOARD_STYLES.includes(look.style as BoardStyle)) {
+        return DEFAULT_BOARD_STYLE;
+    }
+    return look.style;
+};
 
 // Check a change to the look (anything except heights, which are painted hex by hex). Answers the cleaned change.
 export function checkLookChange(body: unknown): { error: string } | { change: Partial<SceneLook> } {
