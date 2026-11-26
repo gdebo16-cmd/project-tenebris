@@ -701,3 +701,159 @@ body:where(:has(.page)) {
         padding: 0;
     }
 }
+
+/* ---------- empty states (every tab) ---------- */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.75rem 1rem;
+    text-align: center;
+    list-style: none;
+}
+.emptyTitle {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--accent);
+}
+.emptyHint {
+    margin: 0;
+    max-width: 28ch;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    opacity: 0.85;
+}
+.emptyActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+}
+.emptyAction {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    box-sizing: border-box;
+    padding: 0.5rem 1.1rem;
+    border: var(--tileBorder);
+    border-radius: var(--tile);
+    background-color: var(--bgc-char-name);
+    box-shadow: var(--bs2);
+}
+
+/* ---------- phone layout (last in file, so it wins over the older rules above) ----------
+   Header below the status bar; tab bar (labels wrap, equal height); the chosen panel hugs its
+   content and scrolls on its own, so there is no giant empty card. */
+@media (max-width: 768px) {
+    :where(html:has(.page)) main {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        height: calc(100dvh - var(--m-header-h));
+        margin: 0;
+        padding: 12px 3vw calc(2.5dvh + 8px);
+        overflow: hidden !important;
+        background-color: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    .homeTabs {
+        flex: none;
+        align-items: stretch;
+    }
+
+    .homeTab {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: auto;
+        min-height: 3rem;
+        padding: 0.4rem 0.3rem;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.15;
+        font-size: clamp(0.78rem, 3.5vw, 0.95rem);
+        background-color: color-mix(in srgb, var(--bgc-theme) 78%, transparent);
+        opacity: 0.85;
+    }
+
+    .homeTab.isActive {
+        background-color: color-mix(in srgb, var(--bgc-theme) 88%, transparent);
+        opacity: 1;
+    }
+
+    main > .container.isActive {
+        flex: 0 1 auto;
+        min-height: 0;
+        box-sizing: border-box;
+        margin: 0 !important;
+        padding: 12px;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: none;
+        background-color: color-mix(in srgb, var(--bgc-theme) 88%, transparent);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border-radius: 0 0 var(--tile) var(--tile);
+    }
+
+    #currentCharacterTile,
+    #currentCampaignTile,
+    #unfinishedCharacterTile {
+        flex: none;
+        width: 100%;
+        margin: 0;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .tileList {
+        margin: 0;
+        padding: 0;
+    }
+
+    .tileList > li:last-child .charTile,
+    .tileList > li:last-child .campTile {
+        margin-bottom: 0;
+    }
+}
+
+/* ---------- phone header (last in file, so it wins over the older rules above) ----------
+   Sits below the status bar, logo and title on one line, clear of the menu button on the right. */
+@media (max-width: 768px) {
+    #siteTitle {
+        box-sizing: border-box;
+        height: var(--m-header-h);
+        padding: env(safe-area-inset-top) 64px 0 12px;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    #siteTitle h1 {
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        text-align: center;
+        font-size: clamp(1.05rem, 5vw, 1.5rem);
+        line-height: 1.25;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+    }
+    #siteTitle .titleLogo {
+        flex: none;
+        width: auto;
+        height: 40px;
+        max-width: 56px;
+        max-height: 40px;
+        object-fit: contain;
+    }
+}

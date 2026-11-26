@@ -441,3 +441,48 @@ body:where(:has(.page)) {
         -webkit-text-fill-color: transparent;
     }
 }
+
+/* ---------- phone header (last in file, so it wins over the older rules above) ----------
+   Sits below the status bar, logo and title on one line. */
+@media (max-width: 768px) {
+    #siteTitle {
+        box-sizing: border-box;
+        height: var(--m-header-h);
+        padding: env(safe-area-inset-top) 12px 0 12px;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    #siteTitle h1 {
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        text-align: center;
+        font-size: clamp(1.05rem, 5vw, 1.5rem);
+        line-height: 1.25;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+    }
+    #siteTitle .titleLogo {
+        flex: none;
+        width: auto;
+        height: 40px;
+        max-width: 56px;
+        max-height: 40px;
+        object-fit: contain;
+    }
+
+    /* the page fills exactly what is left under the header (it used to be 88% of the screen, so it
+       overlapped the header and ran past the bottom), and scrolls inside itself when it is taller */
+    :where(html:has(.page)) main {
+        box-sizing: border-box;
+        position: static;
+        top: auto;
+        height: calc(100dvh - var(--m-header-h));
+        overflow-x: hidden;
+        overflow-y: auto !important;
+        padding-bottom: calc(2.5dvh + 8px);
+    }
+}

@@ -28,3 +28,9 @@ html[data-status-bar="surface"] {
   --status-bar: var(--surface);
   background-color: var(--surface);
 }
+
+/* Phone header: the status-bar inset plus a comfortable bar. Every page's header and the menu button use it,
+   so the title never hides under the status bar and the menu button stays centered in the bar. */
+:root {
+  --m-header-h: calc(env(safe-area-inset-top) + max(8dvh, 52px));
+}

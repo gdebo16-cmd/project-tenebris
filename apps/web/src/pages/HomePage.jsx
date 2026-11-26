@@ -53,7 +53,13 @@ function HomePage() {
                     </article>
                     <article id={styles.currentCharacterTile}>
                         {characters.length === 0 ? (
-                            <p>No Characters Available</p>
+                            <div className={styles.emptyState}>
+                                <p className={styles.emptyTitle}>No Characters Available</p>
+                                <p className={styles.emptyHint}>Create your first adventurer and they will gather here.</p>
+                                <div className={styles.emptyActions}>
+                                    <Link className={styles.emptyAction} to="/characters/new">Create a character</Link>
+                                </div>
+                            </div>
                         ) : (
                             <ul className={styles.tileList}>
                                 {characters.map((ch) => (
@@ -78,7 +84,14 @@ function HomePage() {
                     </article>
                     <article id={styles.currentCampaignTile}>
                         {campaigns.length === 0 ? (
-                            <p>No Tales to Tell</p>
+                            <div className={styles.emptyState}>
+                                <p className={styles.emptyTitle}>No Tales to Tell</p>
+                                <p className={styles.emptyHint}>Start a tale of your own, or join a friend's with an invite code.</p>
+                                <div className={styles.emptyActions}>
+                                    <Link className={styles.emptyAction} to="/create_campaign">Create a tale</Link>
+                                    <Link className={styles.emptyAction} to="/campaign_list">Join a tale</Link>
+                                </div>
+                            </div>
                         ) : (
                             <ul className={styles.tileList}>
                                 {campaigns.map((camp) => (
@@ -105,7 +118,10 @@ function HomePage() {
                     <article id={styles.unfinishedCharacterTile}>
                         <ul className={styles.tileList}>
                         {drafts.length === 0 ? (
-                            <p>You are all caught up!</p>
+                            <li className={styles.emptyState}>
+                                <p className={styles.emptyTitle}>You are all caught up!</p>
+                                <p className={styles.emptyHint}>Characters you have not finished will wait for you here.</p>
+                            </li>
                         ) : drafts.map((ch) => (
                             <li key={ch.id} id={`character-tile-${ch.id}`}>
                                 <Link to={`/characters/${ch.id}/edit`} className={styles.charTile}>

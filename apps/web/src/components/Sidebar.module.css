@@ -2,7 +2,7 @@
 .hamburger {
     position: fixed;
     /* centered in the 8dvh header, below the status bar (44px tall, so up by half) */
-    top: calc(env(safe-area-inset-top) + 4dvh - 22px);
+    top: calc(env(safe-area-inset-top) + max(8dvh, 52px) / 2 - 22px);
     right: 2dvw;
     z-index: 50;
     width: 44px;
