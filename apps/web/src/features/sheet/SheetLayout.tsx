@@ -3,17 +3,20 @@
 // scrolls inside the block. Phone: the same blocks in reading order, each as tall as its rows (keeping the grid's
 // proportions), grouped under Stats / Combat / Condition on sheets with phone tabs; the page scrolls.
 // Content smaller than its block is scaled up to fill it (Fit below); scrollbars are hidden (content still scrolls).
-// Editing (wide screens, started from the sidebar): the cells show, drag a block to move it, drag its corner to resize it;
-// or use the keyboard.
+// Editing (started from the sidebar). Each sheet has two layouts, arranged separately and saved separately:
+//   Desktop (wide screens only): the cells show, drag a block to move it, drag its corner to resize it; or use the keyboard.
+//   Mobile (any screen): the blocks in a column as the phone shows them, with controls to move (up/down), set the
+//   height (- / +) and hide each one. The phone shows its mobile layout; until it's arranged, that follows the desktop one.
+// The editor's Desktop / Mobile buttons switch between them; Save saves whichever were changed.
 import { Fragment, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
-import { GRID, nudgeBlock, placeBlock, readingOrder, removeBlock, type LayoutItem, type SheetKind as LayoutKind, type SheetLayout as Layout } from '@tenebris/rules/layout';
+import { GRID, LAYOUT_DEVICES, moveInStack, nudgeBlock, phoneStack, placeBlock, readingOrder, removeBlock, setBlockTab, setStackHeight, type LayoutDevice, type LayoutItem, type SheetKind as LayoutKind, type SheetLayout as Layout } from '@tenebris/rules/layout';
 import shared from './Sheet.module.css';
 import css from './SheetLayout.module.css';
 import { PHONE_TABS, blockDef, blocksFor, isBlockId, type BlockId, type PhoneTab } from './blocks/registry.tsx';
 import { SheetContext } from './blocks/SheetContext.tsx';
 import { DEFAULT_LAYOUTS, PHONE_TABS_ON, useSheetLayout } from './layouts.ts';
-import { LayoutEditor } from './LayoutEditor.tsx';
-import { EDIT_LAYOUT_EVENT, isWideScreen } from './layoutEvents.ts';
+import { LayoutEditor, TabPicker, tabOf } from './LayoutEditor.tsx';
+import { EDIT_LAYOUT_EVENT, isWideScreen, useIsWide } from './layoutEvents.ts';
 
 type Spot = { col: number; row: number; colSpan: number; rowSpan: number };
 type Drag = { block: BlockId; mode: 'move' | 'resize'; start: { col: number; row: number }; orig: Spot; to: Spot; ok: boolean };
@@ -105,39 +108,57 @@ function Fit({ children, scaling }: { children: ReactNode; scaling: Scaling }) {
 export default function SheetLayout({ kind: kindProp }: { kind?: LayoutKind }) {
     const tools = useContext(SheetContext);   // the sheet's tools (none on the DM page: its blocks bring their own)
     const kind: LayoutKind = kindProp ?? tools!.kind;
-    const { layout: saved, save, saving } = useSheetLayout(kind);
-    const [draft, setDraft] = useState<Layout | null>(null);   // the layout being edited; null = not editing
+    const wide = useIsWide();
+    const controls = { desktop: useSheetLayout(kind, 'desktop'), mobile: useSheetLayout(kind, 'mobile') };
+    const [editDevice, setEditDevice] = useState<LayoutDevice | null>(null);   // the layout being arranged; null = not editing
+    const [drafts, setDrafts] = useState<Partial<Record<LayoutDevice, Layout>>>({});   // changed but not yet saved
+    const [resets, setResets] = useState<Partial<Record<LayoutDevice, true>>>({});     // reset: saving forgets the player's own layout
     const [message, setMessage] = useState('');
     const tabs = PHONE_TABS[kind];
     const [phoneTab, setPhoneTab] = useState<PhoneTab>(tabs[0].id);
     const [drag, setDrag] = useState<Drag | null>(null);
     const gridRef = useRef<HTMLDivElement>(null);
-    const editing = draft !== null;
-    const layout = draft ?? saved;
+    const editing = editDevice !== null;
+    const device: LayoutDevice = editDevice ?? (wide ? 'desktop' : 'mobile');   // the layout on screen
+    const layoutOf = (d: LayoutDevice) => drafts[d] ?? controls[d].layout;
+    const layout = layoutOf(device);
+    const draft = editing ? layout : null;
+    const saving = controls.desktop.saving || controls.mobile.saving;
     const blocks = blocksFor(kind);
     const tabsOn = PHONE_TABS_ON[kind] && !editing;
+    const phoneEditing = editDevice === 'mobile';
 
-    // The sidebar's "Edit sheet layout" (layoutEvents.ts). Only on a wide screen, where the grid is shown.
-    const savedRef = useRef(saved);
-    useEffect(() => { savedRef.current = saved; }, [saved]);
+    // The sidebar's "Edit sheet layout" (layoutEvents.ts): arranges the layout of the screen you're on
     useEffect(() => {
-        const start = () => { if (isWideScreen()) { setDraft(savedRef.current); setMessage(''); } };
+        const start = () => { setEditDevice(isWideScreen() ? 'desktop' : 'mobile'); setDrafts({}); setResets({}); setMessage(''); };
         window.addEventListener(EDIT_LAYOUT_EVENT, start);
         return () => window.removeEventListener(EDIT_LAYOUT_EVENT, start);
     }, []);
 
+    const stopEditing = () => { setEditDevice(null); setDrafts({}); setResets({}); setMessage(''); };
     const change = (r: Result) => {
-        if ('error' in r) setMessage(r.error);
-        else { setDraft(r.layout); setMessage(''); }
+        if ('error' in r) { setMessage(r.error); return; }
+        setDrafts((d) => ({ ...d, [device]: r.layout }));
+        setResets((o) => ({ ...o, [device]: undefined }));
+        setMessage('');
     };
-    const saveDraft = async () => {
-        if (!draft) return;
-        // Reset to default and saved unchanged: forget the player's layout, so future defaults reach them too
-        const error = await save(draft === DEFAULT_LAYOUTS[kind] ? null : draft);
-        if (error) setMessage(error);
-        else setDraft(null);
+    // Back to where it starts: desktop = the default layout, mobile = the desktop layout stacked
+    const resetDraft = () => {
+        const start = device === 'desktop' ? DEFAULT_LAYOUTS[kind] : phoneStack(layoutOf('desktop'));
+        setDrafts((d) => ({ ...d, [device]: start }));
+        setResets((o) => ({ ...o, [device]: true }));
+        setMessage('');
     };
-
+    const saveDrafts = async () => {
+        for (const d of LAYOUT_DEVICES) {
+            const next = drafts[d];
+            if (!next && !resets[d]) continue;
+            // Reset and saved unchanged: forget the player's layout, so future defaults reach them too
+            const error = await controls[d].save(resets[d] ? null : next!);
+            if (error) { setMessage(error); return; }
+        }
+        stopEditing();
+    };
     // ---- Dragging: the pointer's cell on the grid ----
     const cellAt = (x: number, y: number) => {
         const r = gridRef.current!.getBoundingClientRect();
@@ -196,10 +217,11 @@ export default function SheetLayout({ kind: kindProp }: { kind?: LayoutKind }) {
         const def = blockDef(item.block);
         if (!def.sheets.includes(kind)) return [];
         const visible = !def.show || !tools || def.show(tools);
-        return visible || editing ? [{ item, id: item.block, def, visible }] : [];
+        const tab = tabOf(item, def, kind);
+        return visible || editing ? [{ item, id: item.block, def, visible, tab }] : [];
     });
-    // On a phone the tab bar goes after the blocks that lead the page without a tab (the header)
-    const lead = items.findIndex(({ def }) => def.phoneTab !== null);
+    // On a phone the tab bar goes after the blocks that lead the page without a tab (the main area, e.g. the header)
+    const lead = items.findIndex(({ tab }) => tab !== null);
     const tabBarAt = lead === -1 ? items.length : lead;
     const tabBar = tabsOn && (
         <nav className={css.phoneTabs} aria-label="Sheet areas">
@@ -213,19 +235,54 @@ export default function SheetLayout({ kind: kindProp }: { kind?: LayoutKind }) {
     return (
         <div className={css.root}>
             {editing && (
-                <LayoutEditor layout={layout} blocks={blocks} onChange={change} onSave={saveDraft} saving={saving} message={message}
-                    onCancel={() => { setDraft(null); setMessage(''); }}
-                    onReset={() => { setDraft(DEFAULT_LAYOUTS[kind]); setMessage(''); }} />
+                <LayoutEditor layout={layout} device={device} canDesktop={wide} kind={kind} blocks={blocks} onChange={change} onSave={saveDrafts} saving={saving} message={message}
+                    onDevice={(d) => { setEditDevice(d); setMessage(''); }} onCancel={stopEditing} onReset={resetDraft} />
             )}
 
-            <div ref={gridRef} className={editing ? `${css.grid} ${css.gridEditing}` : css.grid}>
+            {phoneEditing && (
+                <div className={css.phoneEdit}>
+                    {items.map(({ item, id, def, visible, tab }, i) => {
+                        const Block = def.Component;
+                        const rows = Math.min(GRID.rows, Math.max(1, item.rowSpan));
+                        return (
+                            <div key={id} className={`${css.phoneItem} ${css[`rows${rows}`]}`} data-block={id}>
+                                <div className={css.phoneBar}>
+                                    <span className={css.tagName}>{def.label}</span>
+                                    <span className={css.tagSize}>{rows} tall</span>
+                                    <TabPicker kind={kind} value={tab} label={def.label} onChange={(next) => change(setBlockTab(layout, id, next, kind))} />
+                                    <button type="button" className={css.phoneButton} aria-label={`Move ${def.label} up`} disabled={i === 0}
+                                        onClick={() => change({ layout: moveInStack(layout, id, -1) })}>▲</button>
+                                    <button type="button" className={css.phoneButton} aria-label={`Move ${def.label} down`} disabled={i === items.length - 1}
+                                        onClick={() => change({ layout: moveInStack(layout, id, 1) })}>▼</button>
+                                    <button type="button" className={css.phoneButton} aria-label={`Make ${def.label} shorter`} disabled={rows <= 1}
+                                        onClick={() => change({ layout: setStackHeight(layout, id, rows - 1) })}>−</button>
+                                    <button type="button" className={css.phoneButton} aria-label={`Make ${def.label} taller`} disabled={rows >= GRID.rows}
+                                        onClick={() => change({ layout: setStackHeight(layout, id, rows + 1) })}>+</button>
+                                    <button type="button" className={css.phoneButton} aria-label={`Hide ${def.label}`}
+                                        onClick={() => change({ layout: phoneStack(removeBlock(layout, id)) })}>×</button>
+                                </div>
+                                {/* A preview: nothing inside can be clicked while arranging */}
+                                <div className={css.preview} inert>
+                                    <Fit scaling={scalingOf(def)}>{visible ? <Block layout={layout} /> : <p className={shared.muted}>{def.label}: {def.note}</p>}</Fit>
+                                </div>
+                            </div>
+                        );
+                    })}
+                    <div className={css.phoneBottom}>
+                        <button type="button" className={`${shared.button} ${shared.primary}`} disabled={saving} onClick={saveDrafts}>{saving ? 'Saving…' : 'Save'}</button>
+                        <button type="button" className={shared.button} disabled={saving} onClick={stopEditing}>Cancel</button>
+                    </div>
+                </div>
+            )}
+
+            {!phoneEditing && <div ref={gridRef} className={editing ? `${css.grid} ${css.gridEditing}` : css.grid}>
                 {/* The cells, so the grid shows while arranging */}
                 {editing && Array.from({ length: GRID.columns * GRID.rows }, (_, i) => (
                     <div key={`cell${i}`} className={css.cell} style={place({ col: (i % GRID.columns) + 1, row: Math.floor(i / GRID.columns) + 1, colSpan: 1, rowSpan: 1 })} aria-hidden="true" />
                 ))}
 
-                {items.map(({ item, id, def, visible }, i) => {
-                    const hiddenOnPhone = tabsOn && def.phoneTab !== null && def.phoneTab !== phoneTab;
+                {items.map(({ item, id, def, visible, tab }, i) => {
+                    const hiddenOnPhone = tabsOn && tab !== null && tab !== phoneTab;
                     const Block = def.Component;
                     if (!editing) {
                         return (
@@ -252,6 +309,7 @@ export default function SheetLayout({ kind: kindProp }: { kind?: LayoutKind }) {
                             <div className={css.tag}>
                                 <span className={css.tagName}>{def.label}</span>
                                 <span className={css.tagSize}>{item.colSpan}×{item.rowSpan}</span>
+                                <TabPicker kind={kind} value={tab} label={def.label} onChange={(next) => change(setBlockTab(layout, id, next, kind))} />
                                 <button type="button" className={css.hide} aria-label={`Hide ${def.label}`} title="Hide"
                                     onPointerDown={(e) => e.stopPropagation()} onClick={() => change({ layout: removeBlock(layout, id) })}>×</button>
                             </div>
@@ -264,7 +322,7 @@ export default function SheetLayout({ kind: kindProp }: { kind?: LayoutKind }) {
 
                 {/* Where the block will land: green if it fits, red if something's in the way */}
                 {drag && <div className={drag.ok ? css.ghost : css.ghostBlocked} style={place(drag.to)} aria-hidden="true" />}
-            </div>
+            </div>}
         </div>
     );
 }

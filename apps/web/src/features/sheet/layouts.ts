@@ -1,8 +1,10 @@
 // Sheet layouts: the default for each kind of sheet (L3), and the player's own, saved to their account (L4)
 // with a copy in this browser so the sheet shows the right layout at once, before the server answers.
-import { useCallback, useEffect } from 'react';
+// Each sheet has a desktop layout and a separate mobile one (layoutKey in @tenebris/rules/layout); the mobile one follows
+// the desktop layout's reading order until the player has arranged it.
+import { useCallback, useEffect, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { checkLayout, type SheetKind, type SheetLayout } from '@tenebris/rules/layout';
+import { checkLayout, layoutKey, phoneStack, type LayoutDevice, type SheetKind, type SheetLayout } from '@tenebris/rules/layout';
 import { api } from '../../api.ts';
 import { blocksFor } from './blocks/registry.tsx';
 
@@ -75,33 +77,34 @@ export const DEFAULT_LAYOUTS: Record<SheetKind, SheetLayout> = {
 // Whether a kind of sheet groups its blocks under phone tabs on a phone
 export const PHONE_TABS_ON: Record<SheetKind, boolean> = { character: true, monster: true, dm: true };
 
-type SavedLayouts = Partial<Record<SheetKind, SheetLayout>>;
+type SavedLayouts = Record<string, SheetLayout>;   // by layoutKey: 'character', 'character-mobile', ...
 const layoutsKey = ['layouts'] as const;
-const storageKey = (kind: SheetKind) => `tenebris.sheetLayout.${kind}`;
+const storageKey = (key: string) => `tenebris.sheetLayout.${key}`;
 
 // A layout checked against this sheet's blocks, or null
-const checked = (raw: unknown, kind: SheetKind): SheetLayout | null => {
-    const r = checkLayout(raw, blocksFor(kind));
+const checked = (raw: unknown, kind: SheetKind, device: LayoutDevice): SheetLayout | null => {
+    const r = checkLayout(raw, blocksFor(kind), device, kind);
     return 'layout' in r ? r.layout : null;
 };
 
 // The browser's copy. Browser storage can be missing or blocked: never throw.
-function readCopy(kind: SheetKind): SheetLayout | null {
+function readCopy(kind: SheetKind, device: LayoutDevice): SheetLayout | null {
     try {
-        const saved = localStorage.getItem(storageKey(kind));
-        return saved ? checked(JSON.parse(saved), kind) : null;
+        const saved = localStorage.getItem(storageKey(layoutKey(kind, device)));
+        return saved ? checked(JSON.parse(saved), kind, device) : null;
     } catch {
         return null;
     }
 }
-function writeCopy(kind: SheetKind, layout: SheetLayout | null) {
+function writeCopy(kind: SheetKind, device: LayoutDevice, layout: SheetLayout | null) {
     try {
-        if (layout) localStorage.setItem(storageKey(kind), JSON.stringify(layout));
-        else localStorage.removeItem(storageKey(kind));
+        const key = storageKey(layoutKey(kind, device));
+        if (layout) localStorage.setItem(key, JSON.stringify(layout));
+        else localStorage.removeItem(key);
     } catch { /* the account still has it */ }
 }
 
-// The player's saved layouts (one request for both kinds)
+// The player's saved layouts (one request for every kind and both devices)
 export function useSavedLayouts() {
     return useQuery({ queryKey: layoutsKey, queryFn: () => api<SavedLayouts>('/api/layouts'), staleTime: 5 * 60 * 1000 });
 }
@@ -113,30 +116,37 @@ export type LayoutControls = {
     saving: boolean;
 };
 
-export function useSheetLayout(kind: SheetKind): LayoutControls {
+// The layout for one device ('desktop' by default). The mobile layout falls back to the desktop layout stacked
+// (their own saved desktop layout, else the default), so a phone looks as it always did until it's arranged.
+export function useSheetLayout(kind: SheetKind, device: LayoutDevice = 'desktop'): LayoutControls {
     const saved = useSavedLayouts();
     const queryClient = useQueryClient();
+    const key = layoutKey(kind, device);
 
     // The server's answer wins; until it comes, the browser's copy; else the default
-    const fromServer = saved.data ? checked(saved.data[kind], kind) : undefined;
-    const own = saved.data ? fromServer : readCopy(kind);
-    const layout = own ?? DEFAULT_LAYOUTS[kind];
+    const own = useMemo(
+        () => (saved.data ? checked(saved.data[key], kind, device) : readCopy(kind, device)),
+        [saved.data, key, kind, device]);
+    const desktop = useMemo(
+        () => (device === 'mobile' ? (saved.data ? checked(saved.data[kind], kind, 'desktop') : readCopy(kind, 'desktop')) : null),
+        [saved.data, kind, device]);
+    const layout = own ?? (device === 'mobile' ? phoneStack(desktop ?? DEFAULT_LAYOUTS[kind]) : DEFAULT_LAYOUTS[kind]);
 
     // Keep the browser's copy in step with the account (e.g. after editing on another device)
     useEffect(() => {
-        if (saved.data) writeCopy(kind, fromServer ?? null);
-    }, [saved.data, fromServer, kind]);
+        if (saved.data) writeCopy(kind, device, own);
+    }, [saved.data, own, kind, device]);
 
     const mutation = useMutation({
         mutationFn: (next: SheetLayout | null) => next
-            ? api<SheetLayout>(`/api/layouts/${kind}`, { method: 'PUT', body: next })
-            : api(`/api/layouts/${kind}`, { method: 'DELETE' }).then(() => null),
+            ? api<SheetLayout>(`/api/layouts/${key}`, { method: 'PUT', body: next })
+            : api(`/api/layouts/${key}`, { method: 'DELETE' }).then(() => null),
         onSuccess: (result) => {
-            writeCopy(kind, result);
+            writeCopy(kind, device, result);
             queryClient.setQueryData<SavedLayouts>(layoutsKey, (old) => {
                 const next = { ...(old ?? {}) };
-                if (result) next[kind] = result;
-                else delete next[kind];
+                if (result) next[key] = result;
+                else delete next[key];
                 return next;
             });
         },
@@ -144,7 +154,7 @@ export function useSheetLayout(kind: SheetKind): LayoutControls {
 
     const save = useCallback(async (next: SheetLayout | null) => {
         if (next) {
-            const check = checkLayout(next, blocksFor(kind));
+            const check = checkLayout(next, blocksFor(kind), device, kind);
             if ('error' in check) return check.error;
         }
         try {
@@ -153,7 +163,7 @@ export function useSheetLayout(kind: SheetKind): LayoutControls {
         } catch (err) {
             return err instanceof Error ? err.message : 'Could not save the layout';
         }
-    }, [kind, mutation]);
+    }, [kind, device, mutation]);
 
     return { layout, isDefault: !own, save, saving: mutation.isPending };
 }

@@ -1,5 +1,5 @@
 // The block list (L2): every block a sheet layout can place. Each entry says what the block is called, which
-// sheets have it, which phone tab it goes under, and how to draw it from the sheet context.
+// sheets have it, which phone tab it sits in by default (the player can move it in the layout editor), and how to draw it from the sheet context.
 // A new block = an entry here + its id in SHEET_BLOCKS (packages/rules/src/layout.ts, which the server checks).
 import type { JSX } from 'react';
 import { panelTabsOf, SHEET_BLOCKS, SHEET_KINDS, type SheetKind as LayoutKind, type SheetLayout } from '@tenebris/rules/layout';
@@ -45,7 +45,7 @@ export type PhoneTab = (typeof PHONE_TABS)[LayoutKind][number]['id'];
 export type BlockDef = {
     label: string;
     sheets: LayoutKind[];                    // the kinds of layout that can place it (character, monster, dm)
-    phoneTab: PhoneTab | null;
+    phoneTab: PhoneTab | null;           // default tab when the layout does not assign one; null = always shown
     show?: (tools: SheetTools) => boolean;   // e.g. the roll feed only for the DM on a character sheet
     note?: string;                           // shown in the layout editor
     scrolls?: true;                          // a growing list (actions, spells...): never shrunk to fit; what doesn't fit scrolls
