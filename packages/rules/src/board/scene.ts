@@ -6,7 +6,10 @@ export const SCENE_WEATHERS = ['clear', 'fog', 'rain', 'snow'] as const;
 export type SceneWeather = (typeof SCENE_WEATHERS)[number];
 export const MAX_HEIGHT = 5;
 export type SceneMap = { url: string; size: number };      // size: how many world units wide the picture is (10–80)
-export type SceneLook = { mood?: SceneMood; weather?: SceneWeather; room?: boolean; fog?: boolean; map?: SceneMap | null; heights?: Record<string, number>; radius?: number };   // radius: rings of hexes around the centre (one of BOARD_SIZES); missing = DEFAULT_BOARD_RADIUS
+export type SceneLook = { mood?: SceneMood; weather?: SceneWeather; room?: boolean; fog?: boolean; map?: SceneMap | null; heights?: Record<string, number>; radius?: number; style?: BoardStyle };   // radius: rings of hexes around the centre (one of BOARD_SIZES); missing = DEFAULT_BOARD_RADIUS
+export const BOARD_STYLES = ['tiles', 'natural'] as const;
+export type BoardStyle = (typeof BOARD_STYLES)[number];
+export const DEFAULT_BOARD_STYLE: BoardStyle = 'tiles';
 
 // A board's radius: its own, or the old default for boards made before sizes existed
 export const radiusOf = (look?: SceneLook | null): number => (isBoardSize(look?.radius) ? look.radius : DEFAULT_BOARD_RADIUS);
@@ -18,6 +21,9 @@ export function keepOnBoard<T>(map: Record<string, T> | null | undefined, radius
         return onBoard({ q, r } as Hex, radius);
     }));
 }
+
+// A board's style: its own, or the old default for boards made before styles existed
+export const styleOf = (look?: SceneLook | null): BoardStyle => (BOARD_STYLES.includes(look?.style as BoardStyle) ? look.style : DEFAULT_BOARD_STYLE);
 
 // Check a change to the look (anything except heights, which are painted hex by hex). Answers the cleaned change.
 export function checkLookChange(body: unknown): { error: string } | { change: Partial<SceneLook> } {
@@ -42,6 +48,10 @@ export function checkLookChange(body: unknown): { error: string } | { change: Pa
     if ('radius' in b) {                                   // the board's size: one of the listed options
         if (!isBoardSize(b.radius)) return { error: `radius must be one of ${BOARD_SIZES.join(', ')}` };
         change.radius = b.radius;
+    }
+    if ('style' in b) {
+        if (!BOARD_STYLES.includes(b.style as BoardStyle)) return { error: `style must be one of ${BOARD_STYLES.join(', ')}` };
+        change.style = b.style as BoardStyle;
     }
     if ('map' in b) {
         if (b.map === null) change.map = null;
