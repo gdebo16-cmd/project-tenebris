@@ -32,9 +32,7 @@ Switch over — **only after Gate 1, and ask the owner before each one (touches 
 
 - [x] **0.11** Back up first (Neon branch `pre-cutover-<date>` from `production`) — ✓ 2026-11-22 · Claude · Neon branch `pre-cutover-20261122` (no commit: a database copy)
 
-> > > > > > > b460d628ef2e657b088eefd084acb6c6b0af54b4
-
-- [ ] **0.12** Point the new service at production
+- [x] **0.12** Point the new service at production — ✓ 2026-11-25 · Major · commit feb7853
   - note: move the `NODE_OPTIONS` IPv4 fix into the Dockerfile first; adopt migration baseline with `npm run migrate -- fake`
 - [ ] **0.13** Move the domain — Done when: the live domain runs the new code and smoke tests pass against it
 - [ ] **0.14** Retire the old project (suspend old Render service a week, then delete; archive Project-Umber)

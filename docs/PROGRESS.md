@@ -5,7 +5,7 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 ## Now
 
 - **Stage 2, the 2D hex table:** steps 8–13 done (2026-11-23). **Gate 2 is ready for Gabriel to check and tick.**
-- Stage 0 cutover: backup made (0.11) and rehearsed; new Render service `tenebris` runs on a copy of production. The switch itself waits for a time from Gabriel.
+- Stage 0 cutover: 0.12 done 2026-11-25 (production migrated, `tenebris` on production). Next: 0.13 move eldridtales.com (Gabriel, Render dashboard), then 0.14.
 - **Paused by Gabriel:** nothing.
 - **In progress:** nothing claimed. Steps 17–18 built (uncommitted in Gabriel's main folder), waiting for his check.
 - **Map Editor / Play Session split** built 2026-11-24 (uncommitted in Gabriel's main folder), waiting for his check.
@@ -23,6 +23,13 @@ Every AI reads this first and adds a Log entry last. Newest entry on top.
 See `docs/CHECKLIST.md` — the one place steps get ticked off.
 
 ## Log
+
+### 2026-11-25 — grokbot (cutover 0.12; Gabriel asked: "Do it", "YES, run all 12 migrations")
+- Backup: Neon snapshot `pre-cutover-20261125` (`snap-nameless-river-ar053ae3`) of `production` (branch limit reached, so a snapshot, not a branch).
+- Production migrated: baseline faked alone (count 1), then the other 12 applied (incl. drop-legacy-character-ids and drop-legacy-tables). `pgmigrations` has 13 rows; 15 tables; users/characters/campaigns kept (9/13/4).
+- Render `tenebris` (`srv-dc1sje6c6qcc73bocm7g`, https://tenebris-hxir.onrender.com) now on production `DATABASE_URL`, `NODE_ENV=production`; deployed `feb7853`, live. Smoke: home 200, `/health` ok, `/api/content` returns data, `/api/me` 401, bad login 401. No logged-in smoke: `smoketest` users are not in production.
+- Note: `npm run migrate -- fake` fakes EVERY pending migration (count Infinity); do not use it on a database that only has the baseline.
+- Not done: 0.13 domain (Gabriel moves eldridtales.com in the Render dashboard; old site is broken until then), 0.14. `elldridtales` untouched.
 
 ### 2026-11-24 — Claude (Map Editor / Play Session split, editor tools, monsters, frost; real-terrain plan; Gabriel asked: "Do it", "go for it")
 All in Gabriel's main folder, **uncommitted** (he commits). No new migrations (look + explored from 2026-11-23 already run on `rework`).
