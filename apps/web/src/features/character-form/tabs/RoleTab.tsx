@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
 import { ApiError } from '../../../api.ts';
+import useContent from '../../../hooks/useContent.js';
 import formStyles from '../CharacterForm.module.css';
 import styles from './RoleTab.module.css';
 import { useCharacterForm, useCharacterOptions, useSaveTab } from '../queries.ts';
@@ -27,6 +28,7 @@ export default function RoleTab({ id }: Props) {
 function RoleFields({ id }: { id: string }) {
     const form = useCharacterForm(id);
     const save = useSaveTab(id, 'role');
+    const pack = (useContent() as { content?: { roles?: { id: number; callings?: { id: number; name: string }[] }[] } | null } | null)?.content ?? null;
     const [roleId, setRoleId] = useState('');
     const [callingId, setCallingId] = useState('');
     const [skills, setSkills] = useState<string[]>([]);
@@ -69,6 +71,10 @@ function RoleFields({ id }: { id: string }) {
 
     const options = roleId && live.data ? live.data : form.data.options;
     const role = options.roles.find((item) => String(item.id) === roleId) ?? null;
+    const unlocked = level >= CALLING_LEVEL;
+    const listedCallings = unlocked
+        ? options.callings
+        : (pack?.roles?.find((item) => String(item.id) === roleId)?.callings ?? []);
 
     function pickRole(next: RoleChoice) {
         setRoleId(String(next.id));
@@ -164,13 +170,20 @@ function RoleFields({ id }: { id: string }) {
             </div>
             <div className={styles.choicesContainer}>
                 <div className={styles.callingContainer}>
-                    <span className={styles.callingTitle}>Calling</span>                  
+                    <span className={styles.callingTitle}>Calling</span>
+                    {!roleId && <p className={styles.callingHint}>Pick a role to see its callings.</p>}
+                    {roleId && !unlocked && (
+                        <p className={styles.callingHint}>Callings unlock at level {CALLING_LEVEL}. Set the level in the header to choose one.</p>
+                    )}
                     <ul className={styles.CallList}>
-                        {options.callings.map((call) => {
-                            const selected = String(call.id) === callingId;
+                        {listedCallings.map((call) => {
+                            const selected = unlocked && String(call.id) === callingId;
                             return (
                             <li className={styles.callTile} key={call.id}>
-                                <button type="button" className={selected ? styles.callSelected : styles.callButton} aria-pressed={selected} onClick={() => pickCalling(call)}>
+                                <button type="button" className={!unlocked ? styles.callButtonDisabled : selected ? styles.callSelected : styles.callButton} disabled={!unlocked} aria-pressed={selected} onClick={() => {
+                                    const picked = options.callings.find((item) => item.id === call.id);
+                                    if (picked) pickCalling(picked);
+                                }}>
                                     <p className={styles.callName}>{call.name}</p>
                                 </button>
                                 </li>
