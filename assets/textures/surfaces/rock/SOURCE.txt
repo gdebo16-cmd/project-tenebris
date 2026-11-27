@@ -1,1 +1,1 @@
-Rock030 from ambientCG (CC0), 2K, recompressed for the web.
+Rock Surface (rock_surface) from Poly Haven, https://polyhaven.com/a/rock_surface (CC0). By Amal Kumar. 1K JPG (diffuse, normal GL, roughness), recompressed for the web.

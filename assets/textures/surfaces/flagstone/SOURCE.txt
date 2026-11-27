@@ -1,1 +1,1 @@
-PavingStones151 from ambientCG (CC0), 2K, recompressed for the web.
+Stone Tiles 02 (stone_tiles_02) from Poly Haven, https://polyhaven.com/a/stone_tiles_02 (CC0). By Charlotte Baglioni. 1K JPG (diffuse, normal GL, roughness), recompressed for the web.

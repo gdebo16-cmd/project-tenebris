@@ -1,12 +1,17 @@
 // models/sceneModel.js — scenes and their terrain (step 12). Only reads and saves; the controller decides who may.
 import pool from '../db.js';
+import { upgradeTerrain } from '@tenebris/rules/board';
+
+// T0: a scene read from the database, with an old board's rule names (wall, water, ice) under today's names.
+// Nothing else changes, and the next save stores the new names.
+const upgraded = (row) => (row ? { ...row, terrain: upgradeTerrain(row.terrain) } : null);
 
 // The campaign's active scene, or null when it has none
 export async function activeScene(campId) {
     const { rows } = await pool.query(
         `SELECT s.id, s.name, s.terrain, s.surfaces, s.features, s.look, s.explored FROM campaigns c JOIN scenes s ON s.id = c.active_scene_id WHERE c.id = $1`,
         [campId]);
-    return rows[0] ?? null;
+    return upgraded(rows[0]);
 }
 
 // Make a scene and make it the active one; answers it
@@ -20,7 +25,7 @@ export async function createActiveScene(campId, name) {
 // The scene with its campaign (to check who may change it), or null
 export async function getScene(sceneId) {
     const { rows } = await pool.query(`SELECT id, campaign_id, name, terrain, surfaces, features, look, explored FROM scenes WHERE id = $1`, [sceneId]);
-    return rows[0] ?? null;
+    return upgraded(rows[0]);
 }
 
 // Save the whole terrain map
@@ -65,8 +70,8 @@ export async function listTokens(sceneId) {
 // One token with its scene's campaign (to check who may move it), or null
 export async function getToken(tokenId) {
     const { rows } = await pool.query(
-        `SELECT t.*, s.campaign_id, s.terrain, s.features FROM tokens t JOIN scenes s ON s.id = t.scene_id WHERE t.id = $1`, [tokenId]);
-    return rows[0] ?? null;
+        `SELECT t.*, s.campaign_id, s.terrain, s.features, s.look FROM tokens t JOIN scenes s ON s.id = t.scene_id WHERE t.id = $1`, [tokenId]);
+    return upgraded(rows[0]);
 }
 
 // Put a token on a scene. Throws the database's "unique" error (code 23505) when the hex is taken.
@@ -107,7 +112,7 @@ export async function scenesWith({ characterId, campaignMonsterId }) {
          FROM tokens t JOIN scenes s ON s.id = t.scene_id
          WHERE ($1::int IS NOT NULL AND t.character_id = $1) OR ($2::int IS NOT NULL AND t.campaign_monster_id = $2)`,
         [characterId ?? null, campaignMonsterId ?? null]);
-    return rows;
+    return rows.map(upgraded);
 }
 
 // Step 18: save what the party has seen on a scene ({ "q,r": 1, ... })

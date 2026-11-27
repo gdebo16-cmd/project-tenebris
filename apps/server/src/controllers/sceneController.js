@@ -2,7 +2,7 @@
 // The server decides everything (hard rule): painting, placing and removing are DM only; moving is the token's
 // owner or the DM, and a move must have a path around walls (findPath from @tenebris/rules/hex).
 // Spec: docs/specs/table.md.
-import { isTerrainKind, isSurface, isFeatureKind, LIGHT_FEATURES, MAX_LIGHTS, MAX_HEIGHT, checkLookChange, radiusOf, keepOnBoard, findPath, wallsOf, hexKey, hexesForSpeed, onBoard } from '@tenebris/rules/board';
+import { isTerrainKind, isSurface, isFeatureKind, LIGHT_FEATURES, MAX_LIGHTS, MAX_HEIGHT, checkLookChange, applyLookChange, radiusOf, keepOnBoard, findWalk, wallsOf, hexKey, hexesForSpeed, onBoard } from '@tenebris/rules/board';
 import { characterToCreature } from '@tenebris/rules/creature';
 import * as Scenes from '../models/sceneModel.js';
 import * as Monsters from '../models/monsterModel.js';   // for memberRole(campId, userId)
@@ -227,8 +227,9 @@ async function speedInHexes(token) {
 }
 
 // POST /api/tokens/:id/move  body { q, r }  -> the scene answer
-// token.move: the token's owner, or the DM. The walk must go around walls (findPath); a player can walk as far
-// as the token's speed, the DM as far as they like. Ending on another token is refused (one per hex).
+// token.move: the token's owner, or the DM. The walk must go around walls and objects that block, and pays for the
+// ground on the way (findWalk, T0: rough +1, steep and short props +2, deep water costs double without a swim speed);
+// a player can walk as far as the token's speed, the DM as far as they like. Ending on another token is refused (one per hex).
 export async function moveToken(req, res) {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const token = await Scenes.getToken(Number(req.params.id));
@@ -245,10 +246,12 @@ export async function moveToken(req, res) {
     const walls = wallsOf(token.terrain, token.features);
     if (walls.has(hexKey({ q, r }))) return res.status(400).json({ error: "A token can't stand there (a wall, tree, boulder or pillar)" });
     const maxSteps = isDm ? DM_MAX_STEPS : await speedInHexes(token);
-    const path = findPath({ q: token.q, r: token.r }, { q, r }, walls, maxSteps);
-    if (!path) {
+    const board = { terrain: token.terrain, features: token.features, heights: token.look?.heights };
+    const walk = findWalk({ q: token.q, r: token.r }, { q, r }, board, maxSteps, { radius: radiusOf(token.look) });
+    if (!walk) {
         return res.status(400).json({
-            error: isDm ? 'No way around the walls to that hex' : `No way there within ${maxSteps} hexes (walls block the way, or it's too far)`,
+            error: isDm ? 'No way around the walls to that hex'
+                : `No way there with ${maxSteps} hexes of movement (walls block the way, rough ground, climbing and water cost extra, or it's too far)`,
         });
     }
 
@@ -301,7 +304,7 @@ export async function setLook(req, res) {
         await Scenes.saveFeatures(scene.id, scene.features);
         await Scenes.saveExplored(scene.id, scene.explored);
     }
-    scene.look = { ...scene.look, ...checked.change };
+    scene.look = applyLookChange(scene.look, checked.change);      // a style switch (T1) changes only look.style
     await Scenes.saveLook(scene.id, scene.look);
     res.json(scene.look);
     await tellTable(req, scene.campaign_id, scene);

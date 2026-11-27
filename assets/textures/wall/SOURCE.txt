@@ -1,1 +1,1 @@
-Rock064 from ambientCG (CC0), 2K, recompressed for the web.
+Castle Wall Slates (castle_wall_slates) from Poly Haven, https://polyhaven.com/a/castle_wall_slates (CC0). By Rob Tuytel. 1K JPG (diffuse, normal GL, roughness), recompressed for the web.

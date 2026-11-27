@@ -150,7 +150,7 @@ const MAX_TORCHES = 4;      // each torch is a real light, so keep a handful
 // Torches on a few walls (the same walls on every screen, so they don't jump when someone repaints elsewhere)
 export function Torches({ terrain }: { terrain: Record<string, string> }) {
     const spots = useMemo(() => {
-        const walls = Object.keys(terrain).filter((key) => terrain[key] === 'wall').map((key) => {
+        const walls = Object.keys(terrain).filter((key) => terrain[key] === 'block').map((key) => {
             const [q, r] = key.split(',').map(Number);
             return { q, r };
         });

@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { styleOf } from '@tenebris/rules/board'
 import { Terrain, Tabletop } from './TableScenery.tsx'
 import { BoardFeatures } from './BoardFeatures.tsx'
 import { Grass, TurnSpotlight, TurnRing } from './BoardMoments.tsx'
@@ -25,6 +26,7 @@ const StillTorches = memo(Torches);
 
 export function BoardCanvas({ c }: { c: TableController }) {
     const { radius, hexes, data, terrain, move, view, fitKey, surfaces, features, walls, look, heights, mood, dpr, showPerf, noEffects, grassHexes, tool, selected, boardRef, woodColor, surfaceColor, lines, isDm, tokens, overlays, fog, acting, brush, painting, shapeOrigin, newest, notices, selectedToken, currentAt, onHexClick, onStroke, onTokenClick, mode } = c;
+    const style = styleOf(look);              // T1: Tiles or Natural
     return (
             <Canvas shadows orthographic dpr={dpr} camera={{ position: [0, 100, 0], zoom: startZoom() }}>
                 {tableDebug && <FrameWatch />}
@@ -39,8 +41,8 @@ export function BoardCanvas({ c }: { c: TableController }) {
                 <Tabletop wood={woodColor} surface={surfaceColor} felt={!look.room} radius={radius} />
                 {look.room && <Room felt={surfaceColor} radius={radius} />}
 
-                {/* the hexes: terrain, raised walls, raised ground (TableScenery.tsx) */}
-                <StillTerrain hexes={hexes} terrain={terrain} surfaces={surfaces} heights={heights} onHexClick={onHexClick} />
+                {/* the hexes: terrain, raised walls, raised ground (TableScenery.tsx); Natural = one blended ground (TableNatural.tsx) */}
+                <StillTerrain hexes={hexes} terrain={terrain} surfaces={surfaces} heights={heights} onHexClick={onHexClick} style={style} radius={radius} />
                 {/* the DM's map picture over the hexes, if there is one */}
                 <StillMap map={look.map} />
                 <StillGrass hexes={grassHexes} heights={heights} />
@@ -55,10 +57,12 @@ export function BoardCanvas({ c }: { c: TableController }) {
                 <AreaFlash keys={newest?.area ?? null} flashId={newest?.id ?? null} heights={heights} />
                 {/* step 18: the fog over what the party hasn't seen */}
                 <Fog hexes={hexes} fog={fog} dm={isDm} />
-                {/* thin grid lines just above the hexes */}
-                <lineSegments geometry={lines} position={[0, 0.102, 0]}>
-                    <lineBasicMaterial color="#000000" transparent opacity={0.25} />
-                </lineSegments>
+                {/* thin grid lines just above the hexes (Tiles only: the Natural ground has no hex edges; T4 adds on/faint/off) */}
+                {style === 'tiles' && (
+                    <lineSegments geometry={lines} position={[0, 0.102, 0]}>
+                        <lineBasicMaterial color="#000000" transparent opacity={0.25} />
+                    </lineSegments>
+                )}
                 {/* what the DM placed: lights, trees, pillars, crates... (BoardFeatures.tsx) */}
                 <StillFeatures features={features} heights={heights} onHexClick={onHexClick} />
                 {tokens.map((token) => (

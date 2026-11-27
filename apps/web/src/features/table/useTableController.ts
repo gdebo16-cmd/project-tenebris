@@ -43,7 +43,7 @@ export function useTableController(mode: 'session' | 'editor', editSceneId: numb
     // grass blades grow on every grass hex (the default ground) that isn't wall or water
     const grassHexes = useMemo(() => hexes.filter((h) => {
         const key = hexKey(h);
-        return (surfaces[key] ?? 'grass') === 'grass' && terrain[key] !== 'wall' && terrain[key] !== 'water' && !features[key];
+        return (surfaces[key] ?? 'grass') === 'grass' && terrain[key] !== 'block' && terrain[key] !== 'deep' && !features[key];
     }), [hexes, surfaces, terrain, features]);
     const [tool, setTool] = useState<Tool>({ type: 'move' });
     const [selected, setSelected] = useState<number | null>(null);    // the token about to move

@@ -2,7 +2,9 @@
 //   paintTiles : hex tiles look hand-painted: soft colour mottling across the board, a darker rim on every hex,
 //                and each hex a touch lighter or darker than its neighbours
 //   paintStone : the same mottling without the hex rim (walls, rocks)
-//   waterLook  : moving ripples that catch the light, and deeper/shallower patches that drift slowly
+//   waterLook  : custom water (T2): moving ripples that catch the light, shallow water clear and deep water dark,
+//                foam along the shore. waterLookFor(depth, shore) makes one for water that deep.
+//   iceLook    : custom ice (T2): glossy, with white cracks and frost that catch the light
 // How it works: three.js builds each material's shader (the little program the graphics card runs per pixel) from
 // pieces. onBeforeCompile lets us add a few lines to it before it's built. We work out where each pixel is in the world
 // (vPaintPos), and colour or bend the light from there, so neighbouring hexes flow into each other.
@@ -25,6 +27,18 @@ float pFbm(vec2 p) {
     for (int k = 0; k < 4; k++) { v += a * pNoise(p); p *= 2.03; a *= 0.5; }
     return v;
 }
+// Cells (for ice cracks): x = distance to the nearest cell point, y = to the second nearest. A crack runs where they meet.
+vec2 pCells(vec2 p) {
+    vec2 i = floor(p), f = fract(p);
+    float d1 = 8.0, d2 = 8.0;
+    for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {
+        vec2 g = vec2(float(x), float(y));
+        vec2 o = vec2(pHash(i + g), pHash(i + g + 17.3));
+        float d = length(g + o - f);
+        if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) { d2 = d; }
+    }
+    return vec2(d1, d2);
+}
 `;
 
 // Where this corner is in the world (and the middle of its hex, for instanced tiles)
@@ -39,6 +53,10 @@ vec4 paintWorld = vec4(transformed, 1.0);
 #endif
 vPaintPos = (modelMatrix * paintWorld).xyz;
 `;
+
+// The same pieces for shaders built elsewhere (the Natural ground: TableNatural.tsx)
+export const NOISE_GLSL = NOISE;
+export const WHERE_GLSL = WHERE;
 
 function addWhere(shader: Shader) {
     shader.vertexShader = 'varying vec3 vPaintPos;\nvarying vec2 vPaintCenter;\n' +
@@ -88,15 +106,64 @@ vec3 rippleUp = normalize(vec3(-(hx - h0) / 0.15 * 0.18, 1.0, -(hz - h0) / 0.15 
 normal = normalize((viewMatrix * vec4(rippleUp, 0.0)).xyz);   // the surface now tilts with the ripples, so it catches the light
 `;
 
-const DEPTH = /* glsl */ `
-diffuseColor.rgb *= 0.8 + 0.4 * pFbm(vPaintPos.xz * 0.5 + uWaterTime * 0.03);   // deeper and shallower patches, drifting
+// How deep the water looks. wDeep: 0 at the shore up to 1 three hexes out. Shallow water is clear (the ground shows
+// through), deep water dark and solid. (Shared with the Natural ground's water: TableNatural.tsx.)
+export const WATER_COLOUR = /* glsl */ `
+float wDeep = clamp(wDepth, 0.0, 1.0);
+diffuseColor.rgb = mix(vec3(0.24, 0.55, 0.58), vec3(0.03, 0.13, 0.24), wDeep);
+diffuseColor.rgb *= 0.85 + 0.3 * pFbm(vPaintPos.xz * 0.5 + uWaterTime * 0.03);   // deeper and shallower patches, drifting
+diffuseColor.a = mix(0.42, 0.96, wDeep);
 `;
 
-export function waterLook(shader: Shader) {
-    shader.uniforms.uWaterTime = waterTime;
+// White foam: wFoam (0..1) says how close to the shore this pixel is. The foam breaks up and moves with the water.
+export const WATER_FOAM = /* glsl */ `
+float foamNoise = pFbm(vPaintPos.xz * 3.5 + vec2(uWaterTime * 0.25, -uWaterTime * 0.18));
+float foamLine = smoothstep(0.55, 0.85, wFoam + (foamNoise - 0.5) * 0.45);
+foamLine *= 0.65 + 0.35 * sin(uWaterTime * 1.3 + foamNoise * 6.0);                 // it laps in and out
+diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.9, 0.95, 0.96), foamLine);
+diffuseColor.a = max(diffuseColor.a, foamLine);
+`;
+
+// Tiles: a water hex's own depth (uWaterDepth) and, for a shore hex, foam towards its edge
+const TILE_WATER = /* glsl */ `
+float wDepth = uWaterDepth;
+vec2 wLocal = vPaintPos.xz - vPaintCenter;
+float wEdge = max(max(abs(dot(wLocal, vec2(0.8660254, 0.5))), abs(wLocal.y)), abs(dot(wLocal, vec2(-0.8660254, 0.5)))) / 0.8660254;
+float wFoam = uWaterShore * smoothstep(0.5, 1.0, wEdge);
+` + WATER_COLOUR + WATER_FOAM;
+
+// Water depth: 0 = shore .. 1 = deep. shore: foam along the edges (hexes next to land).
+export function waterLookFor(depth: number, shore: boolean) {
+    return (shader: Shader) => {
+        shader.uniforms.uWaterTime = waterTime;
+        shader.uniforms.uWaterDepth = { value: depth };
+        shader.uniforms.uWaterShore = { value: shore ? 1 : 0 };
+        addWhere(shader);
+        shader.fragmentShader = 'uniform float uWaterTime;\nuniform float uWaterDepth;\nuniform float uWaterShore;\n' + shader.fragmentShader
+            .replace('#include <color_fragment>', '#include <color_fragment>\n' + TILE_WATER)
+            .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n' + RIPPLES);
+    };
+}
+export const waterLook = waterLookFor(1, false);
+export const WATER_RIPPLES = RIPPLES;
+
+// ---- ice (T2): custom, not a picture ----
+// iceAmount (0..1): how much ice covers this pixel. Cracks and frost are white and rougher; the rest is glassy.
+export const ICE_COLOUR = /* glsl */ `
+vec2 iceCells = pCells(vPaintPos.xz * 1.4);
+float iceCrack = 1.0 - smoothstep(0.0, 0.06, iceCells.y - iceCells.x);
+float iceFrost = smoothstep(0.45, 0.85, pFbm(vPaintPos.xz * 2.6));
+vec3 iceTint = mix(vec3(0.62, 0.82, 0.92), vec3(0.95, 0.98, 1.0), clamp(iceCrack * 0.85 + iceFrost * 0.5, 0.0, 1.0));
+diffuseColor.rgb = mix(diffuseColor.rgb, iceTint, iceAmount * 0.85);
+`;
+export const ICE_ROUGHNESS = /* glsl */ `
+roughnessFactor = mix(roughnessFactor, 0.06 + 0.5 * clamp(iceCrack + iceFrost * 0.6, 0.0, 1.0), iceAmount);
+`;
+
+export function iceLook(shader: Shader) {
     addWhere(shader);
-    shader.fragmentShader = 'uniform float uWaterTime;\n' + shader.fragmentShader
-        .replace('#include <color_fragment>', '#include <color_fragment>\n' + DEPTH)
-        .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n' + RIPPLES);
+    shader.fragmentShader = shader.fragmentShader
+        .replace('#include <color_fragment>', '#include <color_fragment>\nfloat iceAmount = 1.0;\n' + ICE_COLOUR)
+        .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n' + ICE_ROUGHNESS);
 }
 

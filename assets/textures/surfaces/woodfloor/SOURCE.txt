@@ -1,1 +1,1 @@
-WoodFloor041 from ambientCG (CC0), 2K, recompressed for the web.
+Wood Floor Deck (wood_floor_deck) from Poly Haven, https://polyhaven.com/a/wood_floor_deck (CC0). By Dimitrios Savva. 1K JPG (diffuse, normal GL, roughness), recompressed for the web.

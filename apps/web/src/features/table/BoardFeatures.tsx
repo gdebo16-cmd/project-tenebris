@@ -1,7 +1,7 @@
 // Features the DM places on hexes (Stage 2 polish): lights and terrain pieces, saved with the scene.
 //   lights  : light (a glowing orb, any colour and reach), brazier (a fire bowl)
-//   blockers: tree, boulder, pillar — these block movement like walls (rules: BLOCKING_FEATURES in @tenebris/rules/hex)
-//   looks   : bush, crate, barrel, rubble
+//   blockers: tree (thick), boulder, pillar — these block movement like walls (rules: BLOCKING_FEATURES in @tenebris/rules/hex)
+//   others  : thin tree, bush, rubble (rough: +1 to walk in), crate, barrel (climbed over: +2): OBJECT_RULES in the rules
 // Every piece is built from simple shapes in code, in the same painted style as the board. Clicking a piece clicks
 // its hex, so the DM's brushes still work on top of it.
 import { useRef } from 'react'
@@ -24,6 +24,7 @@ export const FEATURE_LOOK: Record<Feature['kind'], { label: string; color?: stri
     crate:   { label: 'Crate' },
     barrel:  { label: 'Barrel' },
     rubble:  { label: 'Rubble' },
+    thinTree: { label: 'Thin tree' },
 };
 
 // A light that flickers gently (fire) or glows steadily (magic)
@@ -199,6 +200,7 @@ function Piece({ hex, feature }: { hex: Hex; feature: Feature }) {
         case 'crate':   return <Crate />;
         case 'barrel':  return <Barrel />;
         case 'rubble':  return <Rubble hex={hex} />;
+        case 'thinTree': return <group scale={[0.55, 1.1, 0.55]}><Tree seed={seed} /></group>;
         default:        return null;
     }
 }

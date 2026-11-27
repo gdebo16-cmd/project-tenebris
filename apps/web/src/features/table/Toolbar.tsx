@@ -1,6 +1,6 @@
 import { type SceneData, type Token, type Brush } from './tableQueries.ts'
 import { type Tool, PAINT_TOOLS, BRUSHES } from './tableTypes.ts'
-import { type SceneLook, TERRAIN_KINDS, type Surface, MAX_HEIGHT, SURFACES, FEATURE_KINDS, SCENE_MOODS, SCENE_WEATHERS } from '@tenebris/rules/board'
+import { type SceneLook, TERRAIN_KINDS, type Surface, MAX_HEIGHT, SURFACES, FEATURE_KINDS, SCENE_MOODS, SCENE_WEATHERS, BOARD_STYLES, styleOf } from '@tenebris/rules/board'
 import { type ReactNode, useState } from 'react'
 import { type AreaKind } from '@tenebris/rules/sight'
 import { ShapeControls } from './ShapePanels.tsx'
@@ -193,6 +193,10 @@ function SceneControls({ mode, look, onLook, onResetFog, onClearMap }: { mode: '
                 </div>
                 <div className={styles.weatherSelect}>
                     {SCENE_WEATHERS.map((w) => <button aria-pressed={look.weather === w} onClick={(e) => onLook({ weather: w })} key={w} type="button" className={controls.tool} value={w}>{titled(w)}</button>)}
+                </div>
+                {/* T1: the board's art style. Tiles = hex tiles; Natural = one blended ground. The terrain stays exactly as painted. */}
+                <div className={styles.styleSelect} role="group" aria-label="Board style">
+                    {BOARD_STYLES.map((s) => <button aria-pressed={styleOf(look) === s} onClick={() => onLook({ style: s })} key={s} type="button" className={controls.tool}>{titled(s)}</button>)}
                 </div>
                 <div className={styles.roomSelect}>
                     <button aria-pressed={look.room ?? false} onClick={(e) => onLook({ room: !look.room })} key="room" type="button" className={controls.tool}> Room and candles</button>

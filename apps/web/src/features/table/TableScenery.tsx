@@ -1,18 +1,19 @@
 // The table's scenery: the hexes and what's on them, the felt tabletop and the wooden rim.
 // Each hex has a SURFACE (how it looks: grass, cobble, wood floor...) and maybe a TERRAIN on top (the rules):
-//   wall  -> a raised stone block            water -> glossy water instead of the surface
-//   ice   -> a shiny see-through layer over the surface
-//   rough -> small rocks scattered on the surface
+//   block -> a raised stone block (a wall)   deep  -> water instead of the surface
+//   slick -> a shiny see-through ice layer over the surface
+//   rough -> small rocks scattered on the surface        (steep only changes walking; heights show it)
 // Every picture set lives in assets/textures/: color.jpg, normal.jpg (GL), rough.jpg. Until they load (or if one
 // fails) the board draws the same shapes in plain colours, so it never goes blank.
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react'
 import { type ThreeEvent } from '@react-three/fiber'
 import { Instances, Instance, useTexture } from '@react-three/drei'
-import { type Hex, hexKey, SURFACES, DEFAULT_SURFACE, type Surface } from '@tenebris/rules/board'
+import { type Hex, hexKey, neighbors, SURFACES, DEFAULT_SURFACE, type Surface, type BoardStyle } from '@tenebris/rules/board'
 import { Shape, ExtrudeGeometry, RepeatWrapping, SRGBColorSpace, type BufferGeometry, type Texture } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
-import { paintTiles, paintStone, waterLook } from './boardLooks.ts'
+import { paintTiles, paintStone, waterLookFor, iceLook } from './boardLooks.ts'
 import { useCssColor } from '../../hooks/useCssColor.ts'
+import { NaturalGround, radiusOfHexes } from './TableNatural.tsx'
 
 const backgroundColor = useCssColor('--background-color', '#0e1815');
 
@@ -67,7 +68,21 @@ export const HEIGHT_STEP = 0.35;   // one level of raised ground (looks only: wa
 
 // How far a hex's ground is raised (heights come from the scene's look: { "q,r": 1..3 })
 export const liftOf = (heights: Record<string, number> | undefined, hex: Hex) => (heights?.[hexKey(hex)] ?? 0) * HEIGHT_STEP;
-const WATER = { color: '#1f4f78', roughness: 0.08 };   // no picture: deep, glossy blue (animated water comes later)
+const WATER = { roughness: 0.08 };   // custom water (T2): colour, depth and foam come from waterLookFor in boardLooks.ts
+
+// How far each water hex is from land, in hexes (1 = on the shore), counted up to 3: shallow water by the shore, deep
+// water further out. Off-board hexes count as land.
+export function waterDepths(water: Hex[]): Map<string, number> {
+    const isWater = new Set(water.map(hexKey));
+    const depth = new Map<string, number>();
+    let ring = water.filter((h) => neighbors(h).some((n) => !isWater.has(hexKey(n))));
+    for (let d = 1; ring.length > 0; d++) {
+        for (const h of ring) depth.set(hexKey(h), Math.min(d, 3));
+        ring = [...new Map(ring.flatMap((h) => neighbors(h)).filter((n) => isWater.has(hexKey(n)) && !depth.has(hexKey(n))).map((n) => [hexKey(n), n])).values()];
+    }
+    return depth;
+}
+const WATER_LEVELS = [1, 2, 3].map((d) => ({ d, look: waterLookFor((d - 1) / 2, d === 1) }));
 
 // Small "random" numbers that are the same on every screen for the same hex (so rocks don't jump about on a repaint)
 export function fixedRandom(hex: Hex, n: number) {
@@ -126,6 +141,8 @@ type TerrainProps = {
     surfaces: Record<string, string>;    // the looks: { "q,r": "cobble" }
     heights: Record<string, number>;     // raised ground: { "q,r": 2 }
     onHexClick: (hex: Hex, e: ThreeEvent<MouseEvent>) => void;
+    style?: BoardStyle;                  // T1: 'tiles' (hex tiles, the default) or 'natural' (one blended ground, T3)
+    radius?: number;                     // the board's size (worked out from the hexes when missing)
 };
 
 // Sort the hexes into what gets drawn where. An unknown surface name from the server just shows the default.
@@ -135,11 +152,11 @@ function sortHexes(hexes: Hex[], terrain: Record<string, string>, surfaces: Reco
     for (const hex of hexes) {
         const key = hexKey(hex);
         const rule = terrain[key];
-        if (rule === 'wall') { walls.push(hex); continue; }      // the block replaces the tile
-        if (rule === 'water') { water.push(hex); continue; }     // water replaces the tile
+        if (rule === 'block') { walls.push(hex); continue; }     // the block replaces the tile
+        if (rule === 'deep') { water.push(hex); continue; }      // water replaces the tile
         const surface = (SURFACES as readonly string[]).includes(surfaces[key]) ? surfaces[key] as Surface : DEFAULT_SURFACE;
         tiles[surface].push(hex);
-        if (rule === 'ice') ice.push(hex);                       // these sit on top of the tile
+        if (rule === 'slick') ice.push(hex);                     // these sit on top of the tile
         if (rule === 'rough') rough.push(hex);
     }
     return { tiles, walls, water, ice, rough };
@@ -231,6 +248,7 @@ function Walls({ walls, tex, onHexClick }: { walls: Hex[]; tex: Pictures; onHexC
 // Everything on the grid. tex = the loaded pictures, or null for plain colours (same shapes either way).
 function BoardHexes({ hexes, terrain, surfaces, heights, onHexClick, tex }: TerrainProps & { tex: Pictures }) {
     const sorted = useMemo(() => sortHexes(hexes, terrain, surfaces), [hexes, terrain, surfaces]);
+    const depths = useMemo(() => waterDepths(sorted.water), [sorted.water]);
     const at = (hex: Hex, y: number): [number, number, number] => { const [x, , z] = hexToWorld(hex, 1); return [x, y + liftOf(heights, hex), z]; };
     // a raised tile is the same hex column, stretched upwards (its bottom stays on the table)
     const raised = (hex: Hex): [number, number, number] => { const [x, , z] = hexToWorld(hex, 1); const l = liftOf(heights, hex); return [x, l / 2, z]; };
@@ -253,23 +271,27 @@ function BoardHexes({ hexes, terrain, surfaces, heights, onHexClick, tex }: Terr
             {/* walls: one joined stone mass standing up from the board */}
             <Walls walls={sorted.walls} tex={tex} onHexClick={onHexClick} />
 
-            {/* water: deep glossy water in place of the ground, sitting a little lower, with moving ripples (boardLooks.ts) */}
-            {sorted.water.length > 0 && (
-                <Instances limit={hexes.length} receiveShadow>
-                    <cylinderGeometry args={[1, 1, TILE_HEIGHT, 6]} />
-                    <meshPhysicalMaterial color={WATER.color} roughness={WATER.roughness} clearcoat={1} clearcoatRoughness={0.05} onBeforeCompile={waterLook} />
-                    {sorted.water.map((hex) => (
-                        <Instance key={hexKey(hex)} position={at(hex, -0.04)} rotation={[0, Math.PI / 6, 0]} />
-                    ))}
-                </Instances>
-            )}
+            {/* water: custom water in place of the ground, a little lower, with moving ripples; clear by the shore with
+                foam, darker further out (waterLookFor in boardLooks.ts). One batch per depth. */}
+            {WATER_LEVELS.map(({ d, look }) => {
+                const level = sorted.water.filter((hex) => depths.get(hexKey(hex)) === d);
+                return level.length > 0 && (
+                    <Instances key={d} limit={hexes.length} receiveShadow>
+                        <cylinderGeometry args={[1, 1, TILE_HEIGHT, 6]} />
+                        <meshPhysicalMaterial roughness={WATER.roughness} clearcoat={1} clearcoatRoughness={0.05} transparent onBeforeCompile={look} />
+                        {level.map((hex) => (
+                            <Instance key={hexKey(hex)} position={at(hex, -0.04)} rotation={[0, Math.PI / 6, 0]} />
+                        ))}
+                    </Instances>
+                );
+            })}
 
             {/* ice: a thin, shiny, see-through layer over whatever ground is underneath */}
             {sorted.ice.length > 0 && (
                 <Instances limit={hexes.length} receiveShadow>
                     <cylinderGeometry args={[0.97, 0.97, 0.02, 6]} />
-                    <meshPhysicalMaterial {...pictures(tex, 'ice')} color={tex ? '#e4f8ff' : '#7ec8e8'} roughness={tex ? 1 : 0.08}
-                        transparent opacity={0.35} depthWrite={false} clearcoat={0.6} clearcoatRoughness={0.05} />
+                    <meshPhysicalMaterial color="#9fd6ee" roughness={0.08}
+                        transparent opacity={0.6} depthWrite={false} clearcoat={0.8} clearcoatRoughness={0.04} onBeforeCompile={iceLook} />
                     {sorted.ice.map((hex) => (
                         <Instance key={hexKey(hex)} position={at(hex, 0.11)} rotation={[0, turnFor(hex, 'rock'), 0]} />
                     ))}
@@ -307,9 +329,32 @@ function TexturedHexes(props: TerrainProps) {
     return <BoardHexes {...props} tex={tex} />;
 }
 
-// What TablePage uses: pictures when they're ready, plain colours until then (or if they fail)
+// The Natural style (T3): the blended ground (TableNatural.tsx), with the walls standing on it as in Tiles
+function NaturalBoard(props: TerrainProps) {
+    const { hexes, terrain, surfaces, heights, onHexClick } = props;
+    const walls = useMemo(() => sortHexes(hexes, terrain, surfaces).walls, [hexes, terrain, surfaces]);
+    const radius = props.radius ?? radiusOfHexes(hexes);
+    return (
+        <>
+            <NaturalGround hexes={hexes} terrain={terrain} surfaces={surfaces} heights={heights} radius={radius} />
+            <Walls walls={walls} tex={null} onHexClick={onHexClick} />
+        </>
+    );
+}
+
+// What TablePage uses: pictures when they're ready, plain colours until then (or if they fail).
+// Natural boards show the plain tiles while their pictures load (or if they fail), then the blended ground.
 export function Terrain(props: TerrainProps) {
     const plain = <BoardHexes {...props} tex={null} />;
+    if (props.style === 'natural') {
+        return (
+            <Fallback plain={plain}>
+                <Suspense fallback={plain}>
+                    <NaturalBoard {...props} />
+                </Suspense>
+            </Fallback>
+        );
+    }
     if (!USE_TEXTURES) return plain;
     return (
         <Fallback plain={plain}>

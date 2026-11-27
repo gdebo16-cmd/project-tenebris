@@ -32,6 +32,9 @@
 }
 
 
+/* the board style switch (Tiles / Natural): its two buttons sit together */
+.styleSelect { display: inline-flex; gap: 4px; }
+
 /* a button that can't be undone (Clear map) */
 .toolDanger { border-color: #d0503c; color: #ffb3a6; }
 

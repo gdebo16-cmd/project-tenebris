@@ -18,6 +18,7 @@
   },
   "scripts": {
     "test:e2e": "playwright test",
+    "textures:check": "node scripts/check-textures.mjs",
     "migrate": "node db/migrate.js",
     "content:build": "node packages/content/build.ts",
     "migrate:create": "node-pg-migrate create --migrations-dir db/migrations --migration-file-language js",

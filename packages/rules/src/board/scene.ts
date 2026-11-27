@@ -31,6 +31,10 @@ export const styleOf = (look?: SceneLook | null): BoardStyle => {
     return look.style as BoardStyle;
 };
 
+// A board's look after a checked change (checkLookChange): only the parts named in the change move. The style switch
+// (T1) is one of them, so switching Tiles <-> Natural never touches the terrain, surfaces, features or heights.
+export const applyLookChange = (look: SceneLook | null | undefined, change: Partial<SceneLook>): SceneLook => ({ ...(look ?? {}), ...change });
+
 // Check a change to the look (anything except heights, which are painted hex by hex). Answers the cleaned change.
 export function checkLookChange(body: unknown): { error: string } | { change: Partial<SceneLook> } {
     const b = (body ?? {}) as Record<string, unknown>;
