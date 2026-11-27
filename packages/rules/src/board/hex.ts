@@ -54,6 +54,14 @@ export function hexKey(hex: Hex): string {
     return `${hex.q},${hex.r}`;
 }
 
+export function hexFromKey(key: string): Hex | null {
+    const parts = key.split(',');
+    if (parts.length !== 2) return null;
+    const q = Number(parts[0]), r = Number(parts[1]);
+    if (!Number.isInteger(q) || !Number.isInteger(r)) return null;
+    return { q, r };
+}
+
 
 export function hexesWithin(center: Hex, radius: number): Hex[] {
     const out: Hex[] = [];

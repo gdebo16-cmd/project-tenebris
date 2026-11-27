@@ -72,7 +72,7 @@ export function brushOf(tool: Tool): Brush | null {
         case 'paint': return { terrain: tool.terrain };
         case 'erase': return { clear: true };
         case 'surface': return { surface: tool.surface };
-        case 'feature': return { feature: tool.kind ? { kind: tool.kind, size: tool.size, ...(tool.kind === 'light' ? { color: tool.color } : {}) } : null };
+        case 'feature': return { feature: tool.kind ? { kind: tool.kind, size: tool.size, ...(tool.kind === 'light' ? { color: tool.color } : {}), ...(tool.kind === 'model' && tool.model ? { model: tool.model } : {}) } : null };
         case 'height': return { height: tool.height };
         default: return null;
     }

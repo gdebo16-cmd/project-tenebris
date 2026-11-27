@@ -10,6 +10,7 @@ import type { Mesh, PointLight } from 'three'
 import { type Hex, type Feature } from '@tenebris/rules/board'
 import { hexToWorld, fixedRandom, liftOf } from './TableScenery.tsx'
 import { paintStone } from './boardLooks.ts'
+import { BoardModels, isModeledFeature } from './BoardModels.tsx'
 
 type Click = (hex: Hex, e: ThreeEvent<MouseEvent>) => void;
 
@@ -25,6 +26,7 @@ export const FEATURE_LOOK: Record<Feature['kind'], { label: string; color?: stri
     barrel:  { label: 'Barrel' },
     rubble:  { label: 'Rubble' },
     thinTree: { label: 'Thin tree' },
+    model: { label: 'Model' },
 };
 
 // A light that flickers gently (fire) or glows steadily (magic)
@@ -195,7 +197,7 @@ function Piece({ hex, feature }: { hex: Hex; feature: Feature }) {
         case 'brazier': return <Brazier seed={seed} />;
         case 'tree':    return <Tree seed={seed} />;
         case 'bush':    return <Bush />;
-        case 'boulder': return <Boulder />;
+        case 'boulder': return isModeledFeature(feature) ? null : <Boulder />;
         case 'pillar':  return <Pillar />;
         case 'crate':   return <Crate />;
         case 'barrel':  return <Barrel />;
@@ -209,7 +211,9 @@ function Piece({ hex, feature }: { hex: Hex; feature: Feature }) {
 export function BoardFeatures({ features, heights, onHexClick }: { features: Record<string, Feature>; heights: Record<string, number>; onHexClick: Click }) {
     return (
         <>
+            <BoardModels features={features} heights={heights} onHexClick={onHexClick} />
             {Object.entries(features).map(([key, feature]) => {
+                if (isModeledFeature(feature)) return null;
                 const [q, r] = key.split(',').map(Number);
                 const hex = { q, r };
                 const [x, , z] = hexToWorld(hex, 1);

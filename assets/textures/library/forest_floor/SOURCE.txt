@@ -1,0 +1,5 @@
+Forest Floor
+eye-candy.xyz
+CC0
+https://polyhaven.com/a/forest_floor
+Imported for Tenebris with scripts/import-polyhaven.mjs

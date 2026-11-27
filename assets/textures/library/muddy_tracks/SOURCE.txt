@@ -1,0 +1,5 @@
+Muddy Tracks
+Amal Kumar
+CC0
+https://polyhaven.com/a/muddy_tracks
+Imported for Tenebris with scripts/import-polyhaven.mjs

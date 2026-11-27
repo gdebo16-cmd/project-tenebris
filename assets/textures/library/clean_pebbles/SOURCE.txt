@@ -1,0 +1,5 @@
+Clean Pebbles
+Dario Barresi, Charlotte Baglioni
+CC0
+https://polyhaven.com/a/clean_pebbles
+Imported for Tenebris with scripts/import-polyhaven.mjs

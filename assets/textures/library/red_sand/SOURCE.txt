@@ -1,0 +1,5 @@
+Red Sand
+Rohit Seervi
+CC0
+https://polyhaven.com/a/red_sand
+Imported for Tenebris with scripts/import-polyhaven.mjs

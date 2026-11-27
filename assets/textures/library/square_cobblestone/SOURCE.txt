@@ -1,0 +1,5 @@
+Square Cobblestone
+Sơn Nguyễn
+CC0
+https://polyhaven.com/a/square_cobblestone
+Imported for Tenebris with scripts/import-polyhaven.mjs

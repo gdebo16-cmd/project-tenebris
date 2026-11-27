@@ -1,0 +1,5 @@
+Forest Ground 04
+Rob Tuytel, Rico Cilliers
+CC0
+https://polyhaven.com/a/forest_ground_04
+Imported for Tenebris with scripts/import-polyhaven.mjs

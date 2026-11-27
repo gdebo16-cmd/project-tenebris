@@ -1,0 +1,6 @@
+Treasure Chest
+Rico Cilliers
+CC0
+https://polyhaven.com/a/treasure_chest
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

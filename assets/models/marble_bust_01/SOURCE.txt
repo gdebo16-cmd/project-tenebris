@@ -1,0 +1,6 @@
+Marble Bust 01
+Rico Cilliers
+CC0
+https://polyhaven.com/a/marble_bust_01
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

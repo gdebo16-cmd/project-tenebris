@@ -1,0 +1,5 @@
+Cobblestone 02
+Amal Kumar
+CC0
+https://polyhaven.com/a/cobblestone_02
+Imported for Tenebris with scripts/import-polyhaven.mjs

@@ -1,0 +1,6 @@
+Wicker Basket 01
+Kuutti Siitonen
+CC0
+https://polyhaven.com/a/wicker_basket_01
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

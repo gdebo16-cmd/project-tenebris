@@ -1,0 +1,5 @@
+Worn Brick Floor
+Amal Kumar
+CC0
+https://polyhaven.com/a/worn_brick_floor
+Imported for Tenebris with scripts/import-polyhaven.mjs

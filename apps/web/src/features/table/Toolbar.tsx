@@ -1,10 +1,11 @@
 import { type SceneData, type Token, type Brush } from './tableQueries.ts'
 import { type Tool, PAINT_TOOLS, BRUSHES } from './tableTypes.ts'
-import { type SceneLook, TERRAIN_KINDS, type Surface, MAX_HEIGHT, SURFACES, FEATURE_KINDS, SCENE_MOODS, SCENE_WEATHERS, BOARD_STYLES, styleOf, GRID_MODES, gridOf } from '@tenebris/rules/board'
+import { type SceneLook, TERRAIN_KINDS, MAX_HEIGHT, SURFACES, SHAPE_FEATURE_KINDS, SCENE_MOODS, SCENE_WEATHERS, BOARD_STYLES, styleOf, GRID_MODES, gridOf, LIBRARY_PAINTS, BOARD_MODELS } from '@tenebris/rules/board'
 import { type ReactNode, useState } from 'react'
 import { type AreaKind } from '@tenebris/rules/sight'
 import { ShapeControls } from './ShapePanels.tsx'
-import { SURFACE_LOOK } from './TableScenery.tsx'
+import { surfaceLook } from './TableScenery.tsx'
+import { useGraphics, writeGraphicsLevel, GRAPHICS_LEVELS } from './graphicsSettings.ts'
 import { FEATURE_LOOK } from './BoardFeatures.tsx'
 import { Room } from './BoardWorld.tsx'
 import { Fog } from './BoardActs.tsx'
@@ -152,31 +153,50 @@ export function Toolbar(props: {
                     )}
                     {currentTab === 'paint' && isDm && editing && (
                         <div className={styles.section} role="tabpanel" id="board-tab-panel-paint" aria-labelledby="board-tab-paint">
-                            <div className={styles.btnRow}>
-                                {SURFACES.map((s) => (
-                                    <button key={s} type="button" aria-pressed={tool.type === 'surface' && tool.surface === s}
-                                        className={btnClass(tool.type === 'surface' && tool.surface === s)}
-                                        onClick={() => setTool({ type: 'surface', surface: s })}>
-                                        <span className={styles.swatch} data-surface={s} aria-hidden="true" />
-                                        {SURFACE_LOOK[s].label}
-                                    </button>
-                                ))}
-                                <button type="button" aria-pressed={tool.type === 'surface' && tool.surface === null}
-                                    className={btnClass(tool.type === 'surface' && tool.surface === null)}
-                                    onClick={() => setTool({ type: 'surface', surface: null })}>Clear</button>
-                            </div>
                             {tool.type === 'surface' && (
                                 <BrushRow brush={props.brush} setBrush={props.setBrush} />
                             )}
+                            <div className={styles.paintList}>
+                                <h3 className={styles.sectionTitle}>Core</h3>
+                                <div className={styles.btnRow}>
+                                    {SURFACES.map((s) => (
+                                        <button key={s} type="button" aria-pressed={tool.type === 'surface' && tool.surface === s}
+                                            className={btnClass(tool.type === 'surface' && tool.surface === s)}
+                                            onClick={() => setTool({ type: 'surface', surface: s })}>
+                                            <span className={styles.swatch} data-surface={s} aria-hidden="true" />
+                                            {surfaceLook(s).label}
+                                        </button>
+                                    ))}
+                                    <button type="button" aria-pressed={tool.type === 'surface' && tool.surface === null}
+                                        className={btnClass(tool.type === 'surface' && tool.surface === null)}
+                                        onClick={() => setTool({ type: 'surface', surface: null })}>Clear</button>
+                                </div>
+                                {paintCategories().map(([category, paints]) => (
+                                    <div key={category}>
+                                        <h3 className={styles.sectionTitle}>{titled(category)}</h3>
+                                        <div className={styles.btnRow}>
+                                            {paints.map((p) => (
+                                                <button key={p.id} type="button" aria-pressed={tool.type === 'surface' && tool.surface === p.id}
+                                                    className={btnClass(tool.type === 'surface' && tool.surface === p.id)}
+                                                    onClick={() => setTool({ type: 'surface', surface: p.id })}>
+                                                    <span className={styles.swatchThumb} style={{ backgroundImage: 'url(' + p.thumb + ')' }} aria-hidden="true" />
+                                                    {p.name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
+
                     {currentTab === 'objects' && isDm && (
                         <div className={styles.section} role="tabpanel" id="board-tab-panel-objects" aria-labelledby="board-tab-objects">
                             {editing && (
                                 <>
                                     <h3 className={styles.sectionTitle}>Features</h3>
                                     <div className={styles.btnRow}>
-                                        {FEATURE_KINDS.map((k) => (
+                                        {SHAPE_FEATURE_KINDS.map((k) => (
                                             <button key={k} type="button" aria-pressed={tool.type === 'feature' && tool.kind === k}
                                                 className={btnClass(tool.type === 'feature' && tool.kind === k)}
                                                 onClick={() => setTool({ type: 'feature', kind: k, size: tool.type === 'feature' ? tool.size : 1, color: tool.type === 'feature' ? tool.color : '#ffd08a' })}>{FEATURE_LOOK[k].label}</button>
@@ -199,6 +219,7 @@ export function Toolbar(props: {
                                     {tool.type === 'feature' && (
                                         <BrushRow brush={props.brush} setBrush={props.setBrush} />
                                     )}
+                                    <LibraryObjects tool={tool} setTool={setTool} />
                                 </>
                             )}
                             <h3 className={styles.sectionTitle}>Place</h3>
@@ -238,6 +259,7 @@ export function Toolbar(props: {
                     )}
                     {currentTab === 'scene' && isDm && (
                         <div className={styles.section} role="tabpanel" id="board-tab-panel-scene" aria-labelledby="board-tab-scene">
+                            <GraphicsSection />
                             <SceneLookSection mode={props.mode} look={props.look} onLook={props.onLook} onResetFog={props.onResetFog} />
                             <SceneBoardSection mode={props.mode} look={props.look} onLook={props.onLook} boardSize={props.boardSize} />
                         </div>
@@ -362,6 +384,75 @@ function SceneBoardSection({ mode, look, onLook, boardSize }: { mode: 'session' 
                     {look.map && <button type="button" className={`${controls.tool} ${styles.btn}`} onClick={() => { setUrl(''); onLook({ map: null }); }}>Remove map</button>}
                 </form>
             )}
+        </>
+    );
+}
+
+
+function paintCategories() {
+    const groups = new Map<string, typeof LIBRARY_PAINTS[number][]>();
+    for (const paint of LIBRARY_PAINTS) {
+        const list = groups.get(paint.category) ?? [];
+        list.push(paint);
+        groups.set(paint.category, list);
+    }
+    return [...groups.entries()];
+}
+
+function GraphicsSection() {
+    const graphics = useGraphics();
+    return (
+        <>
+            <h3 className={styles.sectionTitle}>Graphics</h3>
+            <div className={styles.btnRow} role="group" aria-label="Graphics quality">
+                {GRAPHICS_LEVELS.map((level) => (
+                    <button key={level} type="button" aria-pressed={graphics.level === level}
+                        className={btnClass(graphics.level === level)}
+                        onClick={() => writeGraphicsLevel(level)}>{titled(level)}</button>
+                ))}
+            </div>
+            <p className={styles.hint}>This device only. Not saved with the board.</p>
+        </>
+    );
+}
+
+function LibraryObjects({ tool, setTool }: { tool: Tool; setTool: (t: Tool) => void }) {
+    const [query, setQuery] = useState('');
+    const needle = query.trim().toLowerCase();
+    const groups = new Map<string, typeof BOARD_MODELS[number][]>();
+    for (const model of BOARD_MODELS) {
+        if (needle && !`${model.name} ${model.category ?? ''}`.toLowerCase().includes(needle)) continue;
+        const category = model.category ?? 'props';
+        const list = groups.get(category) ?? [];
+        list.push(model);
+        groups.set(category, list);
+    }
+    const size = tool.type === 'feature' ? tool.size : 1;
+    const color = tool.type === 'feature' ? tool.color : '#ffd08a';
+    return (
+        <>
+            <h3 className={styles.sectionTitle}>Library</h3>
+            <div className={styles.btnRow}>
+                <input className={controls.input} type="search" value={query} placeholder="Search objects"
+                    aria-label="Search objects" onChange={(e) => setQuery(e.target.value)} />
+            </div>
+            <div className={styles.objectList}>
+                {[...groups.entries()].map(([category, models]) => (
+                    <div key={category}>
+                        <h3 className={styles.sectionTitle}>{titled(category)}</h3>
+                        <div className={styles.btnRow}>
+                            {models.map((model) => (
+                                <button key={model.id} type="button"
+                                    aria-pressed={tool.type === 'feature' && tool.kind === 'model' && tool.model === model.id}
+                                    className={btnClass(tool.type === 'feature' && tool.kind === 'model' && tool.model === model.id)}
+                                    onClick={() => setTool({ type: 'feature', kind: 'model', model: model.id, size, color })}>
+                                    {model.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
         </>
     );
 }

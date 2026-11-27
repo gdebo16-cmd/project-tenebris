@@ -1,0 +1,5 @@
+Rocks Ground 05
+Rob Tuytel
+CC0
+https://polyhaven.com/a/rocks_ground_05
+Imported for Tenebris with scripts/import-polyhaven.mjs

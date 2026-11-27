@@ -4,7 +4,7 @@
 // ('table-feed') and sends everyone the new table (the tokens' HP, and any spell area left on the board).
 import { checkTableAct, resolveTableAct, actChoices, outcomeLine } from '@tenebris/rules/combat';
 import { areaHexes } from '@tenebris/rules/sight';
-import { wallsOf, hexKey } from '@tenebris/rules/board';
+import { sightOf, hexKey } from '@tenebris/rules/board';
 import { characterToCreature } from '@tenebris/rules/creature';
 import { applyMonsterHp } from '@tenebris/rules/monster';
 import * as Scenes from '../models/sceneModel.js';
@@ -73,7 +73,7 @@ export async function act(req, res) {
     }
     const actor = everyone.find((p) => p.tokenId === who.token.id);
 
-    const result = resolveTableAct(actor, request, everyone, wallsOf(scene.terrain ?? {}, scene.features ?? {}), rng);
+    const result = resolveTableAct(actor, request, everyone, sightOf(scene.terrain ?? {}, scene.features ?? {}), rng);
     if ('error' in result) return res.status(400).json({ error: result.error });
 
     // ---- save what happened ----

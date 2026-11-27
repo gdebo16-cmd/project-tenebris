@@ -24,7 +24,7 @@ export const SKY_LIGHT: Record<SceneMood, { file: string; strength: number }> = 
 
 // ---- lights ----
 
-export function BoardLights({ mood, moodName = 'day', radius }: { mood: MoodLight; moodName?: SceneMood; radius: number }) {
+export function BoardLights({ mood, moodName = 'day', radius, shadowMapSize = 4096, castShadow = true }: { mood: MoodLight; moodName?: SceneMood; radius: number; shadowMapSize?: number; castShadow?: boolean }) {
     const reach = rimOuter(radius) + 3;     // how far the sun's shadows reach from the centre: the whole board and its rim
     const sky = SKY_LIGHT[moodName] ?? SKY_LIGHT.day;
     // keep the water moving (its shader reads this clock)
@@ -38,8 +38,8 @@ export function BoardLights({ mood, moodName = 'day', radius }: { mood: MoodLigh
             {/* a little leftover fill so tokens stay readable in dark moods (night, dungeon) */}
             <hemisphereLight args={[mood.sky, mood.ground, Math.max(0.1, mood.roomPower * 0.28)]} />
             {/* the sun's shadows: kept as the extra hand-set light; fill now comes from the sky */}
-            <directionalLight position={[6, 20, 9]} intensity={mood.sunPower * 0.4} color={mood.sun} castShadow
-                shadow-mapSize={[4096, 4096]} shadow-camera-near={1} shadow-camera-far={90}
+            <directionalLight position={[6, 20, 9]} intensity={mood.sunPower * 0.4} color={mood.sun} castShadow={castShadow}
+                shadow-mapSize={[Math.max(512, shadowMapSize), Math.max(512, shadowMapSize)]} shadow-camera-near={1} shadow-camera-far={90}
                 shadow-camera-left={-reach} shadow-camera-right={reach} shadow-camera-top={reach} shadow-camera-bottom={-reach}
                 shadow-bias={-0.0003} shadow-normalBias={0.03} />
         </>

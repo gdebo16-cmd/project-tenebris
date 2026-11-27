@@ -14,7 +14,7 @@ const CONTENT_SECTIONS = [
   'legacy_subraces', 'legacy_sub_classes', 'monsters', 'personality_options',
   'primordial_blessings', 'proficiency_levels', 'role_features', 'role_item_proficiencies',
   'runes', 'sizes', 'species', 'species_affinity_elements', 'species_features', 'weapons',
-  'weapon_category',
+  'weapon_category', 'board_models', 'board_paints',
 ];
 
 const SPELL_SECTIONS = [

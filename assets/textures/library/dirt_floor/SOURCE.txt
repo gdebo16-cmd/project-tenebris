@@ -1,0 +1,5 @@
+Dirt Floor
+eye-candy.xyz
+CC0
+https://polyhaven.com/a/dirt_floor
+Imported for Tenebris with scripts/import-polyhaven.mjs

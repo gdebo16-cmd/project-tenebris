@@ -1,0 +1,6 @@
+Nettle Plant
+Rob Tuytel, Rico Cilliers
+CC0
+https://polyhaven.com/a/nettle_plant
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

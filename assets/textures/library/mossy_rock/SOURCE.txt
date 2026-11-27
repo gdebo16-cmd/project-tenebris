@@ -1,0 +1,5 @@
+Mossy Rock
+Rob Tuytel
+CC0
+https://polyhaven.com/a/mossy_rock
+Imported for Tenebris with scripts/import-polyhaven.mjs

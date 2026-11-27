@@ -1,0 +1,5 @@
+Withered Grass
+Charlotte Baglioni
+CC0
+https://polyhaven.com/a/withered_grass
+Imported for Tenebris with scripts/import-polyhaven.mjs

@@ -1,0 +1,6 @@
+Coast Rocks 05
+Rob Tuytel
+CC0
+https://polyhaven.com/a/coast_rocks_05
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

@@ -1,0 +1,5 @@
+Pine Bark
+Dimitrios Savva
+CC0
+https://polyhaven.com/a/pine_bark
+Imported for Tenebris with scripts/import-polyhaven.mjs

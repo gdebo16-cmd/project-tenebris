@@ -1,0 +1,5 @@
+Bark Brown 01
+Rob Tuytel
+CC0
+https://polyhaven.com/a/bark_brown_01
+Imported for Tenebris with scripts/import-polyhaven.mjs

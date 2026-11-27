@@ -1,0 +1,5 @@
+Brick Floor 002
+Dimitrios Savva, Rico Cilliers
+CC0
+https://polyhaven.com/a/t_brick_floor_002
+Imported for Tenebris with scripts/import-polyhaven.mjs

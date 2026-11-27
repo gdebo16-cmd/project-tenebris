@@ -1,0 +1,5 @@
+Stone Tiles
+Christopher Melani
+CC0
+https://polyhaven.com/a/stone_tiles
+Imported for Tenebris with scripts/import-polyhaven.mjs

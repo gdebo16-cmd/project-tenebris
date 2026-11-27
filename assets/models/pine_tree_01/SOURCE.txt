@@ -1,0 +1,7 @@
+﻿Pine Tree 01
+Rico Cilliers / Poly Haven
+CC0
+https://polyhaven.com/a/pine_tree_01
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).
+

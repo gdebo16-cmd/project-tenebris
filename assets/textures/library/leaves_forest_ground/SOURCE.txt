@@ -1,0 +1,5 @@
+Leaves Forest Ground
+Dario Barresi, Dimitrios Savva
+CC0
+https://polyhaven.com/a/leaves_forest_ground
+Imported for Tenebris with scripts/import-polyhaven.mjs

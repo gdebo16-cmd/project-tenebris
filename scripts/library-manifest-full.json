@@ -1,0 +1,1174 @@
+{
+  "note": "Previous curated board-relevant set (75 paints, 47 models) before the ~40/40 cap. The keep set is scripts/library-manifest.json. To pull these later: npm run library:import -- --deferred",
+  "textures": {
+    "count": 75,
+    "byCategory": {
+      "grass": 6,
+      "moss": 7,
+      "forest floor": 6,
+      "dirt": 6,
+      "mud": 4,
+      "sand": 6,
+      "gravel": 6,
+      "cobble and paving": 8,
+      "brick floors": 4,
+      "rock": 8,
+      "snow": 4,
+      "wood planks": 6,
+      "bark": 4
+    },
+    "items": [
+      {
+        "id": "grass_path_2",
+        "name": "Grass Path 2",
+        "category": "grass",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/grass_path_2"
+      },
+      {
+        "id": "grass_path_3",
+        "name": "Grass Path 3",
+        "category": "grass",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/grass_path_3"
+      },
+      {
+        "id": "sparse_grass",
+        "name": "Sparse Grass",
+        "category": "grass",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/sparse_grass"
+      },
+      {
+        "id": "withered_grass",
+        "name": "Withered Grass",
+        "category": "grass",
+        "authors": "Charlotte Baglioni",
+        "url": "https://polyhaven.com/a/withered_grass"
+      },
+      {
+        "id": "leafy_grass",
+        "name": "Leafy Grass",
+        "category": "grass",
+        "authors": "Charlotte Baglioni",
+        "url": "https://polyhaven.com/a/leafy_grass"
+      },
+      {
+        "id": "forrest_ground_03",
+        "name": "Forest Ground 03",
+        "category": "grass",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/forrest_ground_03"
+      },
+      {
+        "id": "mossy_rock",
+        "name": "Mossy Rock",
+        "category": "moss",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/mossy_rock"
+      },
+      {
+        "id": "rock_pitted_mossy",
+        "name": "Rock Pitted Mossy",
+        "category": "moss",
+        "authors": "Dimitrios Savva, Rico Cilliers",
+        "url": "https://polyhaven.com/a/rock_pitted_mossy"
+      },
+      {
+        "id": "moss_wood",
+        "name": "Moss Wood",
+        "category": "moss",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/moss_wood"
+      },
+      {
+        "id": "lichen_rock",
+        "name": "Lichen Rock",
+        "category": "moss",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/lichen_rock"
+      },
+      {
+        "id": "mossy_stone_wall",
+        "name": "Mossy Stone Wall",
+        "category": "moss",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/mossy_stone_wall"
+      },
+      {
+        "id": "mossy_brick_floor",
+        "name": "Mossy Brick Floor",
+        "category": "moss",
+        "authors": "Charlotte Baglioni",
+        "url": "https://polyhaven.com/a/mossy_brick_floor"
+      },
+      {
+        "id": "mossy_cobblestone",
+        "name": "Mossy Cobblestone",
+        "category": "moss",
+        "authors": "Sơn Nguyễn",
+        "url": "https://polyhaven.com/a/mossy_cobblestone"
+      },
+      {
+        "id": "forest_ground_04",
+        "name": "Forest Ground 04",
+        "category": "forest floor",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/forest_ground_04"
+      },
+      {
+        "id": "forest_floor",
+        "name": "Forest Floor",
+        "category": "forest floor",
+        "authors": "eye-candy.xyz",
+        "url": "https://polyhaven.com/a/forest_floor"
+      },
+      {
+        "id": "forest_leaves_04",
+        "name": "Forest Leaves 04",
+        "category": "forest floor",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/forest_leaves_04"
+      },
+      {
+        "id": "leaves_forest_ground",
+        "name": "Leaves Forest Ground",
+        "category": "forest floor",
+        "authors": "Dario Barresi, Dimitrios Savva",
+        "url": "https://polyhaven.com/a/leaves_forest_ground"
+      },
+      {
+        "id": "mud_forest",
+        "name": "Mud Forest",
+        "category": "forest floor",
+        "authors": "eye-candy.xyz",
+        "url": "https://polyhaven.com/a/mud_forest"
+      },
+      {
+        "id": "brown_mud_leaves_01",
+        "name": "Brown Mud Leaves 01",
+        "category": "forest floor",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/brown_mud_leaves_01"
+      },
+      {
+        "id": "dirt_floor",
+        "name": "Dirt Floor",
+        "category": "dirt",
+        "authors": "eye-candy.xyz",
+        "url": "https://polyhaven.com/a/dirt_floor"
+      },
+      {
+        "id": "park_dirt",
+        "name": "Park Dirt",
+        "category": "dirt",
+        "authors": "Christopher Melani",
+        "url": "https://polyhaven.com/a/park_dirt"
+      },
+      {
+        "id": "raked_dirt",
+        "name": "Raked Dirt",
+        "category": "dirt",
+        "authors": "Dario Barresi, Dimitrios Savva",
+        "url": "https://polyhaven.com/a/raked_dirt"
+      },
+      {
+        "id": "stony_dirt_path",
+        "name": "Stony Dirt Path",
+        "category": "dirt",
+        "authors": "eye-candy.xyz",
+        "url": "https://polyhaven.com/a/stony_dirt_path"
+      },
+      {
+        "id": "farm_furrows",
+        "name": "Farm Furrows",
+        "category": "dirt",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/farm_furrows"
+      },
+      {
+        "id": "farm_soil",
+        "name": "Farm Soil",
+        "category": "dirt",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/farm_soil"
+      },
+      {
+        "id": "brown_mud_dry",
+        "name": "Brown Mud Dry",
+        "category": "mud",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/brown_mud_dry"
+      },
+      {
+        "id": "brown_mud_03",
+        "name": "Brown Mud 03",
+        "category": "mud",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/brown_mud_03"
+      },
+      {
+        "id": "brown_mud_02",
+        "name": "Brown Mud 02",
+        "category": "mud",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/brown_mud_02"
+      },
+      {
+        "id": "muddy_tracks",
+        "name": "Muddy Tracks",
+        "category": "mud",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/muddy_tracks"
+      },
+      {
+        "id": "sand_03",
+        "name": "Sand 03",
+        "category": "sand",
+        "authors": "Charlotte Baglioni",
+        "url": "https://polyhaven.com/a/sand_03"
+      },
+      {
+        "id": "sand_02",
+        "name": "Sand 02",
+        "category": "sand",
+        "authors": "Charlotte Baglioni",
+        "url": "https://polyhaven.com/a/sand_02"
+      },
+      {
+        "id": "damp_beach_sand",
+        "name": "Damp Beach Sand",
+        "category": "sand",
+        "authors": "Dimitrios Savva",
+        "url": "https://polyhaven.com/a/damp_beach_sand"
+      },
+      {
+        "id": "dense_sand",
+        "name": "Dense Sand",
+        "category": "sand",
+        "authors": "Dimitrios Savva",
+        "url": "https://polyhaven.com/a/dense_sand"
+      },
+      {
+        "id": "red_sand",
+        "name": "Red Sand",
+        "category": "sand",
+        "authors": "Rohit Seervi",
+        "url": "https://polyhaven.com/a/red_sand"
+      },
+      {
+        "id": "gravelly_sand",
+        "name": "Gravelly Sand",
+        "category": "sand",
+        "authors": "Dario Barresi",
+        "url": "https://polyhaven.com/a/gravelly_sand"
+      },
+      {
+        "id": "ganges_river_pebbles",
+        "name": "Ganges River Pebbles",
+        "category": "gravel",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/ganges_river_pebbles"
+      },
+      {
+        "id": "clean_pebbles",
+        "name": "Clean Pebbles",
+        "category": "gravel",
+        "authors": "Dario Barresi, Charlotte Baglioni",
+        "url": "https://polyhaven.com/a/clean_pebbles"
+      },
+      {
+        "id": "floor_pebbles_01",
+        "name": "Floor Pebbles 01",
+        "category": "gravel",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/floor_pebbles_01"
+      },
+      {
+        "id": "gravel_floor",
+        "name": "Gravel Floor",
+        "category": "gravel",
+        "authors": "Jenelle van Heerden, Matterfield",
+        "url": "https://polyhaven.com/a/gravel_floor"
+      },
+      {
+        "id": "pebbles",
+        "name": "Pebbles",
+        "category": "gravel",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/pebbles"
+      },
+      {
+        "id": "rocks_ground_05",
+        "name": "Rocks Ground 05",
+        "category": "gravel",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/rocks_ground_05"
+      },
+      {
+        "id": "stone_tiles",
+        "name": "Stone Tiles",
+        "category": "cobble and paving",
+        "authors": "Christopher Melani",
+        "url": "https://polyhaven.com/a/stone_tiles"
+      },
+      {
+        "id": "cobblestone_02",
+        "name": "Cobblestone 02",
+        "category": "cobble and paving",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/cobblestone_02"
+      },
+      {
+        "id": "patterned_cobblestone",
+        "name": "Patterned Cobblestone",
+        "category": "cobble and paving",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/patterned_cobblestone"
+      },
+      {
+        "id": "pavement_01",
+        "name": "Pavement 01",
+        "category": "cobble and paving",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/pavement_01"
+      },
+      {
+        "id": "square_cobblestone",
+        "name": "Square Cobblestone",
+        "category": "cobble and paving",
+        "authors": "Sơn Nguyễn",
+        "url": "https://polyhaven.com/a/square_cobblestone"
+      },
+      {
+        "id": "stone_floor",
+        "name": "Stone Floor",
+        "category": "cobble and paving",
+        "authors": "Dimitrios Savva",
+        "url": "https://polyhaven.com/a/stone_floor"
+      },
+      {
+        "id": "cobblestone_pavement",
+        "name": "Cobblestone Pavement",
+        "category": "cobble and paving",
+        "authors": "Charlotte Baglioni",
+        "url": "https://polyhaven.com/a/cobblestone_pavement"
+      },
+      {
+        "id": "cobblestone_floor_06",
+        "name": "Cobblestone Floor 06",
+        "category": "cobble and paving",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/cobblestone_floor_06"
+      },
+      {
+        "id": "t_brick_floor_002",
+        "name": "Brick Floor 002",
+        "category": "brick floors",
+        "authors": "Dimitrios Savva, Rico Cilliers",
+        "url": "https://polyhaven.com/a/t_brick_floor_002"
+      },
+      {
+        "id": "worn_brick_floor",
+        "name": "Worn Brick Floor",
+        "category": "brick floors",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/worn_brick_floor"
+      },
+      {
+        "id": "brick_floor_04",
+        "name": "Brick Floor 04",
+        "category": "brick floors",
+        "authors": "Dimitrios Savva",
+        "url": "https://polyhaven.com/a/brick_floor_04"
+      },
+      {
+        "id": "floor_bricks_02",
+        "name": "Floor Bricks 02",
+        "category": "brick floors",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/floor_bricks_02"
+      },
+      {
+        "id": "rock_face_03",
+        "name": "Rock Face 03",
+        "category": "rock",
+        "authors": "Dario Barresi, Rico Cilliers",
+        "url": "https://polyhaven.com/a/rock_face_03"
+      },
+      {
+        "id": "rock_boulder_dry",
+        "name": "Rock Boulder Dry",
+        "category": "rock",
+        "authors": "Dimitrios Savva, Rico Cilliers",
+        "url": "https://polyhaven.com/a/rock_boulder_dry"
+      },
+      {
+        "id": "rock_01",
+        "name": "Rock 01",
+        "category": "rock",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/rock_01"
+      },
+      {
+        "id": "dry_riverbed_rock",
+        "name": "Dry Riverbed Rock",
+        "category": "rock",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/dry_riverbed_rock"
+      },
+      {
+        "id": "rock_05",
+        "name": "Rock 05",
+        "category": "rock",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/rock_05"
+      },
+      {
+        "id": "rock_boulder_cracked",
+        "name": "Rock Boulder Cracked",
+        "category": "rock",
+        "authors": "Dario Barresi, Dimitrios Savva",
+        "url": "https://polyhaven.com/a/rock_boulder_cracked"
+      },
+      {
+        "id": "dark_rock",
+        "name": "Dark Rock",
+        "category": "rock",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/dark_rock"
+      },
+      {
+        "id": "seaside_rock",
+        "name": "Seaside Rock",
+        "category": "rock",
+        "authors": "Dimitrios Savva",
+        "url": "https://polyhaven.com/a/seaside_rock"
+      },
+      {
+        "id": "snow_02",
+        "name": "Snow 02",
+        "category": "snow",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/snow_02"
+      },
+      {
+        "id": "snow_03",
+        "name": "Snow 03",
+        "category": "snow",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/snow_03"
+      },
+      {
+        "id": "snow_04",
+        "name": "Snow 04",
+        "category": "snow",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/snow_04"
+      },
+      {
+        "id": "snow_05",
+        "name": "Snow 05",
+        "category": "snow",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/snow_05"
+      },
+      {
+        "id": "wood_planks",
+        "name": "Wood Planks",
+        "category": "wood planks",
+        "authors": "Amal Kumar",
+        "url": "https://polyhaven.com/a/wood_planks"
+      },
+      {
+        "id": "weathered_brown_planks",
+        "name": "Weathered Brown Planks",
+        "category": "wood planks",
+        "authors": "Dimitrios Savva, Rico Cilliers",
+        "url": "https://polyhaven.com/a/weathered_brown_planks"
+      },
+      {
+        "id": "weathered_planks",
+        "name": "Weathered Planks",
+        "category": "wood planks",
+        "authors": "Dario Barresi, Dimitrios Savva",
+        "url": "https://polyhaven.com/a/weathered_planks"
+      },
+      {
+        "id": "plank_flooring",
+        "name": "Plank Flooring",
+        "category": "wood planks",
+        "authors": "Dario Barresi, Dimitrios Savva, Rico Cilliers",
+        "url": "https://polyhaven.com/a/plank_flooring"
+      },
+      {
+        "id": "old_wood_floor",
+        "name": "Old Wood Floor",
+        "category": "wood planks",
+        "authors": "Guillaume Monsergent",
+        "url": "https://polyhaven.com/a/old_wood_floor"
+      },
+      {
+        "id": "oak_wood_planks",
+        "name": "Oak Wood Planks",
+        "category": "wood planks",
+        "authors": "Dimitrios Savva",
+        "url": "https://polyhaven.com/a/oak_wood_planks"
+      },
+      {
+        "id": "bark_brown_01",
+        "name": "Bark Brown 01",
+        "category": "bark",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/bark_brown_01"
+      },
+      {
+        "id": "bark_willow",
+        "name": "Bark Willow",
+        "category": "bark",
+        "authors": "Dario Barresi, Dimitrios Savva",
+        "url": "https://polyhaven.com/a/bark_willow"
+      },
+      {
+        "id": "pine_bark",
+        "name": "Pine Bark",
+        "category": "bark",
+        "authors": "Dimitrios Savva",
+        "url": "https://polyhaven.com/a/pine_bark"
+      },
+      {
+        "id": "knotted_pine_bark",
+        "name": "Knotted Pine Bark",
+        "category": "bark",
+        "authors": "Dimitrios Savva",
+        "url": "https://polyhaven.com/a/knotted_pine_bark"
+      }
+    ]
+  },
+  "models": {
+    "count": 47,
+    "byCategory": {
+      "rocks": 8,
+      "trees and logs": 10,
+      "plants and bushes": 5,
+      "flowers": 5,
+      "ground cover": 5,
+      "props": 8,
+      "statues and ruins": 4,
+      "fences and walls": 2
+    },
+    "items": [
+      {
+        "id": "boulder",
+        "sourceId": "boulder_01",
+        "name": "Boulder 01",
+        "category": "rocks",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/boulder_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": "boulder"
+      },
+      {
+        "id": "namaqualand_boulder_02",
+        "sourceId": "namaqualand_boulder_02",
+        "name": "Namaqualand Boulder 02",
+        "category": "rocks",
+        "authors": "Greg Zaal, Rico Cilliers",
+        "url": "https://polyhaven.com/a/namaqualand_boulder_02",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "namaqualand_boulder_03",
+        "sourceId": "namaqualand_boulder_03",
+        "name": "Namaqualand Boulder 03",
+        "category": "rocks",
+        "authors": "Jenelle van Heerden, Dario Barresi",
+        "url": "https://polyhaven.com/a/namaqualand_boulder_03",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "namaqualand_boulder_04",
+        "sourceId": "namaqualand_boulder_04",
+        "name": "Namaqualand Boulder 04",
+        "category": "rocks",
+        "authors": "Jenelle van Heerden",
+        "url": "https://polyhaven.com/a/namaqualand_boulder_04",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "namaqualand_boulder_05",
+        "sourceId": "namaqualand_boulder_05",
+        "name": "Namaqualand Boulder 05",
+        "category": "rocks",
+        "authors": "Jenelle van Heerden, Dario Barresi",
+        "url": "https://polyhaven.com/a/namaqualand_boulder_05",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "coast_rocks_05",
+        "sourceId": "coast_rocks_05",
+        "name": "Coast Rocks 05",
+        "category": "rocks",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/coast_rocks_05",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "sand_rocks_small_01",
+        "sourceId": "sand_rocks_small_01",
+        "name": "Sand Rocks Small 01",
+        "category": "rocks",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/sand_rocks_small_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "rock_moss_set_01",
+        "sourceId": "rock_moss_set_01",
+        "name": "Rock Moss Set 01",
+        "category": "rocks",
+        "authors": "Kless Gyzen",
+        "url": "https://polyhaven.com/a/rock_moss_set_01",
+        "width": 2,
+        "footprint": "cluster",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "tree_small_02",
+        "sourceId": "tree_small_02",
+        "name": "Tree Small 02",
+        "category": "trees and logs",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/tree_small_02",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "fir_tree_01",
+        "sourceId": "fir_tree_01",
+        "name": "Fir Tree 01",
+        "category": "trees and logs",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/fir_tree_01",
+        "width": 2,
+        "footprint": "cluster",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "pine_tree_01",
+        "sourceId": "pine_tree_01",
+        "name": "Pine Tree 01",
+        "category": "trees and logs",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/pine_tree_01",
+        "width": 2,
+        "footprint": "cluster",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "island_tree_01",
+        "sourceId": "island_tree_01",
+        "name": "Island Tree 01",
+        "category": "trees and logs",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/island_tree_01",
+        "width": 2,
+        "footprint": "cluster",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "jacaranda_tree",
+        "sourceId": "jacaranda_tree",
+        "name": "Jacaranda Tree",
+        "category": "trees and logs",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/jacaranda_tree",
+        "width": 2,
+        "footprint": "cluster",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "fir_sapling",
+        "sourceId": "fir_sapling",
+        "name": "Fir Sapling",
+        "category": "trees and logs",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/fir_sapling",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "pine_sapling_small",
+        "sourceId": "pine_sapling_small",
+        "name": "Pine Sapling Small",
+        "category": "trees and logs",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/pine_sapling_small",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "dead_tree_trunk_02",
+        "sourceId": "dead_tree_trunk_02",
+        "name": "Dead Tree Trunk 02",
+        "category": "trees and logs",
+        "authors": "Jenelle van Heerden, Rico Cilliers",
+        "url": "https://polyhaven.com/a/dead_tree_trunk_02",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "tree_stump_01",
+        "sourceId": "tree_stump_01",
+        "name": "Tree Stump 01",
+        "category": "trees and logs",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/tree_stump_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "searsia_lucida",
+        "sourceId": "searsia_lucida",
+        "name": "Searsia Lucida",
+        "category": "trees and logs",
+        "authors": "James Ray Cock, Jenelle van Heerden",
+        "url": "https://polyhaven.com/a/searsia_lucida",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "fern_02",
+        "sourceId": "fern_02",
+        "name": "Fern 02",
+        "category": "plants and bushes",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/fern_02",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "wild_rooibos_bush",
+        "sourceId": "wild_rooibos_bush",
+        "name": "Wild Rooibos Bush",
+        "category": "plants and bushes",
+        "authors": "James Ray Cock, Jenelle van Heerden",
+        "url": "https://polyhaven.com/a/wild_rooibos_bush",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "shrub_02",
+        "sourceId": "shrub_02",
+        "name": "Shrub 02",
+        "category": "plants and bushes",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/shrub_02",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "shrub_03",
+        "sourceId": "shrub_03",
+        "name": "Shrub 03",
+        "category": "plants and bushes",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/shrub_03",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "nettle_plant",
+        "sourceId": "nettle_plant",
+        "name": "Nettle Plant",
+        "category": "plants and bushes",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/nettle_plant",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "celandine_01",
+        "sourceId": "celandine_01",
+        "name": "Celandine 01",
+        "category": "flowers",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/celandine_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "dandelion_01",
+        "sourceId": "dandelion_01",
+        "name": "Dandelion 01",
+        "category": "flowers",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/dandelion_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "flower_gazania",
+        "sourceId": "flower_gazania",
+        "name": "Flower Gazania",
+        "category": "flowers",
+        "authors": "James Ray Cock, Jenelle van Heerden",
+        "url": "https://polyhaven.com/a/flower_gazania",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "flower_heliophila",
+        "sourceId": "flower_heliophila",
+        "name": "Flower Heliophila",
+        "category": "flowers",
+        "authors": "Jenelle van Heerden",
+        "url": "https://polyhaven.com/a/flower_heliophila",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "shrub_01",
+        "sourceId": "shrub_01",
+        "name": "Shrub 01",
+        "category": "flowers",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/shrub_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "grass_medium_01",
+        "sourceId": "grass_medium_01",
+        "name": "Grass Medium 01",
+        "category": "ground cover",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/grass_medium_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "grass_bermuda_01",
+        "sourceId": "grass_bermuda_01",
+        "name": "Grass Bermuda 01",
+        "category": "ground cover",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/grass_bermuda_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "grass_medium_02",
+        "sourceId": "grass_medium_02",
+        "name": "Grass Medium 02",
+        "category": "ground cover",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/grass_medium_02",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "moss_01",
+        "sourceId": "moss_01",
+        "name": "Moss 01",
+        "category": "ground cover",
+        "authors": "Rob Tuytel",
+        "url": "https://polyhaven.com/a/moss_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "dry_branches_medium_01",
+        "sourceId": "dry_branches_medium_01",
+        "name": "Dry Branches Medium 01",
+        "category": "ground cover",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/dry_branches_medium_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "Lantern_01",
+        "sourceId": "Lantern_01",
+        "name": "Lantern 01",
+        "category": "props",
+        "authors": "Rajil Jose Macatangay",
+        "url": "https://polyhaven.com/a/Lantern_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "wooden_lantern_01",
+        "sourceId": "wooden_lantern_01",
+        "name": "Wooden Lantern 01",
+        "category": "props",
+        "authors": "James Ray Cock",
+        "url": "https://polyhaven.com/a/wooden_lantern_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "treasure_chest",
+        "sourceId": "treasure_chest",
+        "name": "Treasure Chest",
+        "category": "props",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/treasure_chest",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "wooden_crate_01",
+        "sourceId": "wooden_crate_01",
+        "name": "Wooden Crate 01",
+        "category": "props",
+        "authors": "James Ray Cock",
+        "url": "https://polyhaven.com/a/wooden_crate_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "wooden_crate_02",
+        "sourceId": "wooden_crate_02",
+        "name": "Wooden Crate 02",
+        "category": "props",
+        "authors": "James Ray Cock, Jurita Burger",
+        "url": "https://polyhaven.com/a/wooden_crate_02",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "wine_barrel_01",
+        "sourceId": "wine_barrel_01",
+        "name": "Wine Barrel 01",
+        "category": "props",
+        "authors": "James Ray Cock",
+        "url": "https://polyhaven.com/a/wine_barrel_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "wicker_basket_01",
+        "sourceId": "wicker_basket_01",
+        "name": "Wicker Basket 01",
+        "category": "props",
+        "authors": "Kuutti Siitonen",
+        "url": "https://polyhaven.com/a/wicker_basket_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "wooden_candlestick",
+        "sourceId": "wooden_candlestick",
+        "name": "Wooden Candlestick",
+        "category": "props",
+        "authors": "Josh Dean",
+        "url": "https://polyhaven.com/a/wooden_candlestick",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": false,
+        "blocksSight": false,
+        "already": null
+      },
+      {
+        "id": "gothic_statue",
+        "sourceId": "gothic_statue",
+        "name": "Gothic Statue",
+        "category": "statues and ruins",
+        "authors": "Benny Weimer",
+        "url": "https://polyhaven.com/a/gothic_statue",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "marble_bust_01",
+        "sourceId": "marble_bust_01",
+        "name": "Marble Bust 01",
+        "category": "statues and ruins",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/marble_bust_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "lion_head",
+        "sourceId": "lion_head",
+        "name": "Lion Head",
+        "category": "statues and ruins",
+        "authors": "Tina",
+        "url": "https://polyhaven.com/a/lion_head",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "horse_statue_01",
+        "sourceId": "horse_statue_01",
+        "name": "Horse Statue 01",
+        "category": "statues and ruins",
+        "authors": "Rico Cilliers",
+        "url": "https://polyhaven.com/a/horse_statue_01",
+        "width": 1,
+        "footprint": "hex",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "large_castle_door",
+        "sourceId": "large_castle_door",
+        "name": "Large Castle Door",
+        "category": "fences and walls",
+        "authors": "Tina",
+        "url": "https://polyhaven.com/a/large_castle_door",
+        "width": 2,
+        "footprint": "line",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "large_iron_gate",
+        "sourceId": "large_iron_gate",
+        "name": "Large Iron Gate",
+        "category": "fences and walls",
+        "authors": "Josh Dean",
+        "url": "https://polyhaven.com/a/large_iron_gate",
+        "width": 2,
+        "footprint": "line",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      }
+    ]
+  }
+}

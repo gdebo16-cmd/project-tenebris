@@ -1,0 +1,5 @@
+Gravel Floor
+Jenelle van Heerden, Matterfield
+CC0
+https://polyhaven.com/a/gravel_floor
+Imported for Tenebris with scripts/import-polyhaven.mjs

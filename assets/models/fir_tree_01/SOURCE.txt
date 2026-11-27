@@ -1,0 +1,6 @@
+Fir Tree 01
+Rob Tuytel, Rico Cilliers
+CC0
+https://polyhaven.com/a/fir_tree_01
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

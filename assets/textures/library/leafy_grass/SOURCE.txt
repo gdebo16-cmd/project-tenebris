@@ -1,0 +1,5 @@
+Leafy Grass
+Charlotte Baglioni
+CC0
+https://polyhaven.com/a/leafy_grass
+Imported for Tenebris with scripts/import-polyhaven.mjs

@@ -8,7 +8,10 @@
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react'
 import { type ThreeEvent } from '@react-three/fiber'
 import { Instances, Instance, useTexture } from '@react-three/drei'
-import { type Hex, hexKey, neighbors, waterShoreEdges, SURFACES, DEFAULT_SURFACE, type Surface, type BoardStyle } from '@tenebris/rules/board'
+import { type Hex, hexKey, neighbors, waterShoreEdges, SURFACES, DEFAULT_SURFACE, isCoreSurface, isSurface, type CoreSurface, type Surface, type BoardStyle } from '@tenebris/rules/board'
+import { paintById } from '@tenebris/rules/board'
+import { surfaceSet, textureUrl } from './groundTextures.ts'
+import { useGraphics } from './graphicsSettings.ts'
 import { Shape, ExtrudeGeometry, RepeatWrapping, SRGBColorSpace, type BufferGeometry, type Texture } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { paintTiles, paintStone, waterLookFor, iceLook } from './boardLooks.ts'
@@ -48,7 +51,7 @@ export function worldToHex(x: number, z: number): Hex {
 
 // flat = the plain colour before the pictures load. straight = the picture has a direction (planks, rows of bricks):
 // those hexes all face the same way instead of getting a random turn.
-export const SURFACE_LOOK: Record<Surface, { label: string; flat: string; straight?: boolean }> = {
+export const SURFACE_LOOK: Record<CoreSurface, { label: string; flat: string; straight?: boolean }> = {
     grass:     { label: 'Grass',      flat: '#3f6b2a' },
     moss:      { label: 'Moss',       flat: '#5a6b33' },
     dirt:      { label: 'Dirt',       flat: '#6b5440' },
@@ -61,6 +64,20 @@ export const SURFACE_LOOK: Record<Surface, { label: string; flat: string; straig
     woodfloor: { label: 'Wood floor', flat: '#7a5a3a', straight: true },
     roof:      { label: 'Roof',       flat: '#3a3a3e', straight: true },
 };
+
+const CATEGORY_FLAT: Record<string, string> = {
+    grass: '#3f6b2a', moss: '#5a6b33', 'forest floor': '#4a5a32', dirt: '#6b5440', mud: '#5a4030',
+    sand: '#c2a36b', gravel: '#8a8680', 'cobble and paving': '#8a8a7a', 'brick floors': '#9a7b5c',
+    rock: '#5d5a55', snow: '#e8eef2', 'wood planks': '#7a5a3a', bark: '#5a4632',
+};
+
+export function surfaceLook(surface: string): { label: string; flat: string; straight?: boolean } {
+    if (isCoreSurface(surface)) return SURFACE_LOOK[surface];
+    const paint = paintById(surface);
+    if (!paint) return { label: surface, flat: '#6b665e' };
+    const straight = paint.category === 'wood planks' || paint.category === 'brick floors';
+    return { label: paint.name, flat: CATEGORY_FLAT[paint.category] ?? '#6b665e', straight };
+}
 
 const TILE_HEIGHT = 0.2;           // every hex's bottom sits at -0.1, so a tile's top is at 0.1
 const WALL_HEIGHT = 1;             // walls stand up as blocks
@@ -110,8 +127,8 @@ export function fixedRandom(hex: Hex, n: number) {
 }
 
 // A turn for each hex: a multiple of 60° (so hexes still line up), to hide the repeating picture. Straight ones don't turn.
-const turnFor = (hex: Hex, surface: Surface) =>
-    Math.PI / 6 + (SURFACE_LOOK[surface].straight ? 0 : Math.floor(fixedRandom(hex, 99) * 6) * (Math.PI / 3));
+const turnFor = (hex: Hex, surface: string) =>
+    Math.PI / 6 + (surfaceLook(surface).straight ? 0 : Math.floor(fixedRandom(hex, 99) * 6) * (Math.PI / 3));
 
 // ---- the pictures ----
 
@@ -165,14 +182,14 @@ type TerrainProps = {
 
 // Sort the hexes into what gets drawn where. An unknown surface name from the server just shows the default.
 function sortHexes(hexes: Hex[], terrain: Record<string, string>, surfaces: Record<string, string>) {
-    const tiles = Object.fromEntries(SURFACES.map((s) => [s, [] as Hex[]])) as Record<Surface, Hex[]>;
+    const tiles: Record<string, Hex[]> = Object.fromEntries(SURFACES.map((s) => [s, [] as Hex[]]));
     const walls: Hex[] = [], water: Hex[] = [], ice: Hex[] = [], rough: Hex[] = [];
     for (const hex of hexes) {
         const key = hexKey(hex);
         const rule = terrain[key];
         if (rule === 'block') { walls.push(hex); continue; }     // the block replaces the tile
         if (rule === 'deep') { water.push(hex); continue; }      // water replaces the tile
-        const surface = (SURFACES as readonly string[]).includes(surfaces[key]) ? surfaces[key] as Surface : DEFAULT_SURFACE;
+        const surface = isSurface(surfaces[key]) ? surfaces[key] : DEFAULT_SURFACE;
         tiles[surface].push(hex);
         if (rule === 'slick') ice.push(hex);                     // these sit on top of the tile
         if (rule === 'rough') rough.push(hex);
@@ -263,6 +280,52 @@ function Walls({ walls, tex, onHexClick }: { walls: Hex[]; tex: Pictures; onHexC
     );
 }
 
+
+function LibrarySurfaceTiles({ surface, hexes, limit, raised, stretch }: {
+    surface: string;
+    hexes: Hex[];
+    limit: number;
+    raised: (hex: Hex) => [number, number, number];
+    stretch: (hex: Hex) => [number, number, number];
+}) {
+    const look = surfaceLook(surface);
+    const body = (pictures: Pictures) => (
+        <Instances limit={limit} receiveShadow>
+            <cylinderGeometry args={[1, 1, TILE_HEIGHT, 6]} />
+            <meshPhysicalMaterial {...(pictures ? { map: pictures.color, normalMap: pictures.normal, roughnessMap: pictures.rough } : {})} color={pictures ? 'white' : look.flat} roughness={1} onBeforeCompile={paintTiles} />
+            {hexes.map((hex) => (
+                <Instance key={hexKey(hex)} position={raised(hex)} scale={stretch(hex)} rotation={[0, turnFor(hex, surface), 0]} />
+            ))}
+        </Instances>
+    );
+    if (!USE_TEXTURES) return body(null);
+    return (
+        <Suspense fallback={body(null)}>
+            <LibrarySurfacePictures surface={surface}>{body}</LibrarySurfacePictures>
+        </Suspense>
+    );
+}
+
+function LibrarySurfacePictures({ surface, children }: { surface: string; children: (pictures: Pictures) => ReactNode }) {
+    const graphics = useGraphics();
+    const folder = surfaceSet(surface).folder;
+    const urls = {
+        color: textureUrl(folder, 'color', graphics.textureQuality),
+        normal: textureUrl(folder, 'normal', graphics.textureQuality),
+        rough: textureUrl(folder, 'rough', graphics.textureQuality),
+    };
+    const tex = useTexture(urls) as { color: Texture; normal: Texture; rough: Texture };
+    useMemo(() => {
+        tex.color.colorSpace = SRGBColorSpace;
+        for (const picture of Object.values(tex)) {
+            picture.anisotropy = 16;
+            picture.wrapS = picture.wrapT = RepeatWrapping;
+            picture.needsUpdate = true;
+        }
+    }, [tex]);
+    return children(tex);
+}
+
 // Everything on the grid. tex = the loaded pictures, or null for plain colours (same shapes either way).
 function BoardHexes({ hexes, terrain, surfaces, heights, onHexClick, tex }: TerrainProps & { tex: Pictures }) {
     const sorted = useMemo(() => sortHexes(hexes, terrain, surfaces), [hexes, terrain, surfaces]);
@@ -285,6 +348,9 @@ function BoardHexes({ hexes, terrain, surfaces, heights, onHexClick, tex }: Terr
                         <Instance key={hexKey(hex)} position={raised(hex)} scale={stretch(hex)} rotation={[0, turnFor(hex, s), 0]} />
                     ))}
                 </Instances>
+            ))}
+            {Object.entries(sorted.tiles).filter(([s, list]) => list.length > 0 && !isCoreSurface(s)).map(([s, list]) => (
+                <LibrarySurfaceTiles key={s} surface={s} hexes={list} limit={hexes.length} raised={raised} stretch={stretch} />
             ))}
 
             {/* walls: one joined stone mass standing up from the board */}

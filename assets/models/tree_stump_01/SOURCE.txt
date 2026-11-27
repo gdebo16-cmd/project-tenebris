@@ -1,0 +1,6 @@
+Tree Stump 01
+Rob Tuytel
+CC0
+https://polyhaven.com/a/tree_stump_01
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

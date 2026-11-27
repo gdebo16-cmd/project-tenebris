@@ -1,0 +1,6 @@
+Tree Small 02
+Rico Cilliers
+CC0
+https://polyhaven.com/a/tree_small_02
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

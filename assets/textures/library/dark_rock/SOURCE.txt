@@ -1,0 +1,5 @@
+Dark Rock
+Amal Kumar
+CC0
+https://polyhaven.com/a/dark_rock
+Imported for Tenebris with scripts/import-polyhaven.mjs

@@ -1,0 +1,5 @@
+Sparse Grass
+Amal Kumar
+CC0
+https://polyhaven.com/a/sparse_grass
+Imported for Tenebris with scripts/import-polyhaven.mjs

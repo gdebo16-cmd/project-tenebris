@@ -1,0 +1,5 @@
+Rock 01
+Rob Tuytel
+CC0
+https://polyhaven.com/a/rock_01
+Imported for Tenebris with scripts/import-polyhaven.mjs

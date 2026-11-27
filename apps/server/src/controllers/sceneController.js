@@ -2,7 +2,7 @@
 // The server decides everything (hard rule): painting, placing and removing are DM only; moving is the token's
 // owner or the DM, and a move must have a path around walls (findPath from @tenebris/rules/hex).
 // Spec: docs/specs/table.md.
-import { isTerrainKind, isSurface, isFeatureKind, LIGHT_FEATURES, MAX_LIGHTS, MAX_HEIGHT, checkLookChange, applyLookChange, radiusOf, keepOnBoard, findWalk, wallsOf, hexKey, hexesForSpeed, onBoard } from '@tenebris/rules/board';
+import { isTerrainKind, isSurface, isFeatureKind, LIGHT_FEATURES, MAX_LIGHTS, MAX_HEIGHT, checkLookChange, applyLookChange, radiusOf, keepOnBoard, findWalk, wallsOf, hexKey, hexesForSpeed, onBoard, modelById } from '@tenebris/rules/board';
 import { characterToCreature } from '@tenebris/rules/creature';
 import * as Scenes from '../models/sceneModel.js';
 import * as Monsters from '../models/monsterModel.js';   // for memberRole(campId, userId)
@@ -119,7 +119,12 @@ export async function paint(req, res) {
                 const others = Object.entries(scene.features).filter(([k, f]) => !keys.includes(k) && LIGHT_FEATURES.includes(f.kind)).length;
                 if (others + keys.length > MAX_LIGHTS) return res.status(400).json({ error: `At most ${MAX_LIGHTS} lights in a scene` });
             }
-            for (const key of keys) scene.features[key] = { kind: feature.kind, size, ...(color ? { color } : {}) };
+            if (feature.kind === 'model') {
+                if (typeof feature.model !== 'string' || !modelById(feature.model)) return res.status(400).json({ error: 'Invalid model' });
+                for (const key of keys) scene.features[key] = { kind: 'model', model: feature.model, size };
+            } else {
+                for (const key of keys) scene.features[key] = { kind: feature.kind, size, ...(color ? { color } : {}) };
+            }
         }
         await Scenes.saveFeatures(scene.id, scene.features);
     } else if ('surface' in body) {                       // the look

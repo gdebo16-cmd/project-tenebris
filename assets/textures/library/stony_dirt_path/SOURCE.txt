@@ -1,0 +1,5 @@
+Stony Dirt Path
+eye-candy.xyz
+CC0
+https://polyhaven.com/a/stony_dirt_path
+Imported for Tenebris with scripts/import-polyhaven.mjs

@@ -1,5 +1,6 @@
-import { type Hex, hexKey, neighbors, onBoard } from './hex.ts';
+import { type Hex, hexKey, hexFromKey, neighbors, onBoard } from './hex.ts';
 import { type Surface, DEFAULT_SURFACE, isSurface } from './paint.ts';
+import { featuresCovering, modelFootprint, modelOf } from './models.ts';
 
 // The ground rules (T0): how the ground itself treats a token. ('block' in TERRAIN_KINDS isn't one: a block hex is a
 // wall, and a wall is an object; see OBJECT_RULES below.)
@@ -15,20 +16,51 @@ export const isTerrainKind = (value: unknown): value is TerrainKind => TERRAIN_K
 export const BLOCKING_TERRAIN: readonly TerrainKind[] = ['block'];
 export type TerrainKind = (typeof TERRAIN_KINDS)[number];
 
-export const FEATURE_KINDS = ['light', 'brazier', 'tree', 'bush', 'boulder', 'pillar', 'crate', 'barrel', 'rubble', 'thinTree'] as const;   // tree = a thick tree
+export const FEATURE_KINDS = ['light', 'brazier', 'tree', 'bush', 'boulder', 'pillar', 'crate', 'barrel', 'rubble', 'thinTree', 'model'] as const;   // tree = a thick tree; model = a library .glb
 export type FeatureKind = (typeof FEATURE_KINDS)[number];
+export const SHAPE_FEATURE_KINDS = FEATURE_KINDS.filter((k) => k !== 'model');
 export const isFeatureKind = (value: unknown): value is FeatureKind => FEATURE_KINDS.includes(value as FeatureKind);
-export type Feature = { kind: FeatureKind; size?: number; color?: string };   // size: 0.5–2 (1 = normal); color: '#rrggbb'
+export type Feature = { kind: FeatureKind; size?: number; color?: string; model?: string };   // size: 0.5–2 (1 = normal); color: '#rrggbb'; model: library id (T7)
 export const BLOCKING_FEATURES: readonly FeatureKind[] = ['tree', 'boulder', 'pillar'];
 export const LIGHT_FEATURES: readonly FeatureKind[] = ['light', 'brazier'];
 export const MAX_LIGHTS = 8;
 
-// A scene's terrain map ({ "2,0": "wall", ... }) and features -> the hexKeys that block movement, ready for findPath
+export function featureBlocksMovement(feature: Feature): boolean {
+    const model = modelOf(feature);
+    if (model) return model.blocksMovement;
+    return BLOCKING_FEATURES.includes(feature.kind);
+}
+
+export function featureBlocksSight(feature: Feature): boolean {
+    const model = modelOf(feature);
+    if (model) return model.blocksSight;
+    return BLOCKING_FEATURES.includes(feature.kind);
+}
+
+// A scene's terrain map ({ "2,0": "wall", ... }) and features -> the hexKeys that block movement, ready for findPath.
+// T7: a model's footprint (not its mesh) is what counts.
 export function wallsOf(terrain: Record<string, string>, features: Record<string, Feature> = {}): Set<string> {
+    return blockersOf(terrain, features, 'move');
+}
+
+// The hexes that block sight. Today's walls, trees, boulders and pillars do both; a library model can set the two apart.
+export function sightOf(terrain: Record<string, string>, features: Record<string, Feature> = {}): Set<string> {
+    return blockersOf(terrain, features, 'sight');
+}
+
+function blockersOf(terrain: Record<string, string>, features: Record<string, Feature>, mode: 'move' | 'sight'): Set<string> {
     const rules = upgradeTerrain(terrain);              // an old board's 'wall' still blocks
     const walls = Object.keys(rules).filter((key) => BLOCKING_TERRAIN.includes(rules[key] as TerrainKind));
-    const blockers = Object.keys(features).filter((key) => BLOCKING_FEATURES.includes(features[key]?.kind));
-    return new Set([...walls, ...blockers]);
+    const out = new Set(walls);
+    for (const [originKey, feature] of Object.entries(features)) {
+        if (!feature) continue;
+        const blocks = mode === 'move' ? featureBlocksMovement(feature) : featureBlocksSight(feature);
+        if (!blocks) continue;
+        const origin = hexFromKey(originKey);
+        if (!origin) continue;
+        for (const hex of modelFootprint(origin, feature)) out.add(hexKey(hex));
+    }
+    return out;
 }
 
 // ---- T0: one terrain model ----
@@ -60,7 +92,7 @@ export type Board = {
 
 export const OBJECT_KINDS = ['wall', ...FEATURE_KINDS] as const;
 export type ObjectKind = (typeof OBJECT_KINDS)[number];
-export type PlacedObject = { kind: ObjectKind; size?: number; color?: string };   // keeps a feature's own settings (light colour...)
+export type PlacedObject = { kind: ObjectKind; size?: number; color?: string; model?: string };   // keeps a feature's own settings (light colour...)
 
 // What an object does to a token walking into its hex:
 //   block: can't go in (or see through): walls, thick trees, boulders, pillars. The same as BLOCKING_FEATURES.
@@ -73,10 +105,17 @@ export const OBJECT_RULES: Readonly<Record<ObjectKind, ObjectRule>> = {
     thinTree: 'rough', bush: 'rough', rubble: 'rough',
     crate: 'climb', barrel: 'climb', brazier: 'climb',
     light: 'none',
+    model: 'none',   // real cost comes from the library flags via objectMoveRule
 };
 export const ROUGH_COST = 1;      // rough: +1 movement (Gabriel, 2026-11-25)
 export const CLIMB_COST = 2;      // climbing (steep ground, short props): +2
 export const STEEP_RISE = 2;      // stepping up this many height levels (5 ft each) or more is steep
+
+export function objectMoveRule(object: PlacedObject): ObjectRule {
+    const model = modelOf(object);
+    if (model) return model.blocksMovement ? 'block' : 'none';
+    return OBJECT_RULES[object.kind] ?? 'none';
+}
 
 export type HexCell = {
     ground: { look: Surface; rules: GroundRule[] };
@@ -93,8 +132,9 @@ export function cellAt(board: Board, key: string, cameFrom?: string): HexCell {
     if (cameFrom !== undefined && !rules.includes('steep') && height - (board.heights?.[cameFrom] ?? 0) >= STEEP_RISE) rules.push('steep');
     const objects: PlacedObject[] = [];
     if (kind === 'block') objects.push({ kind: 'wall' });
-    const feature = board.features?.[key];
-    if (feature && isFeatureKind(feature.kind)) objects.push({ ...feature });
+    for (const feature of featuresCovering(board.features ?? {}, key)) {
+        if (isFeatureKind(feature.kind)) objects.push({ ...feature });
+    }
     const look = board.surfaces?.[key];
     return { ground: { look: isSurface(look) ? look : DEFAULT_SURFACE, rules }, objects, height };
 }
@@ -106,7 +146,7 @@ export type Walker = { swims?: boolean; radius?: number };   // swims: has a swi
 // Slick costs nothing extra: ice is a Balance roll (sliding 1 hex on a fail), which comes with the Balance prompts.
 export function stepCost(board: Board, from: string, to: string, walker: Walker = {}): number | null {
     const cell = cellAt(board, to, from);
-    const objectRules = cell.objects.map((o) => OBJECT_RULES[o.kind]);
+    const objectRules = cell.objects.map((o) => objectMoveRule(o));
     if (objectRules.includes('block')) return null;
     const rules = cell.ground.rules;
     let cost = rules.includes('deep') && !walker.swims ? 2 : 1;

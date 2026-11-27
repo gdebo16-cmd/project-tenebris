@@ -1,0 +1,5 @@
+Brown Mud 03
+Rob Tuytel
+CC0
+https://polyhaven.com/a/brown_mud_03
+Imported for Tenebris with scripts/import-polyhaven.mjs

@@ -134930,5 +134930,938 @@
       "name": "Great",
       "definition": "Two-handed Might weapons without reach."
     }
+  ],
+  "board_models": [
+    {
+      "id": "boulder",
+      "name": "Boulder 01",
+      "file": "/models/boulder/boulder.glb",
+      "lightFile": "/models/boulder/boulder.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "rocks",
+      "kind": "boulder"
+    },
+    {
+      "id": "namaqualand_boulder_02",
+      "name": "Namaqualand Boulder 02",
+      "file": "/models/namaqualand_boulder_02/namaqualand_boulder_02.glb",
+      "lightFile": "/models/namaqualand_boulder_02/namaqualand_boulder_02.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "rocks"
+    },
+    {
+      "id": "namaqualand_boulder_03",
+      "name": "Namaqualand Boulder 03",
+      "file": "/models/namaqualand_boulder_03/namaqualand_boulder_03.glb",
+      "lightFile": "/models/namaqualand_boulder_03/namaqualand_boulder_03.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "rocks"
+    },
+    {
+      "id": "namaqualand_boulder_04",
+      "name": "Namaqualand Boulder 04",
+      "file": "/models/namaqualand_boulder_04/namaqualand_boulder_04.glb",
+      "lightFile": "/models/namaqualand_boulder_04/namaqualand_boulder_04.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "rocks"
+    },
+    {
+      "id": "namaqualand_boulder_05",
+      "name": "Namaqualand Boulder 05",
+      "file": "/models/namaqualand_boulder_05/namaqualand_boulder_05.glb",
+      "lightFile": "/models/namaqualand_boulder_05/namaqualand_boulder_05.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "rocks"
+    },
+    {
+      "id": "coast_rocks_05",
+      "name": "Coast Rocks 05",
+      "file": "/models/coast_rocks_05/coast_rocks_05.glb",
+      "lightFile": "/models/coast_rocks_05/coast_rocks_05.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "rocks"
+    },
+    {
+      "id": "sand_rocks_small_01",
+      "name": "Sand Rocks Small 01",
+      "file": "/models/sand_rocks_small_01/sand_rocks_small_01.glb",
+      "lightFile": "/models/sand_rocks_small_01/sand_rocks_small_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "rocks"
+    },
+    {
+      "id": "rock_moss_set_01",
+      "name": "Rock Moss Set 01",
+      "file": "/models/rock_moss_set_01/rock_moss_set_01.glb",
+      "lightFile": "/models/rock_moss_set_01/rock_moss_set_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "rocks"
+    },
+    {
+      "id": "tree_small_02",
+      "name": "Tree Small 02",
+      "file": "/models/tree_small_02/tree_small_02.glb",
+      "lightFile": "/models/tree_small_02/tree_small_02.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "trees and logs"
+    },
+    {
+      "id": "fir_tree_01",
+      "name": "Fir Tree 01",
+      "file": "/models/fir_tree_01/fir_tree_01.glb",
+      "lightFile": "/models/fir_tree_01/fir_tree_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "trees and logs"
+    },
+    {
+      "id": "pine_tree_01",
+      "name": "Pine Tree 01",
+      "file": "/models/pine_tree_01/pine_tree_01.glb",
+      "lightFile": "/models/pine_tree_01/pine_tree_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "trees and logs"
+    },
+    {
+      "id": "island_tree_01",
+      "name": "Island Tree 01",
+      "file": "/models/island_tree_01/island_tree_01.glb",
+      "lightFile": "/models/island_tree_01/island_tree_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "trees and logs"
+    },
+    {
+      "id": "jacaranda_tree",
+      "name": "Jacaranda Tree",
+      "file": "/models/jacaranda_tree/jacaranda_tree.glb",
+      "lightFile": "/models/jacaranda_tree/jacaranda_tree.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "trees and logs"
+    },
+    {
+      "id": "fir_sapling",
+      "name": "Fir Sapling",
+      "file": "/models/fir_sapling/fir_sapling.glb",
+      "lightFile": "/models/fir_sapling/fir_sapling.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "trees and logs"
+    },
+    {
+      "id": "dead_tree_trunk_02",
+      "name": "Dead Tree Trunk 02",
+      "file": "/models/dead_tree_trunk_02/dead_tree_trunk_02.glb",
+      "lightFile": "/models/dead_tree_trunk_02/dead_tree_trunk_02.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "trees and logs"
+    },
+    {
+      "id": "tree_stump_01",
+      "name": "Tree Stump 01",
+      "file": "/models/tree_stump_01/tree_stump_01.glb",
+      "lightFile": "/models/tree_stump_01/tree_stump_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "trees and logs"
+    },
+    {
+      "id": "searsia_lucida",
+      "name": "Searsia Lucida",
+      "file": "/models/searsia_lucida/searsia_lucida.glb",
+      "lightFile": "/models/searsia_lucida/searsia_lucida.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "trees and logs"
+    },
+    {
+      "id": "fern_02",
+      "name": "Fern 02",
+      "file": "/models/fern_02/fern_02.glb",
+      "lightFile": "/models/fern_02/fern_02.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "plants and bushes"
+    },
+    {
+      "id": "wild_rooibos_bush",
+      "name": "Wild Rooibos Bush",
+      "file": "/models/wild_rooibos_bush/wild_rooibos_bush.glb",
+      "lightFile": "/models/wild_rooibos_bush/wild_rooibos_bush.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "plants and bushes"
+    },
+    {
+      "id": "shrub_02",
+      "name": "Shrub 02",
+      "file": "/models/shrub_02/shrub_02.glb",
+      "lightFile": "/models/shrub_02/shrub_02.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "plants and bushes"
+    },
+    {
+      "id": "shrub_03",
+      "name": "Shrub 03",
+      "file": "/models/shrub_03/shrub_03.glb",
+      "lightFile": "/models/shrub_03/shrub_03.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "plants and bushes"
+    },
+    {
+      "id": "nettle_plant",
+      "name": "Nettle Plant",
+      "file": "/models/nettle_plant/nettle_plant.glb",
+      "lightFile": "/models/nettle_plant/nettle_plant.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "plants and bushes"
+    },
+    {
+      "id": "celandine_01",
+      "name": "Celandine 01",
+      "file": "/models/celandine_01/celandine_01.glb",
+      "lightFile": "/models/celandine_01/celandine_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "flowers"
+    },
+    {
+      "id": "dandelion_01",
+      "name": "Dandelion 01",
+      "file": "/models/dandelion_01/dandelion_01.glb",
+      "lightFile": "/models/dandelion_01/dandelion_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "flowers"
+    },
+    {
+      "id": "shrub_01",
+      "name": "Shrub 01",
+      "file": "/models/shrub_01/shrub_01.glb",
+      "lightFile": "/models/shrub_01/shrub_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "flowers"
+    },
+    {
+      "id": "grass_medium_01",
+      "name": "Grass Medium 01",
+      "file": "/models/grass_medium_01/grass_medium_01.glb",
+      "lightFile": "/models/grass_medium_01/grass_medium_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "ground cover"
+    },
+    {
+      "id": "moss_01",
+      "name": "Moss 01",
+      "file": "/models/moss_01/moss_01.glb",
+      "lightFile": "/models/moss_01/moss_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "ground cover"
+    },
+    {
+      "id": "dry_branches_medium_01",
+      "name": "Dry Branches Medium 01",
+      "file": "/models/dry_branches_medium_01/dry_branches_medium_01.glb",
+      "lightFile": "/models/dry_branches_medium_01/dry_branches_medium_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "ground cover"
+    },
+    {
+      "id": "Lantern_01",
+      "name": "Lantern 01",
+      "file": "/models/Lantern_01/Lantern_01.glb",
+      "lightFile": "/models/Lantern_01/Lantern_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "props"
+    },
+    {
+      "id": "wooden_lantern_01",
+      "name": "Wooden Lantern 01",
+      "file": "/models/wooden_lantern_01/wooden_lantern_01.glb",
+      "lightFile": "/models/wooden_lantern_01/wooden_lantern_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "props"
+    },
+    {
+      "id": "treasure_chest",
+      "name": "Treasure Chest",
+      "file": "/models/treasure_chest/treasure_chest.glb",
+      "lightFile": "/models/treasure_chest/treasure_chest.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "props"
+    },
+    {
+      "id": "wooden_crate_01",
+      "name": "Wooden Crate 01",
+      "file": "/models/wooden_crate_01/wooden_crate_01.glb",
+      "lightFile": "/models/wooden_crate_01/wooden_crate_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "props"
+    },
+    {
+      "id": "wine_barrel_01",
+      "name": "Wine Barrel 01",
+      "file": "/models/wine_barrel_01/wine_barrel_01.glb",
+      "lightFile": "/models/wine_barrel_01/wine_barrel_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "props"
+    },
+    {
+      "id": "wicker_basket_01",
+      "name": "Wicker Basket 01",
+      "file": "/models/wicker_basket_01/wicker_basket_01.glb",
+      "lightFile": "/models/wicker_basket_01/wicker_basket_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "props"
+    },
+    {
+      "id": "wooden_candlestick",
+      "name": "Wooden Candlestick",
+      "file": "/models/wooden_candlestick/wooden_candlestick.glb",
+      "lightFile": "/models/wooden_candlestick/wooden_candlestick.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": false,
+      "blocksSight": false,
+      "category": "props"
+    },
+    {
+      "id": "gothic_statue",
+      "name": "Gothic Statue",
+      "file": "/models/gothic_statue/gothic_statue.glb",
+      "lightFile": "/models/gothic_statue/gothic_statue.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "statues and ruins"
+    },
+    {
+      "id": "marble_bust_01",
+      "name": "Marble Bust 01",
+      "file": "/models/marble_bust_01/marble_bust_01.glb",
+      "lightFile": "/models/marble_bust_01/marble_bust_01.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "statues and ruins"
+    },
+    {
+      "id": "lion_head",
+      "name": "Lion Head",
+      "file": "/models/lion_head/lion_head.glb",
+      "lightFile": "/models/lion_head/lion_head.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "statues and ruins"
+    },
+    {
+      "id": "large_castle_door",
+      "name": "Large Castle Door",
+      "file": "/models/large_castle_door/large_castle_door.glb",
+      "lightFile": "/models/large_castle_door/large_castle_door.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "fences and walls"
+    },
+    {
+      "id": "large_iron_gate",
+      "name": "Large Iron Gate",
+      "file": "/models/large_iron_gate/large_iron_gate.glb",
+      "lightFile": "/models/large_iron_gate/large_iron_gate.light.glb",
+      "footprint": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        }
+      ],
+      "blocksMovement": true,
+      "blocksSight": true,
+      "category": "fences and walls"
+    }
+  ],
+  "board_paints": [
+    {
+      "id": "grass_path_2",
+      "name": "Grass Path 2",
+      "folder": "library/grass_path_2",
+      "category": "grass",
+      "thumb": "/textures/library/grass_path_2/thumb.jpg"
+    },
+    {
+      "id": "sparse_grass",
+      "name": "Sparse Grass",
+      "folder": "library/sparse_grass",
+      "category": "grass",
+      "thumb": "/textures/library/sparse_grass/thumb.jpg"
+    },
+    {
+      "id": "withered_grass",
+      "name": "Withered Grass",
+      "folder": "library/withered_grass",
+      "category": "grass",
+      "thumb": "/textures/library/withered_grass/thumb.jpg"
+    },
+    {
+      "id": "leafy_grass",
+      "name": "Leafy Grass",
+      "folder": "library/leafy_grass",
+      "category": "grass",
+      "thumb": "/textures/library/leafy_grass/thumb.jpg"
+    },
+    {
+      "id": "mossy_rock",
+      "name": "Mossy Rock",
+      "folder": "library/mossy_rock",
+      "category": "moss",
+      "thumb": "/textures/library/mossy_rock/thumb.jpg"
+    },
+    {
+      "id": "mossy_stone_wall",
+      "name": "Mossy Stone Wall",
+      "folder": "library/mossy_stone_wall",
+      "category": "moss",
+      "thumb": "/textures/library/mossy_stone_wall/thumb.jpg"
+    },
+    {
+      "id": "mossy_cobblestone",
+      "name": "Mossy Cobblestone",
+      "folder": "library/mossy_cobblestone",
+      "category": "moss",
+      "thumb": "/textures/library/mossy_cobblestone/thumb.jpg"
+    },
+    {
+      "id": "forest_ground_04",
+      "name": "Forest Ground 04",
+      "folder": "library/forest_ground_04",
+      "category": "forest floor",
+      "thumb": "/textures/library/forest_ground_04/thumb.jpg"
+    },
+    {
+      "id": "forest_floor",
+      "name": "Forest Floor",
+      "folder": "library/forest_floor",
+      "category": "forest floor",
+      "thumb": "/textures/library/forest_floor/thumb.jpg"
+    },
+    {
+      "id": "leaves_forest_ground",
+      "name": "Leaves Forest Ground",
+      "folder": "library/leaves_forest_ground",
+      "category": "forest floor",
+      "thumb": "/textures/library/leaves_forest_ground/thumb.jpg"
+    },
+    {
+      "id": "dirt_floor",
+      "name": "Dirt Floor",
+      "folder": "library/dirt_floor",
+      "category": "dirt",
+      "thumb": "/textures/library/dirt_floor/thumb.jpg"
+    },
+    {
+      "id": "raked_dirt",
+      "name": "Raked Dirt",
+      "folder": "library/raked_dirt",
+      "category": "dirt",
+      "thumb": "/textures/library/raked_dirt/thumb.jpg"
+    },
+    {
+      "id": "stony_dirt_path",
+      "name": "Stony Dirt Path",
+      "folder": "library/stony_dirt_path",
+      "category": "dirt",
+      "thumb": "/textures/library/stony_dirt_path/thumb.jpg"
+    },
+    {
+      "id": "brown_mud_03",
+      "name": "Brown Mud 03",
+      "folder": "library/brown_mud_03",
+      "category": "mud",
+      "thumb": "/textures/library/brown_mud_03/thumb.jpg"
+    },
+    {
+      "id": "muddy_tracks",
+      "name": "Muddy Tracks",
+      "folder": "library/muddy_tracks",
+      "category": "mud",
+      "thumb": "/textures/library/muddy_tracks/thumb.jpg"
+    },
+    {
+      "id": "sand_03",
+      "name": "Sand 03",
+      "folder": "library/sand_03",
+      "category": "sand",
+      "thumb": "/textures/library/sand_03/thumb.jpg"
+    },
+    {
+      "id": "damp_beach_sand",
+      "name": "Damp Beach Sand",
+      "folder": "library/damp_beach_sand",
+      "category": "sand",
+      "thumb": "/textures/library/damp_beach_sand/thumb.jpg"
+    },
+    {
+      "id": "red_sand",
+      "name": "Red Sand",
+      "folder": "library/red_sand",
+      "category": "sand",
+      "thumb": "/textures/library/red_sand/thumb.jpg"
+    },
+    {
+      "id": "clean_pebbles",
+      "name": "Clean Pebbles",
+      "folder": "library/clean_pebbles",
+      "category": "gravel",
+      "thumb": "/textures/library/clean_pebbles/thumb.jpg"
+    },
+    {
+      "id": "gravel_floor",
+      "name": "Gravel Floor",
+      "folder": "library/gravel_floor",
+      "category": "gravel",
+      "thumb": "/textures/library/gravel_floor/thumb.jpg"
+    },
+    {
+      "id": "rocks_ground_05",
+      "name": "Rocks Ground 05",
+      "folder": "library/rocks_ground_05",
+      "category": "gravel",
+      "thumb": "/textures/library/rocks_ground_05/thumb.jpg"
+    },
+    {
+      "id": "stone_tiles",
+      "name": "Stone Tiles",
+      "folder": "library/stone_tiles",
+      "category": "cobble and paving",
+      "thumb": "/textures/library/stone_tiles/thumb.jpg"
+    },
+    {
+      "id": "cobblestone_02",
+      "name": "Cobblestone 02",
+      "folder": "library/cobblestone_02",
+      "category": "cobble and paving",
+      "thumb": "/textures/library/cobblestone_02/thumb.jpg"
+    },
+    {
+      "id": "patterned_cobblestone",
+      "name": "Patterned Cobblestone",
+      "folder": "library/patterned_cobblestone",
+      "category": "cobble and paving",
+      "thumb": "/textures/library/patterned_cobblestone/thumb.jpg"
+    },
+    {
+      "id": "square_cobblestone",
+      "name": "Square Cobblestone",
+      "folder": "library/square_cobblestone",
+      "category": "cobble and paving",
+      "thumb": "/textures/library/square_cobblestone/thumb.jpg"
+    },
+    {
+      "id": "stone_floor",
+      "name": "Stone Floor",
+      "folder": "library/stone_floor",
+      "category": "cobble and paving",
+      "thumb": "/textures/library/stone_floor/thumb.jpg"
+    },
+    {
+      "id": "t_brick_floor_002",
+      "name": "Brick Floor 002",
+      "folder": "library/t_brick_floor_002",
+      "category": "brick floors",
+      "thumb": "/textures/library/t_brick_floor_002/thumb.jpg"
+    },
+    {
+      "id": "worn_brick_floor",
+      "name": "Worn Brick Floor",
+      "folder": "library/worn_brick_floor",
+      "category": "brick floors",
+      "thumb": "/textures/library/worn_brick_floor/thumb.jpg"
+    },
+    {
+      "id": "rock_face_03",
+      "name": "Rock Face 03",
+      "folder": "library/rock_face_03",
+      "category": "rock",
+      "thumb": "/textures/library/rock_face_03/thumb.jpg"
+    },
+    {
+      "id": "rock_01",
+      "name": "Rock 01",
+      "folder": "library/rock_01",
+      "category": "rock",
+      "thumb": "/textures/library/rock_01/thumb.jpg"
+    },
+    {
+      "id": "dry_riverbed_rock",
+      "name": "Dry Riverbed Rock",
+      "folder": "library/dry_riverbed_rock",
+      "category": "rock",
+      "thumb": "/textures/library/dry_riverbed_rock/thumb.jpg"
+    },
+    {
+      "id": "dark_rock",
+      "name": "Dark Rock",
+      "folder": "library/dark_rock",
+      "category": "rock",
+      "thumb": "/textures/library/dark_rock/thumb.jpg"
+    },
+    {
+      "id": "snow_02",
+      "name": "Snow 02",
+      "folder": "library/snow_02",
+      "category": "snow",
+      "thumb": "/textures/library/snow_02/thumb.jpg"
+    },
+    {
+      "id": "snow_03",
+      "name": "Snow 03",
+      "folder": "library/snow_03",
+      "category": "snow",
+      "thumb": "/textures/library/snow_03/thumb.jpg"
+    },
+    {
+      "id": "wood_planks",
+      "name": "Wood Planks",
+      "folder": "library/wood_planks",
+      "category": "wood planks",
+      "thumb": "/textures/library/wood_planks/thumb.jpg"
+    },
+    {
+      "id": "weathered_brown_planks",
+      "name": "Weathered Brown Planks",
+      "folder": "library/weathered_brown_planks",
+      "category": "wood planks",
+      "thumb": "/textures/library/weathered_brown_planks/thumb.jpg"
+    },
+    {
+      "id": "weathered_planks",
+      "name": "Weathered Planks",
+      "folder": "library/weathered_planks",
+      "category": "wood planks",
+      "thumb": "/textures/library/weathered_planks/thumb.jpg"
+    },
+    {
+      "id": "old_wood_floor",
+      "name": "Old Wood Floor",
+      "folder": "library/old_wood_floor",
+      "category": "wood planks",
+      "thumb": "/textures/library/old_wood_floor/thumb.jpg"
+    },
+    {
+      "id": "bark_brown_01",
+      "name": "Bark Brown 01",
+      "folder": "library/bark_brown_01",
+      "category": "bark",
+      "thumb": "/textures/library/bark_brown_01/thumb.jpg"
+    },
+    {
+      "id": "pine_bark",
+      "name": "Pine Bark",
+      "folder": "library/pine_bark",
+      "category": "bark",
+      "thumb": "/textures/library/pine_bark/thumb.jpg"
+    }
   ]
 }

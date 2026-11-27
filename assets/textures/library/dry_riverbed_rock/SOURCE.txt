@@ -1,0 +1,5 @@
+Dry Riverbed Rock
+Amal Kumar
+CC0
+https://polyhaven.com/a/dry_riverbed_rock
+Imported for Tenebris with scripts/import-polyhaven.mjs

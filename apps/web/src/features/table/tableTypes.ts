@@ -8,7 +8,7 @@ export type Tool =
     | { type: 'paint'; terrain: TerrainKind | null }     // the rules (wall, water...)
     | { type: 'erase' }                                  // the eraser: terrain, ground, what's placed and height all go
     | { type: 'surface'; surface: Surface | null }       // the look; null = back to the default ground
-    | { type: 'feature'; kind: FeatureKind | null; size: number; color: string }   // place a light, tree...; null = remove
+    | { type: 'feature'; kind: FeatureKind | null; size: number; color: string; model?: string }   // place a light, tree, or library model; null = remove
     | { type: 'place' }
     | { type: 'height'; height: number }                 // raise the ground (0 = flat)
     | { type: 'scene' }                                  // the scene's mood, weather, room and map picture

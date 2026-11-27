@@ -1,0 +1,5 @@
+Wood Planks
+Amal Kumar
+CC0
+https://polyhaven.com/a/wood_planks
+Imported for Tenebris with scripts/import-polyhaven.mjs

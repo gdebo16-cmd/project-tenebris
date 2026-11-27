@@ -1,0 +1,1 @@
+Boulder 01 (boulder_01) from Poly Haven, https://polyhaven.com/a/boulder_01 (CC0). By Rico Cilliers. Downloaded as a 2K glTF on 2026-11-26 and cleaned with npm run model (a few thousand triangles, 2K WebP, one hex wide).

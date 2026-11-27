@@ -1,0 +1,6 @@
+Namaqualand Boulder 02
+Greg Zaal, Rico Cilliers
+CC0
+https://polyhaven.com/a/namaqualand_boulder_02
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

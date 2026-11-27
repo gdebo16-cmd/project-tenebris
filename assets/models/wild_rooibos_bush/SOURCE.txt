@@ -1,0 +1,6 @@
+Wild Rooibos Bush
+James Ray Cock, Jenelle van Heerden
+CC0
+https://polyhaven.com/a/wild_rooibos_bush
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

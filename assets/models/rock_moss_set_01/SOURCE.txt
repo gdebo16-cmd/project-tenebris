@@ -1,0 +1,6 @@
+Rock Moss Set 01
+Kless Gyzen
+CC0
+https://polyhaven.com/a/rock_moss_set_01
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

@@ -15,12 +15,14 @@ import {
     NearestFilter, LinearFilter, LinearMipmapLinearFilter, RepeatWrapping, SRGBColorSpace, type Texture, type Material,
 } from 'three'
 import { surfaceSet, TERRAIN_SETS, textureUrl, type GroundSet } from './groundTextures.ts'
+import { useGraphics } from './graphicsSettings.ts'
 import { NOISE_GLSL, WHERE_GLSL, ICE_COLOUR, ICE_ROUGHNESS, WATER_COLOUR, WATER_FOAM, WATER_RIPPLES, waterTime } from './boardLooks.ts'
 
 type Shader = Parameters<Material['onBeforeCompile']>[0];
 
 export const MAX_GROUND_LAYERS = 16;   // Gabriel's limit: 16 ground pictures per board
-const PICTURE_SIZE = 1024;             // each picture in the stack, in pixels (the sets are 1K)
+const PICTURE_SIZE_HIGH = 2048;        // High: 2K ground pictures
+const PICTURE_SIZE_LOW = 1024;         // Medium and Low: 1K
 const TEXTURE_SCALE = 4;               // one copy of a picture covers 4 x 4 world units (about two hexes)
 const HEIGHT_STEP = 0.35;              // the same as HEIGHT_STEP in TableScenery.tsx (one level of raised ground)
 const WATER_DIP = 0.12;                // how far the ground sinks under water
@@ -80,17 +82,17 @@ function buildHexData(hexes: Hex[], radius: number, layerOf: Map<string, number>
 }
 
 // The board's pictures stacked into two layered textures: colour (+ roughness in alpha) and normal
-function buildPictureStacks(textures: Texture[], layers: number) {
+function buildPictureStacks(textures: Texture[], layers: number, pictureSize: number) {
     const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = PICTURE_SIZE;
+    canvas.width = canvas.height = pictureSize;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) throw new Error('No 2D canvas for the ground pictures');
     const pixels = (image: CanvasImageSource) => {
-        ctx.setTransform(1, 0, 0, -1, 0, PICTURE_SIZE);            // bottom row first, like the graphics card expects
-        ctx.drawImage(image, 0, 0, PICTURE_SIZE, PICTURE_SIZE);
-        return ctx.getImageData(0, 0, PICTURE_SIZE, PICTURE_SIZE).data;
+        ctx.setTransform(1, 0, 0, -1, 0, pictureSize);            // bottom row first, like the graphics card expects
+        ctx.drawImage(image, 0, 0, pictureSize, pictureSize);
+        return ctx.getImageData(0, 0, pictureSize, pictureSize).data;
     };
-    const area = PICTURE_SIZE * PICTURE_SIZE;
+    const area = pictureSize * pictureSize;
     const colour = new Uint8Array(area * 4 * layers), normal = new Uint8Array(area * 4 * layers);
     for (let l = 0; l < layers; l++) {
         const c = pixels(textures[l * 3].image as CanvasImageSource);
@@ -103,7 +105,7 @@ function buildPictureStacks(textures: Texture[], layers: number) {
         }
     }
     const stack = (data: Uint8Array, srgb: boolean) => {
-        const t = new DataArrayTexture(data, PICTURE_SIZE, PICTURE_SIZE, layers);
+        const t = new DataArrayTexture(data, pictureSize, pictureSize, layers);
         t.format = RGBAFormat;
         t.type = UnsignedByteType;
         if (srgb) t.colorSpace = SRGBColorSpace;            // only the colour is a colour; roughness (alpha) stays as it is
@@ -328,11 +330,17 @@ type NaturalProps = {
 
 // The Natural ground: loads only this board's pictures (it suspends until they're ready: wrap it in Suspense)
 export function NaturalGround({ hexes, terrain, surfaces, heights, radius }: NaturalProps) {
+    const graphics = useGraphics();
+    const pictureSize = graphics.textureQuality === '2k' ? PICTURE_SIZE_HIGH : PICTURE_SIZE_LOW;
     const plan = useMemo(() => planGround(hexes, terrain, surfaces, heights), [hexes, terrain, surfaces, heights]);
     const layerKey = plan.layers.join('|');
-    const urls = useMemo(() => layerKey.split('|').flatMap((f) => [textureUrl(f, 'color'), textureUrl(f, 'normal'), textureUrl(f, 'rough')]), [layerKey]);
+    const urls = useMemo(() => layerKey.split('|').flatMap((f) => [
+        textureUrl(f, 'color', graphics.textureQuality),
+        textureUrl(f, 'normal', graphics.textureQuality),
+        textureUrl(f, 'rough', graphics.textureQuality),
+    ]), [layerKey, graphics.textureQuality]);
     const pictures = useTexture(urls) as Texture[];
-    const stacks = useMemo(() => buildPictureStacks(pictures, urls.length / 3), [pictures, urls]);
+    const stacks = useMemo(() => buildPictureStacks(pictures, urls.length / 3, pictureSize), [pictures, urls, pictureSize]);
     useEffect(() => () => { stacks.colour.dispose(); stacks.normal.dispose(); }, [stacks]);
 
     const hexData = useMemo(() => buildHexData(hexes, radius, plan.layerOf, terrain, heights), [hexes, radius, plan, terrain, heights]);
@@ -346,7 +354,7 @@ export function NaturalGround({ hexes, terrain, surfaces, heights, radius }: Nat
         uLayerKind: { value: new Array(16).fill(0) },
     }), []);
     const kinds = new Array(16).fill(0);
-    plan.layers.forEach((folder, i) => { kinds[i] = folder === 'surfaces/snow' ? 1 : folder === 'surfaces/grass' ? 2 : 0; });
+    plan.layers.forEach((folder, i) => { kinds[i] = /snow/.test(folder) ? 1 : /(^|\/|_)grass/.test(folder) && !/cobble/.test(folder) ? 2 : 0; });
     uniforms.uLayerKind.value = kinds;
     uniforms.uHexData.value = hexData.texture;
     uniforms.uHexOffset.value = hexData.offset;

@@ -1,0 +1,5 @@
+Weathered Planks
+Dario Barresi, Dimitrios Savva
+CC0
+https://polyhaven.com/a/weathered_planks
+Imported for Tenebris with scripts/import-polyhaven.mjs

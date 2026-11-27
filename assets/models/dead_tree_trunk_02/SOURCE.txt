@@ -1,0 +1,6 @@
+Dead Tree Trunk 02
+Jenelle van Heerden, Rico Cilliers
+CC0
+https://polyhaven.com/a/dead_tree_trunk_02
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

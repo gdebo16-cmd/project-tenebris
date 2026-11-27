@@ -1,0 +1,5 @@
+Patterned Cobblestone
+Rob Tuytel
+CC0
+https://polyhaven.com/a/patterned_cobblestone
+Imported for Tenebris with scripts/import-polyhaven.mjs

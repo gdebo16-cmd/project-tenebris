@@ -1,0 +1,6 @@
+Shrub 03
+Rico Cilliers
+CC0
+https://polyhaven.com/a/shrub_03
+Imported for Tenebris with scripts/import-polyhaven.mjs
+Cleaned with npm run model (high + light).

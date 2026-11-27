@@ -1,0 +1,5 @@
+Snow 03
+Rob Tuytel
+CC0
+https://polyhaven.com/a/snow_03
+Imported for Tenebris with scripts/import-polyhaven.mjs

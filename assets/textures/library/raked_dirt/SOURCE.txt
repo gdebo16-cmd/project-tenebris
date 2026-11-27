@@ -1,0 +1,5 @@
+Raked Dirt
+Dario Barresi, Dimitrios Savva
+CC0
+https://polyhaven.com/a/raked_dirt
+Imported for Tenebris with scripts/import-polyhaven.mjs

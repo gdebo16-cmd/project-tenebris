@@ -1,0 +1,5 @@
+Weathered Brown Planks
+Dimitrios Savva, Rico Cilliers
+CC0
+https://polyhaven.com/a/weathered_brown_planks
+Imported for Tenebris with scripts/import-polyhaven.mjs

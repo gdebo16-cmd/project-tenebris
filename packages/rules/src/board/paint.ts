@@ -1,3 +1,5 @@
+import { isLibraryPaint } from './paintLibrary.ts';
+
 export type GroundLook =
     | 'grass'
     | 'dirt'
@@ -13,6 +15,8 @@ export type GroundLook =
     | 'bark';
 
 export const SURFACES = ['grass', 'moss', 'dirt', 'cobble', 'flagstone', 'rock', 'bricks', 'snow', 'bark', 'woodfloor', 'roof'] as const;
-export type Surface = (typeof SURFACES)[number];
+export type CoreSurface = (typeof SURFACES)[number];
+export type Surface = CoreSurface | string;
 export const DEFAULT_SURFACE: Surface = 'grass';
-export const isSurface = (value: unknown): value is Surface => SURFACES.includes(value as Surface);
+export const isCoreSurface = (value: unknown): value is CoreSurface => typeof value === 'string' && (SURFACES as readonly string[]).includes(value);
+export const isSurface = (value: unknown): value is Surface => isCoreSurface(value) || isLibraryPaint(value);

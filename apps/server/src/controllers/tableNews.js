@@ -4,7 +4,7 @@
 // importing each other.
 import { monsterToCreature, healthWord } from '@tenebris/rules/monster';
 import { initiativeOf } from '@tenebris/rules/initiative';
-import { wallsOf, hexKey, radiusOf, onBoard as hexOnBoard } from '@tenebris/rules/board';
+import { wallsOf, sightOf, hexKey, radiusOf, onBoard as hexOnBoard } from '@tenebris/rules/board';
 import { visibleFrom, areaHexes } from '@tenebris/rules/sight';
 import * as Scenes from '../models/sceneModel.js';
 import { getMonster } from '../models/monsterPack.js';
@@ -51,7 +51,7 @@ const isEye = (row) => row.kind === 'character' || (row.kind === 'summon' && row
 // What the party sees now and has seen so far, or null when the scene's fog is off. Saves "seen so far" when it grows.
 export async function visionOf(scene, rows) {
     if (!scene?.look?.fog) return null;
-    const blockers = wallsOf(scene.terrain ?? {}, scene.features ?? {});
+    const blockers = sightOf(scene.terrain ?? {}, scene.features ?? {});
     const radius = radiusOf(scene.look);
     const onBoard = (key) => { const [q, r] = key.split(',').map(Number); return hexOnBoard({ q, r }, radius); };   // nothing beyond the board is tracked
     const visible = new Set([...visibleFrom(rows.filter(isEye).map((r) => ({ q: r.q, r: r.r })), blockers, radius * 2)].filter(onBoard));

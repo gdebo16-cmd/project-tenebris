@@ -1,0 +1,5 @@
+Old Wood Floor
+Guillaume Monsergent
+CC0
+https://polyhaven.com/a/old_wood_floor
+Imported for Tenebris with scripts/import-polyhaven.mjs

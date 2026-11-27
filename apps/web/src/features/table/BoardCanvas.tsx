@@ -16,6 +16,7 @@ import { Overlays, AreaFlash, Fog } from './BoardActs.tsx'
 import { TokenOnBoard } from './TokenOnBoard.tsx'
 import { BoardCamera } from './BoardCamera.tsx'
 import { HexGrid } from './HexGrid.tsx'
+import { useGraphics } from './graphicsSettings.ts'
 
 // The 3D board: the room, the table, the hexes, tokens, effects and camera (R3F).
 // memo: these redraw only when their own props change (not every time anything on the page changes)
@@ -26,14 +27,15 @@ const StillMap = memo(MapPicture);
 const StillTorches = memo(Torches);
 
 export function BoardCanvas({ c }: { c: TableController }) {
-    const { radius, hexes, data, terrain, move, view, fitKey, surfaces, features, walls, look, heights, mood, dpr, showPerf, noEffects, grassHexes, tool, selected, boardRef, woodColor, surfaceColor, isDm, tokens, overlays, fog, acting, brush, painting, shapeOrigin, newest, notices, selectedToken, currentAt, onHexClick, onStroke, onTokenClick, mode } = c;
+    const { radius, hexes, data, terrain, move, view, fitKey, surfaces, features, walls, look, heights, mood, showPerf, noEffects, grassHexes, tool, selected, boardRef, woodColor, surfaceColor, isDm, tokens, overlays, fog, acting, brush, painting, shapeOrigin, newest, notices, selectedToken, currentAt, onHexClick, onStroke, onTokenClick, mode } = c;
+    const graphics = useGraphics();
     const style = styleOf(look);              // T1: Tiles or Natural
     return (
-            <Canvas shadows orthographic dpr={dpr} camera={{ position: [0, 100, 0], zoom: startZoom() }}>
+            <Canvas key={graphics.level} shadows={graphics.shadows !== 'off'} orthographic dpr={graphics.dpr} gl={{ antialias: graphics.antialias }} camera={{ position: [0, 100, 0], zoom: startZoom() }}>
                 {tableDebug && <FrameWatch />}
                 {showPerf && <StatsGl />}
                 {/* the lamp over the table, the room light and reflections (BoardAtmosphere.tsx) */}
-                <BoardLights mood={mood} moodName={look.mood ?? 'day'} radius={radius} />
+                <BoardLights mood={mood} moodName={look.mood ?? 'day'} radius={radius} shadowMapSize={graphics.shadowMapSize} castShadow={graphics.shadows !== 'off'} />
 
                 {/* the room around the table: its colour comes from the scene's mood (BoardWorld.tsx) */}
                 <color attach="background" args={[mood.background]} />

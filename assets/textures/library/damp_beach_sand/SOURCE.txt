@@ -1,0 +1,5 @@
+Damp Beach Sand
+Dimitrios Savva
+CC0
+https://polyhaven.com/a/damp_beach_sand
+Imported for Tenebris with scripts/import-polyhaven.mjs

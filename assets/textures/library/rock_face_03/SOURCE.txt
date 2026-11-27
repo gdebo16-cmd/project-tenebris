@@ -1,0 +1,5 @@
+Rock Face 03
+Dario Barresi, Rico Cilliers
+CC0
+https://polyhaven.com/a/rock_face_03
+Imported for Tenebris with scripts/import-polyhaven.mjs

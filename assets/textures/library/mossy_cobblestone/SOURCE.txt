@@ -1,0 +1,5 @@
+Mossy Cobblestone
+Sơn Nguyễn
+CC0
+https://polyhaven.com/a/mossy_cobblestone
+Imported for Tenebris with scripts/import-polyhaven.mjs

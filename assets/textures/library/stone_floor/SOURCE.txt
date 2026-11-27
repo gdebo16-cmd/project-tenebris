@@ -1,0 +1,5 @@
+Stone Floor
+Dimitrios Savva
+CC0
+https://polyhaven.com/a/stone_floor
+Imported for Tenebris with scripts/import-polyhaven.mjs
