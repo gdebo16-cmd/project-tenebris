@@ -8,12 +8,12 @@ import { useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import Loader from '../../components/ui/Loader.jsx';
 import socket from '../../utils/socket.js';
-import sheet from '../sheet/Sheet.module.css';
-import layout from '../sheet/CharacterSheetPage.module.css'; // the sheet pages' header, footer and sheet area
+import sheet from '../../styles/components/sheets/Sheet.module.css';
+import layout from '../../styles/features/sheets/CharacterSheetPage.module.css'; // the sheet pages' header, footer and sheet area
 import useHeaderStatusBar from '../../hooks/useHeaderStatusBar.ts';
-import SheetLayout from '../sheet/SheetLayout.tsx';
-import type { FeedEntry } from '../sheet/blocks/RollFeed.tsx';
-import { messageOf, useCharacterSheetTools, useMonsterSheetTools, type Reporter } from '../sheet/sheetTools.ts';
+import SheetLayout from '../../components/sheets/SheetLayout.tsx';
+import type { FeedEntry } from '../../components/sheets/blocks/RollFeed.tsx';
+import { messageOf, useCharacterSheetTools, useMonsterSheetTools, type Reporter } from '../sheets/sheetTools.ts';
 import { dmKey, useDmChange, useDmPage } from './dmQueries.ts';
 import { DmContext, type DmTools } from './DmContext.tsx';
 

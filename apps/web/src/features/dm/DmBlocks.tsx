@@ -5,9 +5,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { ApiError } from '../../api.ts';
-import sheet from '../sheet/Sheet.module.css';
+import sheet from '../../styles/components/sheets/Sheet.module.css';
 import styles from './DmPage.module.css';
-import RollFeed from '../sheet/blocks/RollFeed.tsx';
+import RollFeed from '../../components/sheets/blocks/RollFeed.tsx';
 import { useMonsterCatalog } from './dmQueries.ts';
 import { useDmTools } from './DmContext.tsx';
 

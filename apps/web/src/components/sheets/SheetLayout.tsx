@@ -1,0 +1,328 @@
+// Draws a sheet from its layout and lets the player rearrange it.
+// Wide screen: a 12 × 16 grid that fills the screen (no page scrolling). Each block fills its cells; what doesn't fit
+// scrolls inside the block. Phone: the same blocks in reading order, each as tall as its rows (keeping the grid's
+// proportions), grouped under Stats / Combat / Condition on sheets with phone tabs; the page scrolls.
+// Content smaller than its block is scaled up to fill it (Fit below); scrollbars are hidden (content still scrolls).
+// Editing (started from the sidebar). Each sheet has two layouts, arranged separately and saved separately:
+//   Desktop (wide screens only): the cells show, drag a block to move it, drag its corner to resize it; or use the keyboard.
+//   Mobile (any screen): the blocks in a column as the phone shows them, with controls to move (up/down), set the
+//   height (- / +) and hide each one. The phone shows its mobile layout; until it's arranged, that follows the desktop one.
+// The editor's Desktop / Mobile buttons switch between them; Save saves whichever were changed.
+import { Fragment, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
+import { GRID, LAYOUT_DEVICES, moveInStack, nudgeBlock, phoneStack, placeBlock, readingOrder, removeBlock, setBlockTab, setStackHeight, type LayoutDevice, type LayoutItem, type SheetKind as LayoutKind, type SheetLayout as Layout } from '@tenebris/rules/layout';
+import shared from '../../styles/components/sheets/Sheet.module.css';
+import css from '../../styles/components/sheets/SheetLayout.module.css';
+import { PHONE_TABS, blockDef, blocksFor, isBlockId, type BlockId, type PhoneTab } from './blocks/registry.tsx';
+import { SheetContext } from './blocks/SheetContext.tsx';
+import { DEFAULT_LAYOUTS, PHONE_TABS_ON, useSheetLayout } from '../../features/sheets/layouts.ts';
+import { LayoutEditor, TabPicker, tabOf } from './LayoutEditor.tsx';
+import { EDIT_LAYOUT_EVENT, isWideScreen, useIsWide } from '../../features/sheets/layoutEvents.ts';
+
+type Spot = { col: number; row: number; colSpan: number; rowSpan: number };
+type Drag = { block: BlockId; mode: 'move' | 'resize'; start: { col: number; row: number }; orig: Spot; to: Spot; ok: boolean };
+type Result = { error: string } | { layout: Layout };
+
+const place = (s: Spot) => ({ '--col': `${s.col} / span ${s.colSpan}`, '--row': `${s.row} / span ${s.rowSpan}`, '--row-span': s.rowSpan }) as CSSProperties;
+const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
+
+// Scales a block's content to fill its box: up when the content is smaller, down when it's bigger, so the block's
+// content grows and shrinks with the block. Uses CSS zoom, so the content reflows at the new size instead of being
+// stretched. Re-fits when the box changes size (window, layout, resizing in the editor) or the content changes.
+// Blocks marked `scrolls` (growing lists: actions, spells...) only scale up; what doesn't fit scrolls out of sight.
+// Blocks marked `fills` (grids of tiles: stats, skills...) aren't zoomed at all: their tiles stretch to fill the block
+// in both directions and their text sizes itself to each tile (container units in the block's CSS). Zoom keeps the
+// content's shape, so in a tall, narrow block it could only ever fill the width; stretching fills both.
+// So do all blocks on a phone, where text shrunk to fit would be too small to read. Below MIN_ZOOM, a block scrolls too.
+// "Fits" means two things: the content is no taller than the box, and nothing inside spills sideways
+// (a stat label wider than its tile, a row of buttons wider than the block). A tall, narrow block stops growing
+// as soon as its widest piece reaches the edge.
+const MAX_ZOOM = 1.6;
+const MIN_ZOOM = 0.5;
+
+// Pictures and form fields hold nothing that could spill (and images report odd widths), so they're skipped
+const NO_CONTENT = new Set(['IMG', 'INPUT', 'SELECT', 'TEXTAREA', 'VIDEO', 'CANVAS']);
+
+function spillsSideways(el: HTMLElement) {
+    if (el.scrollWidth > el.clientWidth + 1) return true;
+    for (const node of el.querySelectorAll<HTMLElement>('*')) {
+        if (NO_CONTENT.has(node.tagName)) continue;
+        if (node.clientWidth > 0 && node.scrollWidth > node.clientWidth + 1) return true;
+    }
+    return false;
+}
+
+type Scaling = 'both' | 'up' | 'none';
+const scalingOf = (def: { scrolls?: true; fills?: true }): Scaling => (def.fills ? 'none' : def.scrolls ? 'up' : 'both');
+
+function Fit({ children, scaling }: { children: ReactNode; scaling: Scaling }) {
+    const ref = useRef<HTMLDivElement>(null);
+    useLayoutEffect(() => {
+        const el = ref.current;
+        const box = el?.parentElement;
+        if (!el || !box) return;
+        let frame = 0;
+        const fit = () => {
+            const room = box.clientHeight;
+            if (!room) return;
+            el.style.zoom = '1';
+            el.style.minHeight = '0px';
+            const fits = () => el.getBoundingClientRect().height <= room && !spillsSideways(el);
+            let zoom = 1;
+            if (scaling === 'none') {
+                // the block stretches itself to fill (see above): just give it the whole cell area
+            } else if (el.getBoundingClientRect().height < room - 1 && fits()) {
+                // The largest zoom at which the content still fits (a few halving steps are plenty)
+                let lo = 1, hi = MAX_ZOOM;
+                for (let i = 0; i < 7; i++) {
+                    const mid = (lo + hi) / 2;
+                    el.style.zoom = String(mid);
+                    if (fits()) lo = mid; else hi = mid;
+                }
+                zoom = lo;
+            } else if (scaling === 'both' && isWideScreen() && !fits()) {
+                // Too big at full size: the largest zoom, down to MIN_ZOOM, at which it fits
+                // (still too big at MIN_ZOOM? it stays there and the rest scrolls)
+                let lo = MIN_ZOOM, hi = 1;
+                for (let i = 0; i < 7; i++) {
+                    const mid = (lo + hi) / 2;
+                    el.style.zoom = String(mid);
+                    if (fits()) lo = mid; else hi = mid;
+                }
+                zoom = lo;
+            }
+            el.style.zoom = String(zoom);
+            el.style.minHeight = `${room / zoom}px`;   // the block's own box still fills the whole cell area
+        };
+        const later = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(fit); };
+        fit();
+        const resized = new ResizeObserver(later);
+        resized.observe(box);
+        const changed = new MutationObserver(later);
+        changed.observe(el, { childList: true, subtree: true, characterData: true });
+        return () => { resized.disconnect(); changed.disconnect(); cancelAnimationFrame(frame); };
+    }, [scaling]);
+    return <div ref={ref} className={css.fit}>{children}</div>;
+}
+
+// kind: which layout to draw. A sheet page leaves it out (its sheet's kind); the DM page passes 'dm'.
+export default function SheetLayout({ kind: kindProp }: { kind?: LayoutKind }) {
+    const tools = useContext(SheetContext);   // the sheet's tools (none on the DM page: its blocks bring their own)
+    const kind: LayoutKind = kindProp ?? tools!.kind;
+    const wide = useIsWide();
+    const controls = { desktop: useSheetLayout(kind, 'desktop'), mobile: useSheetLayout(kind, 'mobile') };
+    const [editDevice, setEditDevice] = useState<LayoutDevice | null>(null);   // the layout being arranged; null = not editing
+    const [drafts, setDrafts] = useState<Partial<Record<LayoutDevice, Layout>>>({});   // changed but not yet saved
+    const [resets, setResets] = useState<Partial<Record<LayoutDevice, true>>>({});     // reset: saving forgets the player's own layout
+    const [message, setMessage] = useState('');
+    const tabs = PHONE_TABS[kind];
+    const [phoneTab, setPhoneTab] = useState<PhoneTab>(tabs[0].id);
+    const [drag, setDrag] = useState<Drag | null>(null);
+    const gridRef = useRef<HTMLDivElement>(null);
+    const editing = editDevice !== null;
+    const device: LayoutDevice = editDevice ?? (wide ? 'desktop' : 'mobile');   // the layout on screen
+    const layoutOf = (d: LayoutDevice) => drafts[d] ?? controls[d].layout;
+    const layout = layoutOf(device);
+    const draft = editing ? layout : null;
+    const saving = controls.desktop.saving || controls.mobile.saving;
+    const blocks = blocksFor(kind);
+    const tabsOn = PHONE_TABS_ON[kind] && !editing;
+    const phoneEditing = editDevice === 'mobile';
+
+    // The sidebar's "Edit sheet layout" (layoutEvents.ts): arranges the layout of the screen you're on
+    useEffect(() => {
+        const start = () => { setEditDevice(isWideScreen() ? 'desktop' : 'mobile'); setDrafts({}); setResets({}); setMessage(''); };
+        window.addEventListener(EDIT_LAYOUT_EVENT, start);
+        return () => window.removeEventListener(EDIT_LAYOUT_EVENT, start);
+    }, []);
+
+    const stopEditing = () => { setEditDevice(null); setDrafts({}); setResets({}); setMessage(''); };
+    const change = (r: Result) => {
+        if ('error' in r) { setMessage(r.error); return; }
+        setDrafts((d) => ({ ...d, [device]: r.layout }));
+        setResets((o) => ({ ...o, [device]: undefined }));
+        setMessage('');
+    };
+    // Back to where it starts: desktop = the default layout, mobile = the desktop layout stacked
+    const resetDraft = () => {
+        const start = device === 'desktop' ? DEFAULT_LAYOUTS[kind] : phoneStack(layoutOf('desktop'));
+        setDrafts((d) => ({ ...d, [device]: start }));
+        setResets((o) => ({ ...o, [device]: true }));
+        setMessage('');
+    };
+    const saveDrafts = async () => {
+        for (const d of LAYOUT_DEVICES) {
+            const next = drafts[d];
+            if (!next && !resets[d]) continue;
+            // Reset and saved unchanged: forget the player's layout, so future defaults reach them too
+            const error = await controls[d].save(resets[d] ? null : next!);
+            if (error) { setMessage(error); return; }
+        }
+        stopEditing();
+    };
+    // ---- Dragging: the pointer's cell on the grid ----
+    const cellAt = (x: number, y: number) => {
+        const r = gridRef.current!.getBoundingClientRect();
+        return {
+            col: clamp(Math.floor(((x - r.left) / r.width) * GRID.columns) + 1, 1, GRID.columns),
+            row: clamp(Math.floor(((y - r.top) / r.height) * GRID.rows) + 1, 1, GRID.rows),
+        };
+    };
+    const startDrag = (e: PointerEvent<HTMLElement>, item: LayoutItem, mode: Drag['mode']) => {
+        if (!draft || e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        const spot = { col: item.col, row: item.row, colSpan: item.colSpan, rowSpan: item.rowSpan };
+        setDrag({ block: item.block as BlockId, mode, start: cellAt(e.clientX, e.clientY), orig: spot, to: spot, ok: true });
+    };
+    const moveDrag = (e: PointerEvent<HTMLElement>) => {
+        if (!drag || !draft) return;
+        const at = cellAt(e.clientX, e.clientY);
+        const o = drag.orig;
+        const to = drag.mode === 'move'
+            ? {
+                ...o,
+                col: clamp(o.col + at.col - drag.start.col, 1, GRID.columns - o.colSpan + 1),
+                row: clamp(o.row + at.row - drag.start.row, 1, GRID.rows - o.rowSpan + 1),
+            }
+            : { ...o, colSpan: Math.max(1, at.col - o.col + 1), rowSpan: Math.max(1, at.row - o.row + 1) };
+        if (to.col !== drag.to.col || to.row !== drag.to.row || to.colSpan !== drag.to.colSpan || to.rowSpan !== drag.to.rowSpan) {
+            setDrag({ ...drag, to, ok: 'layout' in placeBlock(draft, drag.block, to) });
+        }
+    };
+    const endDrag = () => {
+        if (!drag || !draft) return;
+        const moved = drag.to.col !== drag.orig.col || drag.to.row !== drag.orig.row || drag.to.colSpan !== drag.orig.colSpan || drag.to.rowSpan !== drag.orig.rowSpan;
+        if (moved) change(placeBlock(draft, drag.block, drag.to));
+        setDrag(null);
+    };
+
+    // ---- Keyboard: arrows move, Shift + arrows resize, Delete hides ----
+    const onKey = (e: KeyboardEvent<HTMLElement>, block: BlockId) => {
+        if (!draft) return;
+        const step: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+        if (step[e.key]) {
+            e.preventDefault();
+            const [x, y] = step[e.key];
+            change(nudgeBlock(draft, block, e.shiftKey ? { colSpan: x, rowSpan: y } : { col: x, row: y }));
+        } else if (e.key === 'Delete' || e.key === 'Backspace') {
+            e.preventDefault();
+            change({ layout: removeBlock(draft, block) });
+        }
+    };
+
+    // The blocks to draw, in reading order. While editing, blocks shown only to some people (the roll feed) still show.
+    const items = readingOrder(layout.items).flatMap((item) => {
+        if (!isBlockId(item.block)) return [];
+        const def = blockDef(item.block);
+        if (!def.sheets.includes(kind)) return [];
+        const visible = !def.show || !tools || def.show(tools);
+        const tab = tabOf(item, def, kind);
+        return visible || editing ? [{ item, id: item.block, def, visible, tab }] : [];
+    });
+    // On a phone the tab bar goes after the blocks that lead the page without a tab (the main area, e.g. the header)
+    const lead = items.findIndex(({ tab }) => tab !== null);
+    const tabBarAt = lead === -1 ? items.length : lead;
+    const tabBar = tabsOn && (
+        <nav className={css.phoneTabs} aria-label="Sheet areas">
+            {tabs.map((t) => (
+                <button key={t.id} type="button" className={phoneTab === t.id ? shared.tabActive : shared.tab}
+                    aria-pressed={phoneTab === t.id} onClick={() => setPhoneTab(t.id)}>{t.label}</button>
+            ))}
+        </nav>
+    );
+
+    return (
+        <div className={css.root}>
+            {editing && (
+                <LayoutEditor layout={layout} device={device} canDesktop={wide} kind={kind} blocks={blocks} onChange={change} onSave={saveDrafts} saving={saving} message={message}
+                    onDevice={(d) => { setEditDevice(d); setMessage(''); }} onCancel={stopEditing} onReset={resetDraft} />
+            )}
+
+            {phoneEditing && (
+                <div className={css.phoneEdit}>
+                    {items.map(({ item, id, def, visible, tab }, i) => {
+                        const Block = def.Component;
+                        const rows = Math.min(GRID.rows, Math.max(1, item.rowSpan));
+                        return (
+                            <div key={id} className={`${css.phoneItem} ${css[`rows${rows}`]}`} data-block={id}>
+                                <div className={css.phoneBar}>
+                                    <span className={css.tagName}>{def.label}</span>
+                                    <span className={css.tagSize}>{rows} tall</span>
+                                    <TabPicker kind={kind} value={tab} label={def.label} onChange={(next) => change(setBlockTab(layout, id, next, kind))} />
+                                    <button type="button" className={css.phoneButton} aria-label={`Move ${def.label} up`} disabled={i === 0}
+                                        onClick={() => change({ layout: moveInStack(layout, id, -1) })}>▲</button>
+                                    <button type="button" className={css.phoneButton} aria-label={`Move ${def.label} down`} disabled={i === items.length - 1}
+                                        onClick={() => change({ layout: moveInStack(layout, id, 1) })}>▼</button>
+                                    <button type="button" className={css.phoneButton} aria-label={`Make ${def.label} shorter`} disabled={rows <= 1}
+                                        onClick={() => change({ layout: setStackHeight(layout, id, rows - 1) })}>−</button>
+                                    <button type="button" className={css.phoneButton} aria-label={`Make ${def.label} taller`} disabled={rows >= GRID.rows}
+                                        onClick={() => change({ layout: setStackHeight(layout, id, rows + 1) })}>+</button>
+                                    <button type="button" className={css.phoneButton} aria-label={`Hide ${def.label}`}
+                                        onClick={() => change({ layout: phoneStack(removeBlock(layout, id)) })}>×</button>
+                                </div>
+                                {/* A preview: nothing inside can be clicked while arranging */}
+                                <div className={css.preview} inert>
+                                    <Fit scaling={scalingOf(def)}>{visible ? <Block layout={layout} /> : <p className={shared.muted}>{def.label}: {def.note}</p>}</Fit>
+                                </div>
+                            </div>
+                        );
+                    })}
+                    <div className={css.phoneBottom}>
+                        <button type="button" className={`${shared.button} ${shared.primary}`} disabled={saving} onClick={saveDrafts}>{saving ? 'Saving…' : 'Save'}</button>
+                        <button type="button" className={shared.button} disabled={saving} onClick={stopEditing}>Cancel</button>
+                    </div>
+                </div>
+            )}
+
+            {!phoneEditing && <div ref={gridRef} className={editing ? `${css.grid} ${css.gridEditing}` : css.grid}>
+                {/* The cells, so the grid shows while arranging */}
+                {editing && Array.from({ length: GRID.columns * GRID.rows }, (_, i) => (
+                    <div key={`cell${i}`} className={css.cell} style={place({ col: (i % GRID.columns) + 1, row: Math.floor(i / GRID.columns) + 1, colSpan: 1, rowSpan: 1 })} aria-hidden="true" />
+                ))}
+
+                {items.map(({ item, id, def, visible, tab }, i) => {
+                    const hiddenOnPhone = tabsOn && tab !== null && tab !== phoneTab;
+                    const Block = def.Component;
+                    if (!editing) {
+                        return (
+                            <Fragment key={id}>
+                                {i === tabBarAt && tabBar}
+                                <div className={hiddenOnPhone ? css.itemPhoneHidden : css.item} style={place(item)} data-block={id}>
+                                    <Fit scaling={scalingOf(def)}><Block layout={layout} /></Fit>
+                                </div>
+                            </Fragment>
+                        );
+                    }
+                    const dragging = drag?.block === id;
+                    return (
+                        // The whole block is the handle: drag it anywhere to move it. Its name, size and × float on top
+                        // (shown on hover or focus) without taking any room, so the preview looks like the real block.
+                        <div key={id} className={dragging ? `${css.itemEditing} ${css.itemDragging}` : css.itemEditing} style={place(item)} data-block={id}
+                            tabIndex={0} role="group" onKeyDown={(e) => onKey(e, id)}
+                            onPointerDown={(e) => startDrag(e, item, 'move')} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={() => setDrag(null)}
+                            aria-label={`${def.label}. Drag or use the arrow keys to move it, Shift and arrows to resize it, Delete to hide it.`}>
+                            {/* A preview: nothing inside can be clicked while arranging */}
+                            <div className={css.preview} inert>
+                                <Fit scaling={scalingOf(def)}>{visible ? <Block layout={layout} /> : <p className={shared.muted}>{def.label}: {def.note}</p>}</Fit>
+                            </div>
+                            <div className={css.tag}>
+                                <span className={css.tagName}>{def.label}</span>
+                                <span className={css.tagSize}>{item.colSpan}×{item.rowSpan}</span>
+                                <TabPicker kind={kind} value={tab} label={def.label} onChange={(next) => change(setBlockTab(layout, id, next, kind))} />
+                                <button type="button" className={css.hide} aria-label={`Hide ${def.label}`} title="Hide"
+                                    onPointerDown={(e) => e.stopPropagation()} onClick={() => change({ layout: removeBlock(layout, id) })}>×</button>
+                            </div>
+                            <div className={css.resize} aria-hidden="true" title="Drag to resize"
+                                onPointerDown={(e) => startDrag(e, item, 'resize')} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={() => setDrag(null)} />
+                        </div>
+                    );
+                })}
+                {!editing && tabBarAt === items.length && tabBar}
+
+                {/* Where the block will land: green if it fits, red if something's in the way */}
+                {drag && <div className={drag.ok ? css.ghost : css.ghostBlocked} style={place(drag.to)} aria-hidden="true" />}
+            </div>}
+        </div>
+    );
+}

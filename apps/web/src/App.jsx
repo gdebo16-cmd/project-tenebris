@@ -1,8 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import RequireLogin from './components/layout/RequireLogin';
-import CharacterSheetPage from './features/sheet/CharacterSheetPage.tsx';
-import MonsterSheetPage from './features/sheet/MonsterSheetPage.tsx';
+import CharacterSheetPage from './features/sheets/CharacterSheetPage.tsx';
+import MonsterSheetPage from './features/sheets/MonsterSheetPage.tsx';
 import DmPage from './features/dm/DmPage.tsx';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';

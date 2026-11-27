@@ -2,9 +2,9 @@
 // turn it is, or the ones the DM picked). The DM page provides it once; its blocks (DmBlocks.tsx) read it, and so do
 // the "current monster" / "current player" blocks, which are the ordinary sheet blocks drawn for that creature.
 import { createContext, useContext, type ReactNode } from 'react';
-import shared from '../sheet/Sheet.module.css';
-import { SheetContext, type SheetTools } from '../sheet/blocks/SheetContext.tsx';
-import type { FeedEntry } from '../sheet/blocks/RollFeed.tsx';
+import shared from '../../styles/components/sheets/Sheet.module.css';
+import { SheetContext, type SheetTools } from '../../components/sheets/blocks/SheetContext.tsx';
+import type { FeedEntry } from '../../components/sheets/blocks/RollFeed.tsx';
 import type { DmPageData, useDmChange } from './dmQueries.ts';
 
 export type DmTools = {

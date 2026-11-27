@@ -1,5 +1,5 @@
 import { useMatch } from 'react-router';
-import { requestLayoutEdit } from '../../features/sheet/layoutEvents.ts';
+import { requestLayoutEdit } from '../../features/sheets/layoutEvents.ts';
 import styles from '../../styles/components/layout/Sidebar.module.css';
 
 // "Edit sheet layout": only on a sheet (a character's, a monster's, or the DM page). On a wide screen it arranges the
