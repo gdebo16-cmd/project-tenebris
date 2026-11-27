@@ -1,9 +1,9 @@
 // Species, sub-species or variant, eyes, size and an optional look. The server checks the save.
 import { useEffect, useState } from 'react';
 import { ApiError } from '../../../api.ts';
-import formStyles from '../CharacterForm.module.css';
-import styles from './SpeciesTab.module.css';
-import { useCharacterForm, useSaveTab } from '../queries.ts';
+import formStyles from '../../../styles/features/character-form/CharacterForm.module.css';
+import styles from '../../../styles/components/character-form/tabs/SpeciesTab.module.css';
+import { useCharacterForm, useSaveTab } from '../../../features/character-form/queries.ts';
 
 // A variant's own picture: igni + Ember -> /races/igni-ember.png (Art's files, all lowercase)
 function variantImage(key: string, variant: string): string {

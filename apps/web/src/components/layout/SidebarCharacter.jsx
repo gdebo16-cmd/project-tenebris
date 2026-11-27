@@ -1,5 +1,5 @@
 import { Link, useMatch } from 'react-router';
-import { FORM_TAB_LIST } from '../../features/character-form/FormTabs.tsx';
+import { FORM_TAB_LIST } from '../character-form/FormTabs.tsx';
 import { useSheet } from '../../features/sheets/queries.ts';
 import styles from '../../styles/components/layout/Sidebar.module.css';
 

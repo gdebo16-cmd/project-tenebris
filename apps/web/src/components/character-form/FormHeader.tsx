@@ -1,8 +1,8 @@
 // Name, level and portrait. Stays on screen no matter which tab is open.
 import { useState } from 'react';
 import { levelChoices, DEFAULT_CHARACTER_NAME } from '@tenebris/rules/characterForm';
-import styles from './CharacterForm.module.css';
-import { usePortraits } from './queries.ts';
+import styles from '../../styles/features/character-form/CharacterForm.module.css';
+import { usePortraits } from '../../features/character-form/queries.ts';
 
 const DEFAULT_PORTRAIT = '/default-character.png';
 

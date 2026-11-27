@@ -1,6 +1,6 @@
 // The five tabs. The open one lives in the URL (?tab=species) so a reload stays on it.
 import { useEffect, useRef, type KeyboardEvent } from 'react';
-import styles from './CharacterForm.module.css';
+import styles from '../../styles/features/character-form/CharacterForm.module.css';
 
 export const FORM_TAB_LIST = [
     { id: 'species', long: 'Species & look', short: 'Species' },

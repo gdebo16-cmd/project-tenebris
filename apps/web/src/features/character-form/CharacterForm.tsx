@@ -3,15 +3,15 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { ApiError } from '../../api.ts';
 import Loader from '../../components/ui/Loader.jsx';
-import styles from './CharacterForm.module.css';
-import FormHeader from './FormHeader.tsx';
-import FormTabs, { isFormTab, type FormTabId } from './FormTabs.tsx';
+import styles from '../../styles/features/character-form/CharacterForm.module.css';
+import FormHeader from '../../components/character-form/FormHeader.tsx';
+import FormTabs, { isFormTab, type FormTabId } from '../../components/character-form/FormTabs.tsx';
 import { useCharacterForm, useCreateCharacter, useSaveTab } from './queries.ts';
-import SpeciesTab from './tabs/SpeciesTab.tsx';
-import RoleTab from './tabs/RoleTab.tsx';
-import TraitsTab from './tabs/TraitsTab.tsx';
-import PersonalityTab from './tabs/PersonalityTab.tsx';
-import GearTab from './tabs/GearTab.tsx';
+import SpeciesTab from '../../components/character-form/tabs/SpeciesTab.tsx';
+import RoleTab from '../../components/character-form/tabs/RoleTab.tsx';
+import TraitsTab from '../../components/character-form/tabs/TraitsTab.tsx';
+import PersonalityTab from '../../components/character-form/tabs/PersonalityTab.tsx';
+import GearTab from '../../components/character-form/tabs/GearTab.tsx';
 
 export default function CharacterForm() {
     const { id } = useParams();

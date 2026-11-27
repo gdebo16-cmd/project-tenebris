@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { CALLING_LEVEL } from '@tenebris/rules/characterOptions';
 import { ApiError } from '../../../api.ts';
 import useContent from '../../../hooks/useContent.js';
-import formStyles from '../CharacterForm.module.css';
-import styles from './RoleTab.module.css';
-import { useCharacterForm, useCharacterOptions, useSaveTab } from '../queries.ts';
+import formStyles from '../../../styles/features/character-form/CharacterForm.module.css';
+import styles from '../../../styles/components/character-form/tabs/RoleTab.module.css';
+import { useCharacterForm, useCharacterOptions, useSaveTab } from '../../../features/character-form/queries.ts';
 import type { Options } from '@tenebris/rules/characterForm';
 
 type RoleChoice = Options['roles'][number];

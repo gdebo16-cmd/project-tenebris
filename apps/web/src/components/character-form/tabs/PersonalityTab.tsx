@@ -1,9 +1,9 @@
 // Alignment is the real 3 by 3 chart. Each personality pick gives one magic state, and the three must differ.
 import { useEffect, useState } from 'react';
 import { ApiError } from '../../../api.ts';
-import formStyles from '../CharacterForm.module.css';
-import styles from './PersonalityTab.module.css';
-import { useCharacterForm, useSaveTab } from '../queries.ts';
+import formStyles from '../../../styles/features/character-form/CharacterForm.module.css';
+import styles from '../../../styles/components/character-form/tabs/PersonalityTab.module.css';
+import { useCharacterForm, useSaveTab } from '../../../features/character-form/queries.ts';
 import type { Options } from '@tenebris/rules/characterForm';
 
 // Columns run Lawful, Natural, Chaotic; rows run Good, Natural, Evil.

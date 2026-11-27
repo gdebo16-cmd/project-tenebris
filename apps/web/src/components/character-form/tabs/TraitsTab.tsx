@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { STAT_COLUMNS } from '@tenebris/rules/characterForm';
 import { ApiError } from '../../../api.ts';
-import formStyles from '../CharacterForm.module.css';
-import styles from './TraitsTab.module.css';
-import { useCharacterForm, useSaveTab, useStatRoll } from '../queries.ts';
+import formStyles from '../../../styles/features/character-form/CharacterForm.module.css';
+import styles from '../../../styles/components/character-form/tabs/TraitsTab.module.css';
+import { useCharacterForm, useSaveTab, useStatRoll } from '../../../features/character-form/queries.ts';
 
 const STAT_LABELS: Record<string, string> = {
     str: 'Might', dex: 'Precision', con: 'Endurance', int: 'Intellect',

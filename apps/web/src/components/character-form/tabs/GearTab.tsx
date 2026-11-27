@@ -2,11 +2,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ApiError } from '../../../api.ts';
-import formStyles from '../CharacterForm.module.css';
-import styles from './GearTab.module.css';
-import { useCharacterForm, useDefaultGear, useFinish, useSaveTab } from '../queries.ts';
+import formStyles from '../../../styles/features/character-form/CharacterForm.module.css';
+import styles from '../../../styles/components/character-form/tabs/GearTab.module.css';
+import { useCharacterForm, useDefaultGear, useFinish, useSaveTab } from '../../../features/character-form/queries.ts';
 import { COINS, MONEY_PRESETS, MONEY_PRESET_KEYS, type MoneyPresetKey, type Purse } from '@tenebris/rules/money';
-import type { CharacterFormData } from '../types.ts';
+import type { CharacterFormData } from '../../../features/character-form/types.ts';
 
 type Props = { id: string };
 
