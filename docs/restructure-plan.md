@@ -1,6 +1,6 @@
 # Tenebris web app restructure (MAJ-30)
 
-Plan only. No files have been moved or committed. Goal: **reusable parts in `components/<featureType>/`**, **pages and build files (plus hooks, queries, types) in `features/<section>/`**, **all CSS under `src/styles/` mirroring those two trees exactly**, and **one runtime asset home**. No new inline styles (keep the few that already exist: toolbar swatch thumbs, sheet layout CSS variables). No new libraries. No `index.ts` barrels (they caused import cycles in the table toolbar work).
+Batches 1–11, 14–16 have landed as local commits on `main` (not pushed). Batches 12 and 13 were skipped (see below). Goal: **reusable parts in `components/<featureType>/`**, **pages and build files (plus hooks, queries, types) in `features/<section>/`**, **all CSS under `src/styles/` mirroring those two trees exactly**, and **one runtime asset home**. No new inline styles (keep the few that already exist: toolbar swatch thumbs, sheet layout CSS variables). No new libraries. No `index.ts` barrels (they caused import cycles in the table toolbar work).
 
 Today `apps/web/src` is mixed: a flat `pages/` of fat route files, a useful `features/` that still holds both pages and reusable parts, and a catch-all `components/` for the shell and a few widgets. CSS Modules sit next to components (two global files already live in `src/styles/`). Images and models live in several places. The table feature is already in domain folders after the toolbar split. Character and monster sheets are already block-based.
 
@@ -15,16 +15,22 @@ Today `apps/web/src` is mixed: a flat `pages/` of fat route files, a useful `fea
 - Toolbar → `components/table/toolbar/Toolbar.tsx`
 - Toolbar looks → `styles/components/table/toolbar/Toolbar.module.css`
 - Toolbar button → `components/table/toolbar/parts/ToolButton.tsx`
-- Toolbar button looks → `styles/components/table/toolbar/parts/ToolButton.module.css` (today the parts still share `Toolbar.module.css`; split in a later batch)
+- Toolbar button looks → still `styles/components/table/toolbar/Toolbar.module.css` (parts share the toolbar sheet; a later split would give `parts/ToolButton.module.css`)
+- Shared UI primitives (Button, ToggleButton, ButtonRow, Field, Section) → `components/ui/`
 - Board 3D pieces → `components/table/board/`
+- Hex math (`hexToWorld`, `worldToHex`, `HEIGHT_STEP`, `liftOf`, rims) → `components/table/board/ground/hexMath.ts` (re-exported from `TableScenery.tsx`)
 - Table hooks, queries, types → `features/table/hooks/`
+- Sheet Fit (zoom-to-fill; keeps existing CSS-variable / zoom inline styles) → `components/sheets/Fit.tsx` (looks stay in `SheetLayout.module.css`)
 - Sheet health block → `components/sheets/blocks/HealthBlock.tsx`
 - Sheet health looks → `styles/components/sheets/blocks/HealthBlock.module.css`
 - Character / monster sheet pages → `features/sheets/CharacterSheetPage.tsx`, `MonsterSheetPage.tsx`
 - App chrome (sidebar, login gate, settings) → `components/layout/`
-- Shared primitives (button, tabs, loader, filters) → `components/ui/`
 - Theme / global CSS → `styles/themes/`, `styles/base/`
-- Images, models, HDRIs, icons → repo-root `assets/` (`/models/…`, `/textures/…`, `/icons/…`, `/hdri/…`)
+- Images, models, HDRIs, icons → repo-root `assets/` served at the site root (`Vite publicDir`)
+- Logos, favicon, toolbar SVGs → `assets/icons/` and `assets/icons/toolbar/` (`/icons/Logo.png`, `/icons/toolbar/…`)
+- Theme backgrounds and sketches → `assets/images/backgrounds/`, `assets/images/sketches/` (default portrait: `/images/default-character.png`)
+- HDRIs → `assets/hdri/` (`/hdri/…`; was `/textures/hdris/`)
+- Models and paint textures → still `assets/models/` and `assets/textures/` (`/models/…`, `/textures/…`)
 
 ---
 
