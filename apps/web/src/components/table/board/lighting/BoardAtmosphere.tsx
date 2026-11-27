@@ -15,11 +15,11 @@ import type { MoodLight } from './BoardWorld.tsx'
 
 // T5: one Poly Haven HDRI per mood (2K), used as the scene's sky light only (not shown as a backdrop).
 export const SKY_LIGHT: Record<SceneMood, { file: string; strength: number }> = {
-    day:     { file: '/textures/hdris/day/sky.hdr',     strength: 0.41 },
-    dawn:    { file: '/textures/hdris/dawn/sky.hdr',    strength: 0.34 },
-    dusk:    { file: '/textures/hdris/dusk/sky.hdr',    strength: 0.32 },
-    night:   { file: '/textures/hdris/night/sky.hdr',   strength: 0.4 },
-    dungeon: { file: '/textures/hdris/dungeon/sky.hdr', strength: 0.16 },
+    day:     { file: '/hdri/day/sky.hdr',     strength: 0.41 },
+    dawn:    { file: '/hdri/dawn/sky.hdr',    strength: 0.34 },
+    dusk:    { file: '/hdri/dusk/sky.hdr',    strength: 0.32 },
+    night:   { file: '/hdri/night/sky.hdr',   strength: 0.4 },
+    dungeon: { file: '/hdri/dungeon/sky.hdr', strength: 0.16 },
 };
 
 // ---- lights ----

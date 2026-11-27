@@ -37,7 +37,7 @@ function HomePage() {
     return (
         <>
             <header id={styles.siteTitle}>
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
+                <img src="/icons/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Welcome {username}!</h1>
             </header>
             <main className={styles.page}>
@@ -66,7 +66,7 @@ function HomePage() {
                                     <li key={ch.id} id={`character-tile-${ch.id}`}>
                                         <Link to={`/characters/${ch.id}`} className={styles.charTile}>
                                             <h3 className={styles.characterName}>{ch.name}</h3>
-                                            <img className={styles.characterImage} src={ch.portrait_url ?? '/default-character.png'} alt="Character Image" />
+                                            <img className={styles.characterImage} src={ch.portrait_url ?? '/images/default-character.png'} alt="Character Image" />
                                             <p className={styles.characterRace}>Race: {ch.race}</p>
                                             <p className={styles.characterClass}>Class: {ch.class}</p>
                                             <p className={styles.characterSubclass}>Sub-class: {ch.subclass}</p>
@@ -126,7 +126,7 @@ function HomePage() {
                             <li key={ch.id} id={`character-tile-${ch.id}`}>
                                 <Link to={`/characters/${ch.id}/edit`} className={styles.charTile}>
                                     <h3 className={styles.characterName}>{ch.name || 'One with no name'}</h3>
-                                    <img className={styles.characterImage} src={ch.portrait_url ?? '/default-character.png'} alt='Character Image' />
+                                    <img className={styles.characterImage} src={ch.portrait_url ?? '/images/default-character.png'} alt='Character Image' />
                                     <p className={styles.characterRace}>Race: {ch.race || 'Undecided'}</p>
                                     <p className={styles.characterClass}>Class: {ch.class || 'Undecided'}</p>
                                     <p className={styles.characterSubclass}>Sub-class: {ch.subclass || 'Undecided'}</p>

@@ -59,7 +59,7 @@ export default function CharacterSheetPage() {
     return (
         <SheetContext.Provider value={tools}>
             <header id={layout.siteTitle}>
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className={layout.titleLogo} />
+                <img src="/icons/Logo.png" alt="Eldrid Tales Logo" className={layout.titleLogo} />
             </header>
 
             <div className={`${styles.page} ${layout.sheetArea}`}>

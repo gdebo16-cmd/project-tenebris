@@ -34,7 +34,7 @@ function RegisterPage() {
     return (
         <>
             <header id={styles.siteTitle}>
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
+                <img src="/icons/Logo.png" alt="Eldrid Tales Logo" className={styles.titleLogo} />
                 <h1>Eldrid Tales</h1>
             </header>
 

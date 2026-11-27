@@ -4,7 +4,7 @@ import { levelChoices, DEFAULT_CHARACTER_NAME } from '@tenebris/rules/characterF
 import styles from '../../styles/features/character-form/CharacterForm.module.css';
 import { usePortraits } from '../../features/character-form/queries.ts';
 
-const DEFAULT_PORTRAIT = '/default-character.png';
+const DEFAULT_PORTRAIT = '/images/default-character.png';
 
 type Props = {
     name: string;

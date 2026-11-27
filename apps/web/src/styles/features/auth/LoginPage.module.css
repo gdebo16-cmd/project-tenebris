@@ -311,7 +311,7 @@ body:where(:has(.page)) {
         padding: 0;
         border: none;
         box-shadow: none;
-        content: url('/logo_banner.png');
+        content: url('/icons/logo_banner.png');
         height: auto;
         width: auto;
         object-fit: contain;

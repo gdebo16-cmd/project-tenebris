@@ -739,7 +739,7 @@ main > .container:not(.isActive) {
 
 /* #region Site Title Section */
     .titleLogo {
-        content: url('/logo_banner.png');
+        content: url('/icons/logo_banner.png');
         height: auto;
         width: auto;
         max-width: 33vw;

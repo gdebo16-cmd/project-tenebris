@@ -12,7 +12,7 @@ export default function SheetHeader({ creature }: Pick<BlockProps, 'creature'>) 
     return (
         <section className={styles.headerBlock} aria-label={m ? 'Monster' : 'Character'}>
             <div className={styles.header}>
-                <img className={styles.portrait} src={creature.portrait ?? '/default-character.png'} alt={`Portrait of ${creature.name}`} />
+                <img className={styles.portrait} src={creature.portrait ?? '/images/default-character.png'} alt={`Portrait of ${creature.name}`} />
                 <div className={styles.headerText}>
                     <h1 className={styles.title}>{creature.name}</h1>
                     <p className={styles.muted}>{subtitle}</p>

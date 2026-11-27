@@ -115,7 +115,7 @@ export function PartyBlock() {
             {data.party.length === 0 && <span className={sheet.muted}>No player has picked a character for this campaign yet.</span>}
             {data.party.map((p) => (
                 <div key={p.id} className={p.id === playerId ? `${styles.member} ${styles.memberCurrent}` : styles.member}>
-                    <img className={styles.thumb} src={p.portrait ?? '/default-character.png'} alt="" />
+                    <img className={styles.thumb} src={p.portrait ?? '/images/default-character.png'} alt="" />
                     <div className={styles.memberBody}>
                         <div className={styles.memberTop}>
                             <span className={sheet.rowName}><Link to={`/characters/${p.id}`}>{p.name}</Link></span>
@@ -158,7 +158,7 @@ export function EncounterBlock() {
             {data.encounter.length === 0 && <span className={sheet.muted}>No monsters in this campaign yet.</span>}
             {data.encounter.map((m) => (
                 <div key={m.id} className={m.id === monsterId ? `${styles.member} ${styles.memberCurrent}` : styles.member}>
-                    <img className={styles.thumb} src={m.portrait ?? '/default-character.png'} alt="" />
+                    <img className={styles.thumb} src={m.portrait ?? '/images/default-character.png'} alt="" />
                     <div className={styles.memberBody}>
                         <div className={styles.memberTop}>
                             <span className={sheet.rowName}><Link to={`/monsters/${m.id}`}>{m.name}</Link></span>

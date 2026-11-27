@@ -91,7 +91,7 @@ export default function DmPage() {
     return (
         <DmContext.Provider value={dm}>
             <header id={layout.siteTitle}>
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className={layout.titleLogo} />
+                <img src="/icons/Logo.png" alt="Eldrid Tales Logo" className={layout.titleLogo} />
             </header>
 
             <div className={`${sheet.page} ${layout.sheetArea}`}>

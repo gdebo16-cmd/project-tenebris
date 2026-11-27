@@ -22,7 +22,7 @@ function Glimpse({ glimpse }: { glimpse: MonsterGlimpse }) {
             <div className={styles.column}>
                 <section className={styles.block} aria-label="Monster">
                     <div className={styles.header}>
-                        <img className={styles.portrait} src={glimpse.portrait ?? '/default-character.png'} alt={`Picture of ${glimpse.name}`} />
+                        <img className={styles.portrait} src={glimpse.portrait ?? '/images/default-character.png'} alt={`Picture of ${glimpse.name}`} />
                         <div className={styles.headerText}>
                             <h1 className={styles.title}>{glimpse.name}</h1>
                             <p className={styles.muted}>{[glimpse.type, glimpse.health].filter(Boolean).join(' · ')}</p>
@@ -81,7 +81,7 @@ export default function MonsterSheetPage() {
     return (
         <SheetContext.Provider value={tools}>
             <header id={layout.siteTitle}>
-                <img src="/Logo.png" alt="Eldrid Tales Logo" className={layout.titleLogo} />
+                <img src="/icons/Logo.png" alt="Eldrid Tales Logo" className={layout.titleLogo} />
             </header>
 
             <div className={`${styles.page} ${layout.sheetArea}`}>
