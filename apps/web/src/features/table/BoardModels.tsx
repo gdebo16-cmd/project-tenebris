@@ -2,7 +2,7 @@
 // movement and sight use the model's footprint in @tenebris/rules.
 import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Object3D, type Material } from 'three'
+import { DoubleSide, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Object3D, type Material } from 'three'
 import { type Feature, type Hex, modelOf, modelFile } from '@tenebris/rules/board'
 import { useGraphics } from './graphicsSettings.ts'
 import { hexToWorld, fixedRandom, liftOf } from './TableScenery.tsx'
@@ -10,6 +10,61 @@ import type { ThreeEvent } from '@react-three/fiber'
 
 type Click = (hex: Hex, e: ThreeEvent<MouseEvent>) => void;
 type Item = { hex: Hex; feature: Feature; key: string };
+type Part = { geometry: Mesh['geometry']; material: Material; matrix: Matrix4 };
+
+// Bump this when the baked .glb files change so the browser and useGLTF don't keep an old copy.
+const MODEL_ASSET_VERSION = 'foliage3';
+
+const CUTOUT_NAME = /leaf|twig|needl|foliage|grass|fern|petal|moss|shrub|nettle|plant|celand|dandel/i;
+
+function isMeshNode(node: unknown): node is Mesh {
+    return !!node && typeof node === 'object' && (node as Mesh).isMesh === true && !!(node as Mesh).geometry;
+}
+
+// Leaf cards are thin single-sided planes. Instanced drawing must keep every primitive's own
+// material, draw both sides, and use alphaTest (not blending) or the canopy is discarded.
+function prepareBoardMaterial(source: Material): Material {
+    const mat = source.clone();
+    if (mat instanceof MeshStandardMaterial || (mat as MeshStandardMaterial).isMeshStandardMaterial) {
+        const std = mat as MeshStandardMaterial;
+        std.roughness = Math.min(1, std.roughness);
+        const cutout = std.alphaTest > 0 || std.transparent || CUTOUT_NAME.test(std.name || '');
+        if (cutout) {
+            std.side = DoubleSide;
+            if (std.alphaTest <= 0) std.alphaTest = 0.45;
+            std.transparent = false;
+            std.depthWrite = true;
+        }
+        if (std.map) {
+            std.map.premultiplyAlpha = false;
+            std.map.needsUpdate = true;
+        }
+    }
+    return mat;
+}
+
+function collectParts(root: Object3D): Part[] {
+    const found: Part[] = [];
+    root.updateMatrixWorld(true);
+    root.traverse((node) => {
+        if (!isMeshNode(node)) return;
+        const materials = Array.isArray(node.material) ? node.material : [node.material];
+        const groups = node.geometry.groups ?? [];
+        if (groups.length > 0 && materials.length > 1) {
+            for (const group of groups) {
+                const material = materials[group.materialIndex ?? 0];
+                if (!material) continue;
+                const geometry = node.geometry.clone();
+                geometry.clearGroups();
+                geometry.setDrawRange(group.start, group.count);
+                found.push({ geometry, material, matrix: node.matrixWorld.clone() });
+            }
+        } else if (materials[0]) {
+            found.push({ geometry: node.geometry, material: materials[0], matrix: node.matrixWorld.clone() });
+        }
+    });
+    return found;
+}
 
 export function BoardModels({ features, heights, onHexClick }: { features: Record<string, Feature>; heights: Record<string, number>; onHexClick: Click }) {
     const graphics = useGraphics();
@@ -18,7 +73,7 @@ export function BoardModels({ features, heights, onHexClick }: { features: Recor
         const model = modelOf(feature);
         if (!model) continue;
         const [q, r] = key.split(',').map(Number);
-        const file = modelFile(model, graphics.lightModels);
+        const file = modelFile(model, graphics.lightModels) + '?v=' + MODEL_ASSET_VERSION;
         const list = byFile.get(file) ?? [];
         list.push({ key, feature, hex: { q, r } });
         byFile.set(file, list);
@@ -35,17 +90,7 @@ export function BoardModels({ features, heights, onHexClick }: { features: Recor
 
 function ModelInstances({ file, items, heights, onHexClick }: { file: string; items: Item[]; heights: Record<string, number>; onHexClick: Click }) {
     const gltf = useGLTF(file, true, true);
-    const parts = useMemo(() => {
-        const found: { geometry: Mesh['geometry']; material: Material; matrix: Matrix4 }[] = [];
-        gltf.scene.updateMatrixWorld(true);
-        gltf.scene.traverse((node) => {
-            if (!(node instanceof Mesh) || !node.geometry) return;
-            const material = Array.isArray(node.material) ? node.material[0] : node.material;
-            if (!material) return;
-            found.push({ geometry: node.geometry, material, matrix: node.matrixWorld.clone() });
-        });
-        return found;
-    }, [gltf]);
+    const parts = useMemo(() => collectParts(gltf.scene), [gltf]);
     return (
         <>
             {parts.map((part, i) => (
@@ -56,17 +101,13 @@ function ModelInstances({ file, items, heights, onHexClick }: { file: string; it
 }
 
 function InstancedModels({ part, items, heights, onHexClick }: {
-    part: { geometry: Mesh['geometry']; material: Material; matrix: Matrix4 };
+    part: Part;
     items: Item[];
     heights: Record<string, number>;
     onHexClick: Click;
 }) {
     const mesh = useRef<InstancedMesh>(null);
-    const material = useMemo(() => {
-        const mat = part.material.clone();
-        if (mat instanceof MeshStandardMaterial) mat.roughness = Math.min(1, mat.roughness);
-        return mat;
-    }, [part.material]);
+    const material = useMemo(() => prepareBoardMaterial(part.material), [part.material]);
     useLayoutEffect(() => () => material.dispose(), [material]);
     useLayoutEffect(() => {
         const inst = mesh.current;

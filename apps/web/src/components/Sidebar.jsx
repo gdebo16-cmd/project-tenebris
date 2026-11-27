@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import LogoutLink from './LogoutLink';
 import LookSettings from './settings/LookSettings';
+import GraphicsSettings from './settings/GraphicsSettings';
 import AccountSettings from './settings/AccountSettings';
 import styles from './Sidebar.module.css';
 import SidebarCharacter from './SidebarCharacter';
@@ -65,6 +66,7 @@ export default function Sidebar() {
                     ) : (
                         <div className={styles.settings}>
                             <LookSettings />
+                            <GraphicsSettings />
                             <AccountSettings />
                         </div>
                     )}

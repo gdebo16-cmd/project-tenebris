@@ -1,6 +1,0 @@
-Large Castle Door
-Tina
-CC0
-https://polyhaven.com/a/large_castle_door
-Imported for Tenebris with scripts/import-polyhaven.mjs
-Cleaned with npm run model (high + light).

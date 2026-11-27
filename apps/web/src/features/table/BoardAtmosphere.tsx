@@ -15,10 +15,10 @@ import type { MoodLight } from './BoardWorld.tsx'
 
 // T5: one Poly Haven HDRI per mood (2K), used as the scene's sky light only (not shown as a backdrop).
 export const SKY_LIGHT: Record<SceneMood, { file: string; strength: number }> = {
-    day:     { file: '/textures/hdris/day/sky.hdr',     strength: 0.9 },
-    dawn:    { file: '/textures/hdris/dawn/sky.hdr',    strength: 0.55 },
-    dusk:    { file: '/textures/hdris/dusk/sky.hdr',    strength: 0.5 },
-    night:   { file: '/textures/hdris/night/sky.hdr',   strength: 0.28 },
+    day:     { file: '/textures/hdris/day/sky.hdr',     strength: 0.41 },
+    dawn:    { file: '/textures/hdris/dawn/sky.hdr',    strength: 0.34 },
+    dusk:    { file: '/textures/hdris/dusk/sky.hdr',    strength: 0.32 },
+    night:   { file: '/textures/hdris/night/sky.hdr',   strength: 0.4 },
     dungeon: { file: '/textures/hdris/dungeon/sky.hdr', strength: 0.16 },
 };
 
@@ -36,9 +36,9 @@ export function BoardLights({ mood, moodName = 'day', radius, shadowMapSize = 40
                 <Environment files={sky.file} background={false} environmentIntensity={sky.strength} />
             </Suspense>
             {/* a little leftover fill so tokens stay readable in dark moods (night, dungeon) */}
-            <hemisphereLight args={[mood.sky, mood.ground, Math.max(0.1, mood.roomPower * 0.28)]} />
+            <hemisphereLight args={[mood.sky, mood.ground, Math.max(0.1, mood.roomPower * 0.4)]} />
             {/* the sun's shadows: kept as the extra hand-set light; fill now comes from the sky */}
-            <directionalLight position={[6, 20, 9]} intensity={mood.sunPower * 0.4} color={mood.sun} castShadow={castShadow}
+            <directionalLight position={mood.sunPosition} intensity={mood.sunPower * 0.4} color={mood.sun} castShadow={castShadow}
                 shadow-mapSize={[Math.max(512, shadowMapSize), Math.max(512, shadowMapSize)]} shadow-camera-near={1} shadow-camera-far={90}
                 shadow-camera-left={-reach} shadow-camera-right={reach} shadow-camera-top={reach} shadow-camera-bottom={-reach}
                 shadow-bias={-0.0003} shadow-normalBias={0.03} />

@@ -1,6 +1,0 @@
-Lion Head
-Tina
-CC0
-https://polyhaven.com/a/lion_head
-Imported for Tenebris with scripts/import-polyhaven.mjs
-Cleaned with npm run model (high + light).

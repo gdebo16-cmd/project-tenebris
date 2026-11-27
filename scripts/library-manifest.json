@@ -300,16 +300,13 @@
     ]
   },
   "models": {
-    "count": 40,
+    "count": 28,
     "byCategory": {
       "rocks": 8,
       "trees and logs": 9,
       "plants and bushes": 5,
       "flowers": 3,
-      "ground cover": 3,
-      "props": 7,
-      "statues and ruins": 3,
-      "fences and walls": 2
+      "ground cover": 3
     },
     "items": [
       {
@@ -674,162 +671,6 @@
         "footprint": "hex",
         "blocksMovement": false,
         "blocksSight": false,
-        "already": null
-      },
-      {
-        "id": "Lantern_01",
-        "sourceId": "Lantern_01",
-        "name": "Lantern 01",
-        "category": "props",
-        "authors": "Rajil Jose Macatangay",
-        "url": "https://polyhaven.com/a/Lantern_01",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": false,
-        "blocksSight": false,
-        "already": null
-      },
-      {
-        "id": "wooden_lantern_01",
-        "sourceId": "wooden_lantern_01",
-        "name": "Wooden Lantern 01",
-        "category": "props",
-        "authors": "James Ray Cock",
-        "url": "https://polyhaven.com/a/wooden_lantern_01",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": false,
-        "blocksSight": false,
-        "already": null
-      },
-      {
-        "id": "treasure_chest",
-        "sourceId": "treasure_chest",
-        "name": "Treasure Chest",
-        "category": "props",
-        "authors": "Rico Cilliers",
-        "url": "https://polyhaven.com/a/treasure_chest",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": false,
-        "blocksSight": false,
-        "already": null
-      },
-      {
-        "id": "wooden_crate_01",
-        "sourceId": "wooden_crate_01",
-        "name": "Wooden Crate 01",
-        "category": "props",
-        "authors": "James Ray Cock",
-        "url": "https://polyhaven.com/a/wooden_crate_01",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": false,
-        "blocksSight": false,
-        "already": null
-      },
-      {
-        "id": "wine_barrel_01",
-        "sourceId": "wine_barrel_01",
-        "name": "Wine Barrel 01",
-        "category": "props",
-        "authors": "James Ray Cock",
-        "url": "https://polyhaven.com/a/wine_barrel_01",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": false,
-        "blocksSight": false,
-        "already": null
-      },
-      {
-        "id": "wicker_basket_01",
-        "sourceId": "wicker_basket_01",
-        "name": "Wicker Basket 01",
-        "category": "props",
-        "authors": "Kuutti Siitonen",
-        "url": "https://polyhaven.com/a/wicker_basket_01",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": false,
-        "blocksSight": false,
-        "already": null
-      },
-      {
-        "id": "wooden_candlestick",
-        "sourceId": "wooden_candlestick",
-        "name": "Wooden Candlestick",
-        "category": "props",
-        "authors": "Josh Dean",
-        "url": "https://polyhaven.com/a/wooden_candlestick",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": false,
-        "blocksSight": false,
-        "already": null
-      },
-      {
-        "id": "gothic_statue",
-        "sourceId": "gothic_statue",
-        "name": "Gothic Statue",
-        "category": "statues and ruins",
-        "authors": "Benny Weimer",
-        "url": "https://polyhaven.com/a/gothic_statue",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": true,
-        "blocksSight": true,
-        "already": null
-      },
-      {
-        "id": "marble_bust_01",
-        "sourceId": "marble_bust_01",
-        "name": "Marble Bust 01",
-        "category": "statues and ruins",
-        "authors": "Rico Cilliers",
-        "url": "https://polyhaven.com/a/marble_bust_01",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": true,
-        "blocksSight": true,
-        "already": null
-      },
-      {
-        "id": "lion_head",
-        "sourceId": "lion_head",
-        "name": "Lion Head",
-        "category": "statues and ruins",
-        "authors": "Tina",
-        "url": "https://polyhaven.com/a/lion_head",
-        "width": 1,
-        "footprint": "hex",
-        "blocksMovement": true,
-        "blocksSight": true,
-        "already": null
-      },
-      {
-        "id": "large_castle_door",
-        "sourceId": "large_castle_door",
-        "name": "Large Castle Door",
-        "category": "fences and walls",
-        "authors": "Tina",
-        "url": "https://polyhaven.com/a/large_castle_door",
-        "width": 2,
-        "footprint": "line",
-        "blocksMovement": true,
-        "blocksSight": true,
-        "already": null
-      },
-      {
-        "id": "large_iron_gate",
-        "sourceId": "large_iron_gate",
-        "name": "Large Iron Gate",
-        "category": "fences and walls",
-        "authors": "Josh Dean",
-        "url": "https://polyhaven.com/a/large_iron_gate",
-        "width": 2,
-        "footprint": "line",
-        "blocksMovement": true,
-        "blocksSight": true,
         "already": null
       }
     ]

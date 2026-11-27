@@ -1,6 +1,0 @@
-Lantern 01
-Rajil Jose Macatangay
-CC0
-https://polyhaven.com/a/Lantern_01
-Imported for Tenebris with scripts/import-polyhaven.mjs
-Cleaned with npm run model (high + light).

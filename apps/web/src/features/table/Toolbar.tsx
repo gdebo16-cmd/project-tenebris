@@ -5,7 +5,6 @@ import { type ReactNode, useState } from 'react'
 import { type AreaKind } from '@tenebris/rules/sight'
 import { ShapeControls } from './ShapePanels.tsx'
 import { surfaceLook } from './TableScenery.tsx'
-import { useGraphics, writeGraphicsLevel, GRAPHICS_LEVELS } from './graphicsSettings.ts'
 import { FEATURE_LOOK } from './BoardFeatures.tsx'
 import { Room } from './BoardWorld.tsx'
 import { Fog } from './BoardActs.tsx'
@@ -259,7 +258,6 @@ export function Toolbar(props: {
                     )}
                     {currentTab === 'scene' && isDm && (
                         <div className={styles.section} role="tabpanel" id="board-tab-panel-scene" aria-labelledby="board-tab-scene">
-                            <GraphicsSection />
                             <SceneLookSection mode={props.mode} look={props.look} onLook={props.onLook} onResetFog={props.onResetFog} />
                             <SceneBoardSection mode={props.mode} look={props.look} onLook={props.onLook} boardSize={props.boardSize} />
                         </div>
@@ -397,23 +395,6 @@ function paintCategories() {
         groups.set(paint.category, list);
     }
     return [...groups.entries()];
-}
-
-function GraphicsSection() {
-    const graphics = useGraphics();
-    return (
-        <>
-            <h3 className={styles.sectionTitle}>Graphics</h3>
-            <div className={styles.btnRow} role="group" aria-label="Graphics quality">
-                {GRAPHICS_LEVELS.map((level) => (
-                    <button key={level} type="button" aria-pressed={graphics.level === level}
-                        className={btnClass(graphics.level === level)}
-                        onClick={() => writeGraphicsLevel(level)}>{titled(level)}</button>
-                ))}
-            </div>
-            <p className={styles.hint}>This device only. Not saved with the board.</p>
-        </>
-    );
 }
 
 function LibraryObjects({ tool, setTool }: { tool: Tool; setTool: (t: Tool) => void }) {

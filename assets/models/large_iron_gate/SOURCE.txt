@@ -1,6 +1,0 @@
-Large Iron Gate
-Josh Dean
-CC0
-https://polyhaven.com/a/large_iron_gate
-Imported for Tenebris with scripts/import-polyhaven.mjs
-Cleaned with npm run model (high + light).

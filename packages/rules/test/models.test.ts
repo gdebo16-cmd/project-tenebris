@@ -43,12 +43,20 @@ test('the rules use a model footprint, not just the origin hex', () => {
     assert.ok(!wallsOf({}, { '0,0': { kind: 'boulder' } }).has('1,0'));
 });
 
-test('a library model placed as kind model uses its flags and footprint', () => {
-    const chest = modelById('treasure_chest');
-    assert.ok(chest);
-    assert.equal(chest.blocksMovement, false);
-    assert.equal(modelOf({ kind: 'model', model: 'treasure_chest' })?.id, 'treasure_chest');
+test('a removed or unknown library model is skipped and does not block or throw', () => {
+    assert.equal(modelById('treasure_chest'), undefined);
+    assert.equal(modelOf({ kind: 'model', model: 'Lantern_01' }), undefined);
     const features: Record<string, Feature> = { '1,0': { kind: 'model', model: 'treasure_chest' } };
+    assert.equal(stepCost({ features }, '0,0', '1,0'), 1);
+    assert.equal(wallsOf({}, features).has('1,0'), false);
+});
+
+test('a library model placed as kind model uses its flags and footprint', () => {
+    const grass = modelById('grass_medium_01');
+    assert.ok(grass);
+    assert.equal(grass.blocksMovement, false);
+    assert.equal(modelOf({ kind: 'model', model: 'grass_medium_01' })?.id, 'grass_medium_01');
+    const features: Record<string, Feature> = { '1,0': { kind: 'model', model: 'grass_medium_01' } };
     assert.equal(stepCost({ features }, '0,0', '1,0'), 1);
     assert.equal(wallsOf({}, features).has('1,0'), false);
 

@@ -1,6 +1,0 @@
-Gothic Statue
-Benny Weimer
-CC0
-https://polyhaven.com/a/gothic_statue
-Imported for Tenebris with scripts/import-polyhaven.mjs
-Cleaned with npm run model (high + light).

@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react'
-import { hexesWithin, radiusOf, wallsOf, type SceneLook, hexKey, type Hex } from '@tenebris/rules/board'
+import { hexesWithin, radiusOf, wallsOf, type SceneLook, type Hex } from '@tenebris/rules/board'
 import { useParams } from 'react-router'
 import { useScene, usePaint, usePlaceToken, useMoveToken, useRemoveToken, useTableSync, useSetLook, useTableFeed, useTableAct, useAddOverlay, useRemoveOverlay, useResetFog, useClearMap, type Token, type PlaceRequest } from './tableQueries.ts'
 import { type BoardView } from './BoardCamera.tsx'
@@ -40,11 +40,6 @@ export function useTableController(mode: 'session' | 'editor', editSceneId: numb
     const dpr = Math.min(2, window.devicePixelRatio);
     const showPerf = new URLSearchParams(window.location.search).has('perf');   // /table?perf shows a frame counter
     const noEffects = new URLSearchParams(window.location.search).has('nofx');
-    // grass blades grow on every grass hex (the default ground) that isn't wall or water
-    const grassHexes = useMemo(() => hexes.filter((h) => {
-        const key = hexKey(h);
-        return (surfaces[key] ?? 'grass') === 'grass' && terrain[key] !== 'block' && terrain[key] !== 'deep' && !features[key];
-    }), [hexes, surfaces, terrain, features]);
     const [tool, setTool] = useState<Tool>({ type: 'move' });
     const [selected, setSelected] = useState<number | null>(null);    // the token about to move
     const [placing, setPlacing] = useState('');                       // 'character:3', 'monster:7' or 'summon'
@@ -134,7 +129,7 @@ export function useTableController(mode: 'session' | 'editor', editSceneId: numb
 
     // The board's pieces get these two, which never change, instead of clickHex / clickToken (new on every draw).
     // A piece whose props didn't change can then skip redrawing (memo, below): moving one token no longer
-    // redraws every hex, rock and blade of grass.
+    // redraws every hex and rock.
     const latest = useRef({ clickHex, clickToken: (t: Token, e: ThreeEvent<MouseEvent>) => clickToken(t, e) });
     latest.current = { clickHex, clickToken: (t: Token, e: ThreeEvent<MouseEvent>) => clickToken(t, e) };
     const onHexClick = useCallback((hex: Hex, e: ThreeEvent<MouseEvent>) => latest.current.clickHex(hex, e), []);
@@ -162,7 +157,7 @@ export function useTableController(mode: 'session' | 'editor', editSceneId: numb
 
 
     return {
-        hexes, radius, campId, editing, data, error, terrain, move, remove, view, setView, fitKey, setFitKey, surfaces, features, walls, look, heights, mood, setLook, dpr, showPerf, noEffects, grassHexes, tool, setTool, selected, setSelected, placing, setPlacing, summonName, setSummonName, summonOwner, setSummonOwner, message, setMessage, boardRef, woodColor, surfaceColor, lines, isDm, tokens, overlays, fog, feed, removeOverlay, resetFog, acting, setActing, brush, setBrush, clearMap, painting, shapeOrigin, newest, notices, selectedToken, turns, currentAt, canMove, done, onHexClick, onStroke, onTokenClick, mode,
+        hexes, radius, campId, editing, data, error, terrain, move, remove, view, setView, fitKey, setFitKey, surfaces, features, walls, look, heights, mood, setLook, dpr, showPerf, noEffects, tool, setTool, selected, setSelected, placing, setPlacing, summonName, setSummonName, summonOwner, setSummonOwner, message, setMessage, boardRef, woodColor, surfaceColor, lines, isDm, tokens, overlays, fog, feed, removeOverlay, resetFog, acting, setActing, brush, setBrush, clearMap, painting, shapeOrigin, newest, notices, selectedToken, turns, currentAt, canMove, done, onHexClick, onStroke, onTokenClick, mode,
     };
 }
 

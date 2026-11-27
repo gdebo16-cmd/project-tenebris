@@ -2,15 +2,13 @@
 //   TurnSpotlight : a soft spotlight follows whoever's turn it is
 //   HoverGlow     : the hex under the mouse glows faintly
 //   PathPreview   : footprints show the way a selected token would walk
-//   Grass         : little swaying grass blades on grass hexes
 //   HitBurst      : a ring of light bursts out when a token is hurt (red) or healed (green)
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Instance, Instances } from '@react-three/drei'
-import { Object3D, type InstancedMesh, type Mesh, type MeshBasicMaterial, type SpotLight, type Material } from 'three'
+import { type Mesh, type MeshBasicMaterial, type SpotLight } from 'three'
 import { type Hex } from '@tenebris/rules/board'
 import { hexToWorld, fixedRandom, liftOf } from './TableScenery.tsx'
-import { waterTime } from './boardLooks.ts'
 
 type Heights = Record<string, number>;
 
@@ -114,59 +112,6 @@ export function PathPreview({ path, heights }: { path: Hex[] | null; heights: He
                 <meshBasicMaterial color="#f5e6c0" transparent opacity={0.6} depthWrite={false} />
             </mesh>
         </group>
-    );
-}
-
-// ---- grass ----
-
-const BLADES_PER_HEX = 22;
-
-// Sway: the higher up a blade a point is, the more it leans with a slow wind (the wind is waterTime, the board's clock)
-function swayGrass(shader: Parameters<Material['onBeforeCompile']>[0]) {
-    shader.uniforms.uWind = waterTime;
-    shader.vertexShader = 'uniform float uWind;\n' + shader.vertexShader.replace('#include <begin_vertex>', /* glsl */ `
-#include <begin_vertex>
-float up = max(0.0, position.y + 0.5);            // 0 at the root, 1 at the tip
-vec3 root = (instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-float gust = sin(uWind * 1.7 + root.x * 0.9 + root.z * 0.7) * 0.5 + sin(uWind * 2.9 + root.z * 1.3) * 0.25;
-transformed.x += gust * up * up * 0.35;
-transformed.z += gust * up * up * 0.15;
-`);
-}
-
-export function Grass({ hexes, heights }: { hexes: Hex[]; heights: Heights }) {
-    const mesh = useRef<InstancedMesh>(null);
-    const count = hexes.length * BLADES_PER_HEX;
-    useEffect(() => {
-        const m = mesh.current;
-        if (!m) return;
-        const o = new Object3D();
-        let i = 0;
-        for (const hex of hexes) {
-            const [cx, , cz] = hexToWorld(hex, 1);
-            const base = 0.1 + liftOf(heights, hex);
-            for (let b = 0; b < BLADES_PER_HEX; b++) {
-                const angle = fixedRandom(hex, 60 + b) * Math.PI * 2;
-                const out = Math.sqrt(fixedRandom(hex, 90 + b)) * 0.82;
-                const tall = 0.09 + fixedRandom(hex, 120 + b) * 0.12;
-                o.position.set(cx + Math.cos(angle) * out, base + tall / 2, cz + Math.sin(angle) * out);
-                o.rotation.set(0, fixedRandom(hex, 150 + b) * Math.PI, (fixedRandom(hex, 180 + b) - 0.5) * 0.5);
-                o.scale.set(0.025, tall, 0.025);
-                o.updateMatrix();
-                m.setMatrixAt(i++, o.matrix);
-            }
-        }
-        m.count = i;
-        m.instanceMatrix.needsUpdate = true;
-        m.computeBoundingSphere();
-    }, [hexes, heights]);
-    if (count === 0) return null;
-    return (
-        <instancedMesh ref={mesh} args={[undefined, undefined, count]} raycast={() => null} receiveShadow>
-            {/* one blade: a thin cone, base at the bottom */}
-            <coneGeometry args={[1, 1, 3]} />
-            <meshStandardMaterial color="#5f8f3e" roughness={0.9} onBeforeCompile={swayGrass} />
-        </instancedMesh>
     );
 }
 

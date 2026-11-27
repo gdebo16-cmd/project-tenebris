@@ -163,6 +163,23 @@ function pickModelGltf(files) {
   return level.gltf || level.glb || null;
 }
 
+async function downloadFoliageAlphas(files, rawDir) {
+  const keys = Object.keys(files).filter((key) => {
+    const k = key.toLowerCase();
+    return k === 'alpha' || k.endsWith('_alpha');
+  });
+  const texDir = path.join(rawDir, 'textures');
+  for (const key of keys) {
+    const level = files[key]['2k'] || files[key]['1k'] || files[key]['4k'];
+    const file = level?.png || level?.jpg;
+    if (!file?.url) continue;
+    const dest = path.join(texDir, path.basename(new URL(file.url).pathname));
+    if (fs.existsSync(dest)) continue;
+    await download(file.url, dest);
+    console.log('alpha', path.basename(dest));
+  }
+}
+
 async function importModel(item) {
   const id = item.id;
   if (item.already === 'boulder' || id === 'boulder') {
@@ -195,6 +212,7 @@ async function importModel(item) {
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     await download(url, dest);
   }
+  await downloadFoliageAlphas(files, rawDir);
   fs.mkdirSync(destDir, { recursive: true });
   const outHigh = path.join(destDir, id + '.glb');
   const worldWidth = Math.max(1, Number(item.width) || 1) * 2; // manifest width is in hexes; model.mjs --width is world units (2 = one hex)

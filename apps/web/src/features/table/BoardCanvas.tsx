@@ -2,7 +2,7 @@ import { memo } from 'react'
 import { styleOf, gridOf } from '@tenebris/rules/board'
 import { Terrain, Tabletop } from './TableScenery.tsx'
 import { BoardFeatures } from './BoardFeatures.tsx'
-import { Grass, TurnSpotlight, TurnRing } from './BoardMoments.tsx'
+import { TurnSpotlight, TurnRing } from './BoardMoments.tsx'
 import { MapPicture, Room, Weather } from './BoardWorld.tsx'
 import { Torches, BoardLights, Dust, BoardEffects } from './BoardAtmosphere.tsx'
 import { type TableController } from './useTableController.ts'
@@ -22,12 +22,11 @@ import { useGraphics } from './graphicsSettings.ts'
 // memo: these redraw only when their own props change (not every time anything on the page changes)
 const StillTerrain = memo(Terrain);
 const StillFeatures = memo(BoardFeatures);
-const StillGrass = memo(Grass);
 const StillMap = memo(MapPicture);
 const StillTorches = memo(Torches);
 
 export function BoardCanvas({ c }: { c: TableController }) {
-    const { radius, hexes, data, terrain, move, view, fitKey, surfaces, features, walls, look, heights, mood, showPerf, noEffects, grassHexes, tool, selected, boardRef, woodColor, surfaceColor, isDm, tokens, overlays, fog, acting, brush, painting, shapeOrigin, newest, notices, selectedToken, currentAt, onHexClick, onStroke, onTokenClick, mode } = c;
+    const { radius, hexes, data, terrain, move, view, fitKey, surfaces, features, walls, look, heights, mood, showPerf, noEffects, tool, selected, boardRef, woodColor, surfaceColor, isDm, tokens, overlays, fog, acting, brush, painting, shapeOrigin, newest, notices, selectedToken, currentAt, onHexClick, onStroke, onTokenClick, mode } = c;
     const graphics = useGraphics();
     const style = styleOf(look);              // T1: Tiles or Natural
     return (
@@ -48,7 +47,6 @@ export function BoardCanvas({ c }: { c: TableController }) {
                 <StillTerrain hexes={hexes} terrain={terrain} surfaces={surfaces} heights={heights} onHexClick={onHexClick} style={style} radius={radius} />
                 {/* the DM's map picture over the hexes, if there is one */}
                 <StillMap map={look.map} />
-                <StillGrass hexes={grassHexes} heights={heights} />
                 {/* the hex under the mouse glows, and a selected token shows the way it would walk */}
                 <HoverLayer radius={radius} heights={heights} walls={walls} onHexClick={onHexClick} brush={painting ? brush : null} onStroke={onStroke}
                     measuring={tool.type === 'measure'} labels={boardRef} walker={tool.type === 'move' && !acting ? selectedToken : null}

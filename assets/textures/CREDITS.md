@@ -125,16 +125,4 @@ Board models from [Poly Haven](https://polyhaven.com) (CC0), cleaned with `npm r
 | `models/grass_medium_01` | [Grass Medium 01](https://polyhaven.com/a/grass_medium_01) | Rob Tuytel, Rico Cilliers |
 | `models/moss_01` | [Moss 01](https://polyhaven.com/a/moss_01) | Rob Tuytel |
 | `models/dry_branches_medium_01` | [Dry Branches Medium 01](https://polyhaven.com/a/dry_branches_medium_01) | Rico Cilliers |
-| `models/Lantern_01` | [Lantern 01](https://polyhaven.com/a/Lantern_01) | Rajil Jose Macatangay |
-| `models/wooden_lantern_01` | [Wooden Lantern 01](https://polyhaven.com/a/wooden_lantern_01) | James Ray Cock |
-| `models/treasure_chest` | [Treasure Chest](https://polyhaven.com/a/treasure_chest) | Rico Cilliers |
-| `models/wooden_crate_01` | [Wooden Crate 01](https://polyhaven.com/a/wooden_crate_01) | James Ray Cock |
-| `models/wine_barrel_01` | [Wine Barrel 01](https://polyhaven.com/a/wine_barrel_01) | James Ray Cock |
-| `models/wicker_basket_01` | [Wicker Basket 01](https://polyhaven.com/a/wicker_basket_01) | Kuutti Siitonen |
-| `models/wooden_candlestick` | [Wooden Candlestick](https://polyhaven.com/a/wooden_candlestick) | Josh Dean |
-| `models/gothic_statue` | [Gothic Statue](https://polyhaven.com/a/gothic_statue) | Benny Weimer |
-| `models/marble_bust_01` | [Marble Bust 01](https://polyhaven.com/a/marble_bust_01) | Rico Cilliers |
-| `models/lion_head` | [Lion Head](https://polyhaven.com/a/lion_head) | Tina |
-| `models/large_castle_door` | [Large Castle Door](https://polyhaven.com/a/large_castle_door) | Tina |
-| `models/large_iron_gate` | [Large Iron Gate](https://polyhaven.com/a/large_iron_gate) | Josh Dean |
 

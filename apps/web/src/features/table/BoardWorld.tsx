@@ -17,15 +17,16 @@ export type MoodLight = {
     background: string;                                  // the room around the board
     lamp: string; lampPower: number;                     // the warm lamp over the table
     sun: string; sunPower: number;                       // the light that casts the shadows (sun, moon, torchlight)
+    sunPosition: [number, number, number];               // where the sun/moon sits; dawn and dusk sit low on the horizon
     sky: string; ground: string; roomPower: number;      // soft light from above and below
     dust: string; vignette: number;                      // dust colour, how dark the corners get
 };
 export const MOODS: Record<SceneMood, MoodLight> = {
-    day:     { background: '#14110d', lamp: '#ffe6c4', lampPower: 1.4, sun: '#fff4e0', sunPower: 1.2, sky: '#ffe9cc', ground: '#2a3445', roomPower: 0.75, dust: '#ffdcae', vignette: 0.5 },
-    dawn:    { background: '#1a1014', lamp: '#ffc9a0', lampPower: 1.1, sun: '#ffb88a', sunPower: 0.9, sky: '#ffd2b8', ground: '#3a2f3a', roomPower: 0.6, dust: '#ffd0b0', vignette: 0.55 },
-    dusk:    { background: '#140c12', lamp: '#ff9e6a', lampPower: 1.0, sun: '#ff8a55', sunPower: 0.6, sky: '#9a7aa8', ground: '#2a2030', roomPower: 0.5, dust: '#ffb48a', vignette: 0.6 },
-    night:   { background: '#030408', lamp: '#9fb6ff', lampPower: 0.22, sun: '#7d93d8', sunPower: 0.14, sky: '#3a4870', ground: '#06070c', roomPower: 0.16, dust: '#b8c8ff', vignette: 0.8 },
-    dungeon: { background: '#020101', lamp: '#ffb070', lampPower: 0.16, sun: '#ffcf99', sunPower: 0.06, sky: '#2a221c', ground: '#050403', roomPower: 0.1, dust: '#ffcf99', vignette: 0.85 },
+    day:     { background: '#14110d', lamp: '#ffe6c4', lampPower: 0.81, sun: '#fff4e0', sunPower: 0.60, sunPosition: [6, 20, 9], sky: '#ffe9cc', ground: '#2a3445', roomPower: 0.43, dust: '#ffdcae', vignette: 0.5 },
+    dawn:    { background: '#1a1014', lamp: '#ffb070', lampPower: 0.74, sun: '#ff7a28', sunPower: 0.57, sunPosition: [18, 5, 6], sky: '#ffb070', ground: '#4a3020', roomPower: 0.37, dust: '#ffd0b0', vignette: 0.55 },
+    dusk:    { background: '#140c12', lamp: '#ff8a4a', lampPower: 0.67, sun: '#ff6418', sunPower: 0.54, sunPosition: [-16, 4.2, 7], sky: '#ff8a55', ground: '#3a2030', roomPower: 0.37, dust: '#ffb48a', vignette: 0.6 },
+    night:   { background: '#07080e', lamp: '#9fb6ff', lampPower: 0.32, sun: '#7d93d8', sunPower: 0.24, sunPosition: [8, 16, 10], sky: '#4a5a82', ground: '#0a0c14', roomPower: 0.4, dust: '#b8c8ff', vignette: 0.72 },
+    dungeon: { background: '#020101', lamp: '#ffb070', lampPower: 0.16, sun: '#ffcf99', sunPower: 0.06, sunPosition: [6, 20, 9], sky: '#2a221c', ground: '#050403', roomPower: 0.1, dust: '#ffcf99', vignette: 0.85 },
 };
 export const moodOf = (mood?: SceneMood) => MOODS[mood ?? 'day'] ?? MOODS.day;
 

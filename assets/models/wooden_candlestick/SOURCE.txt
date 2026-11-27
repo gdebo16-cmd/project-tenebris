@@ -1,6 +1,0 @@
-Wooden Candlestick
-Josh Dean
-CC0
-https://polyhaven.com/a/wooden_candlestick
-Imported for Tenebris with scripts/import-polyhaven.mjs
-Cleaned with npm run model (high + light).

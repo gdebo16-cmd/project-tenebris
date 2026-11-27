@@ -1,6 +1,0 @@
-Wine Barrel 01
-James Ray Cock
-CC0
-https://polyhaven.com/a/wine_barrel_01
-Imported for Tenebris with scripts/import-polyhaven.mjs
-Cleaned with npm run model (high + light).
