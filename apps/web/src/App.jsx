@@ -20,8 +20,8 @@ import Loader from './components/Loader.jsx';
 
 
 // The table brings in three.js (big), so it's only downloaded when someone opens the table
-const TablePage = lazy(() => import('./features/table/TablePage.tsx'));
-const MapEditorPage = lazy(() => import('./features/table/MapEditorPage.tsx'));
+const TablePage = lazy(() => import('./features/table/pages/TablePage.tsx'));
+const MapEditorPage = lazy(() => import('./features/table/pages/MapEditorPage.tsx'));
 const DiceLab = lazy(() => import('./features/dice/DiceLab.tsx'));
 
 function ThemeWatcher() {

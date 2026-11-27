@@ -1,0 +1,313 @@
+/* The DM's board tools: a compact, sectioned menu, collapsible, and usable on a phone. */
+
+.toolbar {
+    position: fixed;
+    top: 10dvh;
+    right: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 89.85dvh;
+    max-width: 25dvw;
+    border-radius: 1.5rem 0 0 0;
+    border: 1px solid var(--border, #b27f50);
+    background: color-mix(in srgb, var(--background-color, #141414) 92%, transparent);
+    border-right: 1px solid var(--border, #b27f50);
+    overflow: hidden;
+}
+
+.toolbarClosed {
+    width: 3.25dvw;
+    border-right: none;
+    
+}
+
+.headerTab.tabOn {
+    background: color-mix(in srgb, var(--accent, #d4af37) 28%, transparent);
+    
+}
+
+.toolbarOpen .headerTab {
+    padding: 0.25rem;
+    
+}
+
+.toolbarOpen {
+    flex-direction: row;
+    
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    height: 100%;
+    gap: 8px;
+    border-right: 1px solid var(--border, #b27f50);
+}
+
+.headerTab {
+    margin: 0;
+    padding: 1rem;
+    min-height: 34px;
+    border-radius: 6px;
+    border: none;
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    flex: 1 0 auto;
+    gap: 6px;
+    color: inherit;
+    font: inherit;
+}
+.toolbarClosed .header {
+    border-bottom: none;
+}
+
+.tabIcon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: block;
+}
+
+.headerTools {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    flex: 1 0 auto;
+    gap: 6px;
+}
+
+
+.moveBtn[aria-pressed="true"] {
+    background: color-mix(in srgb, var(--accent, #d4af37) 28%, transparent);
+    color: #1a1208;
+}
+
+
+.collapse {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
+    border: none;
+    width: 2.75dvw;
+    height: 5.25dvh;
+    border-radius: 6px;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    flex: 0 0 auto;      
+    padding: 0; 
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 4px 10px 10px;
+    max-height: min(62dvh, 34rem);
+    overflow: auto;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+    border-top: 1px solid color-mix(in srgb, var(--border, #b27f50) 40%, transparent);
+}
+
+.section:first-child {
+    border-top: none;
+    padding-top: 8px;
+}
+
+.sectionTitle {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+
+.tabs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(4.4rem, 1fr));
+    gap: 4px;
+    padding: 6px 0 4px;
+}
+
+.tab {
+    margin: 0;
+    padding: 6px 4px;
+    min-height: 34px;
+    border-radius: 6px;
+    border: 1px solid var(--border, #b27f50);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+    white-space: normal;
+}
+
+.tabOn {
+    background: color-mix(in srgb, var(--accent, #d4af37) 28%, transparent);
+    border-color: var(--accent, #d4af37);
+}
+
+.hint {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+
+
+.error { color: #f08a7a; opacity: 1; }
+
+.swatch {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.styleSelect { display: inline-flex; gap: 4px; }
+
+.toolDanger { border-color: #d0503c; color: #ffb3a6; }
+
+.inputRange {
+    width: 120px;
+    vertical-align: middle;
+    accent-color: var(--accent, #d4af37);
+}
+
+.inputColor {
+    width: 32px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.mapForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.send {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    min-height: 34px;
+    padding: 0;
+    border-radius: 6px;
+    border: 1px solid var(--accent, #d4af37);
+    background: var(--accent, #d4af37);
+    color: var(--bg, #0b4225);
+    font: inherit;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.send:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Surface brush swatches: one colour per kind of ground (same colours as SURFACE_LOOK in TableScenery.tsx) */
+.swatch[data-surface='grass'] { background: #3f6b2a; }
+.swatch[data-surface='moss'] { background: #5a6b33; }
+.swatch[data-surface='dirt'] { background: #6b5440; }
+.swatch[data-surface='cobble'] { background: #8a8a7a; }
+.swatch[data-surface='flagstone'] { background: #7a7468; }
+.swatch[data-surface='rock'] { background: #5d5a55; }
+.swatch[data-surface='bricks'] { background: #9a7b5c; }
+.swatch[data-surface='snow'] { background: #e8eef2; }
+.swatch[data-surface='bark'] { background: #5a4632; }
+.swatch[data-surface='woodfloor'] { background: #7a5a3a; }
+.swatch[data-surface='roof'] { background: #3a3a3e; }
+
+
+.paintList,
+.objectList {
+    max-height: min(40vh, 22rem);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+}
+
+.swatchThumb {
+    display: inline-block;
+    width: 1.15em;
+    height: 1.15em;
+    margin-right: 6px;
+    border-radius: 3px;
+    background: #444 center / cover no-repeat;
+    vertical-align: -0.15em;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 35%);
+}
+@media (max-width: 700px) {
+    .toolbar {
+        right: 8px;
+        left: 8px;
+        bottom: max(8px, env(safe-area-inset-bottom));
+        max-width: none;
+    }
+
+    .body {
+        max-height: min(52dvh, 28rem);
+    }
+
+    .btn {
+        min-height: 40px;
+        padding: 0 10px;
+    }
+
+    .send {
+        width: 40px;
+        min-height: 40px;
+    }
+
+    .collapse {
+        width: 40px;
+        height: 40px;
+    }
+
+    .tab {
+        min-height: 44px;
+        font-size: 11px;
+        padding: 6px 3px;
+    }
+
+    .paintList,
+    .objectList {
+        max-height: min(36dvh, 18rem);
+    }
+    .header .btn {
+        min-height: 40px;
+    }
+}

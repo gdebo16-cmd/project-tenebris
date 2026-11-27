@@ -1,4 +1,4 @@
-import { GRAPHICS_LEVELS, isGraphicsLevel, useGraphics, writeGraphicsLevel } from '../../features/table/graphicsSettings.ts';
+import { GRAPHICS_LEVELS, isGraphicsLevel, useGraphics, writeGraphicsLevel } from '../../features/table/hooks/graphicsSettings.ts';
 import styles from './Settings.module.css';
 
 const pretty = (s) => s[0].toUpperCase() + s.slice(1);
