@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import styles from './ItemDetails.module.css';
+import styles from '../../styles/components/inventory/ItemDetails.module.css';
 
 // Shared details popup for armor, weapons and items (shop and inventory).
 // item = { kind: 'armor' | 'weapon' | 'item', data }; children render under the stats (e.g. rune controls).

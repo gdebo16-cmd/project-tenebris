@@ -1,5 +1,5 @@
 import { Link, useParams, useNavigate } from 'react-router';
-import ItemShop from './ItemShop';
+import ItemShop from '../../components/inventory/ItemShop';
 import styles from '../../styles/features/inventory/InventoryPage.module.css';
 
 // Replaces views/inventory.ejs. The list itself lives in ItemShop.
