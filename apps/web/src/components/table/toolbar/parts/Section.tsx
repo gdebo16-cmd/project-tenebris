@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
-import styles from '../Toolbar.module.css'
+import styles from '../../../../styles/components/table/toolbar/Toolbar.module.css'
+import { Section as UiSection } from '../../../ui/Section.tsx'
 
 export function Section({ id, labelledBy, title, children }: {
     id: string;
@@ -8,9 +9,8 @@ export function Section({ id, labelledBy, title, children }: {
     children?: ReactNode;
 }) {
     return (
-        <div className={styles.section} role="tabpanel" id={id} aria-labelledby={labelledBy}>
-            {title != null && <h3 className={styles.sectionTitle}>{title}</h3>}
+        <UiSection className={styles.section} role="tabpanel" id={id} aria-labelledby={labelledBy} heading={title} headingClassName={styles.sectionTitle}>
             {children}
-        </div>
+        </UiSection>
     );
 }

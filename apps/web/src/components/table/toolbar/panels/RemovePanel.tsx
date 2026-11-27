@@ -4,7 +4,7 @@ import { BrushRow, ClearMapRow } from '../parts/ToolParts.tsx'
 import { ButtonRow } from '../parts/ButtonRow.tsx'
 import { Section } from '../parts/Section.tsx'
 import { ActionButton } from '../parts/ActionButton.tsx'
-import styles from '../Toolbar.module.css'
+import styles from '../../../../styles/components/table/toolbar/Toolbar.module.css'
 
 export function RemovePanel({ editing, tool, setTool, brush, setBrush, onClearMap, selectedToken, onRemove }: PanelProps) {
     return (

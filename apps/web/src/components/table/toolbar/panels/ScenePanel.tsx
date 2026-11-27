@@ -7,8 +7,8 @@ import { Section } from '../parts/Section.tsx'
 import { Field } from '../parts/Field.tsx'
 import { ActionButton } from '../parts/ActionButton.tsx'
 import { titled } from '../parts/ToolParts.tsx'
-import styles from '../Toolbar.module.css'
-import controls from '../TableControls.module.css'
+import styles from '../../../../styles/components/table/toolbar/Toolbar.module.css'
+import controls from '../../../../styles/components/table/toolbar/TableControls.module.css'
 
 function SceneLookSection({ mode, look, onLook, onResetFog }: { mode: 'session' | 'editor'; look: SceneLook; onLook: (change: Partial<SceneLook>) => void; onResetFog: () => void }) {
     const editing = mode === 'editor';

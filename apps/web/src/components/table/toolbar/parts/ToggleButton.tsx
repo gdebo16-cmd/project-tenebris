@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
-import styles from '../Toolbar.module.css'
-import controls from '../TableControls.module.css'
+import styles from '../../../../styles/components/table/toolbar/Toolbar.module.css'
+import controls from '../../../../styles/components/table/toolbar/TableControls.module.css'
+import { ToggleButton as UiToggleButton } from '../../../ui/ToggleButton.tsx'
 
 export function btnClass(on: boolean) {
     return on ? `${controls.tool} ${controls.toolOn} ${styles.btn}` : `${controls.tool} ${styles.btn}`;
@@ -8,6 +9,6 @@ export function btnClass(on: boolean) {
 
 export function ToggleButton({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: ReactNode }) {
     return (
-        <button type="button" className={btnClass(pressed)} aria-pressed={pressed} onClick={onClick}>{children}</button>
+        <UiToggleButton pressed={pressed} className={btnClass(pressed)} onClick={onClick}>{children}</UiToggleButton>
     );
 }

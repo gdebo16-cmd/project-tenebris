@@ -1,7 +1,7 @@
 import { type ComponentType, useState } from 'react'
 import { type Tool } from '../../../features/table/hooks/tableTypes.ts'
 import { TERRAIN_KINDS } from '@tenebris/rules/board'
-import styles from './Toolbar.module.css'
+import styles from '../../../styles/components/table/toolbar/Toolbar.module.css'
 import { isPressed } from './parts/ToolButton.tsx'
 import { type ToolbarProps, type PanelProps } from '../../../features/table/hooks/toolbarTypes.ts'
 import { ShapesRow } from './parts/ShapesRow.tsx'

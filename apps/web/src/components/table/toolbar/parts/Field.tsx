@@ -1,8 +1,9 @@
 import { type ReactNode } from 'react'
-import controls from '../TableControls.module.css'
+import controls from '../../../../styles/components/table/toolbar/TableControls.module.css'
+import { Field as UiField } from '../../../ui/Field.tsx'
 
 export function Field({ label, children }: { label: ReactNode; children?: ReactNode }) {
     return (
-        <label className={controls.field}>{label}{' '}{children}</label>
+        <UiField className={controls.field} label={label}>{children}</UiField>
     );
 }

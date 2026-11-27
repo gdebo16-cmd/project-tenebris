@@ -3,7 +3,7 @@ import { AREA_KINDS } from '@tenebris/rules/sight'
 import { titled } from './parts/ToolParts.tsx'
 import { Fog } from '../board/overlays/BoardActs.tsx'
 import { type Overlay } from '../../../features/table/hooks/tableQueries.ts'
-import controls from './TableControls.module.css'
+import controls from '../../../styles/components/table/toolbar/TableControls.module.css'
 
 // The Shapes tool: which shape, how big, how long it stays, and its name
 export function ShapeControls({ tool, setTool }: { tool: Extract<Tool, { type: 'shape' }>; setTool: (t: Tool) => void }) {

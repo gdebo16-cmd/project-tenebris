@@ -4,7 +4,7 @@ import { messageOf } from '../../../features/table/hooks/tableUtils.ts'
 import { type ActChoice } from '@tenebris/rules/combat'
 import { type Area, AREA_KINDS } from '@tenebris/rules/sight'
 import { titled } from './parts/ToolParts.tsx'
-import controls from './TableControls.module.css'
+import controls from '../../../styles/components/table/toolbar/TableControls.module.css'
 
 // The selected token's actions: pick one, then (for spells) the level and a target or an area
 export function ActPanel({ token, acting, setActing }: { token: Token; acting: Acting | null; setActing: (a: Acting | null) => void }) {

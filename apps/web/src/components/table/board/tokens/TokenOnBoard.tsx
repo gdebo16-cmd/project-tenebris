@@ -7,7 +7,7 @@ import { type Hex, findPath } from '@tenebris/rules/board'
 import { hexToWorld, liftOf } from '../ground/TableScenery.tsx'
 import { Html, Billboard } from '@react-three/drei'
 import { HitBurst } from '../moments/BoardMoments.tsx'
-import styles from './TokenOnBoard.module.css'
+import styles from '../../../../styles/components/table/board/tokens/TokenOnBoard.module.css'
 
 // Token colours: yours, another player's, a monster (the DM's), a summon
 const TOKEN_COLORS = { mine: '#3fae6a', player: '#4d8fe0', monster: '#d0503c', summon: '#e0a63b', down: '#5a5a5a' };

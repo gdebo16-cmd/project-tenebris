@@ -5,7 +5,7 @@ import { ToggleButton } from '../parts/ToggleButton.tsx'
 import { ButtonRow } from '../parts/ButtonRow.tsx'
 import { Section } from '../parts/Section.tsx'
 import { BrushRow, titled } from '../parts/ToolParts.tsx'
-import styles from '../Toolbar.module.css'
+import styles from '../../../../styles/components/table/toolbar/Toolbar.module.css'
 
 function paintCategories() {
     const groups = new Map<string, typeof LIBRARY_PAINTS[number][]>();

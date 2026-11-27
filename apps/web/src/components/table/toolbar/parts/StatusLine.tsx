@@ -1,7 +1,7 @@
 import { type Token } from '../../../../features/table/hooks/tableQueries.ts'
 import { type Tool, PAINT_TOOLS } from '../../../../features/table/hooks/tableTypes.ts'
-import styles from '../Toolbar.module.css'
-import controls from '../TableControls.module.css'
+import styles from '../../../../styles/components/table/toolbar/Toolbar.module.css'
+import controls from '../../../../styles/components/table/toolbar/TableControls.module.css'
 
 export function StatusLine({ message, selectedToken, tool, editing, isDm }: {
     message: string;

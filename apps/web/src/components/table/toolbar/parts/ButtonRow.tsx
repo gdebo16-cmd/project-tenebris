@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
-import styles from '../Toolbar.module.css'
-import controls from '../TableControls.module.css'
+import styles from '../../../../styles/components/table/toolbar/Toolbar.module.css'
+import controls from '../../../../styles/components/table/toolbar/TableControls.module.css'
+import { ButtonRow as UiButtonRow } from '../../../ui/ButtonRow.tsx'
 
 export function ButtonRow({ label, children, role, 'aria-label': ariaLabel }: {
     label?: ReactNode;
@@ -9,9 +10,8 @@ export function ButtonRow({ label, children, role, 'aria-label': ariaLabel }: {
     'aria-label'?: string;
 }) {
     return (
-        <div className={styles.btnRow} role={role} aria-label={ariaLabel}>
-            {label != null && <span className={controls.field}>{label}</span>}
+        <UiButtonRow className={styles.btnRow} label={label} labelClassName={controls.field} role={role} aria-label={ariaLabel}>
             {children}
-        </div>
+        </UiButtonRow>
     );
 }
