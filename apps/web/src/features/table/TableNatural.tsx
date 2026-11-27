@@ -199,21 +199,67 @@ nearTotal = max(nearTotal, 1e-4);
 `;
 
 const GROUND_COLOUR = /* glsl */ `
-vec2 guv = np / uTextureScale;
-vec2 gdx = dFdx(guv), gdy = dFdy(guv);
+// uLayerKind: 0 = ordinary, 1 = snow, 2 = grass (so each can be treated a little differently)
+float snowAmt = 0.0;
+for (int i = 0; i < 7; i++) {
+    float w = nearW[i] / nearTotal;
+    if (w <= 0.001) continue;
+    float kind0 = uLayerKind[int(clamp(floor(hexPixel(nearQr[i]).r + 0.5), 0.0, 15.0))];
+    if (kind0 > 0.5 && kind0 < 1.5) snowAmt += w;
+}
 vec4 gCol = vec4(0.0);
 vec3 gNor = vec3(0.0);
-float iceAmount = 0.0, gWet = 0.0;
+float iceAmount = 0.0, gWet = 0.0, wSum = 0.0;
 for (int i = 0; i < 7; i++) {
     float w = nearW[i] / nearTotal;
     if (w <= 0.001) continue;
     vec4 h = hexPixel(nearQr[i]);
-    vec3 at = vec3(guv, floor(h.r + 0.5));
-    gCol += w * textureGrad(uGroundColour, at, gdx, gdy);
-    gNor += w * (textureGrad(uGroundNormal, at, gdx, gdy).xyz * 2.0 - 1.0);
+    int li = int(clamp(floor(h.r + 0.5), 0.0, 15.0));
+    float kind = uLayerKind[li];
+    float isSnow = step(0.5, kind) * step(kind, 1.5);
+    float isGrass = step(1.5, kind) * step(kind, 2.5);
+    float scale = uTextureScale * mix(1.0, 2.5, isSnow);   // snow uses a larger repeat so footprints don't tile
+    vec2 uv = np / scale;
+    vec4 samp;
+    vec3 nor;
+    if (isSnow > 0.5) {
+        vec2 uvB = vec2(uv.x * 0.743 - uv.y * 0.669, uv.x * 0.669 + uv.y * 0.743) + vec2(0.37, 0.19);
+        float bomb = pFbm(np * 0.18);
+        vec4 a = textureGrad(uGroundColour, vec3(uv, float(li)), dFdx(uv), dFdy(uv));
+        vec4 b = textureGrad(uGroundColour, vec3(uvB, float(li)), dFdx(uvB), dFdy(uvB));
+        samp = mix(a, b, bomb);
+        // lift and cool: the table's warm lamp would otherwise turn white snow pink
+        samp.rgb = mix(samp.rgb, vec3(0.93, 0.96, 1.0), 0.42);
+        samp.rgb = min(samp.rgb * vec3(0.98, 1.0, 1.06) + vec3(0.04, 0.045, 0.06), vec3(1.0));
+        samp.a = mix(samp.a, 0.72, 0.35);
+        vec3 na = textureGrad(uGroundNormal, vec3(uv, float(li)), dFdx(uv), dFdy(uv)).xyz * 2.0 - 1.0;
+        vec3 nb = textureGrad(uGroundNormal, vec3(uvB, float(li)), dFdx(uvB), dFdy(uvB)).xyz * 2.0 - 1.0;
+        nor = mix(na, nb, bomb);
+    } else {
+        vec2 gdx = dFdx(uv), gdy = dFdy(uv);
+        samp = textureGrad(uGroundColour, vec3(uv, float(li)), gdx, gdy);
+        nor = textureGrad(uGroundNormal, vec3(uv, float(li)), gdx, gdy).xyz * 2.0 - 1.0;
+        if (isGrass > 0.5) {
+            float luma = dot(samp.rgb, vec3(0.3, 0.59, 0.11));
+            vec3 green = vec3(0.18, 0.44, 0.12) * (0.5 + luma);
+            samp.rgb = mix(samp.rgb, green, 0.55) * vec3(0.70, 1.18, 0.52);
+        }
+    }
+    // snow wins the blend: dark neighbour ground (dirt, dry grass) must not smear in as brown blotches
+    if (isSnow < 0.5 && snowAmt > 0.01) {
+        float luma = dot(samp.rgb, vec3(0.3, 0.59, 0.11));
+        w *= mix(1.0, 0.12, clamp(snowAmt * (1.0 - luma) * 1.4, 0.0, 1.0));
+    }
+    gCol += w * samp;
+    gNor += w * nor;
     iceAmount += w * step(128.0, h.b);
     gWet += w * isWater(h);
+    wSum += w;
 }
+gCol /= max(wSum, 1e-4);
+gNor /= max(wSum, 1e-4);
+gWet /= max(wSum, 1e-4);
+iceAmount /= max(wSum, 1e-4);
 diffuseColor.rgb *= gCol.rgb;
 diffuseColor.rgb *= 1.0 - 0.45 * gWet;            // wet and darker under the water
 float groundRough = gCol.a;
@@ -250,7 +296,7 @@ function groundLook(uniforms: Uniforms) {
     return (shader: Shader) => {
         Object.assign(shader.uniforms, uniforms);
         shapeGround(shader, 'uWaterDip', `${GROUND_TOP.toFixed(3)}`);
-        shader.fragmentShader = 'varying vec3 vGroundN;\nuniform highp sampler2DArray uGroundColour;\nuniform highp sampler2DArray uGroundNormal;\nuniform float uTextureScale;\n'
+        shader.fragmentShader = 'varying vec3 vGroundN;\nuniform highp sampler2DArray uGroundColour;\nuniform highp sampler2DArray uGroundNormal;\nuniform float uTextureScale;\nuniform float uLayerKind[16];\n'
             + NOISE_GLSL + shader.fragmentShader
                 .replace('void main() {', HEX_GLSL + 'void main() {')
                 .replace('#include <map_fragment>', '#include <map_fragment>\n' + NEAR_HEXES + GROUND_COLOUR + ICE_COLOUR)
@@ -297,7 +343,11 @@ export function NaturalGround({ hexes, terrain, surfaces, heights, radius }: Nat
         uHexData: { value: null }, uHexOffset: { value: 0 }, uHexSize: { value: 1 },
         uHeightStep: { value: HEIGHT_STEP }, uWaterDip: { value: WATER_DIP }, uRimApothem: { value: 1 },
         uGroundColour: { value: null }, uGroundNormal: { value: null }, uTextureScale: { value: TEXTURE_SCALE },
+        uLayerKind: { value: new Array(16).fill(0) },
     }), []);
+    const kinds = new Array(16).fill(0);
+    plan.layers.forEach((folder, i) => { kinds[i] = folder === 'surfaces/snow' ? 1 : folder === 'surfaces/grass' ? 2 : 0; });
+    uniforms.uLayerKind.value = kinds;
     uniforms.uHexData.value = hexData.texture;
     uniforms.uHexOffset.value = hexData.offset;
     uniforms.uHexSize.value = hexData.size;

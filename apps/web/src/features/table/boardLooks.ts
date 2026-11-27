@@ -124,20 +124,30 @@ diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.9, 0.95, 0.96), foamLine);
 diffuseColor.a = max(diffuseColor.a, foamLine);
 `;
 
-// Tiles: a water hex's own depth (uWaterDepth) and, for a shore hex, foam towards its edge
+// Tiles: a water hex's own depth (uWaterDepth) and foam only on sides that face land.
+// uWaterShore is a bit mask, one bit per side, in the same order as HEX_DIRECTIONS.
+// (Inlined: GLSL does not allow a function inside main(), which is where this is inserted.)
 const TILE_WATER = /* glsl */ `
 float wDepth = uWaterDepth;
 vec2 wLocal = vPaintPos.xz - vPaintCenter;
-float wEdge = max(max(abs(dot(wLocal, vec2(0.8660254, 0.5))), abs(wLocal.y)), abs(dot(wLocal, vec2(-0.8660254, 0.5)))) / 0.8660254;
-float wFoam = uWaterShore * smoothstep(0.5, 1.0, wEdge);
+float wAp = 0.8660254;
+float wFoam = 0.0;
+wFoam = max(wFoam, step(0.5, mod(floor(uWaterShore / 1.0 + 0.001), 2.0)) * smoothstep(0.5, 1.0, dot(wLocal, vec2(0.8660254, 0.5)) / wAp));
+wFoam = max(wFoam, step(0.5, mod(floor(uWaterShore / 2.0 + 0.001), 2.0)) * smoothstep(0.5, 1.0, dot(wLocal, vec2(0.8660254, -0.5)) / wAp));
+wFoam = max(wFoam, step(0.5, mod(floor(uWaterShore / 4.0 + 0.001), 2.0)) * smoothstep(0.5, 1.0, dot(wLocal, vec2(0.0, -1.0)) / wAp));
+wFoam = max(wFoam, step(0.5, mod(floor(uWaterShore / 8.0 + 0.001), 2.0)) * smoothstep(0.5, 1.0, dot(wLocal, vec2(-0.8660254, -0.5)) / wAp));
+wFoam = max(wFoam, step(0.5, mod(floor(uWaterShore / 16.0 + 0.001), 2.0)) * smoothstep(0.5, 1.0, dot(wLocal, vec2(-0.8660254, 0.5)) / wAp));
+wFoam = max(wFoam, step(0.5, mod(floor(uWaterShore / 32.0 + 0.001), 2.0)) * smoothstep(0.5, 1.0, dot(wLocal, vec2(0.0, 1.0)) / wAp));
 ` + WATER_COLOUR + WATER_FOAM;
 
-// Water depth: 0 = shore .. 1 = deep. shore: foam along the edges (hexes next to land).
-export function waterLookFor(depth: number, shore: boolean) {
+// Water depth: 0 = shore .. 1 = deep. shoreEdges: foam on sides that face land (a bit mask, same
+// order as HEX_DIRECTIONS). A boolean still works: true = all sides, false = none.
+export function waterLookFor(depth: number, shoreEdges: number | boolean = 0) {
+    const mask = typeof shoreEdges === 'boolean' ? (shoreEdges ? 63 : 0) : shoreEdges;
     return (shader: Shader) => {
         shader.uniforms.uWaterTime = waterTime;
         shader.uniforms.uWaterDepth = { value: depth };
-        shader.uniforms.uWaterShore = { value: shore ? 1 : 0 };
+        shader.uniforms.uWaterShore = { value: mask };
         addWhere(shader);
         shader.fragmentShader = 'uniform float uWaterTime;\nuniform float uWaterDepth;\nuniform float uWaterShore;\n' + shader.fragmentShader
             .replace('#include <color_fragment>', '#include <color_fragment>\n' + TILE_WATER)

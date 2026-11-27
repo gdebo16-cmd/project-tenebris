@@ -6,11 +6,14 @@ import { ShapeList } from './ShapePanels.tsx'
 import { Feed } from './Feed.tsx'
 import { TurnBar } from './TurnBar.tsx'
 import { BoardSelector } from './BoardLibrary.tsx'
+import { BoardSize } from './BoardSize.tsx'
+import { radiusOf } from '@tenebris/rules/board'
 import styles from './TablePanels.module.css'
 
 // The tools, the feed, the turn order and the view buttons laid over the board (the Canvas itself is BoardCanvas.tsx).
 export function TablePanels({ c }: { c: TableController }) {
     const { campId, editing, data, move, remove, view, setView, fitKey, setFitKey, look, setLook, tool, setTool, setSelected, placing, setPlacing, summonName, setSummonName, summonOwner, setSummonOwner, message, setMessage, isDm, tokens, overlays, feed, removeOverlay, resetFog, acting, setActing, brush, setBrush, clearMap, shapeOrigin, selectedToken, turns, canMove, done, mode } = c;
+    const scene = data?.scene;
     return (
         <>
             <Toolbar
@@ -28,6 +31,10 @@ export function TablePanels({ c }: { c: TableController }) {
                 onResetFog={() => data?.scene && resetFog.mutate(data.scene.id, { onError: (err) => setMessage(messageOf(err)) })}
                 onClearMap={() => data?.scene && clearMap.mutate(data.scene.id, done)}
                 brush={brush} setBrush={setBrush}
+                boardSize={mode === 'editor' && scene ? (
+                    <BoardSize value={radiusOf(scene.look)} error={setLook.error ? messageOf(setLook.error) : undefined}
+                        onChange={(radius) => setLook.mutate({ sceneId: scene.id, radius }, done)} />
+                ) : undefined}
                 message={message || (acting ? (acting.mode === 'target' ? `${acting.choice.name}: click the target` : `${acting.choice.name}: click where the ${acting.kind} goes`) : '')
                     || (tool.type === 'shape' ? (shapeOrigin ? 'Now click where it points' : (tool.kind === 'cone' || tool.kind === 'line') ? 'Click where it starts' : 'Click where it goes') : '')}>
                 {/* step 17: what the selected token can do */}

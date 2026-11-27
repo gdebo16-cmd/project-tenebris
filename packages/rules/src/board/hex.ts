@@ -31,7 +31,16 @@ export function neighbors (hex: Hex): Hex[] {
     return HEX_DIRECTIONS.map(dir => add(hex, dir));
 }
 
-
+// Which sides of a hex are missing from a set, as a bit mask (bit i matches HEX_DIRECTIONS[i]).
+// For water, pass the water hexes: a set bit means that side faces land (or the edge of the board).
+export function waterShoreEdges(hex: Hex, present: ReadonlySet<string>): number {
+    let mask = 0;
+    for (let i = 0; i < HEX_DIRECTIONS.length; i++) {
+        const d = HEX_DIRECTIONS[i];
+        if (!present.has(hexKey({ q: hex.q + d.q, r: hex.r + d.r }))) mask |= 1 << i;
+    }
+    return mask;
+}
 
 export function distance(a: Hex, b: Hex): number {
     const dq = b.q - a.q;

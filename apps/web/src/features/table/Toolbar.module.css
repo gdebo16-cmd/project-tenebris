@@ -1,4 +1,4 @@
-
+/* The DM's board tools: a compact, sectioned menu, collapsible, and usable on a phone. */
 
 .toolbar {
     position: fixed;
@@ -7,21 +7,102 @@
     z-index: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    max-width: calc(100vw - 80px);   /* leaves room for the menu button on the right */
-    padding: 8px 10px;
-    border-radius: 12px;
+    align-items: stretch;
+    max-width: min(28rem, calc(100vw - 80px)); /* leaves room for the menu button on the right */
+    padding: 0;
+    border-radius: 10px;
     border: 1px solid var(--border, #b27f50);
-    background: color-mix(in srgb, var(--background-color, #141414) 88%, transparent);
+    background: color-mix(in srgb, var(--background-color, #141414) 92%, transparent);
     color: var(--text, #000000);
+    box-shadow: 0 8px 24px color-mix(in srgb, #000 40%, transparent);
+}
+
+.toolbarClosed {
+    width: auto;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid color-mix(in srgb, var(--border, #b27f50) 55%, transparent);
+}
+
+.toolbarClosed .header {
+    border-bottom: none;
+}
+
+.title {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--text, #facd8d) 80%, var(--accent, #d4af37));
+}
+
+.collapse {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 6px;
+    border: 1px solid var(--border, #b27f50);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 4px 10px 10px;
+    max-height: min(62dvh, 34rem);
+    overflow: auto;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+    border-top: 1px solid color-mix(in srgb, var(--border, #b27f50) 40%, transparent);
+}
+
+.section:first-child {
+    border-top: none;
+    padding-top: 8px;
+}
+
+.sectionTitle {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.btnRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.btn {
+    border-radius: 6px;
+    min-height: 34px;
 }
 
 .error { color: #f08a7a; opacity: 1; }
 
-
-/* the little colour square on each Surface button */
 .swatch {
     display: inline-block;
     width: 22px;
@@ -31,14 +112,56 @@
     margin-right: 6px;
 }
 
-
-/* the board style switch (Tiles / Natural): its two buttons sit together */
 .styleSelect { display: inline-flex; gap: 4px; }
 
-/* a button that can't be undone (Clear map) */
 .toolDanger { border-color: #d0503c; color: #ffb3a6; }
 
-/* the Surface brush swatches: one colour per kind of ground (same colours as SURFACE_LOOK in TableScenery.tsx) */
+.inputRange {
+    width: 120px;
+    vertical-align: middle;
+    accent-color: var(--accent, #d4af37);
+}
+
+.inputColor {
+    width: 32px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--border, #b27f50);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.mapForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.send {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    min-height: 34px;
+    padding: 0;
+    border-radius: 6px;
+    border: 1px solid var(--accent, #d4af37);
+    background: var(--accent, #d4af37);
+    color: var(--bg, #0b4225);
+    font: inherit;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.send:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Surface brush swatches: one colour per kind of ground (same colours as SURFACE_LOOK in TableScenery.tsx) */
 .swatch[data-surface='grass'] { background: #3f6b2a; }
 .swatch[data-surface='moss'] { background: #5a6b33; }
 .swatch[data-surface='dirt'] { background: #6b5440; }
@@ -50,3 +173,31 @@
 .swatch[data-surface='bark'] { background: #5a4632; }
 .swatch[data-surface='woodfloor'] { background: #7a5a3a; }
 .swatch[data-surface='roof'] { background: #3a3a3e; }
+
+@media (max-width: 700px) {
+    .toolbar {
+        right: 8px;
+        left: 8px;
+        bottom: max(8px, env(safe-area-inset-bottom));
+        max-width: none;
+    }
+
+    .body {
+        max-height: min(52dvh, 28rem);
+    }
+
+    .btn {
+        min-height: 40px;
+        padding: 0 10px;
+    }
+
+    .send {
+        width: 40px;
+        min-height: 40px;
+    }
+
+    .collapse {
+        width: 40px;
+        height: 40px;
+    }
+}

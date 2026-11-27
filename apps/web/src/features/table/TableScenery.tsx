@@ -8,7 +8,7 @@
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react'
 import { type ThreeEvent } from '@react-three/fiber'
 import { Instances, Instance, useTexture } from '@react-three/drei'
-import { type Hex, hexKey, neighbors, SURFACES, DEFAULT_SURFACE, type Surface, type BoardStyle } from '@tenebris/rules/board'
+import { type Hex, hexKey, neighbors, waterShoreEdges, SURFACES, DEFAULT_SURFACE, type Surface, type BoardStyle } from '@tenebris/rules/board'
 import { Shape, ExtrudeGeometry, RepeatWrapping, SRGBColorSpace, type BufferGeometry, type Texture } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { paintTiles, paintStone, waterLookFor, iceLook } from './boardLooks.ts'
@@ -82,7 +82,25 @@ export function waterDepths(water: Hex[]): Map<string, number> {
     }
     return depth;
 }
-const WATER_LEVELS = [1, 2, 3].map((d) => ({ d, look: waterLookFor((d - 1) / 2, d === 1) }));
+// One batch per depth and land-edge mask, so foam can differ from hex to hex.
+function groupWater(water: Hex[], depths: Map<string, number>) {
+    const isWater = new Set(water.map(hexKey));
+    const groups: { key: string; d: number; look: ReturnType<typeof waterLookFor>; hexes: Hex[] }[] = [];
+    const index = new Map<string, number>();
+    for (const hex of water) {
+        const d = depths.get(hexKey(hex)) ?? 1;
+        const edges = waterShoreEdges(hex, isWater);
+        const key = d + ':' + edges;
+        let i = index.get(key);
+        if (i === undefined) {
+            i = groups.length;
+            index.set(key, i);
+            groups.push({ key, d, look: waterLookFor((d - 1) / 2, edges), hexes: [] });
+        }
+        groups[i].hexes.push(hex);
+    }
+    return groups;
+}
 
 // Small "random" numbers that are the same on every screen for the same hex (so rocks don't jump about on a repaint)
 export function fixedRandom(hex: Hex, n: number) {
@@ -249,6 +267,7 @@ function Walls({ walls, tex, onHexClick }: { walls: Hex[]; tex: Pictures; onHexC
 function BoardHexes({ hexes, terrain, surfaces, heights, onHexClick, tex }: TerrainProps & { tex: Pictures }) {
     const sorted = useMemo(() => sortHexes(hexes, terrain, surfaces), [hexes, terrain, surfaces]);
     const depths = useMemo(() => waterDepths(sorted.water), [sorted.water]);
+    const waterGroups = useMemo(() => groupWater(sorted.water, depths), [sorted.water, depths]);
     const at = (hex: Hex, y: number): [number, number, number] => { const [x, , z] = hexToWorld(hex, 1); return [x, y + liftOf(heights, hex), z]; };
     // a raised tile is the same hex column, stretched upwards (its bottom stays on the table)
     const raised = (hex: Hex): [number, number, number] => { const [x, , z] = hexToWorld(hex, 1); const l = liftOf(heights, hex); return [x, l / 2, z]; };
@@ -273,18 +292,15 @@ function BoardHexes({ hexes, terrain, surfaces, heights, onHexClick, tex }: Terr
 
             {/* water: custom water in place of the ground, a little lower, with moving ripples; clear by the shore with
                 foam, darker further out (waterLookFor in boardLooks.ts). One batch per depth. */}
-            {WATER_LEVELS.map(({ d, look }) => {
-                const level = sorted.water.filter((hex) => depths.get(hexKey(hex)) === d);
-                return level.length > 0 && (
-                    <Instances key={d} limit={hexes.length} receiveShadow>
-                        <cylinderGeometry args={[1, 1, TILE_HEIGHT, 6]} />
-                        <meshPhysicalMaterial roughness={WATER.roughness} clearcoat={1} clearcoatRoughness={0.05} transparent onBeforeCompile={look} />
-                        {level.map((hex) => (
-                            <Instance key={hexKey(hex)} position={at(hex, -0.04)} rotation={[0, Math.PI / 6, 0]} />
-                        ))}
-                    </Instances>
-                );
-            })}
+            {waterGroups.map(({ key, look, hexes: level }) => (
+                <Instances key={key} limit={hexes.length} receiveShadow>
+                    <cylinderGeometry args={[1, 1, TILE_HEIGHT, 6]} />
+                    <meshPhysicalMaterial roughness={WATER.roughness} clearcoat={1} clearcoatRoughness={0.05} transparent onBeforeCompile={look} />
+                    {level.map((hex) => (
+                        <Instance key={hexKey(hex)} position={at(hex, -0.04)} rotation={[0, Math.PI / 6, 0]} />
+                    ))}
+                </Instances>
+            ))}
 
             {/* ice: a thin, shiny, see-through layer over whatever ground is underneath */}
             {sorted.ice.length > 0 && (

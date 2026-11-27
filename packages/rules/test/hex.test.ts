@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { distance, neighbors, hexKey, findPath, hexesWithin, wallsOf, hexesForSpeed, isTerrainKind, checkLookChange } from '../src/board.ts';
+import { distance, neighbors, hexKey, findPath, hexesWithin, wallsOf, hexesForSpeed, isTerrainKind, checkLookChange, waterShoreEdges } from '../src/board.ts';
 
 test('distance counts the fewest steps between two hexes', () => {
     assert.equal(distance({q:0,r:0}, {q:2,r:2}), 4)
@@ -79,4 +79,18 @@ test('isTerrainKind accepts only the paintable kinds', () => {
     assert.ok(isTerrainKind('block'));
     assert.ok(!isTerrainKind('lava'));
     assert.ok(!isTerrainKind(null));
+});
+
+test('waterShoreEdges foams only sides that face land', () => {
+    const alone = new Set(['0,0']);
+    assert.equal(waterShoreEdges({ q: 0, r: 0 }, alone), 63);   // all six sides face land
+
+    const surrounded = new Set(['0,0', ...neighbors({ q: 0, r: 0 }).map(hexKey)]);
+    assert.equal(waterShoreEdges({ q: 0, r: 0 }, surrounded), 0);   // no land sides
+
+    // a 1-hex-wide river along +q: the middle hex still has water on two sides
+    const river = new Set(['-1,0', '0,0', '1,0']);
+    assert.equal(waterShoreEdges({ q: 0, r: 0 }, river), 54);       // bits 0 and 3 (the river) are off; 63-1-8=54
+    assert.ok((waterShoreEdges({ q: 0, r: 0 }, river) & 1) === 0);
+    assert.ok((waterShoreEdges({ q: 0, r: 0 }, river) & 8) === 0);
 });
