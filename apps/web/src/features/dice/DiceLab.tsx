@@ -7,7 +7,7 @@ import { Quaternion, Vector3, IcosahedronGeometry, BufferGeometry, TetrahedronGe
 import socket from '../../utils/socket.js';
 import { api } from '../../api.ts';
 import { useCssColor } from '../../hooks/useCssColor.ts';
-import styles from './dice.module.css';
+import styles from '../../styles/features/dice/DiceLab.module.css';
 import { Physics, RigidBody, CuboidCollider, ConvexHullCollider, type RapierRigidBody } from '@react-three/rapier';
 
 

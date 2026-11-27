@@ -6,9 +6,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { ApiError } from '../../api.ts';
 import sheet from '../../styles/components/sheets/Sheet.module.css';
-import styles from './DmPage.module.css';
-import RollFeed from '../../components/sheets/blocks/RollFeed.tsx';
-import { useMonsterCatalog } from './dmQueries.ts';
+import styles from '../../styles/features/dm/DmPage.module.css';
+import RollFeed from '../sheets/blocks/RollFeed.tsx';
+import { useMonsterCatalog } from '../../features/dm/dmQueries.ts';
 import { useDmTools } from './DmContext.tsx';
 
 const messageOf = (err: unknown) => (err instanceof ApiError || err instanceof Error ? err.message : 'Something went wrong');

@@ -3,9 +3,9 @@
 // the "current monster" / "current player" blocks, which are the ordinary sheet blocks drawn for that creature.
 import { createContext, useContext, type ReactNode } from 'react';
 import shared from '../../styles/components/sheets/Sheet.module.css';
-import { SheetContext, type SheetTools } from '../../components/sheets/blocks/SheetContext.tsx';
-import type { FeedEntry } from '../../components/sheets/blocks/RollFeed.tsx';
-import type { DmPageData, useDmChange } from './dmQueries.ts';
+import { SheetContext, type SheetTools } from '../sheets/blocks/SheetContext.tsx';
+import type { FeedEntry } from '../sheets/blocks/RollFeed.tsx';
+import type { DmPageData, useDmChange } from '../../features/dm/dmQueries.ts';
 
 export type DmTools = {
     campaignId: string;

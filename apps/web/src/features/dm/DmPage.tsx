@@ -15,7 +15,7 @@ import SheetLayout from '../../components/sheets/SheetLayout.tsx';
 import type { FeedEntry } from '../../components/sheets/blocks/RollFeed.tsx';
 import { messageOf, useCharacterSheetTools, useMonsterSheetTools, type Reporter } from '../sheets/sheetTools.ts';
 import { dmKey, useDmChange, useDmPage } from './dmQueries.ts';
-import { DmContext, type DmTools } from './DmContext.tsx';
+import { DmContext, type DmTools } from '../../components/dm/DmContext.tsx';
 
 type Pick = { id: number; turnKey: string } | null;
 
