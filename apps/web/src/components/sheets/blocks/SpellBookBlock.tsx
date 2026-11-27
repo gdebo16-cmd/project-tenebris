@@ -8,7 +8,7 @@ import panelCss from '../../../styles/components/sheets/blocks/ActionPanel.modul
 import { useSpellbook, useSpellbookChange, type SpellbookOp } from '../../../features/sheets/queries.ts';
 import type { BlockProps } from '../../../features/sheets/types.ts';
 import DetailsPanel from './DetailsPanel.tsx';
-import { SpellInfo } from './details.tsx';
+import { SpellInfo } from './SpellInfo.tsx';
 
 type Props = Pick<BlockProps, 'creature' | 'canEdit'> & { id: string };
 

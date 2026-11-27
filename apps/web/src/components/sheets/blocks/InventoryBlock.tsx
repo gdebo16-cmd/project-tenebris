@@ -12,7 +12,9 @@ import panelCss from '../../../styles/components/sheets/blocks/ActionPanel.modul
 import { useGear, useRuneInfo } from '../../../features/sheets/queries.ts';
 import RuneControl from './RuneControl.tsx';
 import DetailsPanel from './DetailsPanel.tsx';
-import { ArmorInfo, ItemInfo, WeaponInfo } from './details.tsx';
+import { ArmorInfo } from './ArmorInfo.tsx';
+import { ItemInfo } from './ItemInfo.tsx';
+import { WeaponInfo } from './WeaponInfo.tsx';
 import type { BlockProps } from '../../../features/sheets/types.ts';
 
 type Props = Pick<BlockProps, 'creature' | 'canEdit' | 'onNote'> & { id: string };

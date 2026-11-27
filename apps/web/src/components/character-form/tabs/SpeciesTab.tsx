@@ -4,6 +4,7 @@ import { ApiError } from '../../../api.ts';
 import formStyles from '../../../styles/features/character-form/CharacterForm.module.css';
 import styles from '../../../styles/components/character-form/tabs/SpeciesTab.module.css';
 import { useCharacterForm, useSaveTab } from '../../../features/character-form/queries.ts';
+import { messageOf } from '../../../features/character-form/messageOf.ts';
 
 // A variant's own picture: igni + Ember -> /races/igni-ember.png (Art's files, all lowercase)
 function variantImage(key: string, variant: string): string {
@@ -158,8 +159,3 @@ function Choice({ label, value, onChange, options }: { label: string; value: str
     );
 }
 
-function messageOf(err: unknown): string {
-    if (err instanceof ApiError) return err.message;
-    if (err instanceof Error) return err.message;
-    return 'Something went wrong';
-}

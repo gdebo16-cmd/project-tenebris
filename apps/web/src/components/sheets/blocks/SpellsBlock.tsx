@@ -8,7 +8,7 @@ import styles from '../../../styles/components/sheets/blocks/SpellsBlock.module.
 import panelCss from '../../../styles/components/sheets/blocks/ActionPanel.module.css';
 import type { BlockProps } from '../../../features/sheets/types.ts';
 import DetailsPanel from './DetailsPanel.tsx';
-import { SpellInfo } from './details.tsx';
+import { SpellInfo } from './SpellInfo.tsx';
 
 type Props = BlockProps & { onCast: (actionKey: string, castLevel: number) => void };
 

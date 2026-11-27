@@ -12,6 +12,7 @@ import RoleTab from '../../components/character-form/tabs/RoleTab.tsx';
 import TraitsTab from '../../components/character-form/tabs/TraitsTab.tsx';
 import PersonalityTab from '../../components/character-form/tabs/PersonalityTab.tsx';
 import GearTab from '../../components/character-form/tabs/GearTab.tsx';
+import { messageOf } from './messageOf.ts';
 
 export default function CharacterForm() {
     const { id } = useParams();
@@ -148,8 +149,3 @@ function SavedHeader({ id }: { id: string }) {
     );
 }
 
-function messageOf(err: unknown): string {
-    if (err instanceof ApiError) return err.message;
-    if (err instanceof Error) return err.message;
-    return 'Something went wrong';
-}

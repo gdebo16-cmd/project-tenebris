@@ -6,6 +6,7 @@ import { ApiError } from '../../../api.ts';
 import formStyles from '../../../styles/features/character-form/CharacterForm.module.css';
 import styles from '../../../styles/components/character-form/tabs/TraitsTab.module.css';
 import { useCharacterForm, useSaveTab, useStatRoll } from '../../../features/character-form/queries.ts';
+import { messageOf } from '../../../features/character-form/messageOf.ts';
 
 const STAT_LABELS: Record<string, string> = {
     str: 'Might', dex: 'Precision', con: 'Endurance', int: 'Intellect',
@@ -243,8 +244,3 @@ function taken(placement: Record<string, string>, stat: string, index: number): 
     return STAT_COLUMNS.some((other) => other !== stat && placement[other] === String(index));
 }
 
-function messageOf(err: unknown): string {
-    if (err instanceof ApiError) return err.message;
-    if (err instanceof Error) return err.message;
-    return 'Something went wrong';
-}

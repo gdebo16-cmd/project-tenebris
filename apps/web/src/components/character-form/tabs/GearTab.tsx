@@ -7,6 +7,7 @@ import styles from '../../../styles/components/character-form/tabs/GearTab.modul
 import { useCharacterForm, useDefaultGear, useFinish, useSaveTab } from '../../../features/character-form/queries.ts';
 import { COINS, MONEY_PRESETS, MONEY_PRESET_KEYS, type MoneyPresetKey, type Purse } from '@tenebris/rules/money';
 import type { CharacterFormData } from '../../../features/character-form/types.ts';
+import { messageOf } from '../../../features/character-form/messageOf.ts';
 
 type Props = { id: string };
 
@@ -192,8 +193,3 @@ function coinText(purse: Purse): string {
     return parts.length ? parts.join(', ') : 'none';
 }
 
-function messageOf(err: unknown): string {
-    if (err instanceof ApiError) return err.message;
-    if (err instanceof Error) return err.message;
-    return 'Something went wrong';
-}

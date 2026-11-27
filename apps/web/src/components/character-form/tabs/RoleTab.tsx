@@ -7,6 +7,7 @@ import formStyles from '../../../styles/features/character-form/CharacterForm.mo
 import styles from '../../../styles/components/character-form/tabs/RoleTab.module.css';
 import { useCharacterForm, useCharacterOptions, useSaveTab } from '../../../features/character-form/queries.ts';
 import type { Options } from '@tenebris/rules/characterForm';
+import { messageOf } from '../../../features/character-form/messageOf.ts';
 
 type RoleChoice = Options['roles'][number];
 type FeatureChoice = Options['features'][number];
@@ -289,8 +290,3 @@ function dropCallingPicks(picks: Record<string, string[]>): Record<string, strin
     return next;
 }
 
-function messageOf(err: unknown): string {
-    if (err instanceof ApiError) return err.message;
-    if (err instanceof Error) return err.message;
-    return 'Something went wrong';
-}

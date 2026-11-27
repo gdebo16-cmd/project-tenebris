@@ -5,6 +5,7 @@ import formStyles from '../../../styles/features/character-form/CharacterForm.mo
 import styles from '../../../styles/components/character-form/tabs/PersonalityTab.module.css';
 import { useCharacterForm, useSaveTab } from '../../../features/character-form/queries.ts';
 import type { Options } from '@tenebris/rules/characterForm';
+import { messageOf } from '../../../features/character-form/messageOf.ts';
 
 // Columns run Lawful, Natural, Chaotic; rows run Good, Natural, Evil.
 const LAW = [-1, 0, 1];
@@ -148,8 +149,3 @@ function PersonalityFields({ id }: { id: string }) {
     );
 }
 
-function messageOf(err: unknown): string {
-    if (err instanceof ApiError) return err.message;
-    if (err instanceof Error) return err.message;
-    return 'Something went wrong';
-}

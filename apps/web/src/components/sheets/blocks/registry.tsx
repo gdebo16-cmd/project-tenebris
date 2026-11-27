@@ -22,7 +22,11 @@ import TraitsBlock from './TraitsBlock.tsx';
 import LegendaryBlock from './LegendaryBlock.tsx';
 import RollFeed from './RollFeed.tsx';
 import { CurrentCreature } from '../../dm/DmContext.tsx';
-import { EncounterBlock, InitiativeBlock, NotesBlock, PartyBlock, TableRollsBlock } from '../../dm/DmBlocks.tsx';
+import { EncounterBlock } from '../../dm/EncounterBlock.tsx';
+import { InitiativeBlock } from '../../dm/InitiativeBlock.tsx';
+import { NotesBlock } from '../../dm/NotesBlock.tsx';
+import { PartyBlock } from '../../dm/PartyBlock.tsx';
+import { TableRollsBlock } from '../../dm/TableRollsBlock.tsx';
 
 // The phone tabs of each kind of layout (decision A: phones follow the layout, grouped under these). null = always shown.
 const SHEET_TABS = [

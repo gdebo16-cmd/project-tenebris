@@ -14,7 +14,9 @@ import type { UtilityRune } from '@tenebris/rules/runes';
 import styles from '../../../styles/components/sheets/blocks/ActionsBlock.module.css';
 import panelCss from '../../../styles/components/sheets/blocks/ActionPanel.module.css';
 import DetailsPanel, { PanelExtras } from './DetailsPanel.tsx';
-import { FeatureInfo, SpellInfo, WeaponInfo } from './details.tsx';
+import { FeatureInfo } from './FeatureInfo.tsx';
+import { SpellInfo } from './SpellInfo.tsx';
+import { WeaponInfo } from './WeaponInfo.tsx';
 import type { BlockProps } from '../../../features/sheets/types.ts';
 
 type Props = BlockProps & {

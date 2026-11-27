@@ -1,137 +1,18 @@
 // Dice lab (step 15): you throw real physics dice; what lands goes to the server and into everyone's roll feed.
-import { useState, useRef, useEffect, useMemo, type ReactNode, Suspense } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { useParams } from 'react-router';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Text, Environment, Lightformer } from '@react-three/drei';
-import { Quaternion, Vector3, IcosahedronGeometry, BufferGeometry, TetrahedronGeometry, BoxGeometry, OctahedronGeometry, DodecahedronGeometry } from 'three';
+import { OrbitControls, Environment, Lightformer } from '@react-three/drei';
 import socket from '../../utils/socket.js';
 import { api } from '../../api.ts';
 import { useCssColor } from '../../hooks/useCssColor.ts';
 import styles from '../../styles/features/dice/DiceLab.module.css';
-import { Physics, RigidBody, CuboidCollider, ConvexHullCollider, type RapierRigidBody } from '@react-three/rapier';
-
+import { Physics, RigidBody, CuboidCollider } from '@react-three/rapier';
+import { PhysicsDie } from '../../components/dice/PhysicsDie.tsx';
+import { DicePicker, notation } from '../../components/dice/DicePicker.tsx';
 
 // one line in the roll feed, as the server sends it
 type FeedLine = { dice: { sides: number; value: number }[]; bonus: number; total: number; by: number; name: string; at: number };
-
-const TURN = Math.PI * 2;          // a full circle, in radians
-
-const SHAPES: Record<number, BufferGeometry> = {
-    4: new TetrahedronGeometry(0.9),
-    6: new BoxGeometry(1, 1, 1),
-    8: new OctahedronGeometry(0.85),
-    12: new DodecahedronGeometry(0.8),
-    20: new IcosahedronGeometry(0.8),
-};
-
-type Face = { value: number; normal: Vector3; center: Vector3 };
-
-function facesOf(shape: BufferGeometry): Face[] {
-    const geometry = shape.index ? shape.toNonIndexed() : shape;   // the cube shares corners; this gives every triangle its own
-    const corners = geometry.getAttribute('position');
-    const groups: { normal: Vector3; centers: Vector3[] }[] = [];
-    for (let i = 0; i < corners.count; i += 3) {
-        const a = new Vector3().fromBufferAttribute(corners, i);
-        const b = new Vector3().fromBufferAttribute(corners, i + 1);
-        const c = new Vector3().fromBufferAttribute(corners, i + 2);
-        const center = a.add(b).add(c).divideScalar(3);
-        // the triangle's true facing direction: at right angles to two of its edges
-        const normal = new Vector3().subVectors(b, a).cross(new Vector3().subVectors(c, a)).normalize();
-        const same = groups.find((g) => g.normal.dot(normal) > 0.999);    // already have a face pointing this way?
-        if (same) same.centers.push(center);
-        else groups.push({ normal, centers: [center] });
-    }
-    // each group is one face: its middle is the average of its triangles' middles
-    return groups.map((g, i) => ({
-        value: i + 1,
-        normal: g.normal,
-        center: g.centers.reduce((sum, p) => sum.add(p), new Vector3()).divideScalar(g.centers.length),
-    }));
-}
-
-// The dice the lab can roll (no d10 yet: it needs a hand-built shape)
-const DICE = [4, 6, 8, 12, 20];
-
-// One physics die: thrown from the right side of the tray, tumbles, and reports its top face when it settles.
-function PhysicsDie({ sides, start, onLand }: { sides: number; start: [number, number, number]; onLand: (value: number) => void }) {
-    const diceColor = useCssColor('--dice-color', 'white');
-    const numberColor = useCssColor('--dice-number', 'black');
-    const shape = SHAPES[sides] ?? SHAPES[20];
-    const faces = useMemo(() => facesOf(shape), [shape]);
-    const tilt = useMemo(() => [Math.random() * TURN, Math.random() * TURN, Math.random() * TURN] as [number, number, number], []);
-    const throwSpeed = useMemo(() => [-6 - Math.random() * 3, 2, Math.random() * 4 - 2] as [number, number, number], []);
-    const spin = useMemo(() => [Math.random() * 20 - 10, Math.random() * 20 - 10, Math.random() * 20 - 10] as [number, number, number], []);
-    const fontSize = sides <= 6 ? 0.35 : sides <= 12 ? 0.24 : 0.18;
-
-    const body = useRef<RapierRigidBody>(null);
-
-    // called when the die settles: find the face pointing most upward
-    function readTop() {
-        const r = body.current!.rotation();                    // how the die ended up turned
-        const turn = new Quaternion(r.x, r.y, r.z, r.w);
-        let top = faces[0];
-        let bestUp = -Infinity;
-        for (const face of faces) {
-            const up = face.normal.clone().applyQuaternion(turn).y;   // how much this face points up now
-            if (up > bestUp) { bestUp = up; top = face; }
-        }
-        onLand(top.value);
-    }
-
-    return (
-        <RigidBody ref={body} onSleep={readTop} colliders={false} position={start} rotation={tilt}
-            linearVelocity={throwSpeed} angularVelocity={spin} restitution={0.3} friction={0.7}>
-            {/* the collision shape: built only from the die's corners, not the numbers */}
-            <ConvexHullCollider args={[shape.attributes.position.array as Float32Array]} />
-            <mesh geometry={shape} castShadow>
-                {faces.map((face) => (
-                    <Text key={face.value} position={face.center.clone().multiplyScalar(1.01)}
-                        quaternion={new Quaternion().setFromUnitVectors(new Vector3(0, 0, 1), face.normal)}
-                        fontSize={fontSize} color={numberColor}>
-                        {face.value}
-                    </Text>
-                ))}
-                <meshPhysicalMaterial color={diceColor} roughness={0.25} metalness={0.2} clearcoat={1} clearcoatRoughness={0.15} />
-            </mesh>
-        </RigidBody>
-    );
-}
-
-// Flat outlines of each die for the picker buttons (viewBox 0–100). currentColor = the button's text colour.
-const DIE_ICONS: Record<number, ReactNode> = {
-    4:  <><polygon points="50,8 92,86 8,86" /><line x1="50" y1="8" x2="50" y2="86" /></>,
-    6:  <><rect x="14" y="14" width="72" height="72" rx="8" /></>,
-    8:  <><polygon points="50,6 90,50 50,94 10,50" /><line x1="10" y1="50" x2="90" y2="50" /></>,
-    12: <><polygon points="50,6 92,37 76,88 24,88 8,37" /><polygon points="50,26 70,42 62,66 38,66 30,42" /></>,
-    20: <><polygon points="50,4 90,27 90,73 50,96 10,73 10,27" /><polygon points="50,24 74,64 26,64" /></>,
-};
-
-// One button per die: its outline, and "D20" underneath. Each click adds one of that die to the pool.
-// A die already in the pool is highlighted and shows how many: "D6 ×2".
-function DicePicker({ pool, onPick }: { pool: number[]; onPick: (d: number) => void }) {
-    return (
-        <div className={styles.picker} role="group" aria-label="Add a die">
-            {DICE.map((d) => {
-                const count = pool.filter((p) => p === d).length;
-                return (
-                    <button key={d} type="button"
-                        className={count > 0 ? `${styles.die} ${styles.dieOn}` : styles.die}
-                        onClick={() => onPick(d)}>
-                        <svg viewBox="0 0 100 100" aria-hidden="true">{DIE_ICONS[d]}</svg>
-                        <span>D{d}{count > 0 && ` ×${count}`}</span>
-                    </button>
-                );
-            })}
-        </div>
-    );
-}
-
-// The pool in dice notation: [6, 6, 8] -> "2d6 + 1d8"
-function notation(pool: number[]) {
-    return DICE.filter((d) => pool.includes(d))
-        .map((d) => `${pool.filter((p) => p === d).length}d${d}`)
-        .join(' + ');
-}
 
 export default function DiceLab() {
     const { campId = '' } = useParams();
