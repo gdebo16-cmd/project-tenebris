@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { ApiError } from '../../api.ts';
-import Loader from '../../components/Loader.jsx';
+import Loader from '../../components/ui/Loader.jsx';
 import styles from './CharacterForm.module.css';
 import FormHeader from './FormHeader.tsx';
 import FormTabs, { isFormTab, type FormTabId } from './FormTabs.tsx';

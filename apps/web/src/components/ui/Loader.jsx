@@ -1,4 +1,4 @@
-import styles from './Loader.module.css';
+import styles from '../../styles/components/ui/Loader.module.css';
 
 // className: extra class for the outer box (a page passes its own so its styles still apply while loading)
 function Loader({ text = 'Trying my best...', className = '' }) {

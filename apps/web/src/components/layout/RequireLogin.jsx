@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router';
-import Loader from './Loader';
-import { useMe, useProfile } from '../queries.ts';
+import Loader from '../ui/Loader';
+import { useMe, useProfile } from '../../queries.ts';
 
 // Saved look settings follow the account to any device: copy them onto the page.
 const LOOKS = [['site_theme', 'siteTheme', 'data-theme'], ['site_background', 'siteBackground', 'data-background'], ['site_display', 'siteDisplay', 'data-display']];

@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
-import RequireLogin from './components/RequireLogin';
+import RequireLogin from './components/layout/RequireLogin';
 import CharacterSheetPage from './features/sheet/CharacterSheetPage.tsx';
 import MonsterSheetPage from './features/sheet/MonsterSheetPage.tsx';
 import DmPage from './features/dm/DmPage.tsx';
@@ -15,8 +15,8 @@ import CreateCampaign from './pages/CreateCampaign';
 import CampaignList from './pages/CampaignList';
 import JoinCampaign from './pages/JoinCampaign';
 import { ContentProvider } from './hooks/ContentContext';
-import AppLayout from './components/AppLayout';
-import Loader from './components/Loader.jsx';
+import AppLayout from './components/layout/AppLayout';
+import Loader from './components/ui/Loader.jsx';
 
 
 // The table brings in three.js (big), so it's only downloaded when someone opens the table

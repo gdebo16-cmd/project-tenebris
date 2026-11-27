@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import Loader from '../../components/Loader.jsx';
+import Loader from '../../components/ui/Loader.jsx';
 import socket from '../../utils/socket.js';
 import sheet from '../sheet/Sheet.module.css';
 import layout from '../sheet/CharacterSheetPage.module.css'; // the sheet pages' header, footer and sheet area

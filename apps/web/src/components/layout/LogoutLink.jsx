@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { api } from '../api.ts';
+import { api } from '../../api.ts';
 
 // "Log Out" in the Settings dropdown: ends the session on the server, forgets everything
 // cached for this account, then goes to /login. SiteNav passes the dropdown link style.

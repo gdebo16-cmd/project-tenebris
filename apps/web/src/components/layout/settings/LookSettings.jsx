@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { api } from '../../api.ts';
-import { keys } from '../../queries.ts';
-import styles from './Settings.module.css';
+import { api } from '../../../api.ts';
+import { keys } from '../../../queries.ts';
+import styles from '../../../styles/components/layout/settings/Settings.module.css';
 
 const THEMES = ['default', 'green', 'purple', 'blue', 'red', 'orange', 'yellow', 'dark', 'light', 'hellfire', 'frozen', 'neon', 'gestalt', 'shadow-of-the-mountains', 'prestige', 'glass-green', 'glass-blue', 'glass-red', 'glass-orange', 'glass-yellow', 'glass-fire', 'dark-glass', 'light-glass', 'neon-glass', 'frozen-glass', 'gothic', 'pilgrim'];
 const DISPLAYS = ['standard', 'compact', 'neon', 'glass', 'parchment', 'minimal', 'bold', 'shadow-of-the-mountains', 'gestalt'];

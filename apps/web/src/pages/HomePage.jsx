@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useHome } from '../queries.ts';
-import Loader from '../components/Loader';
+import Loader from '../components/ui/Loader';
 import styles from './HomePage.module.css';
 
 function HomePage() {

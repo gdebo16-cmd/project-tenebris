@@ -4,7 +4,7 @@ import LogoutLink from './LogoutLink';
 import LookSettings from './settings/LookSettings';
 import GraphicsSettings from './settings/GraphicsSettings';
 import AccountSettings from './settings/AccountSettings';
-import styles from './Sidebar.module.css';
+import styles from '../../styles/components/layout/Sidebar.module.css';
 import SidebarCharacter from './SidebarCharacter';
 import SidebarCampaign from './SidebarCampaign';
 import SidebarSheetLayout from './SidebarSheetLayout';

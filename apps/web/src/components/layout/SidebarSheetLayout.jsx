@@ -1,6 +1,6 @@
 import { useMatch } from 'react-router';
-import { requestLayoutEdit } from '../features/sheet/layoutEvents.ts';
-import styles from './Sidebar.module.css';
+import { requestLayoutEdit } from '../../features/sheet/layoutEvents.ts';
+import styles from '../../styles/components/layout/Sidebar.module.css';
 
 // "Edit sheet layout": only on a sheet (a character's, a monster's, or the DM page). On a wide screen it arranges the
 // desktop layout, on a phone the mobile one (the editor can switch between them). It asks the sheet to start, then closes the sidebar.

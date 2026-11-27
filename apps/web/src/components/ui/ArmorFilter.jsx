@@ -1,14 +1,14 @@
-import { WEAPON_CATEGORIES, RARITIES } from '../utils/weapons';
+import { ARMOR_CATEGORIES, RARITIES } from '../../utils/armor';
 
-// Category / rarity filters and a sort picker for any weapon list. value = { category, rarity, sort }.
-// The parent styles it: className goes on the wrapper, selectClassName on each select.
-function WeaponFilter({ value, onChange, showRarity = true, className, selectClassName }) {
+// Same as WeaponFilter, for armor: className goes on the wrapper, selectClassName on each select.
+
+function ArmorFilter({ value, onChange, showRarity = true, className, selectClassName }) {
     const set = (key) => (e) => onChange({ ...value, [key]: e.target.value });
     return (
         <div className={className}>
-            <select className={selectClassName} aria-label="Weapon category" value={value.category} onChange={set('category')}>
+            <select className={selectClassName} aria-label="Armor category" value={value.category} onChange={set('category')}>
                 <option value="">All categories</option>
-                {WEAPON_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                {ARMOR_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
             {showRarity && (
                 <select className={selectClassName} aria-label="Rarity" value={value.rarity} onChange={set('rarity')}>
@@ -16,7 +16,7 @@ function WeaponFilter({ value, onChange, showRarity = true, className, selectCla
                     {RARITIES.map((r) => <option key={r} value={r}>{r}</option>)}
                 </select>
             )}
-            <select className={selectClassName} aria-label="Sort weapons" value={value.sort} onChange={set('sort')}>
+            <select className={selectClassName} aria-label="Sort armor" value={value.sort} onChange={set('sort')}>
                 <option value="name">Sort: Name</option>
                 <option value="category">Sort: Category</option>
                 {showRarity && <option value="rarity">Sort: Rarity</option>}
@@ -25,4 +25,4 @@ function WeaponFilter({ value, onChange, showRarity = true, className, selectCla
     );
 }
 
-export default WeaponFilter;
+export default ArmorFilter;

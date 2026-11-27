@@ -1,7 +1,7 @@
 import { Link, useMatch } from 'react-router';
-import { useCampaign } from '../queries.ts';
-import { useMonsterSheet } from '../features/sheet/monsterQueries.ts';
-import styles from './Sidebar.module.css';
+import { useCampaign } from '../../queries.ts';
+import { useMonsterSheet } from '../../features/sheet/monsterQueries.ts';
+import styles from '../../styles/components/layout/Sidebar.module.css';
 
 // The "this tale" part of the sidebar: on a campaign's pages (/campaign/5, /campaign/5/dm)
 // and on a monster sheet (/monsters/9, which belongs to a campaign). The DM also gets the DM page.

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useCampaigns } from '../queries.ts';
-import Loader from '../components/Loader';
+import Loader from '../components/ui/Loader';
 import styles from './CampaignList.module.css';
 
 

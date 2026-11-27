@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import useFetch from '../../hooks/useFetch';
-import TabList from '../../components/TabList';
+import TabList from '../../components/ui/TabList';
 import { sendJson } from '../../utils/api';
-import Loader from '../../components/Loader';
+import Loader from '../../components/ui/Loader';
 import ItemDetails from './ItemDetails';
-import WeaponFilter from '../../components/WeaponFilter';
-import ArmorFilter from '../../components/ArmorFilter';
+import WeaponFilter from '../../components/ui/WeaponFilter';
+import ArmorFilter from '../../components/ui/ArmorFilter';
 import { filterSortWeapons, EMPTY_WEAPON_FILTER } from '../../utils/weapons';
 import { filterSortArmor, EMPTY_ARMOR_FILTER } from '../../utils/armor';
 import styles from './ItemShop.module.css';

@@ -4,7 +4,7 @@
 // Rolls open the roll orb. The text roll feed is a block, shown to the campaign DM only.
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
-import Loader from '../../components/Loader.jsx';
+import Loader from '../../components/ui/Loader.jsx';
 import socket from '../../utils/socket.js';
 import styles from './Sheet.module.css';
 import { messageOf, useCharacterSheetTools, type Reporter } from './sheetTools.ts';

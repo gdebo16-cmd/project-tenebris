@@ -2,7 +2,7 @@
 // changes: HP, temporary HP, spell slots, conditions, exhaustion and uses per rest. Asks first, like the old sheet.
 import { useState } from 'react';
 import styles from './RestBlock.module.css';
-import CampfireIcon from '../../../components/CampfireIcon.tsx';
+import CampfireIcon from '../../../components/ui/CampfireIcon.tsx';
 
 type Props = { canEdit: boolean; busy: boolean; onRest: (type: 'short' | 'long') => void };
 

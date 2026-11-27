@@ -1,7 +1,7 @@
 import { Link, useMatch } from 'react-router';
-import { FORM_TAB_LIST } from '../features/character-form/FormTabs.tsx';
-import { useSheet } from '../features/sheet/queries.ts';
-import styles from './Sidebar.module.css';
+import { FORM_TAB_LIST } from '../../features/character-form/FormTabs.tsx';
+import { useSheet } from '../../features/sheet/queries.ts';
+import styles from '../../styles/components/layout/Sidebar.module.css';
 
 // The "this character" part of the sidebar. It only shows on a character's own pages:
 // /characters/12, /characters/12/edit, /characters/12/inventory

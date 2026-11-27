@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { api } from '../../api.ts';
-import { keys, useSettings } from '../../queries.ts';
-import styles from './Settings.module.css';
+import { api } from '../../../api.ts';
+import { keys, useSettings } from '../../../queries.ts';
+import styles from '../../../styles/components/layout/settings/Settings.module.css';
 
 // Username, email, password, and deleting the account.
 // Waits for the saved username and email, then shows the form filled in with them.

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../api.ts';
 import { keys, useCampaign, useCampaignMonsters, useHome, useMonsterCatalog } from '../queries.ts';
-import Loader from '../components/Loader';
+import Loader from '../components/ui/Loader';
 import campaignImages from '../data/campaignImages';
 import styles from './CampaignPage.module.css';
 

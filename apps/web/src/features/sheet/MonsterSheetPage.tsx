@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import type { MonsterGlimpse } from '@tenebris/rules/monster';
-import Loader from '../../components/Loader.jsx';
+import Loader from '../../components/ui/Loader.jsx';
 import socket from '../../utils/socket.js';
 import styles from './Sheet.module.css';
 import layout from './CharacterSheetPage.module.css'; // the sheet pages' header, footer and sheet area
