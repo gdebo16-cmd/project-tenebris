@@ -13,7 +13,7 @@ type Item = { hex: Hex; feature: Feature; key: string };
 type Part = { geometry: Mesh['geometry']; material: Material; matrix: Matrix4 };
 
 // Bump this when the baked .glb files change so the browser and useGLTF don't keep an old copy.
-const MODEL_ASSET_VERSION = 'foliage3';
+const MODEL_ASSET_VERSION = 'canopy1';
 
 const CUTOUT_NAME = /leaf|twig|needl|foliage|grass|fern|petal|moss|shrub|nettle|plant|celand|dandel/i;
 

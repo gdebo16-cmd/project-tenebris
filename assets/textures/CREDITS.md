@@ -107,7 +107,8 @@ Board models from [Poly Haven](https://polyhaven.com) (CC0), cleaned with `npm r
 | `models/rock_moss_set_01` | [Rock Moss Set 01](https://polyhaven.com/a/rock_moss_set_01) | Kless Gyzen |
 | `models/tree_small_02` | [Tree Small 02](https://polyhaven.com/a/tree_small_02) | Rico Cilliers |
 | `models/fir_tree_01` | [Fir Tree 01](https://polyhaven.com/a/fir_tree_01) | Rob Tuytel, Rico Cilliers |
-| `models/pine_tree_01` | [Pine Tree 01](https://polyhaven.com/a/pine_tree_01) | Rob Tuytel, Rico Cilliers |
+| `models/pine_tree_01` | [Pine](https://polyhaven.com/a/pine_sapling_medium) | Rob Tuytel, Rico Cilliers |
+| `models/evergreen` | [Evergreen](https://polyhaven.com/a/fir_sapling_medium) | Rob Tuytel, Rico Cilliers |
 | `models/island_tree_01` | [Island Tree 01](https://polyhaven.com/a/island_tree_01) | Rob Tuytel, Rico Cilliers |
 | `models/jacaranda_tree` | [Jacaranda Tree](https://polyhaven.com/a/jacaranda_tree) | Rob Tuytel, Rico Cilliers |
 | `models/fir_sapling` | [Fir Sapling](https://polyhaven.com/a/fir_sapling) | Rob Tuytel, Rico Cilliers |

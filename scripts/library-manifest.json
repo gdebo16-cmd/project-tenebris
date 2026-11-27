@@ -63,7 +63,7 @@
         "id": "mossy_cobblestone",
         "name": "Mossy Cobblestone",
         "category": "moss",
-        "authors": "Sơn Nguyễn",
+        "authors": "S\u01a1n Nguy\u1ec5n",
         "url": "https://polyhaven.com/a/mossy_cobblestone"
       },
       {
@@ -189,7 +189,7 @@
         "id": "square_cobblestone",
         "name": "Square Cobblestone",
         "category": "cobble and paving",
-        "authors": "Sơn Nguyễn",
+        "authors": "S\u01a1n Nguy\u1ec5n",
         "url": "https://polyhaven.com/a/square_cobblestone"
       },
       {
@@ -441,11 +441,24 @@
       },
       {
         "id": "pine_tree_01",
-        "sourceId": "pine_tree_01",
-        "name": "Pine Tree 01",
+        "sourceId": "pine_sapling_medium",
+        "name": "Pine",
         "category": "trees and logs",
         "authors": "Rob Tuytel, Rico Cilliers",
-        "url": "https://polyhaven.com/a/pine_tree_01",
+        "url": "https://polyhaven.com/a/pine_sapling_medium",
+        "width": 2,
+        "footprint": "cluster",
+        "blocksMovement": true,
+        "blocksSight": true,
+        "already": null
+      },
+      {
+        "id": "evergreen",
+        "sourceId": "fir_sapling_medium",
+        "name": "Evergreen",
+        "category": "trees and logs",
+        "authors": "Rob Tuytel, Rico Cilliers",
+        "url": "https://polyhaven.com/a/fir_sapling_medium",
         "width": 2,
         "footprint": "cluster",
         "blocksMovement": true,

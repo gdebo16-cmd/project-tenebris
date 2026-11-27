@@ -168,9 +168,32 @@
   },
   {
     "id": "pine_tree_01",
-    "name": "Pine Tree 01",
+    "name": "Pine",
     "file": "/models/pine_tree_01/pine_tree_01.glb",
     "lightFile": "/models/pine_tree_01/pine_tree_01.light.glb",
+    "footprint": [
+      {
+        "q": 0,
+        "r": 0
+      },
+      {
+        "q": 1,
+        "r": 0
+      },
+      {
+        "q": 0,
+        "r": 1
+      }
+    ],
+    "blocksMovement": true,
+    "blocksSight": true,
+    "category": "trees and logs"
+  },
+  {
+    "id": "evergreen",
+    "name": "Evergreen",
+    "file": "/models/evergreen/evergreen.glb",
+    "lightFile": "/models/evergreen/evergreen.light.glb",
     "footprint": [
       {
         "q": 0,

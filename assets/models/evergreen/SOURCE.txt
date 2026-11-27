@@ -1,0 +1,6 @@
+Fir Sapling Medium
+Rob Tuytel, Rico Cilliers
+CC0
+https://polyhaven.com/a/fir_sapling_medium
+Imported for Tenebris with scripts/rebuild-foliage-cards.mjs and npm run model (high + light).
+Library id is evergreen; fir_tree_01 and fir_sapling are unchanged.

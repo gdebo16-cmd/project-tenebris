@@ -102,8 +102,8 @@ function writeContent() {
 function writeCredits() {
   const creditsPath = path.join(root, 'assets/textures/CREDITS.md');
   let text = fs.readFileSync(creditsPath, 'utf8');
-  const paintStart = '\n# Library paints\n';
-  const cut = text.indexOf(paintStart);
+  const paintStart = /\r?\n# Library paints\r?\n/;
+  const cut = text.search(paintStart);
   if (cut >= 0) text = text.slice(0, cut);
   const paintRows = manifest.textures.items.map((p) =>
     `| \`library/${p.id}\` | [${p.name}](${p.url}) | ${p.authors} |`).join('\n');
