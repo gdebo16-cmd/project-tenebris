@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { api } from '../api.ts';
-import { keys } from '../queries.ts';
-import styles from './RegisterPage.module.css';
+import { api } from '../../api.ts';
+import { keys } from '../../queries.ts';
+import styles from '../../styles/features/auth/RegisterPage.module.css';
 
 // Replaces Public/registration.html
 function RegisterPage() {

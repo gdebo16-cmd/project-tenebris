@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { api } from '../api.ts';
-import { keys } from '../queries.ts';
-import styles from './JoinCampaign.module.css';
+import { api } from '../../api.ts';
+import { keys } from '../../queries.ts';
+import styles from '../../styles/features/campaign/JoinCampaign.module.css';
 
 
 export default function JoinCampaign() {

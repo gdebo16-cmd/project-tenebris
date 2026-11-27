@@ -1,10 +1,10 @@
 import { useState} from 'react';
 import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { api } from '../api.ts';
-import { keys } from '../queries.ts';
+import { api } from '../../api.ts';
+import { keys } from '../../queries.ts';
 
-import styles from './CreateCampaign.module.css';
+import styles from '../../styles/features/campaign/CreateCampaign.module.css';
 
 
 function CreateCampaign() {

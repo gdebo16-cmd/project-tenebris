@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { api } from '../api.ts';
-import { keys, useHome } from '../queries.ts';
-import Loader from '../components/ui/Loader';
-import styles from './HomePage.module.css';
+import { api } from '../../api.ts';
+import { keys, useHome } from '../../queries.ts';
+import Loader from '../../components/ui/Loader';
+import styles from '../../styles/features/home/HomePage.module.css';
 
 function HomePage() {
     const { data, isPending, error } = useHome();

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { api } from '../api.ts';
-import { keys } from '../queries.ts';
-import styles from './LoginPage.module.css';
+import { api } from '../../api.ts';
+import { keys } from '../../queries.ts';
+import styles from '../../styles/features/auth/LoginPage.module.css';
 
 // Replaces Public/signin.html
 function LoginPage() {
