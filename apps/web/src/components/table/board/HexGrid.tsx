@@ -5,8 +5,8 @@
 import { useEffect, useMemo } from 'react'
 import { DataTexture, RGBAFormat, UnsignedByteType, NearestFilter, ShaderMaterial, PlaneGeometry, DoubleSide } from 'three'
 import { hexesWithin, hexKey, type GridMode } from '@tenebris/rules/board'
+import { HEIGHT_STEP } from './ground/hexMath.ts'
 
-const HEIGHT_STEP = 0.35;     // same as TableScenery.tsx
 const GRID_LIFT = 0.102;      // a hair above a flat hex's top (tiles sit from -0.1 to 0.1)
 const OPACITY = { on: 0.55, faint: 0.22, off: 0 } as const;
 

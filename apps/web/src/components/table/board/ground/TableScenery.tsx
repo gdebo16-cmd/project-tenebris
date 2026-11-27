@@ -11,6 +11,7 @@ import { Instances, Instance, useTexture } from '@react-three/drei'
 import { type Hex, hexKey, neighbors, waterShoreEdges, SURFACES, DEFAULT_SURFACE, isCoreSurface, isSurface, type CoreSurface, type Surface, type BoardStyle } from '@tenebris/rules/board'
 import { paintById } from '@tenebris/rules/board'
 import { surfaceSet, textureUrl } from './groundTextures.ts'
+import { hexToWorld, worldToHex, HEIGHT_STEP, liftOf, rimInner, rimOuter } from './hexMath.ts'
 import { useGraphics } from '../../../../features/table/hooks/graphicsSettings.ts'
 import { Shape, ExtrudeGeometry, RepeatWrapping, SRGBColorSpace, type BufferGeometry, type Texture } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
@@ -27,25 +28,7 @@ const backgroundColor = useCssColor('--background-color', '#0e1815');
 const USE_TEXTURES = false;
 
 
-// Axial (q, r) -> world position, flat-top hexes of radius `size`
-export function hexToWorld(hex: Hex, size: number): [number, number, number] {
-    const x = 1.5 * size * hex.q;
-    const z = Math.sqrt(3) * size * (hex.r + hex.q / 2);
-    return [x, 0, z];
-}
-
-// World position -> the hex it's in (the reverse of hexToWorld, rounded to the nearest whole hex)
-export function worldToHex(x: number, z: number): Hex {
-    const q = (2 / 3) * x;
-    const r = z / Math.sqrt(3) - x / 3;
-    const s = -q - r;
-    let rq = Math.round(q), rr = Math.round(r);
-    const rs = Math.round(s);
-    const dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - s);
-    if (dq > dr && dq > ds) rq = -rr - rs;          // the coordinate that rounded furthest is worked out from the other two
-    else if (dr > ds) rr = -rq - rs;
-    return { q: rq, r: rr };
-}
+export { hexToWorld, worldToHex, HEIGHT_STEP, liftOf, rimInner, rimOuter } from './hexMath.ts'
 
 // ---- how each surface looks ----
 
@@ -81,10 +64,6 @@ export function surfaceLook(surface: string): { label: string; flat: string; str
 
 const TILE_HEIGHT = 0.2;           // every hex's bottom sits at -0.1, so a tile's top is at 0.1
 const WALL_HEIGHT = 1;             // walls stand up as blocks
-export const HEIGHT_STEP = 0.35;   // one level of raised ground (looks only: walking ignores height until step 18)
-
-// How far a hex's ground is raised (heights come from the scene's look: { "q,r": 1..3 })
-export const liftOf = (heights: Record<string, number> | undefined, hex: Hex) => (heights?.[hexKey(hex)] ?? 0) * HEIGHT_STEP;
 const WATER = { roughness: 0.08 };   // custom water (T2): colour, depth and foam come from waterLookFor in boardLooks.ts
 
 // How far each water hex is from land, in hexes (1 = on the shore), counted up to 3: shallow water by the shore, deep
@@ -461,8 +440,6 @@ function hexOutline(radius: number) {
 }
 
 // The wooden frame around a board of this radius: a big hexagon with the board-sized hexagon cut out, 0.4 tall.
-export const rimInner = (radius: number) => radius * Math.sqrt(3) + 1.3;    // distance to the corner hexes, plus a little room
-export const rimOuter = (radius: number) => rimInner(radius) + 1.3;           // how wide the wood is
 function rimGeometry(radius: number) {
     const frame = hexOutline(rimOuter(radius));
     frame.holes.push(hexOutline(rimInner(radius)));       // cut the middle out

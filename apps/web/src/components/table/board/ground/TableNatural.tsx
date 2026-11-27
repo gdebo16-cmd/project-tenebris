@@ -17,6 +17,7 @@ import {
 import { surfaceSet, TERRAIN_SETS, textureUrl, type GroundSet } from './groundTextures.ts'
 import { useGraphics } from '../../../../features/table/hooks/graphicsSettings.ts'
 import { NOISE_GLSL, WHERE_GLSL, ICE_COLOUR, ICE_ROUGHNESS, WATER_COLOUR, WATER_FOAM, WATER_RIPPLES, waterTime } from './boardLooks.ts'
+import { HEIGHT_STEP } from './hexMath.ts'
 
 type Shader = Parameters<Material['onBeforeCompile']>[0];
 
@@ -24,7 +25,6 @@ export const MAX_GROUND_LAYERS = 16;   // Gabriel's limit: 16 ground pictures pe
 const PICTURE_SIZE_HIGH = 2048;        // High: 2K ground pictures
 const PICTURE_SIZE_LOW = 1024;         // Medium and Low: 1K
 const TEXTURE_SCALE = 4;               // one copy of a picture covers 4 x 4 world units (about two hexes)
-const HEIGHT_STEP = 0.35;              // the same as HEIGHT_STEP in TableScenery.tsx (one level of raised ground)
 const WATER_DIP = 0.12;                // how far the ground sinks under water
 const GROUND_TOP = 0.1;                // a flat hex's top (tiles sit from -0.1 to 0.1), so tokens stand at the same height
 
