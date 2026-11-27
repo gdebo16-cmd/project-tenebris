@@ -2,7 +2,7 @@
 
 Ground looks come from [Poly Haven](https://polyhaven.com) (CC0: free to use, no credit required; shown in the app as
 "Powered by Poly Haven"). Downloaded 2026-11-26 through the Poly Haven API at 1K JPG (diffuse, normal GL, roughness) and
-recompressed for the web. Water and ice are not pictures: they are made in code (`apps/web/src/features/table/board/ground/boardLooks.ts`).
+recompressed for the web. Water and ice are not pictures: they are made in code (`apps/web/src/components/table/board/ground/boardLooks.ts`).
 
 | Folder | Poly Haven asset | Authors |
 | --- | --- | --- |

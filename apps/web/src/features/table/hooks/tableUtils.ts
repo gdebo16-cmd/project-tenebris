@@ -1,5 +1,5 @@
 import { type Hex, hexesWithin, onBoard } from '@tenebris/rules/board'
-import { hexToWorld, liftOf, worldToHex } from '../board/ground/TableScenery.tsx'
+import { hexToWorld, liftOf, worldToHex } from '../../../components/table/board/ground/TableScenery.tsx'
 import { BufferGeometry, Float32BufferAttribute } from 'three'
 import { type ThreeEvent } from '@react-three/fiber'
 import { ApiError } from '../../../api.ts'

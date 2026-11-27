@@ -5,8 +5,8 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from '@playwright/test';
-import { GROUND_SETS, groundFiles, TEXTURE_MAPS, textureUrl } from '../apps/web/src/features/table/board/ground/groundTextures.ts';
-import { waterLookFor, iceLook } from '../apps/web/src/features/table/board/ground/boardLooks.ts';
+import { GROUND_SETS, groundFiles, TEXTURE_MAPS, textureUrl } from '../apps/web/src/components/table/board/ground/groundTextures.ts';
+import { waterLookFor, iceLook } from '../apps/web/src/components/table/board/ground/boardLooks.ts';
 
 const LIMIT_MS = 2000;
 const assets = path.resolve(import.meta.dirname, '..', 'assets');

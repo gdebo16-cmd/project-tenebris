@@ -2,7 +2,7 @@
 // Editing a board that isn't on the table changes nothing for the players until the DM puts it on the table.
 import { useParams } from 'react-router'
 import TablePage from './TablePage.tsx'
-import { BoardLibrary } from '../panels/BoardLibrary.tsx'
+import { BoardLibrary } from '../../../components/table/panels/BoardLibrary.tsx'
 
 export default function MapEditorPage() {
     const { campId = '', sceneId } = useParams();

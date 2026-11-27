@@ -1,9 +1,9 @@
 import { debugDraw } from '../hooks/tableDebug.ts'
 import { useTableController } from '../hooks/useTableController.ts'
 import { messageOf } from '../hooks/tableUtils.ts'
-import { TablePanels } from '../panels/TablePanels.tsx'
-import { BoardCanvas } from '../board/BoardCanvas.tsx'
-import styles from './TablePage.module.css'
+import { TablePanels } from '../../../components/table/panels/TablePanels.tsx'
+import { BoardCanvas } from '../../../components/table/board/BoardCanvas.tsx'
+import styles from '../../../styles/features/table/pages/TablePage.module.css'
 
 // The table (Stage 2, steps 11–13): the map, a hex grid over it, painted terrain and tokens, drawn with R3F from a
 // camera looking straight down. Everything that changes goes to the server, which decides (sceneController.js):
