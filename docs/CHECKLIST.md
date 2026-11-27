@@ -98,8 +98,8 @@ Full step wording: https://claude.ai/artifact/UbeSb4hBMicUMUZ5tpwYL6
 - [ ] **T1** Board style switch (Tiles / Natural) — Done when: switching a board's style keeps its terrain exactly and both styles reload as saved
 - [ ] **T2** Ground textures — Done when: every surface and terrain type has a texture set in `assets/` and the whole set loads in under 2 seconds locally
 - [ ] **T3** Splat map and blended ground — Done when: a painted board in Natural style shows soft transitions between terrains and no hex edges
-- [ ] **T4** Grid overlay — Done when: the DM can set the grid to on, faint or off, and moving, Measure and shapes still work with it off
-- [ ] **T5** Sky light per mood (HDRI) — Done when: each mood has its own sky light and tokens stay readable in all of them
+- [x] **T4** Grid overlay — Done when: the DM can set the grid to on, faint or off, and moving, Measure and shapes still work with it off — ✓ 2026-11-26 · Gabe + grokbot
+- [x] **T5** Sky light per mood (HDRI) — Done when: each mood has its own sky light and tokens stay readable in all of them — ✓ 2026-11-26 · Gabe + grokbot
 - [ ] **T6** Model cleanup script — Done when: `npm run model -- <file>.glb` turns a raw Poly Haven or TRELLIS model into a board-ready file under 2 MB
 - [ ] **T7** Model support with footprints — Done when: a boulder model placed on a hex looks right, and the server refuses a move into it and blocks sight through it
 - [ ] **T8** Slopes and cliffs — Done when: heights rise as smooth hills, cliffs appear only where marked, and movement and sight give the same results as before

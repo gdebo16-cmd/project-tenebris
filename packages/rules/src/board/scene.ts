@@ -6,10 +6,13 @@ export const SCENE_WEATHERS = ['clear', 'fog', 'rain', 'snow'] as const;
 export type SceneWeather = (typeof SCENE_WEATHERS)[number];
 export const MAX_HEIGHT = 5;
 export type SceneMap = { url: string; size: number };      // size: how many world units wide the picture is (10–80)
-export type SceneLook = { mood?: SceneMood; weather?: SceneWeather; room?: boolean; fog?: boolean; map?: SceneMap | null; heights?: Record<string, number>; radius?: number; style?: BoardStyle };   // radius: rings of hexes around the centre (one of BOARD_SIZES); missing = DEFAULT_BOARD_RADIUS
+export type SceneLook = { mood?: SceneMood; weather?: SceneWeather; room?: boolean; fog?: boolean; map?: SceneMap | null; heights?: Record<string, number>; radius?: number; style?: BoardStyle; grid?: GridMode };   // radius: rings of hexes around the centre (one of BOARD_SIZES); missing = DEFAULT_BOARD_RADIUS
 export const BOARD_STYLES = ['tiles', 'natural'] as const;
 export type BoardStyle = (typeof BOARD_STYLES)[number];
 export const DEFAULT_BOARD_STYLE: BoardStyle = 'tiles';
+export const GRID_MODES = ['on', 'faint', 'off'] as const;
+export type GridMode = (typeof GRID_MODES)[number];
+export const DEFAULT_GRID: GridMode = 'on';
 
 // A board's radius: its own, or the old default for boards made before sizes existed
 export const radiusOf = (look?: SceneLook | null): number => (isBoardSize(look?.radius) ? look.radius : DEFAULT_BOARD_RADIUS);
@@ -30,6 +33,10 @@ export const styleOf = (look?: SceneLook | null): BoardStyle => {
     // TypeScript needs explicit type assertion here because it can't narrow the optional property
     return look.style as BoardStyle;
 };
+
+// A board's grid overlay (T4): its own, or on for boards made before the setting existed
+export const gridOf = (look?: SceneLook | null): GridMode =>
+    (look && GRID_MODES.includes(look.grid as GridMode) ? look.grid as GridMode : DEFAULT_GRID);
 
 // A board's look after a checked change (checkLookChange): only the parts named in the change move. The style switch
 // (T1) is one of them, so switching Tiles <-> Natural never touches the terrain, surfaces, features or heights.
@@ -62,6 +69,10 @@ export function checkLookChange(body: unknown): { error: string } | { change: Pa
     if ('style' in b) {
         if (!BOARD_STYLES.includes(b.style as BoardStyle)) return { error: `style must be one of ${BOARD_STYLES.join(', ')}` };
         change.style = b.style as BoardStyle;
+    }
+    if ('grid' in b) {
+        if (!GRID_MODES.includes(b.grid as GridMode)) return { error: `grid must be one of ${GRID_MODES.join(', ')}` };
+        change.grid = b.grid as GridMode;
     }
     if ('map' in b) {
         if (b.map === null) change.map = null;

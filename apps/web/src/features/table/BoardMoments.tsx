@@ -60,11 +60,19 @@ export function TurnRing({ at }: { at: [number, number, number] | null }) {
 export function HoverGlow({ hex, heights }: { hex: Hex | null; heights: Heights }) {
     if (!hex) return null;
     const [x, , z] = hexToWorld(hex, 1);
+    const y = 0.108 + liftOf(heights, hex);
+    // T4: a clear outline so the hex under the mouse is obvious even when the grid is off
     return (
-        <mesh position={[x, 0.104 + liftOf(heights, hex), z]} rotation={[-Math.PI / 2, 0, 0]} raycast={() => null}>
-            <circleGeometry args={[0.97, 6]} />
-            <meshBasicMaterial color="#fff4d0" transparent opacity={0.14} depthWrite={false} />
-        </mesh>
+        <group position={[x, y, z]} rotation={[-Math.PI / 2, 0, 0]}>
+            <mesh raycast={() => null}>
+                <circleGeometry args={[0.82, 6]} />
+                <meshBasicMaterial color="#fff4d0" transparent opacity={0.08} depthWrite={false} />
+            </mesh>
+            <mesh raycast={() => null}>
+                <ringGeometry args={[0.8, 0.97, 6]} />
+                <meshBasicMaterial color="#fff4d0" transparent opacity={0.85} depthWrite={false} />
+            </mesh>
+        </group>
     );
 }
 

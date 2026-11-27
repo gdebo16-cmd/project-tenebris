@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { styleOf, checkLookChange, applyLookChange, upgradeTerrain, type SceneLook, type Feature } from '../src/board.ts';
+import { styleOf, gridOf, checkLookChange, applyLookChange, upgradeTerrain, type SceneLook, type Feature } from '../src/board.ts';
 
 // T1: switching a board's style keeps its terrain exactly, and both styles reload as saved.
 
@@ -21,6 +21,34 @@ test('checkLookChange accepts valid styles and rejects invalid ones', () => {
     assert.deepEqual(checkLookChange({ style: 'tiles' }), { change: { style: 'tiles' } });
     assert.ok('error' in checkLookChange({ style: 'hex' }));
     assert.ok('error' in checkLookChange({ style: 1 }));
+});
+
+test('gridOf defaults to on for missing or bad grid, and answers faint or off when set', () => {
+    assert.equal(gridOf(undefined), 'on');
+    assert.equal(gridOf({}), 'on');
+    assert.equal(gridOf({ grid: 'hex' } as unknown as SceneLook), 'on');
+    assert.equal(gridOf({ grid: 'faint' }), 'faint');
+    assert.equal(gridOf({ grid: 'off' }), 'off');
+    assert.equal(gridOf({ grid: 'on' }), 'on');
+});
+
+test('checkLookChange accepts valid grid settings and rejects invalid ones', () => {
+    assert.deepEqual(checkLookChange({ grid: 'faint' }), { change: { grid: 'faint' } });
+    assert.deepEqual(checkLookChange({ grid: 'off' }), { change: { grid: 'off' } });
+    assert.deepEqual(checkLookChange({ grid: 'on' }), { change: { grid: 'on' } });
+    assert.ok('error' in checkLookChange({ grid: 'hex' }));
+    assert.ok('error' in checkLookChange({ grid: 1 }));
+});
+
+test('changing the grid leaves the rest of the look alone', () => {
+    const look: SceneLook = { mood: 'night', weather: 'fog', style: 'natural', grid: 'on' };
+    const checked = checkLookChange({ grid: 'off' });
+    assert.ok('change' in checked);
+    const next = applyLookChange(look, checked.change);
+    assert.equal(next.grid, 'off');
+    assert.equal(next.mood, 'night');
+    assert.equal(next.weather, 'fog');
+    assert.equal(next.style, 'natural');
 });
 
 // What the server keeps for a board: four JSON columns. Saving = JSON out, reloading = JSON back in.

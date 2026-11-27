@@ -2,42 +2,46 @@
 // finishing touches a camera lens would add: ambient occlusion (soft darkness where things meet), a gentle glow on bright
 // things, and a vignette. Plus small signs of life: dust drifting in the lamp light and torches flickering on walls.
 // Made for the TV's graphics card; turn pieces off here if a smaller machine struggles.
-import { useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Environment, Lightformer } from '@react-three/drei'
+import { Environment } from '@react-three/drei'
 import { EffectComposer, N8AO, Bloom, Vignette, ToneMapping } from '@react-three/postprocessing'
 import { ToneMappingMode } from 'postprocessing'
 import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, ShaderMaterial, type Mesh, type PointLight } from 'three'
-import { type Hex } from '@tenebris/rules/board'
+import { type Hex, type SceneMood } from '@tenebris/rules/board'
 import { hexToWorld, wallTop, fixedRandom, rimOuter } from './TableScenery.tsx'
 import { waterTime } from './boardLooks.ts'
 import type { MoodLight } from './BoardWorld.tsx'
 
+// T5: one Poly Haven HDRI per mood (2K), used as the scene's sky light only (not shown as a backdrop).
+export const SKY_LIGHT: Record<SceneMood, { file: string; strength: number }> = {
+    day:     { file: '/textures/hdris/day/sky.hdr',     strength: 0.9 },
+    dawn:    { file: '/textures/hdris/dawn/sky.hdr',    strength: 0.55 },
+    dusk:    { file: '/textures/hdris/dusk/sky.hdr',    strength: 0.5 },
+    night:   { file: '/textures/hdris/night/sky.hdr',   strength: 0.28 },
+    dungeon: { file: '/textures/hdris/dungeon/sky.hdr', strength: 0.16 },
+};
+
 // ---- lights ----
 
-export function BoardLights({ mood, radius }: { mood: MoodLight; radius: number }) {
+export function BoardLights({ mood, moodName = 'day', radius }: { mood: MoodLight; moodName?: SceneMood; radius: number }) {
     const reach = rimOuter(radius) + 3;     // how far the sun's shadows reach from the centre: the whole board and its rim
+    const sky = SKY_LIGHT[moodName] ?? SKY_LIGHT.day;
     // keep the water moving (its shader reads this clock)
     useFrame((_, delta) => { waterTime.value += delta; });
     return (
         <>
-            {/* soft reflections for shiny things (water, ice, the rim's varnish): a few glowing panels, no download */}
-            <Environment resolution={256}>
-                <Lightformer intensity={1.5} position={[0, 5, -2]} scale={[10, 3, 1]} color="#ffe2b8" />
-                <Lightformer intensity={0.6} position={[-5, 1, 1]} scale={[3, 3, 1]} />
-                <Lightformer intensity={0.6} position={[5, 1, 1]} scale={[3, 3, 1]} />
-            </Environment>
-            {/* the room: a little warm light from above, a little cool from below, so shadows are never pitch black */}
-            <hemisphereLight args={[mood.sky, mood.ground, mood.roomPower]} />
-            {/* the lamp over the table: warm, brightest in the middle, fading softly towards the rim (no shadows of its own) */}
-            <spotLight position={[0, 24, 3]} angle={0.62} penumbra={0.9} decay={0} intensity={mood.lampPower} color={mood.lamp} />
-            {/* the shadow light: high and a little to the side, its shadow area fitted to the board so edges stay crisp */}
-            <directionalLight position={[6, 20, 9]} intensity={mood.sunPower} color={mood.sun} castShadow
+            {/* T5: the sky light comes from a real photo of the sky (Poly Haven HDRI). It is not drawn as a backdrop. */}
+            <Suspense fallback={null}>
+                <Environment files={sky.file} background={false} environmentIntensity={sky.strength} />
+            </Suspense>
+            {/* a little leftover fill so tokens stay readable in dark moods (night, dungeon) */}
+            <hemisphereLight args={[mood.sky, mood.ground, Math.max(0.1, mood.roomPower * 0.28)]} />
+            {/* the sun's shadows: kept as the extra hand-set light; fill now comes from the sky */}
+            <directionalLight position={[6, 20, 9]} intensity={mood.sunPower * 0.4} color={mood.sun} castShadow
                 shadow-mapSize={[4096, 4096]} shadow-camera-near={1} shadow-camera-far={90}
                 shadow-camera-left={-reach} shadow-camera-right={reach} shadow-camera-top={reach} shadow-camera-bottom={-reach}
                 shadow-bias={-0.0003} shadow-normalBias={0.03} />
-            {/* a faint second light from the side, so walls show their shape */}
-            <directionalLight position={[-10, 8, -6]} intensity={mood.roomPower * 0.8} color="#bcd0ff" />
         </>
     );
 }

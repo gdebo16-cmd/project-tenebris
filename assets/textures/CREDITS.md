@@ -23,3 +23,16 @@ recompressed for the web. Water and ice are not pictures: they are made in code 
 
 Older sets still from ambientCG (CC0), not ground: `felt`, `wood` (the table), `ice` (unused by the custom ice). Each
 folder's `SOURCE.txt` says where its pictures came from.
+
+# Sky light (HDRI)
+
+Each mood's sky light is a [Poly Haven](https://polyhaven.com) HDRI (CC0), 2K HDR, used as environment lighting only (T5).
+Downloaded 2026-11-26 through the Poly Haven API.
+
+| Folder | Poly Haven asset | Authors |
+| --- | --- | --- |
+| `hdris/day` | [Kloofendal 43d Clear (Pure Sky)](https://polyhaven.com/a/kloofendal_43d_clear_puresky) | Greg Zaal |
+| `hdris/dawn` | [Aarfontein Dawn](https://polyhaven.com/a/aarfontein_dawn) | Jarod Guest, Greg Zaal |
+| `hdris/dusk` | [Belfast Sunset (Pure Sky)](https://polyhaven.com/a/belfast_sunset_puresky) | Greg Zaal, Dimitrios Savva, Jarod Guest |
+| `hdris/night` | [Dikhololo Night](https://polyhaven.com/a/dikhololo_night) | Greg Zaal |
+| `hdris/dungeon` | [Castle Zavelstein Cellar](https://polyhaven.com/a/castle_zavelstein_cellar) | Andreas Mischok |

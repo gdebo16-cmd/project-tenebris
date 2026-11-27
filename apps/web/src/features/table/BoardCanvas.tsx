@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { styleOf } from '@tenebris/rules/board'
+import { styleOf, gridOf } from '@tenebris/rules/board'
 import { Terrain, Tabletop } from './TableScenery.tsx'
 import { BoardFeatures } from './BoardFeatures.tsx'
 import { Grass, TurnSpotlight, TurnRing } from './BoardMoments.tsx'
@@ -15,6 +15,7 @@ import { HoverLayer } from './HoverLayer.tsx'
 import { Overlays, AreaFlash, Fog } from './BoardActs.tsx'
 import { TokenOnBoard } from './TokenOnBoard.tsx'
 import { BoardCamera } from './BoardCamera.tsx'
+import { HexGrid } from './HexGrid.tsx'
 
 // The 3D board: the room, the table, the hexes, tokens, effects and camera (R3F).
 // memo: these redraw only when their own props change (not every time anything on the page changes)
@@ -25,14 +26,14 @@ const StillMap = memo(MapPicture);
 const StillTorches = memo(Torches);
 
 export function BoardCanvas({ c }: { c: TableController }) {
-    const { radius, hexes, data, terrain, move, view, fitKey, surfaces, features, walls, look, heights, mood, dpr, showPerf, noEffects, grassHexes, tool, selected, boardRef, woodColor, surfaceColor, lines, isDm, tokens, overlays, fog, acting, brush, painting, shapeOrigin, newest, notices, selectedToken, currentAt, onHexClick, onStroke, onTokenClick, mode } = c;
+    const { radius, hexes, data, terrain, move, view, fitKey, surfaces, features, walls, look, heights, mood, dpr, showPerf, noEffects, grassHexes, tool, selected, boardRef, woodColor, surfaceColor, isDm, tokens, overlays, fog, acting, brush, painting, shapeOrigin, newest, notices, selectedToken, currentAt, onHexClick, onStroke, onTokenClick, mode } = c;
     const style = styleOf(look);              // T1: Tiles or Natural
     return (
             <Canvas shadows orthographic dpr={dpr} camera={{ position: [0, 100, 0], zoom: startZoom() }}>
                 {tableDebug && <FrameWatch />}
                 {showPerf && <StatsGl />}
                 {/* the lamp over the table, the room light and reflections (BoardAtmosphere.tsx) */}
-                <BoardLights mood={mood} radius={radius} />
+                <BoardLights mood={mood} moodName={look.mood ?? 'day'} radius={radius} />
 
                 {/* the room around the table: its colour comes from the scene's mood (BoardWorld.tsx) */}
                 <color attach="background" args={[mood.background]} />
@@ -57,12 +58,8 @@ export function BoardCanvas({ c }: { c: TableController }) {
                 <AreaFlash keys={newest?.area ?? null} flashId={newest?.id ?? null} heights={heights} />
                 {/* step 18: the fog over what the party hasn't seen */}
                 <Fog hexes={hexes} fog={fog} dm={isDm} />
-                {/* thin grid lines just above the hexes (Tiles only: the Natural ground has no hex edges; T4 adds on/faint/off) */}
-                {style === 'tiles' && (
-                    <lineSegments geometry={lines} position={[0, 0.102, 0]}>
-                        <lineBasicMaterial color="#000000" transparent opacity={0.25} />
-                    </lineSegments>
-                )}
+                {/* T4: thin hex lines from a shader on one sheet (not as objects). Off = the sheet is not drawn. */}
+                <HexGrid radius={radius} heights={heights} mode={gridOf(look)} />
                 {/* what the DM placed: lights, trees, pillars, crates... (BoardFeatures.tsx) */}
                 <StillFeatures features={features} heights={heights} onHexClick={onHexClick} />
                 {tokens.map((token) => (
