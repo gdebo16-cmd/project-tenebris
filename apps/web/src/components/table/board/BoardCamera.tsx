@@ -4,15 +4,16 @@
 //   Top-down view: straight down, like a map. Drag pans (no turning).
 //   Fit          : glide back to the whole board.
 import { useEffect, useRef } from 'react'
-import { useThree } from '@react-three/fiber'
 import { CameraControls } from '@react-three/drei'
 import CameraControlsImpl from 'camera-controls'
 import { Box3, Vector3 } from 'three'
 import { rimOuter } from './ground/TableScenery.tsx'
+import { useThree, useFrame } from '@react-three/fiber'
+import { follow } from './followTarget.ts'
 
 export type BoardView = 'tilt' | 'top';
 
-const TILT = 0.75;                  // how far the tilted view leans from straight down (radians, about 43°)
+const TILT = 1.15;                  // how far the tilted view leans from straight down (radians, about 43°)
 const MAX_LEAN = Math.PI / 2.3;     // never let the camera drop below the table edge
 // The whole board, rim included: what "fit" frames. Built for this board's radius so a small board fills the screen.
 function boardBox(radius: number, view: BoardView) {
@@ -73,6 +74,12 @@ export function BoardCamera({ view, fitKey, focus, painting = false, radius }: {
         c.mouseButtons.left = painting ? ACTION.NONE : view === 'top' ? ACTION.TRUCK : ACTION.ROTATE;
         c.mouseButtons.right = painting && view !== 'top' ? ACTION.ROTATE : ACTION.TRUCK;
     }, [painting, view]);
+
+
+    useFrame(() => {
+        const c = controls.current;
+        if (c && follow.walking) c.moveTo(follow.at.x, follow.at.y, follow.at.z, true);
+    });
 
     // whose turn it is changed: slide over to them (the DM can still move the camera any time)
     const focusKey = focus ? `${focus[0].toFixed(2)},${focus[2].toFixed(2)}` : '';

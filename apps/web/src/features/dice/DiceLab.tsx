@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useParams } from 'react-router';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, Lightformer } from '@react-three/drei';
+import { OrbitControls, Environment, Lightformer, MeshTransmissionMaterial, Sky } from '@react-three/drei';
 import socket from '../../utils/socket.js';
 import { api } from '../../api.ts';
 import { useCssColor } from '../../hooks/useCssColor.ts';
@@ -86,14 +86,17 @@ export default function DiceLab() {
                     {feed.length === 0 && <li>No rolls yet</li>}
                     {feed.map((line) => (
                         <li key={line.at}>
-                            <b>{line.name}</b> rolled {line.dice.map((d) => `d${d.sides}: ${d.value}`).join(', ')}
-                            {line.bonus !== 0 && ` ${line.bonus > 0 ? '+' : ''}${line.bonus}`} = <b>{line.total}</b>
+                            <b>{line.name}</b> rolled a <b>{line.total}</b> <br/>{' '}
+                            ({notation(line.dice.map((d) => d.sides))}
+                            {line.bonus !== 0 && ` ${line.bonus > 0 ? '+' : '-'} ${Math.abs(line.bonus)}`}
+                            :  {line.dice.map((d) => d.value).join(' + ')} = {line.total})
                         </li>
                     ))}
                 </ul>
             </div>
 
             <Canvas shadows camera={{ position: [0, 5, 5] }}>
+                <Sky distance={450000} sunPosition={[0, 1, 0]} inclination={0} azimuth={0.25} />
                 <Environment resolution={256}>
                     <Lightformer intensity={2} position={[0, 5, -2]} scale={[10, 3, 1]} />
                     <Lightformer intensity={1} position={[-5, 1, 1]} scale={[3, 3, 1]} />

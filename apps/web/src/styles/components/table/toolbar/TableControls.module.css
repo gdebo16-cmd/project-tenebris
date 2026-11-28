@@ -1,13 +1,12 @@
 
-.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center;  }
 
 
 .tool {
     min-height: 32px;
     padding: 0 12px;
-    border-radius: 999px;
+    border-radius: 6px;
     border: 1px solid var(--border, #b27f50);
-    background: transparent;
     color: inherit;
     font: inherit;
     font-size: 13px;

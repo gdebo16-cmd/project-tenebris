@@ -55,11 +55,8 @@
 .top { 
     display: flex;
     align-items: center;
-    
-    gap: 18px;
-    border-bottom: var(--tileBorder);
-    padding-bottom: 12px;
-    margin-bottom: 12px;
+    padding-bottom: 5px;
+    margin-bottom: 2px;
 }
 
 .title { 
@@ -114,7 +111,14 @@
 .links { 
     display: flex; 
     flex-direction: column; 
-    gap: 4px; 
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 10px; 
+    height: 100%;
+    overflow-y: auto;   
+    scrollbar-width: none;
+
     
 }
 
@@ -134,13 +138,6 @@
     flex-direction: column;
 
 
-}
-
-.youLinks {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    list-style: none;
 }
 
 .settingsLink {
@@ -238,6 +235,13 @@
     border: none;
     cursor: pointer;
     padding-left: 18px;
+    border: 1px solid var(--border, #b27f50);
+    padding: 5px;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+    &:hover {
+        background: var(--border, #3a2e1c);
+    }
 }
 :where(.links) a:hover, :where(.links) a:focus-visible,
 .link:hover, .link:focus-visible { background: rgba(255, 255, 255, 0.08); }

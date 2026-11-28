@@ -89,6 +89,13 @@ export function useTableController(mode: 'session' | 'editor', editSceneId: numb
         return [x, 0.1 + liftOf(heights, current), z];
     }, [current?.q, current?.r, heights]);
 
+        // where the selected token stands (for its spotlight and the follow cam)
+    const selectedAt = useMemo<[number, number, number] | null>(() => {
+        if (!selectedToken) return null;
+        const [x, , z] = hexToWorld(selectedToken, 1);
+        return [x, 0.1 + liftOf(heights, selectedToken), z];
+    }, [selectedToken?.q, selectedToken?.r, heights]);
+
     const canMove = (t: Token) => isDm || t.ownerId === data?.userId;
     const done = { onSuccess: () => setMessage(''), onError: (err: unknown) => setMessage(messageOf(err)) };
 
@@ -157,7 +164,7 @@ export function useTableController(mode: 'session' | 'editor', editSceneId: numb
 
 
     return {
-        hexes, radius, campId, editing, data, error, terrain, move, remove, view, setView, fitKey, setFitKey, surfaces, features, walls, look, heights, mood, setLook, dpr, showPerf, noEffects, tool, setTool, selected, setSelected, placing, setPlacing, summonName, setSummonName, summonOwner, setSummonOwner, message, setMessage, boardRef, woodColor, surfaceColor, lines, isDm, tokens, overlays, fog, feed, removeOverlay, resetFog, acting, setActing, brush, setBrush, clearMap, painting, shapeOrigin, newest, notices, selectedToken, turns, currentAt, canMove, done, onHexClick, onStroke, onTokenClick, mode,
+        hexes, radius, campId, editing, data, error, terrain, move, remove, view, setView, fitKey, setFitKey, surfaces, features, walls, look, heights, mood, setLook, dpr, showPerf, noEffects, tool, setTool, selected, setSelected, placing, setPlacing, summonName, setSummonName, summonOwner, setSummonOwner, message, setMessage, boardRef, woodColor, surfaceColor, lines, isDm, tokens, overlays, fog, feed, removeOverlay, resetFog, acting, setActing, brush, setBrush, clearMap, painting, shapeOrigin, newest, notices, selectedToken, turns, currentAt, selectedAt, canMove, done, onHexClick, onStroke, onTokenClick, mode,
     };
 }
 

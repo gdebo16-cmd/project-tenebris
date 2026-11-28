@@ -14,23 +14,26 @@ function SceneLookSection({ mode, look, onLook, onResetFog }: { mode: 'session' 
     const editing = mode === 'editor';
     return (
         <>
-            <h3 className={styles.sectionTitle}>Look and lighting</h3>
-            <ButtonRow role="group" aria-label="Mood">
+            <h2 className={styles.panelTitle}>Set the Scene</h2>
+            <h3 className={styles.sectionTitle}>Mood</h3>
+            <ButtonRow className={styles.surfaceButtonRow} role="group" aria-label="Mood">
                 {SCENE_MOODS.map((m) => (
-                    <ToggleButton pressed={look.mood === m} onClick={() => onLook({ mood: m })} key={m}>{titled(m)}</ToggleButton>
+                    <ToggleButton className={styles.surfaceButton} pressed={look.mood === m} onClick={() => onLook({ mood: m })} key={m}>{titled(m)}</ToggleButton>
                 ))}
             </ButtonRow>
-            <ButtonRow role="group" aria-label="Weather">
+            <ButtonRow className={styles.surfaceButtonRow} role="group" aria-label="Weather">
+                <h3 className={styles.sectionTitle}>Weather</h3>
                 {SCENE_WEATHERS.map((w) => (
-                    <ToggleButton pressed={look.weather === w} onClick={() => onLook({ weather: w })} key={w}>{titled(w)}</ToggleButton>
+                    <ToggleButton className={styles.surfaceButton} pressed={look.weather === w} onClick={() => onLook({ weather: w })} key={w}>{titled(w)}</ToggleButton>
                 ))}
             </ButtonRow>
-            <ButtonRow>
-                <ToggleButton pressed={look.room ?? false} onClick={() => onLook({ room: !look.room })}>Room and candles</ToggleButton>
+            <ButtonRow className={styles.surfaceButtonRow}>
+                <h3 className={styles.sectionTitle}>Room and candles</h3>
+                <ToggleButton className={styles.surfaceButton} pressed={look.room ?? false} onClick={() => onLook({ room: !look.room })}>Room and candles</ToggleButton>
                 {!editing && (
-                    <ToggleButton pressed={look.fog ?? false} onClick={() => onLook({ fog: !look.fog })}>Fog</ToggleButton>
+                    <ToggleButton className={styles.surfaceButton} pressed={look.fog ?? false} onClick={() => onLook({ fog: !look.fog })}>Fog</ToggleButton>
                 )}
-                {!editing && look.fog && <ActionButton onClick={onResetFog}>Cover the map again</ActionButton>}
+                {!editing && look.fog && <ActionButton  onClick={onResetFog}>Cover the map again</ActionButton>}
             </ButtonRow>
         </>
     );
@@ -45,18 +48,19 @@ function SceneBoardSection({ mode, look, onLook, boardSize }: { mode: 'session' 
             <h3 className={styles.sectionTitle}>Board</h3>
             <ButtonRow role="group" aria-label="Board style">
                 {BOARD_STYLES.map((s) => (
-                    <ToggleButton pressed={styleOf(look) === s} onClick={() => onLook({ style: s })} key={s}>{titled(s)}</ToggleButton>
+                    <ToggleButton className={styles.surfaceButton} pressed={styleOf(look) === s} onClick={() => onLook({ style: s })} key={s}>{titled(s)}</ToggleButton>
                 ))}
             </ButtonRow>
-            <ButtonRow role="group" aria-label="Grid" label="Grid:">
+            <ButtonRow className={styles.surfaceButtonRow} role="group" aria-label="Grid">
+                <h3 className={styles.sectionTitle}>Grid</h3>
                 {GRID_MODES.map((g) => (
-                    <ToggleButton pressed={gridOf(look) === g} onClick={() => onLook({ grid: g })} key={g}>{titled(g)}</ToggleButton>
+                    <ToggleButton className={styles.surfaceButton} pressed={gridOf(look) === g} onClick={() => onLook({ grid: g })} key={g}>{titled(g)}</ToggleButton>
                 ))}
             </ButtonRow>
             {boardSize}
             {editing && (
-                <form className={styles.mapForm} onSubmit={(e) => { e.preventDefault(); onLook({ map: { url: url.trim(), size } }); }}>
-                    <input className={controls.input} type="url" placeholder="Map picture link (https://…)" aria-label="Map picture link"
+                <form className={styles.surfaceButtonRow} onSubmit={(e) => { e.preventDefault(); onLook({ map: { url: url.trim(), size } }); }}>
+                    <input className={styles.input} type="url" placeholder="Map picture link (https://…)" aria-label="Map picture link"
                         value={url} onChange={(e) => setUrl(e.target.value)} />
                     <Field label="Width">
                         <input className={styles.inputRange} type="range" min={10} max={80} step={1} value={size} onChange={(e) => setSize(Number(e.target.value))} />

@@ -27,19 +27,19 @@ function LibraryObjects({ tool, setTool }: { tool: Tool; setTool: (t: Tool) => v
     const size = tool.type === 'feature' ? tool.size : 1;
     const color = tool.type === 'feature' ? tool.color : '#ffd08a';
     return (
-        <>
-            <h3 className={styles.sectionTitle}>Library</h3>
-            <ButtonRow>
-                <input className={controls.input} type="search" value={query} placeholder="Search objects"
+        <section className={styles.objectsPanel}>
+            <h2 className={styles.panelTitle}>Objects</h2>
+            <ButtonRow className={styles.searchInput}>
+                <input className={styles.input} type="search" value={query} placeholder="Search objects"
                     aria-label="Search objects" onChange={(e) => setQuery(e.target.value)} />
             </ButtonRow>
-            <div className={styles.objectList}>
+            <section className={styles.objectList}>
                 {[...groups.entries()].map(([category, models]) => (
-                    <div key={category}>
+                    <div className={styles.objectCategory} key={category}>
                         <h3 className={styles.sectionTitle}>{titled(category)}</h3>
                         <ButtonRow>
                             {models.map((model) => (
-                                <ToggleButton key={model.id}
+                                <ToggleButton className={styles.objectButton} key={model.id}
                                     pressed={tool.type === 'feature' && tool.kind === 'model' && tool.model === model.id}
                                     onClick={() => setTool({ type: 'feature', kind: 'model', model: model.id, size, color })}>
                                     {model.name}
@@ -48,8 +48,8 @@ function LibraryObjects({ tool, setTool }: { tool: Tool; setTool: (t: Tool) => v
                         </ButtonRow>
                     </div>
                 ))}
-            </div>
-        </>
+            </section>
+        </section>
     );
 }
 
@@ -57,16 +57,20 @@ export function ObjectsPanel({ editing, data, tool, setTool, brush, setBrush, pl
     const featureSize = tool.type === 'feature' ? tool.size : 1;
     const featureColor = tool.type === 'feature' ? tool.color : '#ffd08a';
     return (
-        <Section id="board-tab-panel-objects" labelledBy="board-tab-objects">
+        <Section className={styles.objectsSection} id="board-tab-panel-objects" labelledBy="board-tab-objects">
             {editing && (
-                <>
+                <section className={styles.objectsPanel}>
+                    {tool.type === 'feature' && (
+                        <BrushRow brush={brush} setBrush={setBrush} />
+                    )}
+                    <LibraryObjects tool={tool} setTool={setTool} />
                     <h3 className={styles.sectionTitle}>Features</h3>
                     <ButtonRow>
                         {SHAPE_FEATURE_KINDS.map((k) => (
-                            <ToggleButton key={k} pressed={tool.type === 'feature' && tool.kind === k}
+                            <ToggleButton className={styles.objectButton} key={k} pressed={tool.type === 'feature' && tool.kind === k}
                                 onClick={() => setTool({ type: 'feature', kind: k, size: featureSize, color: featureColor })}>{FEATURE_LOOK[k].label}</ToggleButton>
                         ))}
-                        <ToggleButton pressed={tool.type === 'feature' && tool.kind === null}
+                        <ToggleButton className={styles.objectButton} pressed={tool.type === 'feature' && tool.kind === null}
                             onClick={() => setTool({ type: 'feature', kind: null, size: featureSize, color: featureColor })}>Remove</ToggleButton>
                         {tool.type === 'feature' && (
                             <Field label="Size">
@@ -80,18 +84,15 @@ export function ObjectsPanel({ editing, data, tool, setTool, brush, setBrush, pl
                             </Field>
                         )}
                     </ButtonRow>
-                    {tool.type === 'feature' && (
-                        <BrushRow brush={brush} setBrush={setBrush} />
-                    )}
-                    <LibraryObjects tool={tool} setTool={setTool} />
-                </>
+
+                </section>
             )}
             <h3 className={styles.sectionTitle}>Place</h3>
             <ButtonRow>
-                <ToolButton label="Place" t={{ type: 'place' }} tool={tool} setTool={setTool} />
+                <ToolButton className={styles.objectButton} label="Place" t={{ type: 'place' }} tool={tool} setTool={setTool} />
                 {tool.type === 'place' && (
                     <>
-                        <select className={controls.select} value={placing} aria-label="What to place" onChange={(e) => setPlacing(e.target.value)}>
+                        <select className={styles.select} value={placing} aria-label="What to place" onChange={(e) => setPlacing(e.target.value)}>
                             <option className={controls.option} value="">Choose…</option>
                             <optgroup label="Party">
                                 {data?.placeable?.party.map((p) => <option className={controls.option} key={p.characterId} value={`character:${p.characterId}`}>{p.name} ({p.username})</option>)}

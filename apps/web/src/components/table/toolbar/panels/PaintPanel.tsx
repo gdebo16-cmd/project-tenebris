@@ -19,27 +19,19 @@ function paintCategories() {
 
 export function PaintPanel({ tool, setTool, brush, setBrush }: PanelProps) {
     return (
-        <Section id="board-tab-panel-paint" labelledBy="board-tab-paint">
+        <Section className={styles.paintSection} id="board-tab-panel-paint" labelledBy="board-tab-paint">
+            <h2 className={styles.panelTitle}>Tile Paint</h2>
             {tool.type === 'surface' && (
                 <BrushRow brush={brush} setBrush={setBrush} />
             )}
+            <ToggleButton className={styles.objectButton} pressed={tool.type === 'surface' && tool.surface === null} onClick={() => setTool({ type: 'surface', surface: null })}>Clear</ToggleButton>
             <div className={styles.paintList}>
-                <h3 className={styles.sectionTitle}>Core</h3>
-                <ButtonRow>
-                    {SURFACES.map((s) => (
-                        <ToggleButton key={s} pressed={tool.type === 'surface' && tool.surface === s} onClick={() => setTool({ type: 'surface', surface: s })}>
-                            <span className={styles.swatch} data-surface={s} aria-hidden="true" />
-                            {surfaceLook(s).label}
-                        </ToggleButton>
-                    ))}
-                    <ToggleButton pressed={tool.type === 'surface' && tool.surface === null} onClick={() => setTool({ type: 'surface', surface: null })}>Clear</ToggleButton>
-                </ButtonRow>
                 {paintCategories().map(([category, paints]) => (
-                    <div key={category}>
-                        <h3 className={styles.sectionTitle}>{titled(category)}</h3>
-                        <ButtonRow>
+                    <div className={styles.paintCategory} key={category}>
+                        <h3 className={styles.surfaceTitle}>{titled(category)}</h3>
+                        <ButtonRow className={styles.surfaceButtonRow}>
                             {paints.map((p) => (
-                                <ToggleButton key={p.id} pressed={tool.type === 'surface' && tool.surface === p.id} onClick={() => setTool({ type: 'surface', surface: p.id })}>
+                                <ToggleButton className={styles.surfaceButton} key={p.id} pressed={tool.type === 'surface' && tool.surface === p.id} onClick={() => setTool({ type: 'surface', surface: p.id })}>
                                     <span className={styles.swatchThumb} style={{ backgroundImage: 'url(' + p.thumb + ')' }} aria-hidden="true" />
                                     {p.name}
                                 </ToggleButton>
@@ -47,6 +39,15 @@ export function PaintPanel({ tool, setTool, brush, setBrush }: PanelProps) {
                         </ButtonRow>
                     </div>
                 ))}
+                <h3 className={styles.surfaceTitle}>Core</h3>
+                <ButtonRow className={styles.surfaceButtonRow}>
+                    {SURFACES.map((s) => (
+                        <ToggleButton className={styles.surfaceButton} key={s} pressed={tool.type === 'surface' && tool.surface === s} onClick={() => setTool({ type: 'surface', surface: s })}>
+                            <span className={styles.swatch} data-surface={s} aria-hidden="true" />
+                            {surfaceLook(s).label}
+                        </ToggleButton>
+                    ))}
+                </ButtonRow>
             </div>
         </Section>
     );

@@ -8,6 +8,7 @@ import { hexToWorld, liftOf } from '../ground/TableScenery.tsx'
 import { Html, Billboard } from '@react-three/drei'
 import { HitBurst } from '../moments/BoardMoments.tsx'
 import styles from '../../../../styles/components/table/board/tokens/TokenOnBoard.module.css'
+import { follow } from '../followTarget.ts'
 
 // Token colours: yours, another player's, a monster (the DM's), a summon
 const TOKEN_COLORS = { mine: '#3fae6a', player: '#4d8fe0', monster: '#d0503c', summon: '#e0a63b', down: '#5a5a5a' };
@@ -134,6 +135,7 @@ function TokenPiece({ token, mine, selected, labels, walls, heights, notice, onC
         if (route.current.length === 0) {
             // standing still: settle onto the ground's height (it may have been raised or lowered)
             g.position.y += (0.1 + liftOf(heights, shown.current) - g.position.y) * Math.min(1, delta * 10);
+            if (follow.id === token.id) follow.walking = false;
             return;
         }
         step.current = Math.min(1, step.current + delta / 0.15);
@@ -142,6 +144,7 @@ function TokenPiece({ token, mine, selected, labels, walls, heights, notice, onC
         const t = step.current;
         const ground = liftOf(heights, shown.current) + (liftOf(heights, route.current[0]) - liftOf(heights, shown.current)) * t;
         g.position.set(ax + (bx - ax) * t, 0.1 + ground + Math.sin(Math.PI * t) * 0.15, az + (bz - az) * t);
+        follow.at.set(g.position.x, 0.1 + ground, g.position.z); follow.walking = true; follow.id = token.id;
         if (t >= 1) {
             shown.current = route.current.shift()!;
             step.current = 0;

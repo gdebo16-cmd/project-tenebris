@@ -28,7 +28,7 @@ function CampaignLinks({ campId }) {
     if (!info) return null;
     return (
         <>
-            <h3 className={styles.groupTitle}>{info.name}</h3>
+            <h3 className={styles.group}>{info.name}</h3>
             <Link className={styles.link} to={`/campaign/${campId}`}>Tale page</Link>
             {info.role === 'dm' && <Link className={styles.link} to={`/campaign/${campId}/dm`}>DM page</Link>}
         </>

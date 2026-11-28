@@ -1,8 +1,10 @@
 import { useMemo, useRef } from 'react';
-import { Text } from '@react-three/drei';
+import { Text, MeshTransmissionMaterial, MeshReflectorMaterial, MeshPortalMaterial, MeshWobbleMaterial, MeshDistortMaterial, MeshRefractionMaterial, MeshDiscardMaterial } from '@react-three/drei';
 import { Quaternion, Vector3, IcosahedronGeometry, BufferGeometry, TetrahedronGeometry, BoxGeometry, OctahedronGeometry, DodecahedronGeometry } from 'three';
 import { useCssColor } from '../../hooks/useCssColor.ts';
 import { RigidBody, ConvexHullCollider, type RapierRigidBody } from '@react-three/rapier';
+
+
 
 const TURN = Math.PI * 2;          // a full circle, in radians
 
@@ -81,7 +83,7 @@ export function PhysicsDie({ sides, start, onLand }: { sides: number; start: [nu
                         {face.value}
                     </Text>
                 ))}
-                <meshPhysicalMaterial color={diceColor} roughness={0.25} metalness={0.2} clearcoat={1} clearcoatRoughness={0.15} />
+                <meshStandardMaterial color={diceColor} roughness={0.5} metalness={0.5}  />
             </mesh>
         </RigidBody>
     );

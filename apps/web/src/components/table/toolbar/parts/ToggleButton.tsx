@@ -7,8 +7,8 @@ export function btnClass(on: boolean) {
     return on ? `${controls.tool} ${controls.toolOn} ${styles.btn}` : `${controls.tool} ${styles.btn}`;
 }
 
-export function ToggleButton({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: ReactNode }) {
+export function ToggleButton({ pressed, onClick, children, className }: { pressed: boolean; onClick: () => void; children: ReactNode; className?: string }) {
     return (
-        <UiToggleButton pressed={pressed} className={btnClass(pressed)} onClick={onClick}>{children}</UiToggleButton>
+        <UiToggleButton pressed={pressed} className={`${btnClass(pressed)} ${className}`} onClick={onClick}>{children}</UiToggleButton>
     );
 }

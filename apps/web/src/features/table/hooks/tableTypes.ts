@@ -27,7 +27,7 @@ export const SIZE_WORD: Record<AreaKind, string> = { circle: 'Radius', square: '
 export const PAINT_TOOLS: Tool['type'][] = ['paint', 'erase', 'surface', 'feature', 'height'];
 
 // brush sizes: [label, rings around the mouse]
-export const BRUSHES: [string, number][] = [['1 hex', 0], ['7', 1], ['19', 2]];
+export const BRUSHES: [string, number][] = [['1 hex', 0], ['7 hexes', 1], ['19 hexes', 2], ['37 hexes', 3], ['61 hexes', 4], ['91 hexes', 5] ];
 
 // What floats over a token after an action that didn't change its HP (a miss, a save). Hits show through the HP.
 export type Notice = { id: string; text: string };

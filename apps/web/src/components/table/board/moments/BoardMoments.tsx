@@ -16,13 +16,13 @@ type Heights = Record<string, number>;
 
 // Always there (so the scene's lights never change count, which would make the graphics card rebuild every
 // material and flash); with nobody's turn it simply fades to dark.
-export function TurnSpotlight({ at }: { at: [number, number, number] | null }) {
+export function TurnSpotlight({ at, strength = 60, angle = 0.2 }: { at: [number, number, number] | null; strength?: number; angle?: number }) {
     const light = useRef<SpotLight>(null);
     useFrame((_, delta) => {
         const l = light.current;
         if (!l) return;
-        const ease = Math.min(1, delta * 4);
-        l.intensity += ((at ? 60 : 0) - l.intensity) * ease;
+        const ease = Math.min(1, delta * 7);       
+        l.intensity += ((at ? strength : 0) - l.intensity) * ease;
         if (at) {
             l.target.position.x += (at[0] - l.target.position.x) * ease;
             l.target.position.z += (at[2] - l.target.position.z) * ease;
@@ -31,8 +31,7 @@ export function TurnSpotlight({ at }: { at: [number, number, number] | null }) {
             l.target.updateMatrixWorld();
         }
     });
-    return <spotLight ref={light} angle={0.2} penumbra={0.8} decay={2} distance={20} intensity={0} color="#fff0c8" />;
-}
+    return <spotLight ref={light} angle={angle} penumbra={0.8} decay={2} distance={20} intensity={0} color="#fff0c8" />;}
 
 // The current turn's glowing ring on the board, under the token
 export function TurnRing({ at }: { at: [number, number, number] | null }) {

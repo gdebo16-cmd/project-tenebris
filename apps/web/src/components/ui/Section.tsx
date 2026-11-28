@@ -1,6 +1,7 @@
 import { type HTMLAttributes, type ReactNode } from 'react';
 
-/** A titled section. Visual look comes from className props (no default CSS). */
+type Props = { title?: string; className?: string; children: React.ReactNode }
+
 export function Section({
     className,
     heading,
@@ -15,3 +16,5 @@ export function Section({
         </div>
     );
 }
+
+

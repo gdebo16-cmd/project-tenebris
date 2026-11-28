@@ -2,8 +2,8 @@
 /* the camera buttons, top right: Tilt view / Top-down and Fit */
 .viewButtons {
     position: fixed;
-    top: 2.5dvh;
-    right: 8vw;
+    bottom: 2.5dvh;
+    left: 2vw;
     z-index: 1;
     display: flex;
     gap: 6px;
@@ -18,4 +18,12 @@
     color: var(--text, #eee);
     font-size: 13px;
     cursor: pointer;
+}
+
+@media (max-width: 700px) {
+    .viewButtons {
+        top: auto;
+        left: 0;
+        bottom: 0;
+    }
 }

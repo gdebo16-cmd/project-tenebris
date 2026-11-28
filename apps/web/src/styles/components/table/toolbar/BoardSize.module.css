@@ -11,10 +11,18 @@
     min-height: 34px;
     padding: 2px 8px;
     border-radius: 6px;
+    width: 100%;
     border: 1px solid var(--border, #b27f50);
-    background: transparent;
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
     color: inherit;
     font: inherit;
+    font-size: 13px;
+}
+
+.select option {
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
+    color: var(--text, #000000);
+    font: var(--font, #000000);
     font-size: 13px;
 }
 

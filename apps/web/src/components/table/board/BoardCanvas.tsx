@@ -23,10 +23,10 @@ import { useGraphics } from '../../../features/table/hooks/graphicsSettings.ts'
 const StillTerrain = memo(Terrain);
 const StillFeatures = memo(BoardFeatures);
 const StillMap = memo(MapPicture);
-const StillTorches = memo(Torches);
+// const StillTorches = memo(Torches);
 
 export function BoardCanvas({ c }: { c: TableController }) {
-    const { radius, hexes, data, terrain, move, view, fitKey, surfaces, features, walls, look, heights, mood, showPerf, noEffects, tool, selected, boardRef, woodColor, surfaceColor, isDm, tokens, overlays, fog, acting, brush, painting, shapeOrigin, newest, notices, selectedToken, currentAt, onHexClick, onStroke, onTokenClick, mode } = c;
+    const { radius, hexes, data, terrain, move, view, fitKey, surfaces, features, walls, look, heights, mood, showPerf, noEffects, tool, selected, boardRef, woodColor, surfaceColor, isDm, tokens, overlays, fog, acting, brush, painting, shapeOrigin, newest, notices, selectedToken, currentAt, selectedAt, onHexClick, onStroke, onTokenClick, mode } = c;
     const graphics = useGraphics();
     const style = styleOf(look);              // T1: Tiles or Natural
     return (
@@ -68,17 +68,16 @@ export function BoardCanvas({ c }: { c: TableController }) {
                 ))}
                 
                 {/* the camera: frames the board, glides between views, DM can still pan / turn / zoom (BoardCamera.tsx) */}
-                <BoardCamera view={view} fitKey={fitKey} focus={currentAt} painting={painting || tool.type === 'measure'} radius={radius} />
-
+                <BoardCamera view={view} fitKey={fitKey} focus={selectedAt ?? currentAt} painting={painting || tool.type === 'measure'} radius={radius} />
                 {/* whose turn it is: a soft spotlight and a glowing ring under them (BoardMoments.tsx) */}
-                <TurnSpotlight at={currentAt} />
-                <TurnRing at={currentAt} />
+                <TurnSpotlight at={selectedAt} strength={500} angle={0.14} />                
+                <TurnRing at={selectedAt} />
 
                 {/* the weather: fog, rain or snow (BoardWorld.tsx) */}
                 <Weather weather={look.weather} radius={radius} />
 
                 {/* small life: torches on a few walls, dust in the lamp light */}
-                <StillTorches terrain={terrain} />
+                {/* <StillTorches terrain={terrain} /> */}
                 <Dust color={mood.dust} radius={radius} />
 
                 {/* the finishing touches, like a camera lens: soft shadows where things meet, glow, vignette */}

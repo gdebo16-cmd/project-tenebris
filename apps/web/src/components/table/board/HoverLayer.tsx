@@ -1,11 +1,11 @@
 import { type RefObject, useState, useRef, useEffect, useMemo } from 'react'
 import { type Token } from '../../../features/table/hooks/tableQueries.ts'
-import { type Hex, hexKey, findPath } from '@tenebris/rules/board'
+import { type Hex, hexKey } from '@tenebris/rules/board'
 import { type ThreeEvent } from '@react-three/fiber'
 import { type AreaKind, hexLine } from '@tenebris/rules/sight'
 import { brushAround, hexUnder } from '../../../features/table/hooks/tableUtils.ts'
 import { worldToHex, rimOuter } from './ground/TableScenery.tsx'
-import { HoverGlow, PathPreview } from './moments/BoardMoments.tsx'
+import { HoverGlow } from './moments/BoardMoments.tsx'
 import { HexPatches, AreaPreview } from './overlays/BoardActs.tsx'
 import { MeasureLine } from '../panels/BoardLibrary.tsx'
 
@@ -52,8 +52,6 @@ export function HoverLayer({ radius, heights, walls, walker, preview, onHexClick
     const measuringNow = useRef(false);
     useEffect(() => { if (!measuring) setMeasure(null); }, [measuring]);
     const footprint = useMemo(() => (brush !== null && hover ? brushAround(hover, brush, radius) : []), [brush, radius, hover?.q, hover?.r]);
-    const path = useMemo(() => (walker && hover ? findPath(walker, hover, walls, 200) : null),
-        [walker?.q, walker?.r, hover?.q, hover?.r, walls]);
     return (
         <>
             {/* an invisible sheet over the board that only notices which hex the mouse is over */}
@@ -99,7 +97,6 @@ export function HoverLayer({ radius, heights, walls, walker, preview, onHexClick
             {/* painting: the brush under the mouse, and the stroke so far */}
             {brush !== null && <HexPatches hexes={footprint} color="#ffe08a" opacity={0.22} heights={heights} y={0.113} />}
             {strokeHexes.length > 0 && <HexPatches hexes={strokeHexes} color="#ffd060" opacity={0.42} heights={heights} y={0.114} />}
-            <PathPreview path={path} heights={heights} />
             {measure && <MeasureLine from={measure.from} to={measure.to} heights={heights} labels={labels} />}
             <AreaPreview area={preview && hover ? { kind: preview.kind, at: hover, sizeFt: preview.sizeFt } : null}
                 from={preview?.from ? { q: preview.from.q, r: preview.from.r } : null} heights={heights} />

@@ -8,6 +8,7 @@ import styles from '../../styles/components/layout/Sidebar.module.css';
 import SidebarCharacter from './SidebarCharacter';
 import SidebarCampaign from './SidebarCampaign';
 import SidebarSheetLayout from './SidebarSheetLayout';
+import SidebarTable from './SidebarTable';
 
 // The site menu: a hamburger button that opens a side panel.
 // Two views in the same panel: the menu (Home, Adventures, Settings, Log Out) and Settings (look + account).
@@ -38,7 +39,6 @@ export default function Sidebar() {
             <dialog ref={dialog} className={styles.panel} aria-label="Menu" onClick={onDialogClick}>
                 
                 <div className={styles.inner}>
-                    
                     <div className={styles.top}>
                         <div className={styles.titleContainer}>
                                 {view === 'settings' && (
@@ -56,6 +56,7 @@ export default function Sidebar() {
                             <LogoutLink className={styles.logoutLink} />
                             <SidebarCharacter />
                             <SidebarCampaign />
+                            <SidebarTable />
                             <SidebarSheetLayout onDone={close} />
                             <h3 className={styles.group}>Adventures</h3>
                                 <Link className={styles.createCharacterLink} to="/characters/new">Create Character</Link>

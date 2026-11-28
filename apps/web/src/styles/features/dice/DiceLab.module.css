@@ -26,7 +26,7 @@
     font-size: 1.5rem;
 }
 :root {
-    --dice-color: #aa8f3e;
+    --dice-color: #132033;
     --dice-number: #ffffff;
     --hex-open: #2b4a2f;
     --hex-wall: #4a4a4a;
@@ -80,7 +80,7 @@
 .feed {
     list-style: none;
     position: fixed;
-    right: 2dvw;
+    left: 2dvw;
     bottom: 16dvh;
     width: 20dvw;
     text-align: center;

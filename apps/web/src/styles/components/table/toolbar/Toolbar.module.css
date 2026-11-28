@@ -14,6 +14,7 @@
     border: 1px solid var(--border, #b27f50);
     background: color-mix(in srgb, var(--background-color, #141414) 92%, transparent);
     border-right: 1px solid var(--border, #b27f50);
+    
     overflow: hidden;
 }
 
@@ -35,6 +36,7 @@
 
 .toolbarOpen {
     flex-direction: row;
+    
     
 }
 
@@ -110,10 +112,21 @@
 .body {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    padding: 4px 10px 10px;
-    max-height: min(62dvh, 34rem);
+    justify-content: flex-start;
     overflow: auto;
+    height: 100%;
+    scrollbar-width: none;
+}
+
+.panelTitle {
+    border-bottom: 1px solid color-mix(in srgb, var(--border, #b27f50) 40%, transparent);
+    padding: 8px;
+    margin: 8px;
+}
+
+.tool {
+    border: none;
+    border-radius: 6px;
 }
 
 .section {
@@ -148,19 +161,39 @@
 
 .tab {
     margin: 0;
-    padding: 6px 4px;
-    min-height: 34px;
     border-radius: 6px;
     border: 1px solid var(--border, #b27f50);
-    background: transparent;
     color: inherit;
     font: inherit;
     font-size: 11px;
     font-weight: 650;
-    line-height: 1.2;
-    text-align: center;
     cursor: pointer;
-    white-space: normal;
+}
+
+.toolButtonList {
+    margin: 0;
+    padding: 0;
+}
+
+
+.surfaceButtonRow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: .5rem 0;
+    padding: 0;
+}
+
+.toolButton {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    margin: 5px 0;
+    padding: 0;
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
+    border-radius: 6px;
+
 }
 
 .tabOn {
@@ -192,8 +225,6 @@
 .toolDanger { border-color: #d0503c; color: #ffb3a6; }
 
 .inputRange {
-    width: 120px;
-    vertical-align: middle;
     accent-color: var(--accent, #d4af37);
 }
 
@@ -252,12 +283,47 @@
 
 .paintList,
 .objectList {
-    max-height: min(40vh, 22rem);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding-right: 4px;
+    width: 100%;
+    height: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    
+}
+
+.paintCategory {
+    display: flex;
+    flex-direction: column;
+    
+
+}
+
+.surfaceTitle {
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 650;
+    opacity: 0.85;
+    text-align: center;
+    text-transform: capitalize;
+    color: var(--text, #d4af37);
+    letter-spacing: 0.1em;
+}
+
+.paintSection {
+    scrollbar-width: none;
+}
+
+
+.surfaceButton {
+    width: 100%;
+    text-align: left;
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
+    margin: .05rem 0;
+    padding: 0;
+    border-radius: 6px;
 }
 
 .swatchThumb {
@@ -269,17 +335,88 @@
     background: #444 center / cover no-repeat;
     vertical-align: -0.15em;
     box-shadow: inset 0 0 0 1px rgb(0 0 0 / 35%);
+    
 }
+
+.objectsPanel {
+    display: flex;
+    flex-direction: column;
+    
+    border-top: 1px solid color-mix(in srgb, var(--border, #b27f50) 40%, transparent);
+}
+
+
+.searchInput {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    
+
+}
+.input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--accent, #b27f50) 40%, transparent);
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
+    color: var(--text, #d4af37);
+    
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent, #d4af37);
+}
+
+.objectList {
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+
+}
+
+.objectCategory {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 1rem;
+    
+}
+
+
+.objectButton {
+    width: 100%;
+    text-align: left;
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
+    margin: .25rem 0;
+    border-radius: 6px;
+}
+
+.select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--accent, #b27f50) 40%, transparent);
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
+    color: var(--text, #d4af37);
+    text-align: left;
+    background: color-mix(in srgb, var(--bg, #d4af37) 48%, transparent);
+    margin: .25rem 0;
+}
+
 @media (max-width: 700px) {
     .toolbar {
-        right: 8px;
-        left: 8px;
+    right: 0;
         bottom: max(8px, env(safe-area-inset-bottom));
-        max-width: none;
+        max-width: 45dvw;
+    }
+
+    .toolbarClosed {
+        width: 10dvw;
     }
 
     .body {
-        max-height: min(52dvh, 28rem);
+        scrollbar-width: none;
     }
 
     .btn {

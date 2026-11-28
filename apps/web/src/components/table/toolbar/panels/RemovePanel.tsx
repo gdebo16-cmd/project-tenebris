@@ -1,6 +1,6 @@
 import { type PanelProps } from '../../../../features/table/hooks/toolbarTypes.ts'
 import { ToolButton } from '../parts/ToolButton.tsx'
-import { BrushRow, ClearMapRow } from '../parts/ToolParts.tsx'
+import { BrushRow } from '../parts/ToolParts.tsx'
 import { ButtonRow } from '../parts/ButtonRow.tsx'
 import { Section } from '../parts/Section.tsx'
 import { ActionButton } from '../parts/ActionButton.tsx'
@@ -9,13 +9,16 @@ import styles from '../../../../styles/components/table/toolbar/Toolbar.module.c
 export function RemovePanel({ editing, tool, setTool, brush, setBrush, onClearMap, selectedToken, onRemove }: PanelProps) {
     return (
         <Section id="board-tab-panel-remove">
+            <h2 className={styles.panelTitle}>Remove Tiles</h2>
             {editing && (
                 <>
                     <ButtonRow>
                         <ToolButton label="Eraser" t={{ type: 'erase' }} tool={tool} setTool={setTool} />
                     </ButtonRow>
                     {tool.type === 'erase' && <BrushRow brush={brush} setBrush={setBrush} />}
-                    <ClearMapRow onClearMap={onClearMap} />
+                    <ButtonRow>
+                        <ActionButton onClick={onClearMap}>Clear Map</ActionButton>
+                    </ButtonRow>
                 </>
             )}
             {selectedToken ? (
